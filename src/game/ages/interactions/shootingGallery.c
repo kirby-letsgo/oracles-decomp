@@ -85,8 +85,8 @@ void interactionCode30_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (shootingGallery_jumpTable(gb));
-    if (jt_ == SYM(shootingGalleryNpc) && hook_enabled_at(gb, SYM(shootingGalleryNpc))) { shootingGalleryNpc_hook(gb); return; }
-    else if (jt_ == SYM(shootingGalleryGame) && hook_enabled_at(gb, SYM(shootingGalleryGame))) { shootingGalleryGame_hook(gb); return; }
+    if (jt_ == SYM(shootingGalleryNpc) && hook_is(gb, SYM(shootingGalleryNpc), shootingGalleryNpc_hook)) { shootingGalleryNpc_hook(gb); return; }
+    else if (jt_ == SYM(shootingGalleryGame) && hook_is(gb, SYM(shootingGalleryGame), shootingGalleryGame_hook)) { shootingGalleryGame_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

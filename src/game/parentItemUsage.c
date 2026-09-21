@@ -499,9 +499,9 @@ void functionCaller_b06_hook(GB *gb) {
   CYC(b_+0, b_+1); A = C;
   CYC(b_+1, b_+2); parent_item_jump_table_from_rst(gb, b_+2);
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(clearAllParentItems_body) && hook_enabled_at(gb, SYM(clearAllParentItems_body))) { clearAllParentItems_body_hook(gb); return; }
-    else if (jt_ == SYM(updateParentItemButtonAssignment_body) && hook_enabled_at(gb, SYM(updateParentItemButtonAssignment_body))) { updateParentItemButtonAssignment_body_hook(gb); return; }
-    else if (jt_ == SYM(checkUseItems_b06) && hook_enabled_at(gb, SYM(checkUseItems_b06))) { checkUseItems_b06_hook(gb); return; }
+    if (jt_ == SYM(clearAllParentItems_body) && hook_is(gb, SYM(clearAllParentItems_body), clearAllParentItems_body_hook)) { clearAllParentItems_body_hook(gb); return; }
+    else if (jt_ == SYM(updateParentItemButtonAssignment_body) && hook_is(gb, SYM(updateParentItemButtonAssignment_body), updateParentItemButtonAssignment_body_hook)) { updateParentItemButtonAssignment_body_hook(gb); return; }
+    else if (jt_ == SYM(checkUseItems_b06) && hook_is(gb, SYM(checkUseItems_b06), checkUseItems_b06_hook)) { checkUseItems_b06_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

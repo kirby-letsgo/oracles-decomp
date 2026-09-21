@@ -113,10 +113,10 @@ void specialObjectCode_companionCutscene_b06_hook(GB *gb) {
   CYC(b_+4, b_+6); alu_sub(gb, 0x0f);
   CYC(b_+6, b_+7); push_effect(gb, b_+7);
   do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
-    if (jt_ == SYM(specialObjectCode_rickyCutscene) && hook_enabled_at(gb, SYM(specialObjectCode_rickyCutscene))) { specialObjectCode_rickyCutscene_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_dimitriCutscene) && hook_enabled_at(gb, SYM(specialObjectCode_dimitriCutscene))) { specialObjectCode_dimitriCutscene_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_mooshCutscene) && hook_enabled_at(gb, SYM(specialObjectCode_mooshCutscene))) { specialObjectCode_mooshCutscene_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectCode_mapleCutscene) && hook_enabled_at(gb, SYM(specialObjectCode_mapleCutscene))) { specialObjectCode_mapleCutscene_hook(gb); return; }
+    if (jt_ == SYM(specialObjectCode_rickyCutscene) && hook_is(gb, SYM(specialObjectCode_rickyCutscene), specialObjectCode_rickyCutscene_hook)) { specialObjectCode_rickyCutscene_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_dimitriCutscene) && hook_is(gb, SYM(specialObjectCode_dimitriCutscene), specialObjectCode_dimitriCutscene_hook)) { specialObjectCode_dimitriCutscene_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_mooshCutscene) && hook_is(gb, SYM(specialObjectCode_mooshCutscene), specialObjectCode_mooshCutscene_hook)) { specialObjectCode_mooshCutscene_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectCode_mapleCutscene) && hook_is(gb, SYM(specialObjectCode_mapleCutscene), specialObjectCode_mapleCutscene_hook)) { specialObjectCode_mapleCutscene_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -130,7 +130,7 @@ void specialObjectCode_rickyCutscene_hook(GB *gb) {
   CYC(b_+4, b_+5); push_effect(gb, b_+5);
   do { uint16_t jt_ = (companion_cutscene_jump_table(gb));
     if (jt_ == b_+9) { break; }
-    else if (jt_ == SYM(rickyCutscene_state1) && hook_enabled_at(gb, SYM(rickyCutscene_state1))) { rickyCutscene_state1_hook(gb); return; }
+    else if (jt_ == SYM(rickyCutscene_state1) && hook_is(gb, SYM(rickyCutscene_state1), rickyCutscene_state1_hook)) { rickyCutscene_state1_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
   CALL_C(b_+9, companionCutsceneInitOam_hook, SYM(companionCutsceneInitOam), b_+12);

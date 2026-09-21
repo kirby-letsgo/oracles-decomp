@@ -197,8 +197,8 @@ void monkey0Disappearance_hook(GB *gb) {
   do { uint16_t jt_ = (monkey_jump_table(gb));
     if (jt_ == b_+12) { monkey0_disappearance_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+22) { monkey0_disappearance_substate1_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_is(gb, SYM(monkeyWaitBeforeFlickering), monkeyWaitBeforeFlickering_hook)) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_is(gb, SYM(monkeyFlickerUntilDeletion), monkeyFlickerUntilDeletion_hook)) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -223,8 +223,8 @@ void monkey3Disappearance_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
     if (jt_ == b_+10) { monkey3_disappearance_substate0_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_is(gb, SYM(monkeyWaitBeforeFlickering), monkeyWaitBeforeFlickering_hook)) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_is(gb, SYM(monkeyFlickerUntilDeletion), monkeyFlickerUntilDeletion_hook)) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -275,8 +275,8 @@ void monkey5Disappearance_hook(GB *gb) {
     if (jt_ == b_+14) { monkey5_disappearance_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+21) { monkey5_disappearance_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+38) { monkey5_disappearance_substate2_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_is(gb, SYM(monkeyWaitBeforeFlickering), monkeyWaitBeforeFlickering_hook)) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_is(gb, SYM(monkeyFlickerUntilDeletion), monkeyFlickerUntilDeletion_hook)) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -426,8 +426,8 @@ void monkey9Disappearance_hook(GB *gb) {
     else if (jt_ == b_+55) { monkey9_disappearance_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+81) { monkey9_disappearance_substate2_hook(gb, sp0_); return; }
     else if (jt_ == b_+112) { monkey9_disappearance_substate3_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
-    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_enabled_at(gb, SYM(monkeyFlickerUntilDeletion))) { monkeyFlickerUntilDeletion_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_is(gb, SYM(monkeyWaitBeforeFlickering), monkeyWaitBeforeFlickering_hook)) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyFlickerUntilDeletion) && hook_is(gb, SYM(monkeyFlickerUntilDeletion), monkeyFlickerUntilDeletion_hook)) { monkeyFlickerUntilDeletion_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -533,7 +533,7 @@ void monkey8Disappearance_hook(GB *gb) {
     if (jt_ == b_+16) { monkey8_disappearance_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+43) { monkey8_disappearance_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+52) { monkey8_disappearance_substate2_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_enabled_at(gb, SYM(monkeyWaitBeforeFlickering))) { monkeyWaitBeforeFlickering_hook(gb); return; }
+    else if (jt_ == SYM(monkeyWaitBeforeFlickering) && hook_is(gb, SYM(monkeyWaitBeforeFlickering), monkeyWaitBeforeFlickering_hook)) { monkeyWaitBeforeFlickering_hook(gb); return; }
     else if (jt_ == b_+75) { monkey8_disappearance_substate3_hook(gb, sp0_); return; }
     else if (jt_ == b_+93) { monkey8_disappearance_substate4_hook(gb, sp0_); return; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -555,11 +555,11 @@ void monkeySubid1State1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
-    if (jt_ == SYM(monkey0Disappearance) && hook_enabled_at(gb, SYM(monkey0Disappearance))) { monkey0Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey3Disappearance) && hook_enabled_at(gb, SYM(monkey3Disappearance))) { monkey3Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey5Disappearance) && hook_enabled_at(gb, SYM(monkey5Disappearance))) { monkey5Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey8Disappearance) && hook_enabled_at(gb, SYM(monkey8Disappearance))) { monkey8Disappearance_hook(gb); return; }
-    else if (jt_ == SYM(monkey9Disappearance) && hook_enabled_at(gb, SYM(monkey9Disappearance))) { monkey9Disappearance_hook(gb); return; }
+    if (jt_ == SYM(monkey0Disappearance) && hook_is(gb, SYM(monkey0Disappearance), monkey0Disappearance_hook)) { monkey0Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey3Disappearance) && hook_is(gb, SYM(monkey3Disappearance), monkey3Disappearance_hook)) { monkey3Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey5Disappearance) && hook_is(gb, SYM(monkey5Disappearance), monkey5Disappearance_hook)) { monkey5Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey8Disappearance) && hook_is(gb, SYM(monkey8Disappearance), monkey8Disappearance_hook)) { monkey8Disappearance_hook(gb); return; }
+    else if (jt_ == SYM(monkey9Disappearance) && hook_is(gb, SYM(monkey9Disappearance), monkey9Disappearance_hook)) { monkey9Disappearance_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -632,7 +632,7 @@ void monkeySubid0State1_hook(GB *gb) {
     if (jt_ == b_+25) { monkey_subid0_substate0_hook(gb, sp0_); return; }
     else if (jt_ == b_+41) { monkey_subid0_substate1_hook(gb, sp0_); return; }
     else if (jt_ == b_+61) { monkey_subid0_substate2_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeySubid0State1Substate3) && hook_enabled_at(gb, SYM(monkeySubid0State1Substate3))) { monkeySubid0State1Substate3_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid0State1Substate3) && hook_is(gb, SYM(monkeySubid0State1Substate3), monkeySubid0State1Substate3_hook)) { monkeySubid0State1Substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -872,8 +872,8 @@ void monkeySubid5State1_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
     if (jt_ == b_+24) { monkey_subid5_monkey0_hook(gb, sp0_); return; }
-    else if (jt_ == SYM(monkeyAnimateAndRunScript) && hook_enabled_at(gb, SYM(monkeyAnimateAndRunScript))) { monkeyAnimateAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid5State1_monkey9) && hook_enabled_at(gb, SYM(monkeySubid5State1_monkey9))) { monkeySubid5State1_monkey9_hook(gb); return; }
+    else if (jt_ == SYM(monkeyAnimateAndRunScript) && hook_is(gb, SYM(monkeyAnimateAndRunScript), monkeyAnimateAndRunScript_hook)) { monkeyAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid5State1_monkey9) && hook_is(gb, SYM(monkeySubid5State1_monkey9), monkeySubid5State1_monkey9_hook)) { monkeySubid5State1_monkey9_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -885,13 +885,13 @@ void monkeyState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (monkey_jump_table(gb));
-    if (jt_ == SYM(monkeySubid0State1) && hook_enabled_at(gb, SYM(monkeySubid0State1))) { monkeySubid0State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid1State1) && hook_enabled_at(gb, SYM(monkeySubid1State1))) { monkeySubid1State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid2State1) && hook_enabled_at(gb, SYM(monkeySubid2State1))) { monkeySubid2State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid4State1) && hook_enabled_at(gb, SYM(monkeySubid4State1))) { monkeySubid4State1_hook(gb); return; }
-    else if (jt_ == SYM(monkeySubid5State1) && hook_enabled_at(gb, SYM(monkeySubid5State1))) { monkeySubid5State1_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(monkeyAnimateAndRunScript) && hook_enabled_at(gb, SYM(monkeyAnimateAndRunScript))) { monkeyAnimateAndRunScript_hook(gb); return; }
+    if (jt_ == SYM(monkeySubid0State1) && hook_is(gb, SYM(monkeySubid0State1), monkeySubid0State1_hook)) { monkeySubid0State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid1State1) && hook_is(gb, SYM(monkeySubid1State1), monkeySubid1State1_hook)) { monkeySubid1State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid2State1) && hook_is(gb, SYM(monkeySubid2State1), monkeySubid2State1_hook)) { monkeySubid2State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid4State1) && hook_is(gb, SYM(monkeySubid4State1), monkeySubid4State1_hook)) { monkeySubid4State1_hook(gb); return; }
+    else if (jt_ == SYM(monkeySubid5State1) && hook_is(gb, SYM(monkeySubid5State1), monkeySubid5State1_hook)) { monkeySubid5State1_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_is(gb, SYM(interactionAnimate), interactionAnimate_hook)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(monkeyAnimateAndRunScript) && hook_is(gb, SYM(monkeyAnimateAndRunScript), monkeyAnimateAndRunScript_hook)) { monkeyAnimateAndRunScript_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

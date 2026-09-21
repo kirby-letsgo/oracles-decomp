@@ -7,7 +7,8 @@ calls to ported routines become CALL(...), everything else falls back to the int
 """
 import glob, re, sys
 RESUME_TAILS = '--resume-tails' in sys.argv
-sys.argv = [a for a in sys.argv if a != '--resume-tails']
+SEASONS = '--game=seasons' in sys.argv       # Seasons-only routines: `s_` names, Seasons extra labels, the shared hooks as callees
+sys.argv = [a for a in sys.argv if a not in ('--resume-tails', '--game=seasons')]
 rom = open(sys.argv[1], 'rb').read()
 labels, by_addr, local_by_addr, instances = {}, {}, {}, {}
 for line in open(sys.argv[2]):
@@ -24,8 +25,9 @@ for line in open(sys.argv[2]):
 relocs = []
 externs = set()
 import os as _os
-if _os.path.exists('src/hooks/extra.sym'):
-    for line in open('src/hooks/extra.sym'):
+for extra_path in (['src/hooks/extra_seasons.sym', 'src/hooks/alias_seasons.sym'] if SEASONS else ['src/hooks/extra.sym']):
+    if not _os.path.exists(extra_path): continue
+    for line in open(extra_path):
         line = line.split('#')[0].strip()
         m = re.match(r'([0-9a-f]{2}):([0-9a-f]{4}) (\S+)(?: = ([0-9a-f]{2}):([0-9a-f]{4})| (extern))?$', line)
         if not m: continue
@@ -49,8 +51,19 @@ def body_ok(bank, addr):
     if (bank, addr) not in _body_ok:
         _body_ok[(bank, addr)] = not any(kind == 'unsupported' for a, m, ln, cy, kind, info in routine_body(bank, addr))
     return _body_ok[(bank, addr)]
-ported = set(l.split('#')[0].strip() for l in open(sys.argv[3]) if l.split('#')[0].strip())
-rewritten = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten.txt') else set()
+ported = set(l.split('#')[0].strip() for l in open(sys.argv[3]) if l.split('#')[0].strip()) if sys.argv[3] != '-' else set()
+rewritten = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten.txt') and not SEASONS else set()
+# Seasons: the shared C hooks that run under Seasons (tools/seasons_hooks.py) play the part of
+# the rewritten routines: they are called by name and not generated
+shared_hooks = {}
+if SEASONS:
+    for l in open('src/hooks/generated_seasons.txt'):
+        pp = l.split()
+        if len(pp) >= 2: shared_hooks[(int(pp[0][:2], 16), int(pp[0][3:], 16))] = pp[1]
+entries.update(shared_hooks)
+def is_rewritten(n, b, a):
+    if SEASONS: return (b, a) in shared_hooks
+    return n in rewritten or cname_at(b, a) in rewritten
 rewritten_noverify = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten_noverify.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten_noverify.txt') else set()
 def has_unsupported(n):
     if n not in labels: return True
@@ -198,7 +211,7 @@ def target_name(bank, t, insns_addrs):
     if t in insns_addrs: return None
     return by_addr.get((bank, t))
 
-def cname(n): return n.replace('@', '__')
+def cname(n): return ('s_' if SEASONS else '') + n.replace('@', '__').replace('.', '_')
 
 def infer_banks(bank, insns):
     """For bank 0 code, map each jp/call to a switchable-bank address to the bank selected by the
@@ -288,7 +301,7 @@ def gen(name, bank=None, start=None):
                 if tb is None: tb = banks_at.get(a)
                 tn = by_addr.get((tb, t)) or local_by_addr.get((tb, t))
                 gen.targets.add((tb, t))
-                if (tb, t) in entries and entries[(tb, t)].endswith('_hook'): jump = f'if (hook_enabled_at(gb, 0x{t:04x})) {{ {entries[(tb, t)]}(gb); return; }} HANDOFF(0x{t:04x});'
+                if (tb, t) in entries and entries[(tb, t)].endswith('_hook'): jump = f'if (hook_is(gb, 0x{t:04x}, {entries[(tb, t)]})) {{ {entries[(tb, t)]}(gb); return; }} HANDOFF(0x{t:04x});'
                 elif (tb, t) in entries: jump = f'{entries[(tb, t)]}(gb); return;'
                 else: jump = f'HANDOFF(0x{t:04x}); /* {tn or "unported"} */'
             if cond is None:
@@ -337,7 +350,7 @@ def gen(name, bank=None, start=None):
         if falls and nxt_a not in addrs:
             nn = by_addr.get((bank, nxt_a)) or local_by_addr.get((bank, nxt_a))
             gen.targets.add((bank, nxt_a))
-            if (bank, nxt_a) in entries and entries[(bank, nxt_a)].endswith('_hook'): out.emit(f'if (hook_enabled_at(gb, 0x{nxt_a:04x})) {{ {entries[(bank, nxt_a)]}(gb); return; }} HANDOFF(0x{nxt_a:04x});  // fallthrough')
+            if (bank, nxt_a) in entries and entries[(bank, nxt_a)].endswith('_hook'): out.emit(f'if (hook_is(gb, 0x{nxt_a:04x}, {entries[(bank, nxt_a)]})) {{ {entries[(bank, nxt_a)]}(gb); return; }} HANDOFF(0x{nxt_a:04x});  // fallthrough')
             elif (bank, nxt_a) in entries: out.emit(f'{entries[(bank, nxt_a)]}(gb); return;  // fallthrough')
             else: out.emit(f'HANDOFF(0x{nxt_a:04x});  // fallthrough to {nn or "unlabeled"}')
     out.lines.append('}')
@@ -346,7 +359,7 @@ def gen(name, bank=None, start=None):
 
 if names and names[0] == '--out':
     outdir = names[1]
-    names = [l.split('#')[0].strip() for l in open(sys.argv[3])]
+    names = [l.split('#')[0].strip() for l in open(sys.argv[3])] if sys.argv[3] != '-' else sorted(n for n in instances if '@' not in n)
     names = [n for n in names if n]
     import collections, os
     by_bank = collections.OrderedDict()
@@ -368,7 +381,7 @@ if names and names[0] == '--out':
         return found
     for n in names:
         for (b, a) in instances.get(n, []):
-            if (b, a) in externs or (not RESUME_TAILS and (n in rewritten or cname_at(b, a) in rewritten)): continue
+            if (b, a) in externs or (not RESUME_TAILS and is_rewritten(n, b, a)): continue
             discover_resume(n, b, a)
     owner = {}
     for n in names:
@@ -387,7 +400,7 @@ if names and names[0] == '--out':
                 o = owner.get((tb, info[0]))
                 if o and o[1] != info[0]:
                     local_by_addr[(tb, info[0])] = f'{o[0]}@jump{info[0]:04x}'
-                    if o[0] in rewritten or cname_at(tb, o[1]) in rewritten: print(f'warning: {n} jumps into rewritten {o[0]} at {info[0]:04x} (interpreted)', file=sys.stderr)
+                    if is_rewritten(o[0], tb, o[1]): print(f'warning: {n} jumps into rewritten {o[0]} at {info[0]:04x} (interpreted)', file=sys.stderr)
     locals_of = collections.defaultdict(list)
     for (lb, la), ln in local_by_addr.items():
         if (lb, la) not in by_addr: locals_of[(lb, ln.split('@')[0])].append((la, ln))
@@ -397,8 +410,8 @@ if names and names[0] == '--out':
         for (b, a) in instances.get(n, []):
             if (b, a) in seen_addrs: continue
             seen_addrs.add((b, a))
-            if n in rewritten or cname_at(b, a) in rewritten:
-                entries[(b, a)] = cname_at(b, a) + '_hook'
+            if is_rewritten(n, b, a):
+                entries[(b, a)] = shared_hooks[(b, a)] if SEASONS else cname_at(b, a) + '_hook'
                 items_by_bank.setdefault(b, []).append((n, b, a))
                 # A rewritten routine still gets generated resume tails at its post-yield return
                 # addresses: the yield discards its C frames, so nothing else can run them.
@@ -410,7 +423,7 @@ if names and names[0] == '--out':
                 tails = [(la, ln) for la, ln in locals_of.get((b, n), []) if (b, la) in resume_points]
                 tails += [(la, ln) for (lb, la), ln in local_by_addr.items() if lb == b and la in called and ln.split('@')[0] == n and (b, la) not in by_addr]
                 for la, ln in sorted(set(tails)):
-                    if cname_at(b, la) in rewritten: continue
+                    if is_rewritten(ln, b, la): continue
                     if not body_ok(b, la): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
                     if (b, la) in entries: continue
                     entries[(b, la)] = cname_at(b, la)
@@ -419,6 +432,7 @@ if names and names[0] == '--out':
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
             for la, ln in sorted(locals_of.get((b, n), [])):
+                if SEASONS and (b, la) in shared_hooks: entries[(b, la)] = shared_hooks[(b, la)]; continue
                 if not body_ok(b, la): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
                 entries[(b, la)] = cname_at(b, la)
                 items_by_bank[b].append((ln, b, la))
@@ -436,11 +450,15 @@ if names and names[0] == '--out':
         parent = ln.split('@')[0]
         if parent not in labels: return False
         pb, pa = labels[parent]
-        return parent in rewritten or cname_at(pb, pa) in rewritten
+        return is_rewritten(parent, pb, pa)
     for bank, items in by_bank.items():
         for n, b, a in items:
-            if n in rewritten or cname_at(b, a) in rewritten: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-')); continue
-            if (b, a) in externs: generated.append((b, a, cname_at(b, a), '-')); continue
+            if is_rewritten(n, b, a):
+                if not SEASONS: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-'))
+                continue
+            if (b, a) in externs:
+                if not SEASONS: generated.append((b, a, cname_at(b, a), '-'))    # hand-written (ram_code.c); Seasons has none yet
+                continue
             if RESUME_TAILS and '@' in n and is_rewritten_parent(n): pending.extend(discover_resume(n.split('@')[0], b, a))
             code = gen(n, b, a)
             if code: bank_bodies[bank].append(code); generated.append((b, a, cname_at(b, a), gen.flags)); pending.extend(gen.targets)
@@ -451,7 +469,7 @@ if names and names[0] == '--out':
         tb, t = pending.pop()
         if (tb, t) in entries or (tb, t) in by_addr or (tb, t) not in local_by_addr or t >= 0x8000: continue
         ln = local_by_addr[(tb, t)]
-        if not is_rewritten_parent(ln) or cname_at(tb, t) in rewritten: continue
+        if not is_rewritten_parent(ln) or is_rewritten(ln, tb, t): continue
         if not body_ok(tb, t): print(f'warning: {ln} skipped (unsupported)', file=sys.stderr); continue
         entries[(tb, t)] = cname_at(tb, t)
         pending.extend(discover_resume(ln.split('@')[0], tb, t))
@@ -463,12 +481,12 @@ if names and names[0] == '--out':
         if path not in bank_outputs: os.remove(path)
     for path, bodies in bank_outputs.items():
         with open(path, 'w') as f:
-            f.write('// generated by tools/transliterate.py; do not edit\n#include "game/asm.h"\n#include "game/gen.h"\n\n')
+            f.write('// generated by tools/transliterate.py; do not edit\n#include "game/asm.h"\n#include "' + ('game/seasons/gen.h' if SEASONS else 'game/gen.h') + '"\n\n')
             f.write('\n\n'.join(bodies) + '\n\n')
     with open(os.path.join(outdir, 'gen.h'), 'w') as h:
-        h.write('// generated by tools/transliterate.py; do not edit\n#pragma once\n#include "core/gb.h"\n')
+        h.write('// generated by tools/transliterate.py; do not edit\n#pragma once\n#include "core/gb.h"\n' + ('#include "game/gen.h"\n' if SEASONS else ''))
         for b, a, cn, fl in generated: h.write(f'void {cn}(GB *gb);\n')
-    with open('src/hooks/generated.txt', 'w') as g:
+    with open('src/hooks/generated_seasons_gen.txt' if SEASONS else 'src/hooks/generated.txt', 'w') as g:
         for b, a, cn, fl in generated: g.write(f'{b:02x}:{a:04x} {cn} {fl}\n')
     print(f'{len(generated)} routines in {len(bank_outputs)} bank files')
 elif names and names[0] == '--report':

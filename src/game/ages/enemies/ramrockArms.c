@@ -47,9 +47,9 @@ void enemyCode05_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_state0) && hook_enabled_at(gb, SYM(ramrockArm_state0))) { ramrockArm_state0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_state_stub) && hook_enabled_at(gb, SYM(ramrockArm_state_stub))) { ramrockArm_state_stub_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_state8) && hook_enabled_at(gb, SYM(ramrockArm_state8))) { ramrockArm_state8_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_state0) && hook_is(gb, SYM(ramrockArm_state0), ramrockArm_state0_hook)) { ramrockArm_state0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_state_stub) && hook_is(gb, SYM(ramrockArm_state_stub), ramrockArm_state_stub_hook)) { ramrockArm_state_stub_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_state8) && hook_is(gb, SYM(ramrockArm_state8), ramrockArm_state8_hook)) { ramrockArm_state8_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -146,9 +146,9 @@ void ramrockArm_state8_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x7f);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid0) && hook_enabled_at(gb, SYM(ramrockArm_subid0))) { ramrockArm_subid0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid2) && hook_enabled_at(gb, SYM(ramrockArm_subid2))) { ramrockArm_subid2_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4) && hook_enabled_at(gb, SYM(ramrockArm_subid4))) { ramrockArm_subid4_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid0) && hook_is(gb, SYM(ramrockArm_subid0), ramrockArm_subid0_hook)) { ramrockArm_subid0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2) && hook_is(gb, SYM(ramrockArm_subid2), ramrockArm_subid2_hook)) { ramrockArm_subid2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4) && hook_is(gb, SYM(ramrockArm_subid4), ramrockArm_subid4_hook)) { ramrockArm_subid4_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -186,13 +186,13 @@ runStates:
   CYC(b_+30, b_+31); A = mem_rd(gb, DE);
   CYC(b_+31, b_+32); push_effect(gb, b_+32);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid0_substate0) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate0))) { ramrockArm_subid0_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate1) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate1))) { ramrockArm_subid0_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate2) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate2))) { ramrockArm_subid0_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate3) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate3))) { ramrockArm_subid0_substate3_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate4) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate4))) { ramrockArm_subid0_substate4_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate5) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate5))) { ramrockArm_subid0_substate5_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid0_substate6) && hook_enabled_at(gb, SYM(ramrockArm_subid0_substate6))) { ramrockArm_subid0_substate6_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid0_substate0) && hook_is(gb, SYM(ramrockArm_subid0_substate0), ramrockArm_subid0_substate0_hook)) { ramrockArm_subid0_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate1) && hook_is(gb, SYM(ramrockArm_subid0_substate1), ramrockArm_subid0_substate1_hook)) { ramrockArm_subid0_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate2) && hook_is(gb, SYM(ramrockArm_subid0_substate2), ramrockArm_subid0_substate2_hook)) { ramrockArm_subid0_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate3) && hook_is(gb, SYM(ramrockArm_subid0_substate3), ramrockArm_subid0_substate3_hook)) { ramrockArm_subid0_substate3_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate4) && hook_is(gb, SYM(ramrockArm_subid0_substate4), ramrockArm_subid0_substate4_hook)) { ramrockArm_subid0_substate4_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate5) && hook_is(gb, SYM(ramrockArm_subid0_substate5), ramrockArm_subid0_substate5_hook)) { ramrockArm_subid0_substate5_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid0_substate6) && hook_is(gb, SYM(ramrockArm_subid0_substate6), ramrockArm_subid0_substate6_hook)) { ramrockArm_subid0_substate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -572,9 +572,9 @@ void ramrockArm_subid2_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid2_substate0) && hook_enabled_at(gb, SYM(ramrockArm_subid2_substate0))) { ramrockArm_subid2_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid2_substate1) && hook_enabled_at(gb, SYM(ramrockArm_subid2_substate1))) { ramrockArm_subid2_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid2_substate2) && hook_enabled_at(gb, SYM(ramrockArm_subid2_substate2))) { ramrockArm_subid2_substate2_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid2_substate0) && hook_is(gb, SYM(ramrockArm_subid2_substate0), ramrockArm_subid2_substate0_hook)) { ramrockArm_subid2_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2_substate1) && hook_is(gb, SYM(ramrockArm_subid2_substate1), ramrockArm_subid2_substate1_hook)) { ramrockArm_subid2_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid2_substate2) && hook_is(gb, SYM(ramrockArm_subid2_substate2), ramrockArm_subid2_substate2_hook)) { ramrockArm_subid2_substate2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -710,10 +710,10 @@ void ramrockArm_subid4_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ramrockArm_jump_table(gb));
-    if (jt_ == SYM(ramrockArm_subid4_substate0) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate0))) { ramrockArm_subid4_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4_substate1) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate1))) { ramrockArm_subid4_substate1_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4_substate2) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate2))) { ramrockArm_subid4_substate2_hook(gb); return; }
-    else if (jt_ == SYM(ramrockArm_subid4_substate3) && hook_enabled_at(gb, SYM(ramrockArm_subid4_substate3))) { ramrockArm_subid4_substate3_hook(gb); return; }
+    if (jt_ == SYM(ramrockArm_subid4_substate0) && hook_is(gb, SYM(ramrockArm_subid4_substate0), ramrockArm_subid4_substate0_hook)) { ramrockArm_subid4_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate1) && hook_is(gb, SYM(ramrockArm_subid4_substate1), ramrockArm_subid4_substate1_hook)) { ramrockArm_subid4_substate1_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate2) && hook_is(gb, SYM(ramrockArm_subid4_substate2), ramrockArm_subid4_substate2_hook)) { ramrockArm_subid4_substate2_hook(gb); return; }
+    else if (jt_ == SYM(ramrockArm_subid4_substate3) && hook_is(gb, SYM(ramrockArm_subid4_substate3), ramrockArm_subid4_substate3_hook)) { ramrockArm_subid4_substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

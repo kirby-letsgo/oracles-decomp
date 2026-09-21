@@ -86,18 +86,18 @@ static void ricky_run_state(GB *gb, uint16_t sp0_) {
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); push_effect(gb, b_+16);
   do { uint16_t jt_ = (ricky_jump_table(gb));
-    if (jt_ == SYM(rickyState0) && hook_enabled_at(gb, SYM(rickyState0))) { rickyState0_hook(gb); return; }
-    else if (jt_ == SYM(rickyState1) && hook_enabled_at(gb, SYM(rickyState1))) { rickyState1_hook(gb); return; }
-    else if (jt_ == SYM(rickyState2) && hook_enabled_at(gb, SYM(rickyState2))) { rickyState2_hook(gb); return; }
-    else if (jt_ == SYM(rickyState3) && hook_enabled_at(gb, SYM(rickyState3))) { rickyState3_hook(gb); return; }
-    else if (jt_ == SYM(rickyState4) && hook_enabled_at(gb, SYM(rickyState4))) { rickyState4_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5) && hook_enabled_at(gb, SYM(rickyState5))) { rickyState5_hook(gb); return; }
-    else if (jt_ == SYM(rickyState6) && hook_enabled_at(gb, SYM(rickyState6))) { rickyState6_hook(gb); return; }
-    else if (jt_ == SYM(rickyState7) && hook_enabled_at(gb, SYM(rickyState7))) { rickyState7_hook(gb); return; }
-    else if (jt_ == SYM(rickyState8) && hook_enabled_at(gb, SYM(rickyState8))) { rickyState8_hook(gb); return; }
-    else if (jt_ == SYM(rickyState9) && hook_enabled_at(gb, SYM(rickyState9))) { rickyState9_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateA) && hook_enabled_at(gb, SYM(rickyStateA))) { rickyStateA_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateC) && hook_enabled_at(gb, SYM(rickyStateC))) { rickyStateC_hook(gb); return; }
+    if (jt_ == SYM(rickyState0) && hook_is(gb, SYM(rickyState0), rickyState0_hook)) { rickyState0_hook(gb); return; }
+    else if (jt_ == SYM(rickyState1) && hook_is(gb, SYM(rickyState1), rickyState1_hook)) { rickyState1_hook(gb); return; }
+    else if (jt_ == SYM(rickyState2) && hook_is(gb, SYM(rickyState2), rickyState2_hook)) { rickyState2_hook(gb); return; }
+    else if (jt_ == SYM(rickyState3) && hook_is(gb, SYM(rickyState3), rickyState3_hook)) { rickyState3_hook(gb); return; }
+    else if (jt_ == SYM(rickyState4) && hook_is(gb, SYM(rickyState4), rickyState4_hook)) { rickyState4_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5) && hook_is(gb, SYM(rickyState5), rickyState5_hook)) { rickyState5_hook(gb); return; }
+    else if (jt_ == SYM(rickyState6) && hook_is(gb, SYM(rickyState6), rickyState6_hook)) { rickyState6_hook(gb); return; }
+    else if (jt_ == SYM(rickyState7) && hook_is(gb, SYM(rickyState7), rickyState7_hook)) { rickyState7_hook(gb); return; }
+    else if (jt_ == SYM(rickyState8) && hook_is(gb, SYM(rickyState8), rickyState8_hook)) { rickyState8_hook(gb); return; }
+    else if (jt_ == SYM(rickyState9) && hook_is(gb, SYM(rickyState9), rickyState9_hook)) { rickyState9_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateA) && hook_is(gb, SYM(rickyStateA), rickyStateA_hook)) { rickyStateA_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateC) && hook_is(gb, SYM(rickyStateC), rickyStateC_hook)) { rickyStateC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -326,10 +326,10 @@ void rickyState5_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ricky_jump_table(gb));
-    if (jt_ == SYM(rickyState5Substate0) && hook_enabled_at(gb, SYM(rickyState5Substate0))) { rickyState5Substate0_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5Substate1) && hook_enabled_at(gb, SYM(rickyState5Substate1))) { rickyState5Substate1_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5Substate2) && hook_enabled_at(gb, SYM(rickyState5Substate2))) { rickyState5Substate2_hook(gb); return; }
-    else if (jt_ == SYM(rickyState5Substate3) && hook_enabled_at(gb, SYM(rickyState5Substate3))) { rickyState5Substate3_hook(gb); return; }
+    if (jt_ == SYM(rickyState5Substate0) && hook_is(gb, SYM(rickyState5Substate0), rickyState5Substate0_hook)) { rickyState5Substate0_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5Substate1) && hook_is(gb, SYM(rickyState5Substate1), rickyState5Substate1_hook)) { rickyState5Substate1_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5Substate2) && hook_is(gb, SYM(rickyState5Substate2), rickyState5Substate2_hook)) { rickyState5Substate2_hook(gb); return; }
+    else if (jt_ == SYM(rickyState5Substate3) && hook_is(gb, SYM(rickyState5Substate3), rickyState5Substate3_hook)) { rickyState5Substate3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -936,13 +936,13 @@ void rickyStateA_hook(GB *gb) {
   CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
   CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (ricky_jump_table(gb));
-    if (jt_ == SYM(rickyStateASubstate0) && hook_enabled_at(gb, SYM(rickyStateASubstate0))) { rickyStateASubstate0_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate1) && hook_enabled_at(gb, SYM(rickyStateASubstate1))) { rickyStateASubstate1_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate2) && hook_enabled_at(gb, SYM(rickyStateASubstate2))) { rickyStateASubstate2_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate3) && hook_enabled_at(gb, SYM(rickyStateASubstate3))) { rickyStateASubstate3_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate4) && hook_enabled_at(gb, SYM(rickyStateASubstate4))) { rickyStateASubstate4_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate5) && hook_enabled_at(gb, SYM(rickyStateASubstate5))) { rickyStateASubstate5_hook(gb); return; }
-    else if (jt_ == SYM(rickyStateASubstate6) && hook_enabled_at(gb, SYM(rickyStateASubstate6))) { rickyStateASubstate6_hook(gb); return; }
+    if (jt_ == SYM(rickyStateASubstate0) && hook_is(gb, SYM(rickyStateASubstate0), rickyStateASubstate0_hook)) { rickyStateASubstate0_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate1) && hook_is(gb, SYM(rickyStateASubstate1), rickyStateASubstate1_hook)) { rickyStateASubstate1_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate2) && hook_is(gb, SYM(rickyStateASubstate2), rickyStateASubstate2_hook)) { rickyStateASubstate2_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate3) && hook_is(gb, SYM(rickyStateASubstate3), rickyStateASubstate3_hook)) { rickyStateASubstate3_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate4) && hook_is(gb, SYM(rickyStateASubstate4), rickyStateASubstate4_hook)) { rickyStateASubstate4_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate5) && hook_is(gb, SYM(rickyStateASubstate5), rickyStateASubstate5_hook)) { rickyStateASubstate5_hook(gb); return; }
+    else if (jt_ == SYM(rickyStateASubstate6) && hook_is(gb, SYM(rickyStateASubstate6), rickyStateASubstate6_hook)) { rickyStateASubstate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

@@ -226,7 +226,7 @@ void interactionCode35_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (child_jumpTable(gb));
     if (jt_ == b_+8) { child_state0(gb, sp0_); return; }
-    else if (jt_ == SYM(interac65_state1) && hook_enabled_at(gb, SYM(interac65_state1))) { interac65_state1_hook(gb); return; }
+    else if (jt_ == SYM(interac65_state1) && hook_is(gb, SYM(interac65_state1), interac65_state1_hook)) { interac65_state1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

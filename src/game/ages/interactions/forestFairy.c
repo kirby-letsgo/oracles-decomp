@@ -66,16 +66,16 @@ void interactionCode49_hook(GB *gb) {
   CYC(b_+3, b_+5); E = 0x44;
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (forest_fairy_jump_table(gb));
-    if (jt_ == SYM(forestFairy_subid00) && hook_enabled_at(gb, SYM(forestFairy_subid00))) { forestFairy_subid00_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid01) && hook_enabled_at(gb, SYM(forestFairy_subid01))) { forestFairy_subid01_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid02) && hook_enabled_at(gb, SYM(forestFairy_subid02))) { forestFairy_subid02_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid03) && hook_enabled_at(gb, SYM(forestFairy_subid03))) { forestFairy_subid03_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid04) && hook_enabled_at(gb, SYM(forestFairy_subid04))) { forestFairy_subid04_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid05) && hook_enabled_at(gb, SYM(forestFairy_subid05))) { forestFairy_subid05_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid08) && hook_enabled_at(gb, SYM(forestFairy_subid08))) { forestFairy_subid08_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid0b) && hook_enabled_at(gb, SYM(forestFairy_subid0b))) { forestFairy_subid0b_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid0c) && hook_enabled_at(gb, SYM(forestFairy_subid0c))) { forestFairy_subid0c_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid0e) && hook_enabled_at(gb, SYM(forestFairy_subid0e))) { forestFairy_subid0e_hook(gb); return; }
+    if (jt_ == SYM(forestFairy_subid00) && hook_is(gb, SYM(forestFairy_subid00), forestFairy_subid00_hook)) { forestFairy_subid00_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid01) && hook_is(gb, SYM(forestFairy_subid01), forestFairy_subid01_hook)) { forestFairy_subid01_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid02) && hook_is(gb, SYM(forestFairy_subid02), forestFairy_subid02_hook)) { forestFairy_subid02_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid03) && hook_is(gb, SYM(forestFairy_subid03), forestFairy_subid03_hook)) { forestFairy_subid03_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid04) && hook_is(gb, SYM(forestFairy_subid04), forestFairy_subid04_hook)) { forestFairy_subid04_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid05) && hook_is(gb, SYM(forestFairy_subid05), forestFairy_subid05_hook)) { forestFairy_subid05_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid08) && hook_is(gb, SYM(forestFairy_subid08), forestFairy_subid08_hook)) { forestFairy_subid08_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid0b) && hook_is(gb, SYM(forestFairy_subid0b), forestFairy_subid0b_hook)) { forestFairy_subid0b_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid0c) && hook_is(gb, SYM(forestFairy_subid0c), forestFairy_subid0c_hook)) { forestFairy_subid0c_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid0e) && hook_is(gb, SYM(forestFairy_subid0e), forestFairy_subid0e_hook)) { forestFairy_subid0e_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -86,10 +86,10 @@ void forestFairy_subid00_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (forest_fairy_jump_table(gb));
-    if (jt_ == SYM(forestFairy_subid00State0) && hook_enabled_at(gb, SYM(forestFairy_subid00State0))) { forestFairy_subid00State0_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid00State1) && hook_enabled_at(gb, SYM(forestFairy_subid00State1))) { forestFairy_subid00State1_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid00State2) && hook_enabled_at(gb, SYM(forestFairy_subid00State2))) { forestFairy_subid00State2_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid00State3) && hook_enabled_at(gb, SYM(forestFairy_subid00State3))) { forestFairy_subid00State3_hook(gb); return; }
+    if (jt_ == SYM(forestFairy_subid00State0) && hook_is(gb, SYM(forestFairy_subid00State0), forestFairy_subid00State0_hook)) { forestFairy_subid00State0_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid00State1) && hook_is(gb, SYM(forestFairy_subid00State1), forestFairy_subid00State1_hook)) { forestFairy_subid00State1_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid00State2) && hook_is(gb, SYM(forestFairy_subid00State2), forestFairy_subid00State2_hook)) { forestFairy_subid00State2_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid00State3) && hook_is(gb, SYM(forestFairy_subid00State3), forestFairy_subid00State3_hook)) { forestFairy_subid00State3_hook(gb); return; }
     else if (jt_ == SYM(forestFairy_deleteSelf)) { interactionDelete_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
@@ -327,11 +327,11 @@ void forestFairy_subid03_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (forest_fairy_jump_table(gb));
-    if (jt_ == SYM(forestFairy_subid00State0) && hook_enabled_at(gb, SYM(forestFairy_subid00State0))) { forestFairy_subid00State0_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid03State1) && hook_enabled_at(gb, SYM(forestFairy_subid03State1))) { forestFairy_subid03State1_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid03State2) && hook_enabled_at(gb, SYM(forestFairy_subid03State2))) { forestFairy_subid03State2_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid03State3) && hook_enabled_at(gb, SYM(forestFairy_subid03State3))) { forestFairy_subid03State3_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid00State3) && hook_enabled_at(gb, SYM(forestFairy_subid00State3))) { forestFairy_subid00State3_hook(gb); return; }
+    if (jt_ == SYM(forestFairy_subid00State0) && hook_is(gb, SYM(forestFairy_subid00State0), forestFairy_subid00State0_hook)) { forestFairy_subid00State0_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid03State1) && hook_is(gb, SYM(forestFairy_subid03State1), forestFairy_subid03State1_hook)) { forestFairy_subid03State1_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid03State2) && hook_is(gb, SYM(forestFairy_subid03State2), forestFairy_subid03State2_hook)) { forestFairy_subid03State2_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid03State3) && hook_is(gb, SYM(forestFairy_subid03State3), forestFairy_subid03State3_hook)) { forestFairy_subid03State3_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid00State3) && hook_is(gb, SYM(forestFairy_subid00State3), forestFairy_subid00State3_hook)) { forestFairy_subid00State3_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -342,9 +342,9 @@ void forestFairy_subid04_hook(GB *gb) {
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (forest_fairy_jump_table(gb));
-    if (jt_ == SYM(forestFairy_subid00State0) && hook_enabled_at(gb, SYM(forestFairy_subid00State0))) { forestFairy_subid00State0_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid04State1) && hook_enabled_at(gb, SYM(forestFairy_subid04State1))) { forestFairy_subid04State1_hook(gb); return; }
-    else if (jt_ == SYM(forestFairy_subid00State3) && hook_enabled_at(gb, SYM(forestFairy_subid00State3))) { forestFairy_subid00State3_hook(gb); return; }
+    if (jt_ == SYM(forestFairy_subid00State0) && hook_is(gb, SYM(forestFairy_subid00State0), forestFairy_subid00State0_hook)) { forestFairy_subid00State0_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid04State1) && hook_is(gb, SYM(forestFairy_subid04State1), forestFairy_subid04State1_hook)) { forestFairy_subid04State1_hook(gb); return; }
+    else if (jt_ == SYM(forestFairy_subid00State3) && hook_is(gb, SYM(forestFairy_subid00State3), forestFairy_subid00State3_hook)) { forestFairy_subid00State3_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

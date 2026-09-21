@@ -120,16 +120,16 @@ void interactionCode66_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (goron_jump_table(gb));
-    if (jt_ == SYM(goronSubid00) && hook_enabled_at(gb, SYM(goronSubid00))) { goronSubid00_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid01) && hook_enabled_at(gb, SYM(goronSubid01))) { goronSubid01_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid02) && hook_enabled_at(gb, SYM(goronSubid02))) { goronSubid02_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid03) && hook_enabled_at(gb, SYM(goronSubid03))) { goronSubid03_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid05) && hook_enabled_at(gb, SYM(goronSubid05))) { goronSubid05_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid06) && hook_enabled_at(gb, SYM(goronSubid06))) { goronSubid06_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid07) && hook_enabled_at(gb, SYM(goronSubid07))) { goronSubid07_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid09) && hook_enabled_at(gb, SYM(goronSubid09))) { goronSubid09_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid0b) && hook_enabled_at(gb, SYM(goronSubid0b))) { goronSubid0b_hook(gb); return; }
-    else if (jt_ == SYM(goronSubid0f) && hook_enabled_at(gb, SYM(goronSubid0f))) { goronSubid0f_hook(gb); return; }
+    if (jt_ == SYM(goronSubid00) && hook_is(gb, SYM(goronSubid00), goronSubid00_hook)) { goronSubid00_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid01) && hook_is(gb, SYM(goronSubid01), goronSubid01_hook)) { goronSubid01_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid02) && hook_is(gb, SYM(goronSubid02), goronSubid02_hook)) { goronSubid02_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid03) && hook_is(gb, SYM(goronSubid03), goronSubid03_hook)) { goronSubid03_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid05) && hook_is(gb, SYM(goronSubid05), goronSubid05_hook)) { goronSubid05_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid06) && hook_is(gb, SYM(goronSubid06), goronSubid06_hook)) { goronSubid06_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid07) && hook_is(gb, SYM(goronSubid07), goronSubid07_hook)) { goronSubid07_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid09) && hook_is(gb, SYM(goronSubid09), goronSubid09_hook)) { goronSubid09_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid0b) && hook_is(gb, SYM(goronSubid0b), goronSubid0b_hook)) { goronSubid0b_hook(gb); return; }
+    else if (jt_ == SYM(goronSubid0f) && hook_is(gb, SYM(goronSubid0f), goronSubid0f_hook)) { goronSubid0f_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

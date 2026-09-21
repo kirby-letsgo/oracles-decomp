@@ -219,7 +219,7 @@ subid4:
   do { uint16_t jt_ = (interactionCodee2_jump_table(gb));
     if (jt_ == b_+31) { goto state0Common; }
     else if (jt_ == b_+198) { goto subid4State1; }
-    else if (jt_ == SYM(objectSetVisible83) && hook_enabled_at(gb, SYM(objectSetVisible83))) { objectSetVisible83_hook(gb); return; }
+    else if (jt_ == SYM(objectSetVisible83) && hook_is(gb, SYM(objectSetVisible83), objectSetVisible83_hook)) { objectSetVisible83_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 subid4State1:

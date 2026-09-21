@@ -457,8 +457,8 @@ void interactionCoded7_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (interactiond7_jump_table(gb));
-    if (jt_ == SYM(interactiond7_makuSeed) && hook_enabled_at(gb, SYM(interactiond7_makuSeed))) { interactiond7_makuSeed_hook(gb); return; }
-    else if (jt_ == SYM(interactiond7_essence) && hook_enabled_at(gb, SYM(interactiond7_essence))) { interactiond7_essence_hook(gb); return; }
+    if (jt_ == SYM(interactiond7_makuSeed) && hook_is(gb, SYM(interactiond7_makuSeed), interactiond7_makuSeed_hook)) { interactiond7_makuSeed_hook(gb); return; }
+    else if (jt_ == SYM(interactiond7_essence) && hook_is(gb, SYM(interactiond7_essence), interactiond7_essence_hook)) { interactiond7_essence_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

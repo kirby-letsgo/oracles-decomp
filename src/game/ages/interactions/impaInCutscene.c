@@ -284,7 +284,7 @@ void interactionCode31_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (impaInCutscene_jumpTable(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(impaState1) && hook_enabled_at(gb, SYM(impaState1))) { impaState1_hook(gb); return; }
+    else if (jt_ == SYM(impaState1) && hook_is(gb, SYM(impaState1), impaState1_hook)) { impaState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -311,16 +311,16 @@ void impaState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (impaInCutscene_jumpTable(gb));
-    if (jt_ == SYM(impaSubid0) && hook_enabled_at(gb, SYM(impaSubid0))) { impaSubid0_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid1) && hook_enabled_at(gb, SYM(impaSubid1))) { impaSubid1_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2) && hook_enabled_at(gb, SYM(impaSubid2))) { impaSubid2_hook(gb); return; }
-    else if (jt_ == SYM(impaAnimateAndRunScript) && hook_enabled_at(gb, SYM(impaAnimateAndRunScript))) { impaAnimateAndRunScript_hook(gb); return; } // subids 3 and 6
-    else if (jt_ == SYM(impaSubid4) && hook_enabled_at(gb, SYM(impaSubid4))) { impaSubid4_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid5) && hook_enabled_at(gb, SYM(impaSubid5))) { impaSubid5_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid7) && hook_enabled_at(gb, SYM(impaSubid7))) { impaSubid7_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid8) && hook_enabled_at(gb, SYM(impaSubid8))) { impaSubid8_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid9) && hook_enabled_at(gb, SYM(impaSubid9))) { impaSubid9_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
+    if (jt_ == SYM(impaSubid0) && hook_is(gb, SYM(impaSubid0), impaSubid0_hook)) { impaSubid0_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid1) && hook_is(gb, SYM(impaSubid1), impaSubid1_hook)) { impaSubid1_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2) && hook_is(gb, SYM(impaSubid2), impaSubid2_hook)) { impaSubid2_hook(gb); return; }
+    else if (jt_ == SYM(impaAnimateAndRunScript) && hook_is(gb, SYM(impaAnimateAndRunScript), impaAnimateAndRunScript_hook)) { impaAnimateAndRunScript_hook(gb); return; } // subids 3 and 6
+    else if (jt_ == SYM(impaSubid4) && hook_is(gb, SYM(impaSubid4), impaSubid4_hook)) { impaSubid4_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid5) && hook_is(gb, SYM(impaSubid5), impaSubid5_hook)) { impaSubid5_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid7) && hook_is(gb, SYM(impaSubid7), impaSubid7_hook)) { impaSubid7_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid8) && hook_is(gb, SYM(impaSubid8), impaSubid8_hook)) { impaSubid8_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid9) && hook_is(gb, SYM(impaSubid9), impaSubid9_hook)) { impaSubid9_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_is(gb, SYM(interactionAnimate), interactionAnimate_hook)) { interactionAnimate_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -395,7 +395,7 @@ dispatch:
     else if (jt_ == b_+434) { goto substateD; }
     else if (jt_ == b_+463) { goto substateE; }
     else if (jt_ == b_+492) { goto substateF; }
-    else if (jt_ == SYM(impaRet) && hook_enabled_at(gb, SYM(impaRet))) { impaRet_hook(gb); return; }
+    else if (jt_ == SYM(impaRet) && hook_is(gb, SYM(impaRet), impaRet_hook)) { impaRet_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -749,7 +749,7 @@ void impaSubid1_hook(GB *gb) {
   do { uint16_t jt_ = (impaInCutscene_jumpTable(gb));
     if (jt_ == b_+10) { goto substate0; }
     else if (jt_ == b_+32) { goto substate1; }
-    else if (jt_ == SYM(impaSubid1Substate2) && hook_enabled_at(gb, SYM(impaSubid1Substate2))) { impaSubid1Substate2_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid1Substate2) && hook_is(gb, SYM(impaSubid1Substate2), impaSubid1Substate2_hook)) { impaSubid1Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -824,11 +824,11 @@ void impaSubid2_hook(GB *gb) {
     if (jt_ == b_+20) { goto substate0; }
     else if (jt_ == b_+37) { goto substate1; }
     else if (jt_ == b_+53) { goto substate2; }
-    else if (jt_ == SYM(impaAnimateAndRunScript) && hook_enabled_at(gb, SYM(impaAnimateAndRunScript))) { impaAnimateAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate4) && hook_enabled_at(gb, SYM(impaSubid2Substate4))) { impaSubid2Substate4_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate5) && hook_enabled_at(gb, SYM(impaSubid2Substate5))) { impaSubid2Substate5_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate6) && hook_enabled_at(gb, SYM(impaSubid2Substate6))) { impaSubid2Substate6_hook(gb); return; }
-    else if (jt_ == SYM(impaSubid2Substate7) && hook_enabled_at(gb, SYM(impaSubid2Substate7))) { impaSubid2Substate7_hook(gb); return; }
+    else if (jt_ == SYM(impaAnimateAndRunScript) && hook_is(gb, SYM(impaAnimateAndRunScript), impaAnimateAndRunScript_hook)) { impaAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate4) && hook_is(gb, SYM(impaSubid2Substate4), impaSubid2Substate4_hook)) { impaSubid2Substate4_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate5) && hook_is(gb, SYM(impaSubid2Substate5), impaSubid2Substate5_hook)) { impaSubid2Substate5_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate6) && hook_is(gb, SYM(impaSubid2Substate6), impaSubid2Substate6_hook)) { impaSubid2Substate6_hook(gb); return; }
+    else if (jt_ == SYM(impaSubid2Substate7) && hook_is(gb, SYM(impaSubid2Substate7), impaSubid2Substate7_hook)) { impaSubid2Substate7_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

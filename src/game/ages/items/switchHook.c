@@ -190,7 +190,7 @@ void itemCode0a_hook(GB *gb) {
     if (jt_ == b_+22) { goto state0; }
     else if (jt_ == b_+83) { goto state1; }
     else if (jt_ == b_+204) { goto state2; }
-    else if (jt_ == SYM(switchHookState3) && hook_enabled_at(gb, SYM(switchHookState3))) { switchHookState3_hook(gb); return; }
+    else if (jt_ == SYM(switchHookState3) && hook_is(gb, SYM(switchHookState3), switchHookState3_hook)) { switchHookState3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 

@@ -99,9 +99,9 @@ void interactionCode3e_hook(GB *gb) {
       CYC(b_+68, b_+69); A = mem_rd(gb, DE);
       CYC(b_+69, b_+70); push_effect(gb, b_+70);
       do { uint16_t jt_ = (ghost_veran_jump_table(gb));
-        if (jt_ == SYM(runVeranGhostSubid0) && hook_enabled_at(gb, SYM(runVeranGhostSubid0))) { runVeranGhostSubid0_hook(gb); return; }
-        else if (jt_ == SYM(runVeranGhostSubid1) && hook_enabled_at(gb, SYM(runVeranGhostSubid1))) { runVeranGhostSubid1_hook(gb); return; }
-        else if (jt_ == SYM(runVeranGhostSubid2) && hook_enabled_at(gb, SYM(runVeranGhostSubid2))) { runVeranGhostSubid2_hook(gb); return; }
+        if (jt_ == SYM(runVeranGhostSubid0) && hook_is(gb, SYM(runVeranGhostSubid0), runVeranGhostSubid0_hook)) { runVeranGhostSubid0_hook(gb); return; }
+        else if (jt_ == SYM(runVeranGhostSubid1) && hook_is(gb, SYM(runVeranGhostSubid1), runVeranGhostSubid1_hook)) { runVeranGhostSubid1_hook(gb); return; }
+        else if (jt_ == SYM(runVeranGhostSubid2) && hook_is(gb, SYM(runVeranGhostSubid2), runVeranGhostSubid2_hook)) { runVeranGhostSubid2_hook(gb); return; }
         else { HANDOFF(HL); }
       } while (0);
       goto jt_fall3;

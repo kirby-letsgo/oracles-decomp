@@ -132,8 +132,8 @@ void interactionCode62_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (maku_confetti_jump_table(gb));
-    if (jt_ == SYM(makuConfetti_subid0) && hook_enabled_at(gb, SYM(makuConfetti_subid0))) { makuConfetti_subid0_hook(gb); return; }
-    else if (jt_ == SYM(makuConfetti_subid1) && hook_enabled_at(gb, SYM(makuConfetti_subid1))) { makuConfetti_subid1_hook(gb); return; }
+    if (jt_ == SYM(makuConfetti_subid0) && hook_is(gb, SYM(makuConfetti_subid0), makuConfetti_subid0_hook)) { makuConfetti_subid0_hook(gb); return; }
+    else if (jt_ == SYM(makuConfetti_subid1) && hook_is(gb, SYM(makuConfetti_subid1), makuConfetti_subid1_hook)) { makuConfetti_subid1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

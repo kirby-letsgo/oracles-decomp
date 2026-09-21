@@ -241,8 +241,8 @@ state1:
   CYC(b_+105, b_+106); A = mem_rd(gb, DE);
   CYC(b_+106, b_+107); push_effect(gb, b_+107);
   do { uint16_t jt_ = (fakeOctorok_jumpTable(gb));
-    if (jt_ == SYM(impaOctorokCode) && hook_enabled_at(gb, SYM(impaOctorokCode))) { impaOctorokCode_hook(gb); return; }
-    else if (jt_ == SYM(greatFairyOctorokCode) && hook_enabled_at(gb, SYM(greatFairyOctorokCode))) { greatFairyOctorokCode_hook(gb); return; }
+    if (jt_ == SYM(impaOctorokCode) && hook_is(gb, SYM(impaOctorokCode), impaOctorokCode_hook)) { impaOctorokCode_hook(gb); return; }
+    else if (jt_ == SYM(greatFairyOctorokCode) && hook_is(gb, SYM(greatFairyOctorokCode), greatFairyOctorokCode_hook)) { greatFairyOctorokCode_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

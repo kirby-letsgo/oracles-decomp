@@ -268,9 +268,9 @@ void veranFairy_66ed_hook(GB *gb) {
   CYC(b_+6, b_+7); A = mem_rd(gb, DE);
   CYC(b_+7, b_+8); push_effect(gb, b_+8);
   do { uint16_t jt_ = (veranFairy_jump_table(gb));
-    if (jt_ == SYM(attack0) && hook_enabled_at(gb, SYM(attack0))) { attack0_hook(gb); return; }
-    else if (jt_ == SYM(attack1) && hook_enabled_at(gb, SYM(attack1))) { attack1_hook(gb); return; }
-    else if (jt_ == SYM(attack2) && hook_enabled_at(gb, SYM(attack2))) { attack2_hook(gb); return; }
+    if (jt_ == SYM(attack0) && hook_is(gb, SYM(attack0), attack0_hook)) { attack0_hook(gb); return; }
+    else if (jt_ == SYM(attack1) && hook_is(gb, SYM(attack1), attack1_hook)) { attack1_hook(gb); return; }
+    else if (jt_ == SYM(attack2) && hook_is(gb, SYM(attack2), attack2_hook)) { attack2_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -764,12 +764,12 @@ normalStatus:
   CYC(b_+53, b_+54); A = mem_rd(gb, DE);
   CYC(b_+54, b_+55); push_effect(gb, b_+55);
   do { uint16_t jt_ = (veranFairy_jump_table(gb));
-    if (jt_ == SYM(veranFairy_state0) && hook_enabled_at(gb, SYM(veranFairy_state0))) { veranFairy_state0_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state1) && hook_enabled_at(gb, SYM(veranFairy_state1))) { veranFairy_state1_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state2) && hook_enabled_at(gb, SYM(veranFairy_state2))) { veranFairy_state2_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state3) && hook_enabled_at(gb, SYM(veranFairy_state3))) { veranFairy_state3_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state4) && hook_enabled_at(gb, SYM(veranFairy_state4))) { veranFairy_state4_hook(gb); return; }
-    else if (jt_ == SYM(veranFairy_state5) && hook_enabled_at(gb, SYM(veranFairy_state5))) { veranFairy_state5_hook(gb); return; }
+    if (jt_ == SYM(veranFairy_state0) && hook_is(gb, SYM(veranFairy_state0), veranFairy_state0_hook)) { veranFairy_state0_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state1) && hook_is(gb, SYM(veranFairy_state1), veranFairy_state1_hook)) { veranFairy_state1_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state2) && hook_is(gb, SYM(veranFairy_state2), veranFairy_state2_hook)) { veranFairy_state2_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state3) && hook_is(gb, SYM(veranFairy_state3), veranFairy_state3_hook)) { veranFairy_state3_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state4) && hook_is(gb, SYM(veranFairy_state4), veranFairy_state4_hook)) { veranFairy_state4_hook(gb); return; }
+    else if (jt_ == SYM(veranFairy_state5) && hook_is(gb, SYM(veranFairy_state5), veranFairy_state5_hook)) { veranFairy_state5_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

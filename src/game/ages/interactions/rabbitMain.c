@@ -465,7 +465,7 @@ void rabbitSubid4_hook(GB *gb) {
   do { uint16_t jt_ = (rabbit_jump_table(gb));
     if (jt_ == b_+14) { rabbit_subid4_substate0(gb, sp0_); return; }
     else if (jt_ == b_+43) { rabbit_subid4_substate1(gb, sp0_); return; }
-    else if (jt_ == SYM(rabbitSubid4Substate2) && hook_enabled_at(gb, SYM(rabbitSubid4Substate2))) { rabbitSubid4Substate2_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid4Substate2) && hook_is(gb, SYM(rabbitSubid4Substate2), rabbitSubid4Substate2_hook)) { rabbitSubid4Substate2_hook(gb); return; }
     else if (jt_ == SYM(rabbitSubid5__substate3)) { rabbit_subid5_substate3(gb, sp0_); return; }
     else if (jt_ == SYM(rabbitSubid5__ret)) { rabbit_subid5_ret(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -652,14 +652,14 @@ static void rabbit_dispatch_state1(GB *gb, uint16_t sp0_) {
   CYC(b_+186, b_+187); A = mem_rd(gb, DE);
   CYC(b_+187, b_+188); push_effect(gb, b_+188);
   do { uint16_t jt_ = (rabbit_jump_table(gb));
-    if (jt_ == SYM(rabbitSubid0) && hook_enabled_at(gb, SYM(rabbitSubid0))) { rabbitSubid0_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid1) && hook_enabled_at(gb, SYM(rabbitSubid1))) { rabbitSubid1_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid2) && hook_enabled_at(gb, SYM(rabbitSubid2))) { rabbitSubid2_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid3) && hook_enabled_at(gb, SYM(rabbitSubid3))) { rabbitSubid3_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid4) && hook_enabled_at(gb, SYM(rabbitSubid4))) { rabbitSubid4_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid5) && hook_enabled_at(gb, SYM(rabbitSubid5))) { rabbitSubid5_hook(gb); return; }
-    else if (jt_ == SYM(interactionPushLinkAwayAndUpdateDrawPriority) && hook_enabled_at(gb, SYM(interactionPushLinkAwayAndUpdateDrawPriority))) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; }
-    else if (jt_ == SYM(rabbitSubid7) && hook_enabled_at(gb, SYM(rabbitSubid7))) { rabbitSubid7_hook(gb); return; }
+    if (jt_ == SYM(rabbitSubid0) && hook_is(gb, SYM(rabbitSubid0), rabbitSubid0_hook)) { rabbitSubid0_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid1) && hook_is(gb, SYM(rabbitSubid1), rabbitSubid1_hook)) { rabbitSubid1_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid2) && hook_is(gb, SYM(rabbitSubid2), rabbitSubid2_hook)) { rabbitSubid2_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid3) && hook_is(gb, SYM(rabbitSubid3), rabbitSubid3_hook)) { rabbitSubid3_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid4) && hook_is(gb, SYM(rabbitSubid4), rabbitSubid4_hook)) { rabbitSubid4_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid5) && hook_is(gb, SYM(rabbitSubid5), rabbitSubid5_hook)) { rabbitSubid5_hook(gb); return; }
+    else if (jt_ == SYM(interactionPushLinkAwayAndUpdateDrawPriority) && hook_is(gb, SYM(interactionPushLinkAwayAndUpdateDrawPriority), interactionPushLinkAwayAndUpdateDrawPriority_hook)) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; }
+    else if (jt_ == SYM(rabbitSubid7) && hook_is(gb, SYM(rabbitSubid7), rabbitSubid7_hook)) { rabbitSubid7_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

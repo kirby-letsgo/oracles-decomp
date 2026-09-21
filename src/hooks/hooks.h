@@ -25,6 +25,8 @@ extern bool hook_verify_abort;
 void hooks_init(void);
 bool hook_dispatch(GB *gb);
 bool hook_enabled_at(const GB *gb, uint16_t addr);
+// the hook the table dispatches at addr is exactly fn (a routine may be hooked by another game's C)
+bool hook_is(const GB *gb, uint16_t addr, void (*fn)(GB *));
 void gb_burn(GB *gb, int mcycles);
 void gb_burn_nb(GB *gb, int mcycles);
 void hooks_report(void);

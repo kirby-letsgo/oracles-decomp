@@ -317,11 +317,11 @@ void interactionCodeb1_body_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (tuni_nut_jump_table(gb));
-    if (jt_ == SYM(tuniNut_state0) && hook_enabled_at(gb, SYM(tuniNut_state0))) { tuniNut_state0_hook(gb); return; }
-    else if (jt_ == SYM(tuniNut_state1) && hook_enabled_at(gb, SYM(tuniNut_state1))) { tuniNut_state1_hook(gb); return; }
-    else if (jt_ == SYM(tuniNut_state2) && hook_enabled_at(gb, SYM(tuniNut_state2))) { tuniNut_state2_hook(gb); return; }
-    else if (jt_ == SYM(tuniNut_state3) && hook_enabled_at(gb, SYM(tuniNut_state3))) { tuniNut_state3_hook(gb); return; }
-    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_enabled_at(gb, SYM(objectPreventLinkFromPassing))) { objectPreventLinkFromPassing_hook(gb); return; }
+    if (jt_ == SYM(tuniNut_state0) && hook_is(gb, SYM(tuniNut_state0), tuniNut_state0_hook)) { tuniNut_state0_hook(gb); return; }
+    else if (jt_ == SYM(tuniNut_state1) && hook_is(gb, SYM(tuniNut_state1), tuniNut_state1_hook)) { tuniNut_state1_hook(gb); return; }
+    else if (jt_ == SYM(tuniNut_state2) && hook_is(gb, SYM(tuniNut_state2), tuniNut_state2_hook)) { tuniNut_state2_hook(gb); return; }
+    else if (jt_ == SYM(tuniNut_state3) && hook_is(gb, SYM(tuniNut_state3), tuniNut_state3_hook)) { tuniNut_state3_hook(gb); return; }
+    else if (jt_ == SYM(objectPreventLinkFromPassing) && hook_is(gb, SYM(objectPreventLinkFromPassing), objectPreventLinkFromPassing_hook)) { objectPreventLinkFromPassing_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }

@@ -536,8 +536,8 @@ void interactionCode37_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
-    if (jt_ == SYM(ralphState0) && hook_enabled_at(gb, SYM(ralphState0))) { ralphState0_hook(gb); return; }
-    else if (jt_ == SYM(ralphRunSubid) && hook_enabled_at(gb, SYM(ralphRunSubid))) { ralphRunSubid_hook(gb); return; }
+    if (jt_ == SYM(ralphState0) && hook_is(gb, SYM(ralphState0), ralphState0_hook)) { ralphState0_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunSubid) && hook_is(gb, SYM(ralphRunSubid), ralphRunSubid_hook)) { ralphRunSubid_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -566,24 +566,24 @@ void ralphRunSubid_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
-    if (jt_ == SYM(ralphSubid00) && hook_enabled_at(gb, SYM(ralphSubid00))) { ralphSubid00_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid01) && hook_enabled_at(gb, SYM(ralphSubid01))) { ralphSubid01_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid02) && hook_enabled_at(gb, SYM(ralphSubid02))) { ralphSubid02_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid03) && hook_enabled_at(gb, SYM(ralphSubid03))) { ralphSubid03_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid04) && hook_enabled_at(gb, SYM(ralphSubid04))) { ralphSubid04_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid05) && hook_enabled_at(gb, SYM(ralphSubid05))) { ralphSubid05_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid06) && hook_enabled_at(gb, SYM(ralphSubid06))) { ralphSubid06_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid07) && hook_enabled_at(gb, SYM(ralphSubid07))) { ralphSubid07_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid08) && hook_enabled_at(gb, SYM(ralphSubid08))) { ralphSubid08_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid09) && hook_enabled_at(gb, SYM(ralphSubid09))) { ralphSubid09_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid0a) && hook_enabled_at(gb, SYM(ralphSubid0a))) { ralphSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid0b) && hook_enabled_at(gb, SYM(ralphSubid0b))) { ralphSubid0b_hook(gb); return; } // subids $0b and $10
-    else if (jt_ == SYM(ralphRunScriptAndDeleteWhenOver) && hook_enabled_at(gb, SYM(ralphRunScriptAndDeleteWhenOver))) { ralphRunScriptAndDeleteWhenOver_hook(gb); return; }
-    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation) && hook_enabled_at(gb, SYM(ralphRunScriptWithConditionalAnimation))) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid0e) && hook_enabled_at(gb, SYM(ralphSubid0e))) { ralphSubid0e_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(nayruRunScriptWithConditionalAnimation) && hook_enabled_at(gb, SYM(nayruRunScriptWithConditionalAnimation))) { nayruRunScriptWithConditionalAnimation_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid12) && hook_enabled_at(gb, SYM(ralphSubid12))) { ralphSubid12_hook(gb); return; }
+    if (jt_ == SYM(ralphSubid00) && hook_is(gb, SYM(ralphSubid00), ralphSubid00_hook)) { ralphSubid00_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid01) && hook_is(gb, SYM(ralphSubid01), ralphSubid01_hook)) { ralphSubid01_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid02) && hook_is(gb, SYM(ralphSubid02), ralphSubid02_hook)) { ralphSubid02_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid03) && hook_is(gb, SYM(ralphSubid03), ralphSubid03_hook)) { ralphSubid03_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid04) && hook_is(gb, SYM(ralphSubid04), ralphSubid04_hook)) { ralphSubid04_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid05) && hook_is(gb, SYM(ralphSubid05), ralphSubid05_hook)) { ralphSubid05_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid06) && hook_is(gb, SYM(ralphSubid06), ralphSubid06_hook)) { ralphSubid06_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid07) && hook_is(gb, SYM(ralphSubid07), ralphSubid07_hook)) { ralphSubid07_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid08) && hook_is(gb, SYM(ralphSubid08), ralphSubid08_hook)) { ralphSubid08_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid09) && hook_is(gb, SYM(ralphSubid09), ralphSubid09_hook)) { ralphSubid09_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid0a) && hook_is(gb, SYM(ralphSubid0a), ralphSubid0a_hook)) { ralphSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid0b) && hook_is(gb, SYM(ralphSubid0b), ralphSubid0b_hook)) { ralphSubid0b_hook(gb); return; } // subids $0b and $10
+    else if (jt_ == SYM(ralphRunScriptAndDeleteWhenOver) && hook_is(gb, SYM(ralphRunScriptAndDeleteWhenOver), ralphRunScriptAndDeleteWhenOver_hook)) { ralphRunScriptAndDeleteWhenOver_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation) && hook_is(gb, SYM(ralphRunScriptWithConditionalAnimation), ralphRunScriptWithConditionalAnimation_hook)) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid0e) && hook_is(gb, SYM(ralphSubid0e), ralphSubid0e_hook)) { ralphSubid0e_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_is(gb, SYM(interactionAnimate), interactionAnimate_hook)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(nayruRunScriptWithConditionalAnimation) && hook_is(gb, SYM(nayruRunScriptWithConditionalAnimation), nayruRunScriptWithConditionalAnimation_hook)) { nayruRunScriptWithConditionalAnimation_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid12) && hook_is(gb, SYM(ralphSubid12), ralphSubid12_hook)) { ralphSubid12_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -893,7 +893,7 @@ void ralphSubid04_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
     // Borrow some of Nayru's code from the same cutscene
-    if (jt_ == SYM(nayruSubid02Substate0) && hook_enabled_at(gb, SYM(nayruSubid02Substate0))) { nayruSubid02Substate0_hook(gb); return; }
+    if (jt_ == SYM(nayruSubid02Substate0) && hook_is(gb, SYM(nayruSubid02Substate0), nayruSubid02Substate0_hook)) { nayruSubid02Substate0_hook(gb); return; }
     else if (jt_ == b_+10) { goto substate1; }
     else if (jt_ == b_+30) { goto substate2; }
     else { HANDOFF(HL); }
@@ -934,7 +934,7 @@ void ralphSubid05_hook(GB *gb) {
     else if (jt_ == b_+29) { goto substate1; }
     else if (jt_ == b_+44) { goto substate2; }
     else if (jt_ == b_+58) { goto substate3; }
-    else if (jt_ == SYM(ralphRunScript) && hook_enabled_at(gb, SYM(ralphRunScript))) { ralphRunScript_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScript) && hook_is(gb, SYM(ralphRunScript), ralphRunScript_hook)) { ralphRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -1000,7 +1000,7 @@ void ralphSubid06_hook(GB *gb) {
   do { uint16_t jt_ = (ralph_jumpTable(gb));
     if (jt_ == b_+13) { goto substate0; }
     else if (jt_ == b_+35) { goto substate1; }
-    else if (jt_ == SYM(ralphRunScript) && hook_enabled_at(gb, SYM(ralphRunScript))) { ralphRunScript_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScript) && hook_is(gb, SYM(ralphRunScript), ralphRunScript_hook)) { ralphRunScript_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -1044,9 +1044,9 @@ void ralphSubid07_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, DE);
   CYC(b_+11, b_+12); push_effect(gb, b_+12);
   do { uint16_t jt_ = (ralph_jumpTable(gb));
-    if (jt_ == SYM(ralphAnimateBasedOnSpeedAndRunScript) && hook_enabled_at(gb, SYM(ralphAnimateBasedOnSpeedAndRunScript))) { ralphAnimateBasedOnSpeedAndRunScript_hook(gb); return; } // substates 0 and 3
-    else if (jt_ == SYM(ralphSubid07Substate1) && hook_enabled_at(gb, SYM(ralphSubid07Substate1))) { ralphSubid07Substate1_hook(gb); return; }
-    else if (jt_ == SYM(ralphSubid07Substate2) && hook_enabled_at(gb, SYM(ralphSubid07Substate2))) { ralphSubid07Substate2_hook(gb); return; }
+    if (jt_ == SYM(ralphAnimateBasedOnSpeedAndRunScript) && hook_is(gb, SYM(ralphAnimateBasedOnSpeedAndRunScript), ralphAnimateBasedOnSpeedAndRunScript_hook)) { ralphAnimateBasedOnSpeedAndRunScript_hook(gb); return; } // substates 0 and 3
+    else if (jt_ == SYM(ralphSubid07Substate1) && hook_is(gb, SYM(ralphSubid07Substate1), ralphSubid07Substate1_hook)) { ralphSubid07Substate1_hook(gb); return; }
+    else if (jt_ == SYM(ralphSubid07Substate2) && hook_is(gb, SYM(ralphSubid07Substate2), ralphSubid07Substate2_hook)) { ralphSubid07Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -1307,7 +1307,7 @@ void ralphSubid0b_hook(GB *gb) {
   do { uint16_t jt_ = (ralph_jumpTable(gb));
     if (jt_ == b_+17) { goto substate0; }
     else if (jt_ == b_+22) { goto substate1; }
-    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation) && hook_enabled_at(gb, SYM(ralphRunScriptWithConditionalAnimation))) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
+    else if (jt_ == SYM(ralphRunScriptWithConditionalAnimation) && hook_is(gb, SYM(ralphRunScriptWithConditionalAnimation), ralphRunScriptWithConditionalAnimation_hook)) { ralphRunScriptWithConditionalAnimation_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

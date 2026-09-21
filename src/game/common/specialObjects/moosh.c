@@ -71,17 +71,17 @@ void specialObjectCode_moosh__runState_hook(GB *gb) {
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); push_effect(gb, b_+16);
   do { uint16_t jt_ = (moosh_jump_table(gb));
-    if (jt_ == SYM(mooshState0) && hook_enabled_at(gb, SYM(mooshState0))) { mooshState0_hook(gb); return; }
-    else if (jt_ == SYM(mooshState1) && hook_enabled_at(gb, SYM(mooshState1))) { mooshState1_hook(gb); return; }
-    else if (jt_ == SYM(mooshState2) && hook_enabled_at(gb, SYM(mooshState2))) { mooshState2_hook(gb); return; }
-    else if (jt_ == SYM(mooshState3) && hook_enabled_at(gb, SYM(mooshState3))) { mooshState3_hook(gb); return; }
-    else if (jt_ == SYM(mooshState4) && hook_enabled_at(gb, SYM(mooshState4))) { mooshState4_hook(gb); return; }
-    else if (jt_ == SYM(mooshState5) && hook_enabled_at(gb, SYM(mooshState5))) { mooshState5_hook(gb); return; }
-    else if (jt_ == SYM(mooshState6) && hook_enabled_at(gb, SYM(mooshState6))) { mooshState6_hook(gb); return; }
-    else if (jt_ == SYM(mooshState7) && hook_enabled_at(gb, SYM(mooshState7))) { mooshState7_hook(gb); return; }
-    else if (jt_ == SYM(mooshState8) && hook_enabled_at(gb, SYM(mooshState8))) { mooshState8_hook(gb); return; }
-    else if (jt_ == SYM(mooshStateA) && hook_enabled_at(gb, SYM(mooshStateA))) { mooshStateA_hook(gb); return; }
-    else if (jt_ == SYM(mooshStateC) && hook_enabled_at(gb, SYM(mooshStateC))) { mooshStateC_hook(gb); return; }
+    if (jt_ == SYM(mooshState0) && hook_is(gb, SYM(mooshState0), mooshState0_hook)) { mooshState0_hook(gb); return; }
+    else if (jt_ == SYM(mooshState1) && hook_is(gb, SYM(mooshState1), mooshState1_hook)) { mooshState1_hook(gb); return; }
+    else if (jt_ == SYM(mooshState2) && hook_is(gb, SYM(mooshState2), mooshState2_hook)) { mooshState2_hook(gb); return; }
+    else if (jt_ == SYM(mooshState3) && hook_is(gb, SYM(mooshState3), mooshState3_hook)) { mooshState3_hook(gb); return; }
+    else if (jt_ == SYM(mooshState4) && hook_is(gb, SYM(mooshState4), mooshState4_hook)) { mooshState4_hook(gb); return; }
+    else if (jt_ == SYM(mooshState5) && hook_is(gb, SYM(mooshState5), mooshState5_hook)) { mooshState5_hook(gb); return; }
+    else if (jt_ == SYM(mooshState6) && hook_is(gb, SYM(mooshState6), mooshState6_hook)) { mooshState6_hook(gb); return; }
+    else if (jt_ == SYM(mooshState7) && hook_is(gb, SYM(mooshState7), mooshState7_hook)) { mooshState7_hook(gb); return; }
+    else if (jt_ == SYM(mooshState8) && hook_is(gb, SYM(mooshState8), mooshState8_hook)) { mooshState8_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateA) && hook_is(gb, SYM(mooshStateA), mooshStateA_hook)) { mooshStateA_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateC) && hook_is(gb, SYM(mooshStateC), mooshStateC_hook)) { mooshStateC_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -372,12 +372,12 @@ void mooshState8_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (moosh_jump_table(gb));
-    if (jt_ == SYM(mooshState8Substate0) && hook_enabled_at(gb, SYM(mooshState8Substate0))) { mooshState8Substate0_hook(gb); return; }
-    else if (jt_ == SYM(mooshState8Substate1) && hook_enabled_at(gb, SYM(mooshState8Substate1))) { mooshState8Substate1_hook(gb); return; }
-    else if (jt_ == SYM(mooshState8Substate2) && hook_enabled_at(gb, SYM(mooshState8Substate2))) { mooshState8Substate2_hook(gb); return; }
-    else if (jt_ == SYM(mooshState8Substate3) && hook_enabled_at(gb, SYM(mooshState8Substate3))) { mooshState8Substate3_hook(gb); return; }
-    else if (jt_ == SYM(mooshState8Substate4) && hook_enabled_at(gb, SYM(mooshState8Substate4))) { mooshState8Substate4_hook(gb); return; }
-    else if (jt_ == SYM(mooshState8Substate5) && hook_enabled_at(gb, SYM(mooshState8Substate5))) { mooshState8Substate5_hook(gb); return; }
+    if (jt_ == SYM(mooshState8Substate0) && hook_is(gb, SYM(mooshState8Substate0), mooshState8Substate0_hook)) { mooshState8Substate0_hook(gb); return; }
+    else if (jt_ == SYM(mooshState8Substate1) && hook_is(gb, SYM(mooshState8Substate1), mooshState8Substate1_hook)) { mooshState8Substate1_hook(gb); return; }
+    else if (jt_ == SYM(mooshState8Substate2) && hook_is(gb, SYM(mooshState8Substate2), mooshState8Substate2_hook)) { mooshState8Substate2_hook(gb); return; }
+    else if (jt_ == SYM(mooshState8Substate3) && hook_is(gb, SYM(mooshState8Substate3), mooshState8Substate3_hook)) { mooshState8Substate3_hook(gb); return; }
+    else if (jt_ == SYM(mooshState8Substate4) && hook_is(gb, SYM(mooshState8Substate4), mooshState8Substate4_hook)) { mooshState8Substate4_hook(gb); return; }
+    else if (jt_ == SYM(mooshState8Substate5) && hook_is(gb, SYM(mooshState8Substate5), mooshState8Substate5_hook)) { mooshState8Substate5_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -796,12 +796,12 @@ void mooshStateA_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (moosh_jump_table(gb));
     if (jt_ == b_+18) { goto substate0; }
-    else if (jt_ == SYM(mooshStateASubstate1) && hook_enabled_at(gb, SYM(mooshStateASubstate1))) { mooshStateASubstate1_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateASubstate1) && hook_is(gb, SYM(mooshStateASubstate1), mooshStateASubstate1_hook)) { mooshStateASubstate1_hook(gb); return; }
     else if (jt_ == b_+34) { goto substate2; }
-    else if (jt_ == SYM(mooshStateASubstate3) && hook_enabled_at(gb, SYM(mooshStateASubstate3))) { mooshStateASubstate3_hook(gb); return; }
-    else if (jt_ == SYM(mooshStateASubstate4) && hook_enabled_at(gb, SYM(mooshStateASubstate4))) { mooshStateASubstate4_hook(gb); return; }
-    else if (jt_ == SYM(mooshStateASubstate5) && hook_enabled_at(gb, SYM(mooshStateASubstate5))) { mooshStateASubstate5_hook(gb); return; }
-    else if (jt_ == SYM(mooshStateASubstate6) && hook_enabled_at(gb, SYM(mooshStateASubstate6))) { mooshStateASubstate6_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateASubstate3) && hook_is(gb, SYM(mooshStateASubstate3), mooshStateASubstate3_hook)) { mooshStateASubstate3_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateASubstate4) && hook_is(gb, SYM(mooshStateASubstate4), mooshStateASubstate4_hook)) { mooshStateASubstate4_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateASubstate5) && hook_is(gb, SYM(mooshStateASubstate5), mooshStateASubstate5_hook)) { mooshStateASubstate5_hook(gb); return; }
+    else if (jt_ == SYM(mooshStateASubstate6) && hook_is(gb, SYM(mooshStateASubstate6), mooshStateASubstate6_hook)) { mooshStateASubstate6_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 

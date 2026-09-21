@@ -11863,7 +11863,7 @@ void linkState07_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (rst_jump_table(gb));
     if (jt_ == b_+10) { linkState07__substate0_hook(gb); return; }
-    else if (jt_ == SYM(specialObjectAnimate) && hook_enabled_at(gb, SYM(specialObjectAnimate))) { specialObjectAnimate_hook(gb); return; }
+    else if (jt_ == SYM(specialObjectAnimate) && hook_is(gb, SYM(specialObjectAnimate), specialObjectAnimate_hook)) { specialObjectAnimate_hook(gb); return; }
     else if (jt_ == b_+33) { linkState07__substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);

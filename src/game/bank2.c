@@ -1968,18 +1968,18 @@ void getMinimapPopupType_hook(GB *gb) {
   CYC(b_+2, b_+3); E = A;
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(minimapPopupType_normal) && hook_enabled_at(gb, SYM(minimapPopupType_normal))) { minimapPopupType_normal_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_advanceShop) && hook_enabled_at(gb, SYM(minimapPopupType_advanceShop))) { minimapPopupType_advanceShop_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_cave) && hook_enabled_at(gb, SYM(minimapPopupType_cave))) { minimapPopupType_cave_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_gashaSpot) && hook_enabled_at(gb, SYM(minimapPopupType_gashaSpot))) { minimapPopupType_gashaSpot_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_portalSpot) && hook_enabled_at(gb, SYM(minimapPopupType_portalSpot))) { minimapPopupType_portalSpot_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_seedTree) && hook_enabled_at(gb, SYM(minimapPopupType_seedTree))) { minimapPopupType_seedTree_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_moblinsKeep) && hook_enabled_at(gb, SYM(minimapPopupType_moblinsKeep))) { minimapPopupType_moblinsKeep_hook(gb); return; }
-    else if (jt_ == SYM(minimapNoPopup) && hook_enabled_at(gb, SYM(minimapNoPopup))) { minimapNoPopup_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_shop) && hook_enabled_at(gb, SYM(minimapPopupType_shop))) { minimapPopupType_shop_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_vasuOrSyrup) && hook_enabled_at(gb, SYM(minimapPopupType_vasuOrSyrup))) { minimapPopupType_vasuOrSyrup_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_blackTower) && hook_enabled_at(gb, SYM(minimapPopupType_blackTower))) { minimapPopupType_blackTower_hook(gb); return; }
-    else if (jt_ == SYM(minimapPopupType_makuTree) && hook_enabled_at(gb, SYM(minimapPopupType_makuTree))) { minimapPopupType_makuTree_hook(gb); return; }
+    if (jt_ == SYM(minimapPopupType_normal) && hook_is(gb, SYM(minimapPopupType_normal), minimapPopupType_normal_hook)) { minimapPopupType_normal_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_advanceShop) && hook_is(gb, SYM(minimapPopupType_advanceShop), minimapPopupType_advanceShop_hook)) { minimapPopupType_advanceShop_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_cave) && hook_is(gb, SYM(minimapPopupType_cave), minimapPopupType_cave_hook)) { minimapPopupType_cave_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_gashaSpot) && hook_is(gb, SYM(minimapPopupType_gashaSpot), minimapPopupType_gashaSpot_hook)) { minimapPopupType_gashaSpot_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_portalSpot) && hook_is(gb, SYM(minimapPopupType_portalSpot), minimapPopupType_portalSpot_hook)) { minimapPopupType_portalSpot_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_seedTree) && hook_is(gb, SYM(minimapPopupType_seedTree), minimapPopupType_seedTree_hook)) { minimapPopupType_seedTree_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_moblinsKeep) && hook_is(gb, SYM(minimapPopupType_moblinsKeep), minimapPopupType_moblinsKeep_hook)) { minimapPopupType_moblinsKeep_hook(gb); return; }
+    else if (jt_ == SYM(minimapNoPopup) && hook_is(gb, SYM(minimapNoPopup), minimapNoPopup_hook)) { minimapNoPopup_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_shop) && hook_is(gb, SYM(minimapPopupType_shop), minimapPopupType_shop_hook)) { minimapPopupType_shop_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_vasuOrSyrup) && hook_is(gb, SYM(minimapPopupType_vasuOrSyrup), minimapPopupType_vasuOrSyrup_hook)) { minimapPopupType_vasuOrSyrup_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_blackTower) && hook_is(gb, SYM(minimapPopupType_blackTower), minimapPopupType_blackTower_hook)) { minimapPopupType_blackTower_hook(gb); return; }
+    else if (jt_ == SYM(minimapPopupType_makuTree) && hook_is(gb, SYM(minimapPopupType_makuTree), minimapPopupType_makuTree_hook)) { minimapPopupType_makuTree_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -2280,10 +2280,10 @@ static void run_inventory_menu_states(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wMenuActiveState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(inventoryMenuState0) && hook_enabled_at(gb, SYM(inventoryMenuState0))) { inventoryMenuState0_hook(gb); return; }
-    else if (jt_ == SYM(inventoryMenuState1) && hook_enabled_at(gb, SYM(inventoryMenuState1))) { inventoryMenuState1_hook(gb); return; }
-    else if (jt_ == SYM(inventoryMenuState2) && hook_enabled_at(gb, SYM(inventoryMenuState2))) { inventoryMenuState2_hook(gb); return; }
-    else if (jt_ == SYM(inventoryMenuState3) && hook_enabled_at(gb, SYM(inventoryMenuState3))) { inventoryMenuState3_hook(gb); return; }
+    if (jt_ == SYM(inventoryMenuState0) && hook_is(gb, SYM(inventoryMenuState0), inventoryMenuState0_hook)) { inventoryMenuState0_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState1) && hook_is(gb, SYM(inventoryMenuState1), inventoryMenuState1_hook)) { inventoryMenuState1_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState2) && hook_is(gb, SYM(inventoryMenuState2), inventoryMenuState2_hook)) { inventoryMenuState2_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState3) && hook_is(gb, SYM(inventoryMenuState3), inventoryMenuState3_hook)) { inventoryMenuState3_hook(gb); return; }
     else { HANDOFF(jt_); }
   } while (0);
 }
@@ -2294,9 +2294,9 @@ static void run_ring_menu_state_code(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wMenuActiveState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(ringMenu_state0) && hook_enabled_at(gb, SYM(ringMenu_state0))) { ringMenu_state0_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_state1) && hook_enabled_at(gb, SYM(ringMenu_state1))) { ringMenu_state1_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_state2) && hook_enabled_at(gb, SYM(ringMenu_state2))) { ringMenu_state2_hook(gb); return; }
+    if (jt_ == SYM(ringMenu_state0) && hook_is(gb, SYM(ringMenu_state0), ringMenu_state0_hook)) { ringMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state1) && hook_is(gb, SYM(ringMenu_state1), ringMenu_state1_hook)) { ringMenu_state1_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state2) && hook_is(gb, SYM(ringMenu_state2), ringMenu_state2_hook)) { ringMenu_state2_hook(gb); return; }
     else { HANDOFF(jt_); }
   } while (0);
 }
@@ -2378,8 +2378,8 @@ void dungeonMap_checkDirectionButtons_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wSubmenuState);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(dungeonMap_scrollingState0) && hook_enabled_at(gb, SYM(dungeonMap_scrollingState0))) { dungeonMap_scrollingState0_hook(gb); return; }
-    else if (jt_ == SYM(dungeonMap_scrollingState1) && hook_enabled_at(gb, SYM(dungeonMap_scrollingState1))) { dungeonMap_scrollingState1_hook(gb); return; }
+    if (jt_ == SYM(dungeonMap_scrollingState0) && hook_is(gb, SYM(dungeonMap_scrollingState0), dungeonMap_scrollingState0_hook)) { dungeonMap_scrollingState0_hook(gb); return; }
+    else if (jt_ == SYM(dungeonMap_scrollingState1) && hook_is(gb, SYM(dungeonMap_scrollingState1), dungeonMap_scrollingState1_hook)) { dungeonMap_scrollingState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -2712,10 +2712,10 @@ void runGaleSeedMenu__runState_hook(GB *gb) {
   CYC(b_+9, b_+12); A = W8(wMenuActiveState);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(galeSeedMenu_state0) && hook_enabled_at(gb, SYM(galeSeedMenu_state0))) { galeSeedMenu_state0_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedMenu_state1) && hook_enabled_at(gb, SYM(galeSeedMenu_state1))) { galeSeedMenu_state1_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedMenu_state2) && hook_enabled_at(gb, SYM(galeSeedMenu_state2))) { galeSeedMenu_state2_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedMenu_state3) && hook_enabled_at(gb, SYM(galeSeedMenu_state3))) { galeSeedMenu_state3_hook(gb); return; }
+    if (jt_ == SYM(galeSeedMenu_state0) && hook_is(gb, SYM(galeSeedMenu_state0), galeSeedMenu_state0_hook)) { galeSeedMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedMenu_state1) && hook_is(gb, SYM(galeSeedMenu_state1), galeSeedMenu_state1_hook)) { galeSeedMenu_state1_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedMenu_state2) && hook_is(gb, SYM(galeSeedMenu_state2), galeSeedMenu_state2_hook)) { galeSeedMenu_state2_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedMenu_state3) && hook_is(gb, SYM(galeSeedMenu_state3), galeSeedMenu_state3_hook)) { galeSeedMenu_state3_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -2877,8 +2877,8 @@ void runMapMenu_hook(GB *gb) {
   CYC(b_+3, b_+6); A = W8(wMenuActiveState);
   CYC(b_+6, b_+7); push_effect(gb, b_+7);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(mapMenu_state0) && hook_enabled_at(gb, SYM(mapMenu_state0))) { mapMenu_state0_hook(gb); return; }
-    else if (jt_ == SYM(mapMenu_state1) && hook_enabled_at(gb, SYM(mapMenu_state1))) { mapMenu_state1_hook(gb); return; }
+    if (jt_ == SYM(mapMenu_state0) && hook_is(gb, SYM(mapMenu_state0), mapMenu_state0_hook)) { mapMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(mapMenu_state1) && hook_is(gb, SYM(mapMenu_state1), mapMenu_state1_hook)) { mapMenu_state1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -3515,7 +3515,7 @@ void runSecretEntryMenu__func_hook(GB *gb) {
     if (jt_ == b_+23) { runSecretEntryMenu__mode0_hook(gb); return; }
     else if (jt_ == b_+34) { runSecretEntryMenu__mode1_hook(gb); return; }
     else if (jt_ == b_+42) { runSecretEntryMenu__mode2_hook(gb); return; }
-    else if (jt_ == SYM(closeMenu) && hook_enabled_at(gb, SYM(closeMenu))) { closeMenu_hook(gb); return; }
+    else if (jt_ == SYM(closeMenu) && hook_is(gb, SYM(closeMenu), closeMenu_hook)) { closeMenu_hook(gb); return; }
     else if (jt_ == SYM(textInput_waitForInput)) { HANDOFF(HL); }
     else { HANDOFF(HL); }
   } while (0);
@@ -5547,8 +5547,8 @@ void runInventoryMenu__inventoryMenuStates_hook(GB *gb) {
   CYC(b_+23, b_+26); A = W8(wMenuActiveState);
   CYC(b_+26, b_+27); push_effect(gb, b_+27);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(inventoryMenuState0) && hook_enabled_at(gb, SYM(inventoryMenuState0))) { inventoryMenuState0_hook(gb); return; }
-    else if (jt_ == SYM(inventoryMenuState1) && hook_enabled_at(gb, SYM(inventoryMenuState1))) { inventoryMenuState1_hook(gb); return; }
+    if (jt_ == SYM(inventoryMenuState0) && hook_is(gb, SYM(inventoryMenuState0), inventoryMenuState0_hook)) { inventoryMenuState0_hook(gb); return; }
+    else if (jt_ == SYM(inventoryMenuState1) && hook_is(gb, SYM(inventoryMenuState1), inventoryMenuState1_hook)) { inventoryMenuState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -5967,9 +5967,9 @@ void runRingMenu__runStateCode_hook(GB *gb) {
   CYC(b_+27, b_+30); A = W8(wMenuActiveState);
   CYC(b_+30, b_+31); push_effect(gb, b_+31);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(ringMenu_state0) && hook_enabled_at(gb, SYM(ringMenu_state0))) { ringMenu_state0_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_state1) && hook_enabled_at(gb, SYM(ringMenu_state1))) { ringMenu_state1_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_state2) && hook_enabled_at(gb, SYM(ringMenu_state2))) { ringMenu_state2_hook(gb); return; }
+    if (jt_ == SYM(ringMenu_state0) && hook_is(gb, SYM(ringMenu_state0), ringMenu_state0_hook)) { ringMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state1) && hook_is(gb, SYM(ringMenu_state1), ringMenu_state1_hook)) { ringMenu_state1_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state2) && hook_is(gb, SYM(ringMenu_state2), ringMenu_state2_hook)) { ringMenu_state2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -6064,8 +6064,8 @@ void ringMenu_state1_hook(GB *gb) {
   CYC(b_+5, b_+8); A = W8(wRingMenu_mode);
   CYC(b_+8, b_+9); push_effect(gb, b_+9);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(ringMenu_state1_unappraisedRings) && hook_enabled_at(gb, SYM(ringMenu_state1_unappraisedRings))) { ringMenu_state1_unappraisedRings_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_state1_ringList) && hook_enabled_at(gb, SYM(ringMenu_state1_ringList))) { ringMenu_state1_ringList_hook(gb); return; }
+    if (jt_ == SYM(ringMenu_state1_unappraisedRings) && hook_is(gb, SYM(ringMenu_state1_unappraisedRings), ringMenu_state1_unappraisedRings_hook)) { ringMenu_state1_unappraisedRings_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_state1_ringList) && hook_is(gb, SYM(ringMenu_state1_ringList), ringMenu_state1_ringList_hook)) { ringMenu_state1_ringList_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -6077,12 +6077,12 @@ void ringMenu_state1_unappraisedRings_hook(GB *gb) {
   CYC(b_+3, b_+6); A = W8(wSubmenuState);
   CYC(b_+6, b_+7); push_effect(gb, b_+7);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(ringMenu_unappraisedRings_state0) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state0))) { ringMenu_unappraisedRings_state0_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_unappraisedRings_state1) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state1))) { ringMenu_unappraisedRings_state1_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_unappraisedRings_state2) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state2))) { ringMenu_unappraisedRings_state2_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_unappraisedRings_state3) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state3))) { ringMenu_unappraisedRings_state3_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_unappraisedRings_state4) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state4))) { ringMenu_unappraisedRings_state4_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_unappraisedRings_state5) && hook_enabled_at(gb, SYM(ringMenu_unappraisedRings_state5))) { ringMenu_unappraisedRings_state5_hook(gb); return; }
+    if (jt_ == SYM(ringMenu_unappraisedRings_state0) && hook_is(gb, SYM(ringMenu_unappraisedRings_state0), ringMenu_unappraisedRings_state0_hook)) { ringMenu_unappraisedRings_state0_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_unappraisedRings_state1) && hook_is(gb, SYM(ringMenu_unappraisedRings_state1), ringMenu_unappraisedRings_state1_hook)) { ringMenu_unappraisedRings_state1_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_unappraisedRings_state2) && hook_is(gb, SYM(ringMenu_unappraisedRings_state2), ringMenu_unappraisedRings_state2_hook)) { ringMenu_unappraisedRings_state2_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_unappraisedRings_state3) && hook_is(gb, SYM(ringMenu_unappraisedRings_state3), ringMenu_unappraisedRings_state3_hook)) { ringMenu_unappraisedRings_state3_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_unappraisedRings_state4) && hook_is(gb, SYM(ringMenu_unappraisedRings_state4), ringMenu_unappraisedRings_state4_hook)) { ringMenu_unappraisedRings_state4_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_unappraisedRings_state5) && hook_is(gb, SYM(ringMenu_unappraisedRings_state5), ringMenu_unappraisedRings_state5_hook)) { ringMenu_unappraisedRings_state5_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -6345,9 +6345,9 @@ void runSecretListMenu__runState_hook(GB *gb) {
   CYC(b_+13, b_+16); A = W8(wSecretListMenu_state);
   CYC(b_+16, b_+17); push_effect(gb, b_+17);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(secretListMenu_state0) && hook_enabled_at(gb, SYM(secretListMenu_state0))) { secretListMenu_state0_hook(gb); return; }
-    else if (jt_ == SYM(secretListMenu_state1) && hook_enabled_at(gb, SYM(secretListMenu_state1))) { secretListMenu_state1_hook(gb); return; }
-    else if (jt_ == SYM(secretListMenu_state2) && hook_enabled_at(gb, SYM(secretListMenu_state2))) { secretListMenu_state2_hook(gb); return; }
+    if (jt_ == SYM(secretListMenu_state0) && hook_is(gb, SYM(secretListMenu_state0), secretListMenu_state0_hook)) { secretListMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(secretListMenu_state1) && hook_is(gb, SYM(secretListMenu_state1), secretListMenu_state1_hook)) { secretListMenu_state1_hook(gb); return; }
+    else if (jt_ == SYM(secretListMenu_state2) && hook_is(gb, SYM(secretListMenu_state2), secretListMenu_state2_hook)) { secretListMenu_state2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -6675,8 +6675,8 @@ void ringMenu_state1_ringList_hook(GB *gb) {
   CYC(b_+9, b_+12); A = W8(wSubmenuState);
   CYC(b_+12, b_+13); push_effect(gb, b_+13);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(ringMenu_ringList_substate0) && hook_enabled_at(gb, SYM(ringMenu_ringList_substate0))) { ringMenu_ringList_substate0_hook(gb); return; }
-    else if (jt_ == SYM(ringMenu_ringList_substate1) && hook_enabled_at(gb, SYM(ringMenu_ringList_substate1))) { ringMenu_ringList_substate1_hook(gb); return; }
+    if (jt_ == SYM(ringMenu_ringList_substate0) && hook_is(gb, SYM(ringMenu_ringList_substate0), ringMenu_ringList_substate0_hook)) { ringMenu_ringList_substate0_hook(gb); return; }
+    else if (jt_ == SYM(ringMenu_ringList_substate1) && hook_is(gb, SYM(ringMenu_ringList_substate1), ringMenu_ringList_substate1_hook)) { ringMenu_ringList_substate1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -7559,9 +7559,9 @@ void runSaveAndQuitMenu__runState_hook(GB *gb) {
   CYC(b_+10, b_+13); A = W8(wSaveQuitMenu_state);
   CYC(b_+13, b_+14); push_effect(gb, b_+14);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(saveQuitMenu_state0) && hook_enabled_at(gb, SYM(saveQuitMenu_state0))) { saveQuitMenu_state0_hook(gb); return; }
-    else if (jt_ == SYM(saveQuitMenu_state1) && hook_enabled_at(gb, SYM(saveQuitMenu_state1))) { saveQuitMenu_state1_hook(gb); return; }
-    else if (jt_ == SYM(saveQuitMenu_state2) && hook_enabled_at(gb, SYM(saveQuitMenu_state2))) { saveQuitMenu_state2_hook(gb); return; }
+    if (jt_ == SYM(saveQuitMenu_state0) && hook_is(gb, SYM(saveQuitMenu_state0), saveQuitMenu_state0_hook)) { saveQuitMenu_state0_hook(gb); return; }
+    else if (jt_ == SYM(saveQuitMenu_state1) && hook_is(gb, SYM(saveQuitMenu_state1), saveQuitMenu_state1_hook)) { saveQuitMenu_state1_hook(gb); return; }
+    else if (jt_ == SYM(saveQuitMenu_state2) && hook_is(gb, SYM(saveQuitMenu_state2), saveQuitMenu_state2_hook)) { saveQuitMenu_state2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -10031,7 +10031,7 @@ void fileSelectMode6__updateMode6_hook(GB *gb) {
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == b_+20) { fileSelectMode6__mode0_hook(gb); return; }
     else if (jt_ == b_+27) { fileSelectMode6__mode2_hook(gb); return; }
-    else if (jt_ == SYM(textInput_waitForInput) && hook_enabled_at(gb, SYM(textInput_waitForInput))) { textInput_waitForInput_hook(gb); return; }
+    else if (jt_ == SYM(textInput_waitForInput) && hook_is(gb, SYM(textInput_waitForInput), textInput_waitForInput_hook)) { textInput_waitForInput_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -10142,10 +10142,10 @@ void b2_updateMenus__updateMenu_hook(GB *gb) {
   CYC(b_+79, b_+82); A = W8(wMenuLoadState);
   CYC(b_+82, b_+83); push_effect(gb, b_+83);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(menuStateFadeIntoMenu) && hook_enabled_at(gb, SYM(menuStateFadeIntoMenu))) { menuStateFadeIntoMenu_hook(gb); return; }
-    else if (jt_ == SYM(menuSpecificCode) && hook_enabled_at(gb, SYM(menuSpecificCode))) { menuSpecificCode_hook(gb); return; }
-    else if (jt_ == SYM(menuStateFadeOutOfMenu) && hook_enabled_at(gb, SYM(menuStateFadeOutOfMenu))) { menuStateFadeOutOfMenu_hook(gb); return; }
-    else if (jt_ == SYM(menuStateFadeIntoGame) && hook_enabled_at(gb, SYM(menuStateFadeIntoGame))) { menuStateFadeIntoGame_hook(gb); return; }
+    if (jt_ == SYM(menuStateFadeIntoMenu) && hook_is(gb, SYM(menuStateFadeIntoMenu), menuStateFadeIntoMenu_hook)) { menuStateFadeIntoMenu_hook(gb); return; }
+    else if (jt_ == SYM(menuSpecificCode) && hook_is(gb, SYM(menuSpecificCode), menuSpecificCode_hook)) { menuSpecificCode_hook(gb); return; }
+    else if (jt_ == SYM(menuStateFadeOutOfMenu) && hook_is(gb, SYM(menuStateFadeOutOfMenu), menuStateFadeOutOfMenu_hook)) { menuStateFadeOutOfMenu_hook(gb); return; }
+    else if (jt_ == SYM(menuStateFadeIntoGame) && hook_is(gb, SYM(menuStateFadeIntoGame), menuStateFadeIntoGame_hook)) { menuStateFadeIntoGame_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -10157,14 +10157,14 @@ void menuSpecificCode_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
     if (jt_ == SYM(runSaveAndQuitMenu) || jt_ == SYM(runSecretListMenu)) { HANDOFF(HL); }
-    else if (jt_ == SYM(runInventoryMenu) && hook_enabled_at(gb, SYM(runInventoryMenu))) { runInventoryMenu_hook(gb); return; }
-    else if (jt_ == SYM(runMapMenu) && hook_enabled_at(gb, SYM(runMapMenu))) { runMapMenu_hook(gb); return; }
-    else if (jt_ == SYM(runRingMenu) && hook_enabled_at(gb, SYM(runRingMenu))) { runRingMenu_hook(gb); return; }
-    else if (jt_ == SYM(runGaleSeedMenu) && hook_enabled_at(gb, SYM(runGaleSeedMenu))) { runGaleSeedMenu_hook(gb); return; }
-    else if (jt_ == SYM(runSecretEntryMenu) && hook_enabled_at(gb, SYM(runSecretEntryMenu))) { runSecretEntryMenu_hook(gb); return; }
-    else if (jt_ == SYM(runKidNameEntryMenu) && hook_enabled_at(gb, SYM(runKidNameEntryMenu))) { runKidNameEntryMenu_hook(gb); return; }
-    else if (jt_ == SYM(runGameLinkMenu) && hook_enabled_at(gb, SYM(runGameLinkMenu))) { runGameLinkMenu_hook(gb); return; }
-    else if (jt_ == SYM(runFakeReset) && hook_enabled_at(gb, SYM(runFakeReset))) { runFakeReset_hook(gb); return; }
+    else if (jt_ == SYM(runInventoryMenu) && hook_is(gb, SYM(runInventoryMenu), runInventoryMenu_hook)) { runInventoryMenu_hook(gb); return; }
+    else if (jt_ == SYM(runMapMenu) && hook_is(gb, SYM(runMapMenu), runMapMenu_hook)) { runMapMenu_hook(gb); return; }
+    else if (jt_ == SYM(runRingMenu) && hook_is(gb, SYM(runRingMenu), runRingMenu_hook)) { runRingMenu_hook(gb); return; }
+    else if (jt_ == SYM(runGaleSeedMenu) && hook_is(gb, SYM(runGaleSeedMenu), runGaleSeedMenu_hook)) { runGaleSeedMenu_hook(gb); return; }
+    else if (jt_ == SYM(runSecretEntryMenu) && hook_is(gb, SYM(runSecretEntryMenu), runSecretEntryMenu_hook)) { runSecretEntryMenu_hook(gb); return; }
+    else if (jt_ == SYM(runKidNameEntryMenu) && hook_is(gb, SYM(runKidNameEntryMenu), runKidNameEntryMenu_hook)) { runKidNameEntryMenu_hook(gb); return; }
+    else if (jt_ == SYM(runGameLinkMenu) && hook_is(gb, SYM(runGameLinkMenu), runGameLinkMenu_hook)) { runGameLinkMenu_hook(gb); return; }
+    else if (jt_ == SYM(runFakeReset) && hook_is(gb, SYM(runFakeReset), runFakeReset_hook)) { runFakeReset_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -10315,14 +10315,14 @@ void b2_fileSelectScreen_hook(GB *gb) {
   CYC(b_+7, b_+10); A = W8(wFileSelect_mode);
   CYC(b_+10, b_+11); push_effect(gb, b_+11);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(fileSelectMode0) && hook_enabled_at(gb, SYM(fileSelectMode0))) { fileSelectMode0_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode1) && hook_enabled_at(gb, SYM(fileSelectMode1))) { fileSelectMode1_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode2) && hook_enabled_at(gb, SYM(fileSelectMode2))) { fileSelectMode2_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode3) && hook_enabled_at(gb, SYM(fileSelectMode3))) { fileSelectMode3_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode4) && hook_enabled_at(gb, SYM(fileSelectMode4))) { fileSelectMode4_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode5) && hook_enabled_at(gb, SYM(fileSelectMode5))) { fileSelectMode5_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode6) && hook_enabled_at(gb, SYM(fileSelectMode6))) { fileSelectMode6_hook(gb); return; }
-    else if (jt_ == SYM(fileSelectMode7) && hook_enabled_at(gb, SYM(fileSelectMode7))) { fileSelectMode7_hook(gb); return; }
+    if (jt_ == SYM(fileSelectMode0) && hook_is(gb, SYM(fileSelectMode0), fileSelectMode0_hook)) { fileSelectMode0_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode1) && hook_is(gb, SYM(fileSelectMode1), fileSelectMode1_hook)) { fileSelectMode1_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode2) && hook_is(gb, SYM(fileSelectMode2), fileSelectMode2_hook)) { fileSelectMode2_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode3) && hook_is(gb, SYM(fileSelectMode3), fileSelectMode3_hook)) { fileSelectMode3_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode4) && hook_is(gb, SYM(fileSelectMode4), fileSelectMode4_hook)) { fileSelectMode4_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode5) && hook_is(gb, SYM(fileSelectMode5), fileSelectMode5_hook)) { fileSelectMode5_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode6) && hook_is(gb, SYM(fileSelectMode6), fileSelectMode6_hook)) { fileSelectMode6_hook(gb); return; }
+    else if (jt_ == SYM(fileSelectMode7) && hook_is(gb, SYM(fileSelectMode7), fileSelectMode7_hook)) { fileSelectMode7_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -10388,15 +10388,15 @@ void runBank2Function_hook(GB *gb) {
   CYC(b_+1, b_+2); A = H;
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == SYM(loadCommonGraphics_body) && hook_enabled_at(gb, SYM(loadCommonGraphics_body))) { loadCommonGraphics_body_hook(gb); return; }
-    else if (jt_ == SYM(updateStatusBar_body) && hook_enabled_at(gb, SYM(updateStatusBar_body))) { updateStatusBar_body_hook(gb); return; }
-    else if (jt_ == SYM(hideStatusBar_body) && hook_enabled_at(gb, SYM(hideStatusBar_body))) { hideStatusBar_body_hook(gb); return; }
-    else if (jt_ == SYM(showStatusBar_body) && hook_enabled_at(gb, SYM(showStatusBar_body))) { showStatusBar_body_hook(gb); return; }
-    else if (jt_ == SYM(saveGraphicsOnEnterMenu_body) && hook_enabled_at(gb, SYM(saveGraphicsOnEnterMenu_body))) { saveGraphicsOnEnterMenu_body_hook(gb); return; }
-    else if (jt_ == SYM(reloadGraphicsOnExitMenu_body) && hook_enabled_at(gb, SYM(reloadGraphicsOnExitMenu_body))) { reloadGraphicsOnExitMenu_body_hook(gb); return; }
-    else if (jt_ == SYM(openMenu_body) && hook_enabled_at(gb, SYM(openMenu_body))) { openMenu_body_hook(gb); return; }
-    else if (jt_ == SYM(copyW2TilesetBgPalettesToW4PaletteData_body) && hook_enabled_at(gb, SYM(copyW2TilesetBgPalettesToW4PaletteData_body))) { copyW2TilesetBgPalettesToW4PaletteData_body_hook(gb); return; }
-    else if (jt_ == SYM(copyW4PaletteDataToW2TilesetBgPalettes_body) && hook_enabled_at(gb, SYM(copyW4PaletteDataToW2TilesetBgPalettes_body))) { copyW4PaletteDataToW2TilesetBgPalettes_body_hook(gb); return; }
+    if (jt_ == SYM(loadCommonGraphics_body) && hook_is(gb, SYM(loadCommonGraphics_body), loadCommonGraphics_body_hook)) { loadCommonGraphics_body_hook(gb); return; }
+    else if (jt_ == SYM(updateStatusBar_body) && hook_is(gb, SYM(updateStatusBar_body), updateStatusBar_body_hook)) { updateStatusBar_body_hook(gb); return; }
+    else if (jt_ == SYM(hideStatusBar_body) && hook_is(gb, SYM(hideStatusBar_body), hideStatusBar_body_hook)) { hideStatusBar_body_hook(gb); return; }
+    else if (jt_ == SYM(showStatusBar_body) && hook_is(gb, SYM(showStatusBar_body), showStatusBar_body_hook)) { showStatusBar_body_hook(gb); return; }
+    else if (jt_ == SYM(saveGraphicsOnEnterMenu_body) && hook_is(gb, SYM(saveGraphicsOnEnterMenu_body), saveGraphicsOnEnterMenu_body_hook)) { saveGraphicsOnEnterMenu_body_hook(gb); return; }
+    else if (jt_ == SYM(reloadGraphicsOnExitMenu_body) && hook_is(gb, SYM(reloadGraphicsOnExitMenu_body), reloadGraphicsOnExitMenu_body_hook)) { reloadGraphicsOnExitMenu_body_hook(gb); return; }
+    else if (jt_ == SYM(openMenu_body) && hook_is(gb, SYM(openMenu_body), openMenu_body_hook)) { openMenu_body_hook(gb); return; }
+    else if (jt_ == SYM(copyW2TilesetBgPalettesToW4PaletteData_body) && hook_is(gb, SYM(copyW2TilesetBgPalettesToW4PaletteData_body), copyW2TilesetBgPalettesToW4PaletteData_body_hook)) { copyW2TilesetBgPalettesToW4PaletteData_body_hook(gb); return; }
+    else if (jt_ == SYM(copyW4PaletteDataToW2TilesetBgPalettes_body) && hook_is(gb, SYM(copyW4PaletteDataToW2TilesetBgPalettes_body), copyW4PaletteDataToW2TilesetBgPalettes_body_hook)) { copyW4PaletteDataToW2TilesetBgPalettes_body_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

@@ -473,8 +473,8 @@ void interactionCode36_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (nayru_jumpTable(gb));
-    if (jt_ == SYM(nayruState0) && hook_enabled_at(gb, SYM(nayruState0))) { nayruState0_hook(gb); return; }
-    else if (jt_ == SYM(nayruState1) && hook_enabled_at(gb, SYM(nayruState1))) { nayruState1_hook(gb); return; }
+    if (jt_ == SYM(nayruState0) && hook_is(gb, SYM(nayruState0), nayruState0_hook)) { nayruState0_hook(gb); return; }
+    else if (jt_ == SYM(nayruState1) && hook_is(gb, SYM(nayruState1), nayruState1_hook)) { nayruState1_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -504,20 +504,20 @@ void nayruState1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (nayru_jumpTable(gb));
-    if (jt_ == SYM(nayruSubid00) && hook_enabled_at(gb, SYM(nayruSubid00))) { nayruSubid00_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid01) && hook_enabled_at(gb, SYM(nayruSubid01))) { nayruSubid01_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid02) && hook_enabled_at(gb, SYM(nayruSubid02))) { nayruSubid02_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid03) && hook_enabled_at(gb, SYM(nayruSubid03))) { nayruSubid03_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid04) && hook_enabled_at(gb, SYM(nayruSubid04))) { nayruSubid04_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid05) && hook_enabled_at(gb, SYM(nayruSubid05))) { nayruSubid05_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid07) && hook_enabled_at(gb, SYM(nayruSubid07))) { nayruSubid07_hook(gb); return; }
-    else if (jt_ == SYM(nayruAnimateAndRunScript) && hook_enabled_at(gb, SYM(nayruAnimateAndRunScript))) { nayruAnimateAndRunScript_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid09) && hook_enabled_at(gb, SYM(nayruSubid09))) { nayruSubid09_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid0a) && hook_enabled_at(gb, SYM(nayruSubid0a))) { nayruSubid0a_hook(gb); return; }
-    else if (jt_ == SYM(nayruAsNpc) && hook_enabled_at(gb, SYM(nayruAsNpc))) { nayruAsNpc_hook(gb); return; }
-    else if (jt_ == SYM(interactionAnimate) && hook_enabled_at(gb, SYM(interactionAnimate))) { interactionAnimate_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid10) && hook_enabled_at(gb, SYM(nayruSubid10))) { nayruSubid10_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid13) && hook_enabled_at(gb, SYM(nayruSubid13))) { nayruSubid13_hook(gb); return; }
+    if (jt_ == SYM(nayruSubid00) && hook_is(gb, SYM(nayruSubid00), nayruSubid00_hook)) { nayruSubid00_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid01) && hook_is(gb, SYM(nayruSubid01), nayruSubid01_hook)) { nayruSubid01_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02) && hook_is(gb, SYM(nayruSubid02), nayruSubid02_hook)) { nayruSubid02_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid03) && hook_is(gb, SYM(nayruSubid03), nayruSubid03_hook)) { nayruSubid03_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid04) && hook_is(gb, SYM(nayruSubid04), nayruSubid04_hook)) { nayruSubid04_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid05) && hook_is(gb, SYM(nayruSubid05), nayruSubid05_hook)) { nayruSubid05_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid07) && hook_is(gb, SYM(nayruSubid07), nayruSubid07_hook)) { nayruSubid07_hook(gb); return; }
+    else if (jt_ == SYM(nayruAnimateAndRunScript) && hook_is(gb, SYM(nayruAnimateAndRunScript), nayruAnimateAndRunScript_hook)) { nayruAnimateAndRunScript_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid09) && hook_is(gb, SYM(nayruSubid09), nayruSubid09_hook)) { nayruSubid09_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid0a) && hook_is(gb, SYM(nayruSubid0a), nayruSubid0a_hook)) { nayruSubid0a_hook(gb); return; }
+    else if (jt_ == SYM(nayruAsNpc) && hook_is(gb, SYM(nayruAsNpc), nayruAsNpc_hook)) { nayruAsNpc_hook(gb); return; }
+    else if (jt_ == SYM(interactionAnimate) && hook_is(gb, SYM(interactionAnimate), interactionAnimate_hook)) { interactionAnimate_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid10) && hook_is(gb, SYM(nayruSubid10), nayruSubid10_hook)) { nayruSubid10_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid13) && hook_is(gb, SYM(nayruSubid13), nayruSubid13_hook)) { nayruSubid13_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -787,9 +787,9 @@ void nayruSubid02_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (nayru_jumpTable(gb));
-    if (jt_ == SYM(nayruSubid02Substate0) && hook_enabled_at(gb, SYM(nayruSubid02Substate0))) { nayruSubid02Substate0_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid02Substate1) && hook_enabled_at(gb, SYM(nayruSubid02Substate1))) { nayruSubid02Substate1_hook(gb); return; }
-    else if (jt_ == SYM(nayruSubid02Substate2) && hook_enabled_at(gb, SYM(nayruSubid02Substate2))) { nayruSubid02Substate2_hook(gb); return; }
+    if (jt_ == SYM(nayruSubid02Substate0) && hook_is(gb, SYM(nayruSubid02Substate0), nayruSubid02Substate0_hook)) { nayruSubid02Substate0_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02Substate1) && hook_is(gb, SYM(nayruSubid02Substate1), nayruSubid02Substate1_hook)) { nayruSubid02Substate1_hook(gb); return; }
+    else if (jt_ == SYM(nayruSubid02Substate2) && hook_is(gb, SYM(nayruSubid02Substate2), nayruSubid02Substate2_hook)) { nayruSubid02Substate2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

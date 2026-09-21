@@ -87,20 +87,20 @@ void enemyCode01__normalStatus_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+104, b_+106); goto stateCOrHigher; } CYC(b_+104, b_+106);  // jr nc,@stateCOrHigher
   CYC(b_+106, b_+107); push_effect(gb, b_+107);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_state_uninitialized) && hook_enabled_at(gb, SYM(mergedTwinrova_state_uninitialized))) { mergedTwinrova_state_uninitialized_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_state_stub) && hook_enabled_at(gb, SYM(mergedTwinrova_state_stub))) { mergedTwinrova_state_stub_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_state8) && hook_enabled_at(gb, SYM(mergedTwinrova_state8))) { mergedTwinrova_state8_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_state9) && hook_enabled_at(gb, SYM(mergedTwinrova_state9))) { mergedTwinrova_state9_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_stateA) && hook_enabled_at(gb, SYM(mergedTwinrova_stateA))) { mergedTwinrova_stateA_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_stateB) && hook_enabled_at(gb, SYM(mergedTwinrova_stateB))) { mergedTwinrova_stateB_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_state_uninitialized) && hook_is(gb, SYM(mergedTwinrova_state_uninitialized), mergedTwinrova_state_uninitialized_hook)) { mergedTwinrova_state_uninitialized_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_state_stub) && hook_is(gb, SYM(mergedTwinrova_state_stub), mergedTwinrova_state_stub_hook)) { mergedTwinrova_state_stub_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_state8) && hook_is(gb, SYM(mergedTwinrova_state8), mergedTwinrova_state8_hook)) { mergedTwinrova_state8_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_state9) && hook_is(gb, SYM(mergedTwinrova_state9), mergedTwinrova_state9_hook)) { mergedTwinrova_state9_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_stateA) && hook_is(gb, SYM(mergedTwinrova_stateA), mergedTwinrova_stateA_hook)) { mergedTwinrova_stateA_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_stateB) && hook_is(gb, SYM(mergedTwinrova_stateB), mergedTwinrova_stateB_hook)) { mergedTwinrova_stateB_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 stateCOrHigher:
   CYC(b_+131, b_+132); A = B;  // ld a,b
   CYC(b_+132, b_+133); push_effect(gb, b_+133);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_lavaRoom) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom))) { mergedTwinrova_lavaRoom_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom))) { mergedTwinrova_iceRoom_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_lavaRoom) && hook_is(gb, SYM(mergedTwinrova_lavaRoom), mergedTwinrova_lavaRoom_hook)) { mergedTwinrova_lavaRoom_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom) && hook_is(gb, SYM(mergedTwinrova_iceRoom), mergedTwinrova_iceRoom_hook)) { mergedTwinrova_iceRoom_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -130,7 +130,7 @@ void enemyCode01_hook(GB *gb) {
   CYC(b_+32, b_+34); L = 0xa4;  // ld l,Enemy.collisionType
   CYC(b_+34, b_+36); mem_wr(gb, HL, GV(0xff, 0x87));  // ld (hl),$ff
   CYC(b_+36, b_+38); A = 0x09;  // ld a,$09
-  CYC(b_+38, b_+41); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+38, b_+41); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 collisionOccurred:
   CYC(b_+41, b_+43); E = 0xba;  // ld e,Enemy.var3a
   CYC(b_+43, b_+44); A = mem_rd(gb, DE);  // ld a,(de)
@@ -159,7 +159,7 @@ collisionOccurred:
   CYC(b_+85, b_+86); L = alu_inc8(gb, L);  // inc l
   CYC(b_+86, b_+88); mem_wr(gb, HL, 216);  // ld (hl),216
   CYC(b_+88, b_+90); A = 0xf0;  // ld a,SNDCTRL_STOPMUSIC
-  CYC(b_+90, b_+93); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+90, b_+93); if (hook_is(gb, SYM(playSound_b00), playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 normalStatus:
   CYC(b_+93, b_+96); push_effect(gb, b_+96); enemyCode01__normalStatus_hook(gb);  // call @normalStatus
 }
@@ -186,7 +186,7 @@ void mergedTwinrova_state_uninitialized_hook(GB *gb) {
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0xff);  // ld (hl),$ff
   CALL_C(b_+36, objectSetVisible83_hook, SYM(objectSetVisible83), b_+39);
   CYC(b_+39, b_+42); SET_BC(0x2f0b);  // ld bc,TX_2f0b
-  CYC(b_+42, b_+45); if (hook_enabled_at(gb, SYM(showText))) { showText_hook(gb); return; } HANDOFF(SYM(showText));  // jp showText
+  CYC(b_+42, b_+45); if (hook_is(gb, SYM(showText), showText_hook)) { showText_hook(gb); return; } HANDOFF(SYM(showText));  // jp showText
 }
 
 void mergedTwinrova_state_stub_hook(GB *gb) {
@@ -223,7 +223,7 @@ void mergedTwinrova_state8_hook(GB *gb) {
   CYC(b_+36, b_+39); mem_wr(gb, wDisableLinkCollisionsAndMenu, A);  // ld (wDisableLinkCollisionsAndMenu),a
   CYC(b_+39, b_+41); A = 0x33;  // ld a,MUS_TWINROVA
   CYC(b_+41, b_+44); mem_wr(gb, wActiveMusic, A);  // ld (wActiveMusic),a
-  CYC(b_+44, b_+47); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+44, b_+47); if (hook_is(gb, SYM(playSound_b00), playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void mergedTwinrova_state9_hook(GB *gb) {
@@ -238,7 +238,7 @@ void mergedTwinrova_state9_hook(GB *gb) {
   CYC(b_+10, b_+11); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+11, b_+13); mem_wr(gb, hFF8E, A);  // ldh (<hFF8E),a
   CALL_C(b_+13, mergedTwinrova_checkPositionsCloseEnough_hook, SYM(mergedTwinrova_checkPositionsCloseEnough), b_+16);
-  if (!(F & FC)) { CYCT(b_+16, b_+19); if (hook_enabled_at(gb, SYM(ecom_moveTowardPosition_b10))) { ecom_moveTowardPosition_b10_hook(gb); return; } HANDOFF(SYM(ecom_moveTowardPosition_b10)); } CYC(b_+16, b_+19);  // jp nc,ecom_moveTowardPosition
+  if (!(F & FC)) { CYCT(b_+16, b_+19); if (hook_is(gb, SYM(ecom_moveTowardPosition_b10), ecom_moveTowardPosition_b10_hook)) { ecom_moveTowardPosition_b10_hook(gb); return; } HANDOFF(SYM(ecom_moveTowardPosition_b10)); } CYC(b_+16, b_+19);  // jp nc,ecom_moveTowardPosition
   CYC(b_+19, b_+20); L = E;  // ld l,e
   CYC(b_+20, b_+21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+21, b_+22); L = alu_inc8(gb, L);  // inc l
@@ -295,7 +295,7 @@ substate0_swapSubid:
   CYC(b_+45, b_+46); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+46, b_+47); A = B;  // ld a,b
   CYC(b_+47, b_+48); A = alu_inc8(gb, A);  // inc a
-  CYC(b_+48, b_+51); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+48, b_+51); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 substate1:
   CALL_C(b_+51, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+54);
   if ((F & FZ)) { CYCT(b_+54, b_+56); goto substate1_swapSubid; } CYC(b_+54, b_+56);  // jr z,++
@@ -319,7 +319,7 @@ substate1_swapSubid:
   CYC(b_+78, b_+81); mem_wr(gb, wDisableLinkCollisionsAndMenu, A);  // ld (wDisableLinkCollisionsAndMenu),a
   CALL_C(b_+81, fastFadeoutToWhite_hook, SYM(fastFadeoutToWhite), b_+84);
   CYC(b_+84, b_+86); A = 0xb9;  // ld a,SND_ENDLESS
-  CYC(b_+86, b_+89); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+86, b_+89); if (hook_is(gb, SYM(playSound_b00), playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 substate2:
   CYC(b_+89, b_+91); A = 0x03;  // ld a,$03
   CYC(b_+91, b_+92); mem_wr(gb, DE, A);  // ld (de),a
@@ -337,7 +337,7 @@ substate2:
 substate3:
   CYC(b_+114, b_+116); A = 0x04;  // ld a,$04
   CYC(b_+116, b_+117); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+117, b_+120); if (hook_enabled_at(gb, SYM(fadeinFromWhiteWithDelay))) { fadeinFromWhiteWithDelay_hook(gb); return; } HANDOFF(SYM(fadeinFromWhiteWithDelay));  // jp fadeinFromWhiteWithDelay
+  CYC(b_+117, b_+120); if (hook_is(gb, SYM(fadeinFromWhiteWithDelay), fadeinFromWhiteWithDelay_hook)) { fadeinFromWhiteWithDelay_hook(gb); return; } HANDOFF(SYM(fadeinFromWhiteWithDelay));  // jp fadeinFromWhiteWithDelay
 substate4:
   CYC(b_+120, b_+123); A = mem_rd(gb, wPaletteThread_mode);  // ld a,(wPaletteThread_mode)
   CYC(b_+123, b_+124); alu_or(gb, A);  // or a
@@ -356,7 +356,7 @@ substate4:
   CYC(b_+144, b_+145); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+145, b_+148); mem_wr(gb, wDisableLinkCollisionsAndMenu, A);  // ld (wDisableLinkCollisionsAndMenu),a
   CYC(b_+148, b_+150); A = 0xf1;  // ld a,SNDCTRL_STOPSFX
-  CYC(b_+150, b_+153); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+150, b_+153); if (hook_is(gb, SYM(playSound_b00), playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void mergedTwinrova_stateB_hook(GB *gb) {
@@ -376,9 +376,9 @@ void mergedTwinrova_lavaRoom_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x0c);  // sub $0c
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_lavaRoom_stateC) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom_stateC))) { mergedTwinrova_lavaRoom_stateC_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateD) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom_stateD))) { mergedTwinrova_lavaRoom_stateD_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateE) && hook_enabled_at(gb, SYM(mergedTwinrova_lavaRoom_stateE))) { mergedTwinrova_lavaRoom_stateE_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_lavaRoom_stateC) && hook_is(gb, SYM(mergedTwinrova_lavaRoom_stateC), mergedTwinrova_lavaRoom_stateC_hook)) { mergedTwinrova_lavaRoom_stateC_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateD) && hook_is(gb, SYM(mergedTwinrova_lavaRoom_stateD), mergedTwinrova_lavaRoom_stateD_hook)) { mergedTwinrova_lavaRoom_stateD_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_lavaRoom_stateE) && hook_is(gb, SYM(mergedTwinrova_lavaRoom_stateE), mergedTwinrova_lavaRoom_stateE_hook)) { mergedTwinrova_lavaRoom_stateE_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -415,7 +415,7 @@ chooseTargetPositionIndex:
   CYC(b_+25, b_+26); A = mem_rd(gb, BC);  // ld a,(bc)
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);  // ld (de),a
   CYC(b_+27, b_+29); A = 0xc9;  // ld a,SND_CIRCLING
-  CYC(b_+29, b_+32); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+29, b_+32); if (hook_is(gb, SYM(playSound_b00), playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 }
 
 void mergedTwinrova_lavaRoom_stateD_hook(GB *gb) {
@@ -431,7 +431,7 @@ readTarget:
   CYC(b_+8, b_+10); L = 0xb7;  // ld l,Enemy.var37
   CALL_C(b_+10, ecom_readPositionVars_b10_hook, SYM(ecom_readPositionVars_b10), b_+13);
   CALL_C(b_+13, mergedTwinrova_checkPositionsCloseEnough_hook, SYM(mergedTwinrova_checkPositionsCloseEnough), b_+16);
-  if (!(F & FC)) { CYCT(b_+16, b_+19); if (hook_enabled_at(gb, SYM(ecom_moveTowardPosition_b10))) { ecom_moveTowardPosition_b10_hook(gb); return; } HANDOFF(SYM(ecom_moveTowardPosition_b10)); } CYC(b_+16, b_+19);  // jp nc,ecom_moveTowardPosition
+  if (!(F & FC)) { CYCT(b_+16, b_+19); if (hook_is(gb, SYM(ecom_moveTowardPosition_b10), ecom_moveTowardPosition_b10_hook)) { ecom_moveTowardPosition_b10_hook(gb); return; } HANDOFF(SYM(ecom_moveTowardPosition_b10)); } CYC(b_+16, b_+19);  // jp nc,ecom_moveTowardPosition
   CYC(b_+19, b_+21); L = 0xb3;  // ld l,Enemy.var33
   CYC(b_+21, b_+22); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+22, b_+23); alu_or(gb, A);  // or a
@@ -493,15 +493,15 @@ flameAttack_substate0:
   CYC(b_+38, b_+40); L = 0xc9;  // ld l,Part.angle
   CYC(b_+40, b_+41); mem_wr(gb, HL, B);  // ld (hl),b
   CYC(b_+41, b_+44); SET_BC(0x1000);  // ld bc,$1000
-  CYC(b_+44, b_+47); if (hook_enabled_at(gb, SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
+  CYC(b_+44, b_+47); if (hook_is(gb, SYM(objectCopyPositionWithOffset), objectCopyPositionWithOffset_hook)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 flameAttack_substate1:
   CALL_C(b_+47, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+50);
-  if (!(F & FZ)) { CYCT(b_+50, b_+53); if (hook_enabled_at(gb, SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+50, b_+53);  // jp nz,enemyAnimate
+  if (!(F & FZ)) { CYCT(b_+50, b_+53); if (hook_is(gb, SYM(enemyAnimate), enemyAnimate_hook)) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+50, b_+53);  // jp nz,enemyAnimate
   CYC(b_+53, b_+55); mem_wr(gb, HL, 16);  // ld (hl),16
   CYC(b_+55, b_+56); L = E;  // ld l,e
   CYC(b_+56, b_+57); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+57, b_+59); A = 0x04;  // ld a,$04
-  CYC(b_+59, b_+62); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+59, b_+62); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 flameAttack_substate2:
   CALL_C(b_+62, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+65);
   if (!(F & FZ)) { RET_TAKEN(b_+65); return; } CYC(b_+65, b_+66);  // ret nz
@@ -515,7 +515,7 @@ doneAttack:
   CYC(b_+78, b_+80); L = 0xb9;  // ld l,Enemy.var39
   CYC(b_+80, b_+82); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CYC(b_+82, b_+84); A = 0x01;  // ld a,$01
-  CYC(b_+84, b_+87); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+84, b_+87); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 keeseAttack:
   CYC(b_+87, b_+89); E = 0x85;  // ld e,Enemy.substate
   CYC(b_+89, b_+90); A = mem_rd(gb, DE);  // ld a,(de)
@@ -535,10 +535,10 @@ keeseAttack_substate0:
   CYC(b_+103, b_+104); L = alu_inc8(gb, L);  // inc l
   CYC(b_+104, b_+106); mem_wr(gb, HL, 0x05);  // ld (hl),$05
   CYC(b_+106, b_+108); A = 0x07;  // ld a,$07
-  CYC(b_+108, b_+111); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+108, b_+111); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 keeseAttack_substate1:
   CALL_C(b_+111, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+114);
-  if (!(F & FZ)) { CYCT(b_+114, b_+117); if (hook_enabled_at(gb, SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+114, b_+117);  // jp nz,enemyAnimate
+  if (!(F & FZ)) { CYCT(b_+114, b_+117); if (hook_is(gb, SYM(enemyAnimate), enemyAnimate_hook)) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+114, b_+117);  // jp nz,enemyAnimate
   CYC(b_+117, b_+119); mem_wr(gb, HL, 20);  // ld (hl),20
   CYC(b_+119, b_+120); L = alu_inc8(gb, L);  // inc l
   CYC(b_+120, b_+121); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -558,14 +558,14 @@ keeseAttack_substate1:
   CYC(b_+140, b_+141); mem_wr(gb, HL, D);  // ld (hl),d
   CYC(b_+141, b_+142); L = alu_dec8(gb, L);  // dec l
   CYC(b_+142, b_+144); mem_wr(gb, HL, 0x80);  // ld (hl),Enemy.start
-  CYC(b_+144, b_+147); if (hook_enabled_at(gb, SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
+  CYC(b_+144, b_+147); if (hook_is(gb, SYM(objectCopyPositionWithOffset), objectCopyPositionWithOffset_hook)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 doneSpawningKeese:
   CYC(b_+147, b_+148); L = alu_dec8(gb, L);  // dec l
   CYC(b_+148, b_+150); mem_wr(gb, HL, 180);  // ld (hl),180
   CYC(b_+150, b_+151); L = E;  // ld l,e
   CYC(b_+151, b_+152); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+152, b_+154); A = 0x03;  // ld a,$03
-  CYC(b_+154, b_+157); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+154, b_+157); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 keeseAttack_substate2:
   CALL_C(b_+165, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+168);
   if (!(F & FZ)) { RET_TAKEN(b_+168); return; } CYC(b_+168, b_+169);  // ret nz
@@ -579,11 +579,11 @@ void mergedTwinrova_iceRoom_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x0c);  // sub $0c
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (mergedTwinrova_jump_table(gb));
-    if (jt_ == SYM(mergedTwinrova_iceRoom_stateC) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateC))) { mergedTwinrova_iceRoom_stateC_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateD) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateD))) { mergedTwinrova_iceRoom_stateD_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateE) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateE))) { mergedTwinrova_iceRoom_stateE_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateF) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_stateF))) { mergedTwinrova_iceRoom_stateF_hook(gb); return; }
-    else if (jt_ == SYM(mergedTwinrova_iceRoom_state10) && hook_enabled_at(gb, SYM(mergedTwinrova_iceRoom_state10))) { mergedTwinrova_iceRoom_state10_hook(gb); return; }
+    if (jt_ == SYM(mergedTwinrova_iceRoom_stateC) && hook_is(gb, SYM(mergedTwinrova_iceRoom_stateC), mergedTwinrova_iceRoom_stateC_hook)) { mergedTwinrova_iceRoom_stateC_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateD) && hook_is(gb, SYM(mergedTwinrova_iceRoom_stateD), mergedTwinrova_iceRoom_stateD_hook)) { mergedTwinrova_iceRoom_stateD_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateE) && hook_is(gb, SYM(mergedTwinrova_iceRoom_stateE), mergedTwinrova_iceRoom_stateE_hook)) { mergedTwinrova_iceRoom_stateE_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_stateF) && hook_is(gb, SYM(mergedTwinrova_iceRoom_stateF), mergedTwinrova_iceRoom_stateF_hook)) { mergedTwinrova_iceRoom_stateF_hook(gb); return; }
+    else if (jt_ == SYM(mergedTwinrova_iceRoom_state10) && hook_is(gb, SYM(mergedTwinrova_iceRoom_state10), mergedTwinrova_iceRoom_state10_hook)) { mergedTwinrova_iceRoom_state10_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -614,7 +614,7 @@ counter2Set:
   CYC(b_+31, b_+33); E = 0x87;  // ld e,Enemy.counter2
   CYC(b_+33, b_+34); mem_wr(gb, DE, A);  // ld (de),a
   CYC(b_+34, b_+36); A = 0x05;  // ld a,$05
-  CYC(b_+36, b_+39); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+36, b_+39); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void mergedTwinrova_iceRoom_stateD_hook(GB *gb) {
@@ -630,7 +630,7 @@ void mergedTwinrova_iceRoom_stateD_hook(GB *gb) {
   } while (0);
 substate0:
   CALL_C(b_+7, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+10);
-  if (!(F & FZ)) { CYCT(b_+10, b_+13); if (hook_enabled_at(gb, SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+10, b_+13);  // jp nz,enemyAnimate
+  if (!(F & FZ)) { CYCT(b_+10, b_+13); if (hook_is(gb, SYM(enemyAnimate), enemyAnimate_hook)) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+10, b_+13);  // jp nz,enemyAnimate
   CYC(b_+13, b_+15); mem_wr(gb, HL, 30);  // ld (hl),30
   CYC(b_+15, b_+16); L = alu_inc8(gb, L);  // inc l
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
@@ -668,7 +668,7 @@ readAngle:
   CYC(b_+60, b_+62); mem_wr(gb, HL, 0x80);  // ld (hl),Enemy.start
   CYC(b_+62, b_+63); L = alu_inc8(gb, L);  // inc l
   CYC(b_+63, b_+64); mem_wr(gb, HL, D);  // ld (hl),d
-  CYC(b_+64, b_+67); if (hook_enabled_at(gb, SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
+  CYC(b_+64, b_+67); if (hook_is(gb, SYM(objectCopyPositionWithOffset), objectCopyPositionWithOffset_hook)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 doneSpawningProjectiles:
   CYC(b_+67, b_+68); L = E;  // ld l,e
   CYC(b_+68, b_+69); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
@@ -677,7 +677,7 @@ doneSpawningProjectiles:
   CYC(b_+73, b_+75); L = 0xb9;  // ld l,Enemy.var39
   CYC(b_+75, b_+77); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CYC(b_+77, b_+79); A = 0x06;  // ld a,$06
-  CYC(b_+79, b_+82); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+79, b_+82); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 substate1:
   CALL_C(b_+102, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+105);
   if (!(F & FZ)) { RET_TAKEN(b_+105); return; } CYC(b_+105, b_+106);  // ret nz
@@ -685,7 +685,7 @@ substate1:
   CYC(b_+108, b_+110); L = 0x84;  // ld l,Enemy.state
   CYC(b_+110, b_+111); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+111, b_+113); A = 0x02;  // ld a,$02
-  CYC(b_+113, b_+116); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+113, b_+116); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void mergedTwinrova_iceRoom_stateE_hook(GB *gb) {
@@ -705,7 +705,7 @@ void mergedTwinrova_iceRoom_stateF_hook(GB *gb) {
   CYC(b_+1, b_+3); L = 0xb7;  // ld l,Enemy.var37
   CALL_C(b_+3, ecom_readPositionVars_b10_hook, SYM(ecom_readPositionVars_b10), b_+6);
   CALL_C(b_+6, mergedTwinrova_checkPositionsCloseEnough_hook, SYM(mergedTwinrova_checkPositionsCloseEnough), b_+9);
-  if (!(F & FC)) { CYCT(b_+9, b_+12); if (hook_enabled_at(gb, SYM(ecom_moveTowardPosition_b10))) { ecom_moveTowardPosition_b10_hook(gb); return; } HANDOFF(SYM(ecom_moveTowardPosition_b10)); } CYC(b_+9, b_+12);  // jp nc,ecom_moveTowardPosition
+  if (!(F & FC)) { CYCT(b_+9, b_+12); if (hook_is(gb, SYM(ecom_moveTowardPosition_b10), ecom_moveTowardPosition_b10_hook)) { ecom_moveTowardPosition_b10_hook(gb); return; } HANDOFF(SYM(ecom_moveTowardPosition_b10)); } CYC(b_+9, b_+12);  // jp nc,ecom_moveTowardPosition
   CYC(b_+12, b_+14); L = 0x84;  // ld l,Enemy.state
   CYC(b_+14, b_+15); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+15, b_+16); L = alu_inc8(gb, L);  // inc l
@@ -720,7 +720,7 @@ void mergedTwinrova_iceRoom_stateF_hook(GB *gb) {
   if (!(F & FZ)) { RET_TAKEN(b_+33); return; } CYC(b_+33, b_+34);  // ret nz
   CYC(b_+34, b_+36); mem_wr(gb, HL, 0x4e);  // ld (hl),PART_TWINROVA_SNOWBALL
   CYC(b_+36, b_+39); SET_BC(0xe800);  // ld bc,$e800
-  CYC(b_+39, b_+42); if (hook_enabled_at(gb, SYM(objectCopyPositionWithOffset))) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
+  CYC(b_+39, b_+42); if (hook_is(gb, SYM(objectCopyPositionWithOffset), objectCopyPositionWithOffset_hook)) { objectCopyPositionWithOffset_hook(gb); return; } HANDOFF(SYM(objectCopyPositionWithOffset));  // jp objectCopyPositionWithOffset
 }
 
 void mergedTwinrova_iceRoom_state10_hook(GB *gb) {
@@ -736,12 +736,12 @@ void mergedTwinrova_iceRoom_state10_hook(GB *gb) {
   } while (0);
 substate0:
   CALL_C(b_+7, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+10);
-  if (!(F & FZ)) { CYCT(b_+10, b_+13); if (hook_enabled_at(gb, SYM(enemyAnimate))) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+10, b_+13);  // jp nz,enemyAnimate
+  if (!(F & FZ)) { CYCT(b_+10, b_+13); if (hook_is(gb, SYM(enemyAnimate), enemyAnimate_hook)) { enemyAnimate_hook(gb); return; } HANDOFF(SYM(enemyAnimate)); } CYC(b_+10, b_+13);  // jp nz,enemyAnimate
   CYC(b_+13, b_+15); mem_wr(gb, HL, 60);  // ld (hl),60
   CYC(b_+15, b_+16); L = E;  // ld l,e
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+17, b_+19); A = 0x06;  // ld a,$06
-  CYC(b_+19, b_+22); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+19, b_+22); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 substate1:
   CALL_C(b_+22, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+25);
   if (!(F & FZ)) { RET_TAKEN(b_+25); return; } CYC(b_+25, b_+26);  // ret nz
@@ -754,7 +754,7 @@ substate1:
   CYC(b_+38, b_+40); L = 0xb9;  // ld l,Enemy.var39
   CYC(b_+40, b_+42); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CYC(b_+42, b_+44); A = 0x02;  // ld a,$02
-  CYC(b_+44, b_+47); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+44, b_+47); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void mergedTwinrova_checkTimeToSwapRoomFromTimer_hook(GB *gb) {
@@ -819,7 +819,7 @@ setState9:
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);  // ld (hl),a
   CYC(b_+26, b_+27); A = B;  // ld a,b
   CYC(b_+27, b_+28); A = alu_inc8(gb, A);  // inc a
-  CYC(b_+28, b_+31); if (hook_enabled_at(gb, SYM(enemySetAnimation))) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
+  CYC(b_+28, b_+31); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation
 }
 
 void mergedTwinrova_deathCutscene_hook(GB *gb) {
@@ -862,7 +862,7 @@ doneExplosions:
   CYC(b_+55, b_+56); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
 substate1:
   CALL_C(b_+56, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+59);
-  if (!(F & FZ)) { CYCT(b_+59, b_+62); if (hook_enabled_at(gb, SYM(ecom_flickerVisibility_b10))) { ecom_flickerVisibility_b10_hook(gb); return; } HANDOFF(SYM(ecom_flickerVisibility_b10)); } CYC(b_+59, b_+62);  // jp nz,ecom_flickerVisibility
+  if (!(F & FZ)) { CYCT(b_+59, b_+62); if (hook_is(gb, SYM(ecom_flickerVisibility_b10), ecom_flickerVisibility_b10_hook)) { ecom_flickerVisibility_b10_hook(gb); return; } HANDOFF(SYM(ecom_flickerVisibility_b10)); } CYC(b_+59, b_+62);  // jp nz,ecom_flickerVisibility
   CYC(b_+62, b_+63); L = E;  // ld l,e
   CYC(b_+63, b_+64); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   CYC(b_+64, b_+66); L = 0x9b;  // ld l,Enemy.oamFlagsBackup
@@ -871,14 +871,14 @@ substate1:
   CYC(b_+68, b_+69); mem_wr(gb, HL, A);  // ld (hl),a
   CALL_C(b_+69, enemySetAnimation_hook, SYM(enemySetAnimation), b_+72);
   CYC(b_+72, b_+75); SET_BC(0x2f0c);  // ld bc,TX_2f0c
-  CYC(b_+75, b_+78); if (hook_enabled_at(gb, SYM(showText))) { showText_hook(gb); return; } HANDOFF(SYM(showText));  // jp showText
+  CYC(b_+75, b_+78); if (hook_is(gb, SYM(showText), showText_hook)) { showText_hook(gb); return; } HANDOFF(SYM(showText));  // jp showText
 substate2:
   CYC(b_+78, b_+80); A = 0x03;  // ld a,$03
   CYC(b_+80, b_+81); mem_wr(gb, DE, A);  // ld (de),a
   CYC(b_+81, b_+83); A = 0x19;  // ld a,CUTSCENE_TWINROVA_SACRIFICE
   CYC(b_+83, b_+86); mem_wr(gb, wCutsceneTrigger, A);  // ld (wCutsceneTrigger),a
   CYC(b_+86, b_+88); A = 0x1d;  // ld a,MUS_ROOM_OF_RITES
-  CYC(b_+88, b_+91); if (hook_enabled_at(gb, SYM(playSound_b00))) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
+  CYC(b_+88, b_+91); if (hook_is(gb, SYM(playSound_b00), playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(SYM(playSound_b00));  // jp playSound
 substate3:
   RET(b_+91); return;  // ret
 createExplosion:

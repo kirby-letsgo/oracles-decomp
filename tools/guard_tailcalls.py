@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Guard direct tail calls into other routines' hooks with hook_enabled_at().
+"""Guard direct tail calls into other routines' hooks with hook_is().
 
 usage: tools/guard_tailcalls.py [--apply] [FILE...]
 
@@ -9,7 +9,7 @@ hooked in the running game. Under Seasons that is wrong whenever the callee is n
 it makes the caller ineligible. The guarded forms
 
     TAIL(x);
-    if (jt_ == SYM(x) && hook_enabled_at(gb, SYM(x))) { x_hook(gb); return; }
+    if (jt_ == SYM(x) && hook_is(gb, SYM(x), x_hook)) { x_hook(gb); return; }
 
 (TAIL(x) is the first form as a macro in game.h: the interpreter runs x until it returns to the
 address on top of the emulated stack) fall back to the interpreter at the callee's address
@@ -59,13 +59,13 @@ def guard_file(path, syms, apply):
             changed += 1
             continue
         m = PLAIN.match(code)
-        if m and m.group(3) in syms and not re.search(r'hook_enabled_at', code) and func_start is not None:
+        if m and m.group(3) in syms and not re.search(r'hook_enabled_at|hook_is', code) and func_start is not None:
             indent, pre, callee, rest = m.groups()
             new = f'{indent}{pre}TAIL({callee});{rest}'
             out.append(new + (sep + comment if sep else '')); changed += 1
             continue
         new = code if i in unsafe else CHAIN.sub(lambda mm: mm.group(0) if mm.group(2) is None or mm.group(2) != mm.group(3) else
-                        f'if (jt_ == {mm.group(1)} && hook_enabled_at(gb, SYM({mm.group(2)}))) {{ {mm.group(3)}_hook(gb); return; }}', code)
+                        f'if (jt_ == {mm.group(1)} && hook_is(gb, SYM({mm.group(2)}), {mm.group(3)}_hook)) {{ {mm.group(3)}_hook(gb); return; }}', code)
         if new != code: changed += 1
         out.append(new + (sep + comment if sep else ''))
     text = '\n'.join(out)

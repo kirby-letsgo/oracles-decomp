@@ -167,7 +167,7 @@ void interactionCode16_hook(GB *gb) {
     if (jt_ == b_+12) { interactionMinecart_state0(gb, sp0_); return; }
     else if (jt_ == b_+59) { interactionMinecart_state1(gb, sp0_); return; }
     else if (jt_ == b_+132) { interactionMinecart_state2(gb, sp0_); return; }
-    else if (jt_ == SYM(interactionDelete) && hook_enabled_at(gb, SYM(interactionDelete))) { interactionDelete_hook(gb); return; }
+    else if (jt_ == SYM(interactionDelete) && hook_is(gb, SYM(interactionDelete), interactionDelete_hook)) { interactionDelete_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

@@ -70,7 +70,7 @@ void parentItemCode_satchel_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (seeds_parent_jump_table(gb));
     if (jt_ == b_+8) { goto state0; }
-    else if (jt_ == SYM(parentItemGenericState1) && hook_enabled_at(gb, SYM(parentItemGenericState1))) { parentItemGenericState1_hook(gb); return; }
+    else if (jt_ == SYM(parentItemGenericState1) && hook_is(gb, SYM(parentItemGenericState1), parentItemGenericState1_hook)) { parentItemGenericState1_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 

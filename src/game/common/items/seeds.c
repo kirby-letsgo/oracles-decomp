@@ -80,9 +80,9 @@ void seedItemState3_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_sub(gb, 0x20);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (seed_jump_table(gb));
-    if (jt_ == SYM(emberSeedBurn) && hook_enabled_at(gb, SYM(emberSeedBurn))) { emberSeedBurn_hook(gb); return; }
-    else if (jt_ == SYM(seedUpdateAnimation) && hook_enabled_at(gb, SYM(seedUpdateAnimation))) { seedUpdateAnimation_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedUpdateAnimationAndCounter) && hook_enabled_at(gb, SYM(galeSeedUpdateAnimationAndCounter))) { galeSeedUpdateAnimationAndCounter_hook(gb); return; }
+    if (jt_ == SYM(emberSeedBurn) && hook_is(gb, SYM(emberSeedBurn), emberSeedBurn_hook)) { emberSeedBurn_hook(gb); return; }
+    else if (jt_ == SYM(seedUpdateAnimation) && hook_is(gb, SYM(seedUpdateAnimation), seedUpdateAnimation_hook)) { seedUpdateAnimation_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedUpdateAnimationAndCounter) && hook_is(gb, SYM(galeSeedUpdateAnimationAndCounter), galeSeedUpdateAnimationAndCounter_hook)) { galeSeedUpdateAnimationAndCounter_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -173,10 +173,10 @@ void seedItemState2_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_sub(gb, 0x20);
   CYC(b_+5, b_+6); push_effect(gb, b_+6);
   do { uint16_t jt_ = (seed_jump_table(gb));
-    if (jt_ == SYM(emberSeedBurn) && hook_enabled_at(gb, SYM(emberSeedBurn))) { emberSeedBurn_hook(gb); return; }
-    else if (jt_ == SYM(scentSeedSmell) && hook_enabled_at(gb, SYM(scentSeedSmell))) { scentSeedSmell_hook(gb); return; }
-    else if (jt_ == SYM(seedUpdateAnimation) && hook_enabled_at(gb, SYM(seedUpdateAnimation))) { seedUpdateAnimation_hook(gb); return; }
-    else if (jt_ == SYM(galeSeedTryToWarpLink) && hook_enabled_at(gb, SYM(galeSeedTryToWarpLink))) { galeSeedTryToWarpLink_hook(gb); return; }
+    if (jt_ == SYM(emberSeedBurn) && hook_is(gb, SYM(emberSeedBurn), emberSeedBurn_hook)) { emberSeedBurn_hook(gb); return; }
+    else if (jt_ == SYM(scentSeedSmell) && hook_is(gb, SYM(scentSeedSmell), scentSeedSmell_hook)) { scentSeedSmell_hook(gb); return; }
+    else if (jt_ == SYM(seedUpdateAnimation) && hook_is(gb, SYM(seedUpdateAnimation), seedUpdateAnimation_hook)) { seedUpdateAnimation_hook(gb); return; }
+    else if (jt_ == SYM(galeSeedTryToWarpLink) && hook_is(gb, SYM(galeSeedTryToWarpLink), galeSeedTryToWarpLink_hook)) { galeSeedTryToWarpLink_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -783,7 +783,7 @@ satchel_update:
   do { uint16_t jt_ = (seed_jump_table(gb));
     if (jt_ == b_+133) { goto ember_standard; }
     else if (jt_ == b_+139) { goto scent_landed; }
-    else if (jt_ == SYM(seedItemDelete) && hook_enabled_at(gb, SYM(seedItemDelete))) { seedItemDelete_hook(gb); return; }
+    else if (jt_ == SYM(seedItemDelete) && hook_is(gb, SYM(seedItemDelete), seedItemDelete_hook)) { seedItemDelete_hook(gb); return; }
     else if (jt_ == b_+167) { goto gale_landed; }
     else if (jt_ == b_+246) { goto mystery_standard; }
     else { hook_continue(gb, HL, sp0_); return; }
@@ -815,7 +815,7 @@ collided_with_enemy:
   do { uint16_t jt_ = (seed_jump_table(gb));
     if (jt_ == b_+133) { goto ember_standard; }
     else if (jt_ == b_+161) { goto scent_or_pegasus_collided; }
-    else if (jt_ == SYM(seedItemDelete) && hook_enabled_at(gb, SYM(seedItemDelete))) { seedItemDelete_hook(gb); return; }
+    else if (jt_ == SYM(seedItemDelete) && hook_is(gb, SYM(seedItemDelete), seedItemDelete_hook)) { seedItemDelete_hook(gb); return; }
     else if (jt_ == b_+217) { goto mystery_collided_with_enemy; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
@@ -912,9 +912,9 @@ void itemCode20_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (seed_jump_table(gb));
     if (jt_ == b_+12) { break; }
-    else if (jt_ == SYM(seedItemState1) && hook_enabled_at(gb, SYM(seedItemState1))) { seedItemState1_hook(gb); return; }
-    else if (jt_ == SYM(seedItemState2) && hook_enabled_at(gb, SYM(seedItemState2))) { seedItemState2_hook(gb); return; }
-    else if (jt_ == SYM(seedItemState3) && hook_enabled_at(gb, SYM(seedItemState3))) { seedItemState3_hook(gb); return; }
+    else if (jt_ == SYM(seedItemState1) && hook_is(gb, SYM(seedItemState1), seedItemState1_hook)) { seedItemState1_hook(gb); return; }
+    else if (jt_ == SYM(seedItemState2) && hook_is(gb, SYM(seedItemState2), seedItemState2_hook)) { seedItemState2_hook(gb); return; }
+    else if (jt_ == SYM(seedItemState3) && hook_is(gb, SYM(seedItemState3), seedItemState3_hook)) { seedItemState3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
   CALL_C(b_+12, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+15);

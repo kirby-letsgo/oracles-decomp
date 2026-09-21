@@ -366,9 +366,9 @@ void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken);
 void cyctab_build(uint8_t *tab, const uint8_t *rom, size_t size);
 uint8_t *cyctab_alloc(const uint8_t *rom, size_t size);
 void burn_store_sp(GB *gb, uint16_t a, uint16_t addr);
-#define CALL_C_(a, fn, target, ra) do { push_effect(gb, (uint16_t)(ra)); uint16_t sp_ = gb->sp; if (hook_in_verify || !hook_enabled_at(gb, target)) asm_call(gb, (target), (ra)); else { fn(gb); if (!(gb->pc == (uint16_t)(ra) && gb->sp == (uint16_t)(sp_ + 2))) { hook_continue(gb, gb->pc, sp0_); return; } } } while (0)
+#define CALL_C_(a, fn, target, ra) do { push_effect(gb, (uint16_t)(ra)); uint16_t sp_ = gb->sp; if (hook_in_verify || !hook_is(gb, target, fn)) asm_call(gb, (target), (ra)); else { fn(gb); if (!(gb->pc == (uint16_t)(ra) && gb->sp == (uint16_t)(sp_ + 2))) { hook_continue(gb, gb->pc, sp0_); return; } } } while (0)
 // a `jp` into another routine: its C if that routine is hooked in the running game, else the interpreter
-#define TAIL(l) do { if (hook_enabled_at(gb, SYM(l))) { l##_hook(gb); return; } hook_continue(gb, SYM(l), gb->sp); return; } while (0)
+#define TAIL(l) do { if (hook_is(gb, SYM(l), l##_hook)) { l##_hook(gb); return; } hook_continue(gb, SYM(l), gb->sp); return; } while (0)
 // a `jp` whose target is a different routine in each game; the Seasons one runs interpreted
 #define TAIL_GV(a, s) do { if (game_seasons) { hook_continue(gb, SYM(s), gb->sp); return; } TAIL(a); } while (0)
 #define CALL_C(a, fn, target, ra) do { CYC((a), (a) + 3); CALL_C_((a), fn, (target), (ra)); } while (0)

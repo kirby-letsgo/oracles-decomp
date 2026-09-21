@@ -2,6 +2,7 @@
 #include "game/syms.h"
 #include "core/bus.h"
 #include "game/gen.h"
+#include "game/seasons/gen.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -221,6 +222,15 @@ bool hook_enabled_at(const GB *gb, uint16_t addr) {
   if (i < 0) return false;
   for (; i < (int)NHOOKS && hooks[i].addr == addr; i++)
     if ((addr < 0x4000 || addr >= 0x8000 || hooks[i].bank == gb->rom_bank) && first_at[hooks[i].addr] >= 0) return true;
+  return false;
+}
+
+bool hook_is(const GB *gb, uint16_t addr, void (*fn)(GB *)) {
+  if (!inited) hooks_init();
+  int i = first_at[addr];
+  if (i < 0) return false;
+  for (; i < (int)NHOOKS && hooks[i].addr == addr; i++)
+    if ((addr < 0x4000 || addr >= 0x8000 || hooks[i].bank == gb->rom_bank) && first_at[hooks[i].addr] >= 0) return hooks[i].fn == fn;
   return false;
 }
 
