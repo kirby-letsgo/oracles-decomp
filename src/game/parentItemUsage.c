@@ -278,60 +278,66 @@ void parentItemUpdate_hook(GB *gb) {
 void checkItemUsed_hook(GB *gb) {
   BASE(checkItemUsed);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); H = 0xc6;
-  CYC(b_+2, b_+3); L = E;
-  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
-  CYC(b_+4, b_+5); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(2)); H = 0xc6;
+  CYC(b_+O(2), b_+OE(3)); L = E;
+  CYC(b_+O(3), b_+OE(4)); A = mem_rd(gb, HL);
+  CYC(b_+O(4), b_+OE(5)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+5, b_+7); goto check_item;
+    CYCT(b_+O(5), b_+OE(7)); goto check_item;
   }
-  CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); A = W8(wActiveRing);
-  CYC(b_+10, b_+12); alu_cp(gb, 0x0b);
+  CYC(b_+O(5), b_+OE(7));
+  if (game_seasons) {       // the boxing match allows punching with nothing equipped
+    CYC(b_+S(7), b_+S(10)); A = W8(wInBoxingMatch);
+    CYC(b_+S(10), b_+S(11)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(11), b_+S(13)); goto punch; }
+    CYC(b_+S(11), b_+S(13));
+  }
+  CYC(b_+O(7), b_+OE(10)); A = W8(wActiveRing);
+  CYC(b_+O(10), b_+OE(12)); alu_cp(gb, 0x0b);
   if (F & FZ) {
-    CYCT(b_+12, b_+14); goto punch;
+    CYCT(b_+O(12), b_+OE(14)); goto punch;
   }
-  CYC(b_+12, b_+14);
-  CYC(b_+14, b_+16); alu_cp(gb, 0x3d);
+  CYC(b_+O(12), b_+OE(14));
+  CYC(b_+O(14), b_+OE(16)); alu_cp(gb, 0x3d);
   if (!(F & FZ)) {
-    CYCT(b_+16, b_+17); ret_effect(gb); return;
+    CYCT(b_+O(16), b_+OE(17)); ret_effect(gb); return;
   }
-  CYC(b_+16, b_+17);
+  CYC(b_+O(16), b_+OE(17));
 
 punch:
-  CYC(b_+17, b_+19); L = 0x88;
-  CYC(b_+19, b_+20); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+20, b_+21); alu_or(gb, mem_rd(gb, HL));
+  CYC(b_+O(17), b_+OE(19)); L = GV(0x88, 0x80);
+  CYC(b_+O(19), b_+OE(20)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(20), b_+OE(21)); alu_or(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+21, b_+22); ret_effect(gb); return;
+    CYCT(b_+O(21), b_+OE(22)); ret_effect(gb); return;
   }
-  CYC(b_+21, b_+22);
-  CYC(b_+22, b_+24); A = 0x02;
+  CYC(b_+O(21), b_+OE(22));
+  CYC(b_+O(22), b_+OE(24)); A = 0x02;
 
 check_item:
-  CYC(b_+24, b_+26); alu_cp(gb, 0x20);
+  CYC(b_+O(24), b_+OE(26)); alu_cp(gb, 0x20);
   if (!(F & FC)) {
-    CYCT(b_+26, b_+27); ret_effect(gb); return;
+    CYCT(b_+O(26), b_+OE(27)); ret_effect(gb); return;
   }
-  CYC(b_+26, b_+27);
-  CYC(b_+27, b_+28); E = A;
-  CYC(b_+28, b_+31); SET_HL(SYM(itemUsageParameterTable));
-  CYC(b_+31, b_+32); parent_item_add_double_index_from_rst(gb, b_+32);
-  CYC(b_+32, b_+33); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+33, b_+34); C = A;
-  CYC(b_+34, b_+35); L = mem_rd(gb, HL);
-  CYC(b_+35, b_+37); H = 0xcc;
-  CYC(b_+37, b_+38); A = mem_rd(gb, HL);
-  CYC(b_+38, b_+39); alu_and(gb, D);
+  CYC(b_+O(26), b_+OE(27));
+  CYC(b_+O(27), b_+OE(28)); E = A;
+  CYC(b_+O(28), b_+OE(31)); SET_HL(SYM(itemUsageParameterTable));
+  CYC(b_+O(31), b_+OE(32)); parent_item_add_double_index_from_rst(gb, b_+OE(32));
+  CYC(b_+O(32), b_+OE(33)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(33), b_+OE(34)); C = A;
+  CYC(b_+O(34), b_+OE(35)); L = mem_rd(gb, HL);
+  CYC(b_+O(35), b_+OE(37)); H = 0xcc;
+  CYC(b_+O(37), b_+OE(38)); A = mem_rd(gb, HL);
+  CYC(b_+O(38), b_+OE(39)); alu_and(gb, D);
   if (F & FZ) {
-    CYCT(b_+39, b_+40); ret_effect(gb); return;
+    CYCT(b_+O(39), b_+OE(40)); ret_effect(gb); return;
   }
-  CYC(b_+39, b_+40);
-  CALL_C(b_+40, chooseParentItemSlot_hook, SYM(chooseParentItemSlot), b_+43);
+  CYC(b_+O(39), b_+OE(40));
+  CALL_C(b_+O(40), chooseParentItemSlot_hook, SYM(chooseParentItemSlot), b_+OE(43));
   if (!(F & FZ)) {
-    CYCT(b_+43, b_+44); ret_effect(gb); return;
+    CYCT(b_+O(43), b_+OE(44)); ret_effect(gb); return;
   }
-  CYC(b_+43, b_+44);
+  CYC(b_+O(43), b_+OE(44));
   TAIL(initializeParentItem);
 }
 

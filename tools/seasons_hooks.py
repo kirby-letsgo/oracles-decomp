@@ -55,7 +55,8 @@ def main():
     for path in ('src/hooks/ofs_routines.txt', 'src/hooks/seasons_ok_manual.txt'):
         if not os.path.exists(path): continue
         for l in open(path):
-            n = l.split('#')[0].strip()
+            n = l.split('#')[0].split()
+            n = n[0] if n else ''
             if not n: continue
             if (n + '!') in safe_jt: print(f'{path}: {n} dispatches a jump table without a fallback, left out'); continue
             verdict[n] = 'IDENTICAL'

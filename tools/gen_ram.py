@@ -33,6 +33,12 @@ with open(out, 'w') as f:
         else:
             f.write('#define %s 0x%04x\n' % (cn, addr))
             if addr < 0xe000: f.write('#define %s_BANK %d\n' % (cn, bank))
+    # Seasons-only names (only reachable under `if (game_seasons)`): 0 in the Ages table
+    for cn, (bank, addr) in sorted(seasons.items(), key=lambda kv: (kv[1][1], kv[0])):
+        if cn in ages: continue
+        f.write('#define %s RAMSYM(R_%s)\n' % (cn, cn))
+        if addr < 0xe000: f.write('#define %s_BANK RAMBANK(R_%s)\n' % (cn, cn))
+        differs[cn] = (0, 0, bank, addr)
 with open('src/hooks/ram_syms.txt', 'w') as f:
     for cn, (ab, aa, sb, sa) in sorted(differs.items(), key=lambda kv: kv[1]):
         f.write('%s %d:%04x %d:%04x\n' % (cn, ab, aa, sb, sa))

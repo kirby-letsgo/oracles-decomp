@@ -2,6 +2,7 @@ _drawObjectTerrainEffects
 applyRoomSpecificTileChanges
 applyRoomSpecificTileChangesAfterGfxLoad
 calculateAdjacentWallsBitset
+checkItemUsed 7=13
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject
 endgameCutsceneHandler_body
@@ -13,7 +14,8 @@ interactionCode71
 interactionCodedc
 introCinematic_inTemple
 introCinematic_ridingHorse
-linkState01
+linkState01 149=148
+loadTilesetLayout
 paletteFadeHandler
 parseGivenObjectData_b12
 rickyStateA

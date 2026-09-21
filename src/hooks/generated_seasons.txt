@@ -1581,6 +1581,7 @@
 06:4822 functionCaller_b06_hook -
 06:482a clearAllParentItems_body_hook -
 06:4842 updateParentItemButtonAssignment_body_hook -
+06:48f3 checkItemUsed_hook -
 06:4925 initializeParentItem_hook -
 06:4931 chooseParentItemSlot_hook -
 06:497f checkShopInput_hook -

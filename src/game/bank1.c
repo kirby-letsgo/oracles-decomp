@@ -4642,8 +4642,8 @@ void setEnteredWarpPosition_hook(GB *gb) {
 void paletteFadeHandler_hook(GB *gb) {
   BASE(paletteFadeHandler);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+O(0), b_+O(3)); A = W8(wPaletteThread_mode);
-  CYC(b_+O(3), b_+O(4)); bank1_jump_table_from_rst(gb, b_+O(4));
+  CYC(b_+O(0), b_+OE(3)); A = W8(wPaletteThread_mode);
+  CYC(b_+O(3), b_+OE(4)); bank1_jump_table_from_rst(gb, b_+OE(4));
   do { uint16_t jt_ = (HL);
     if (jt_ == SYM(paletteFadeHandler09) && hook_enabled_at(gb, SYM(paletteFadeHandler09))) { paletteFadeHandler09_hook(gb); return; }
     else if (jt_ == SYM(paletteFadeHandler01) && hook_enabled_at(gb, SYM(paletteFadeHandler01))) { paletteFadeHandler01_hook(gb); return; }
@@ -4934,29 +4934,29 @@ void loadingRoom_hook(GB *gb) {
 void standardGameState_hook(GB *gb) {
   BASE(standardGameState);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+O(0), b_+O(3)); A = W8(wLinkDeathTrigger);
-  CYC(b_+O(3), b_+O(5)); alu_cp(gb, 0xff);
-  if (!(F & FZ)) CYCT(b_+O(5), b_+O(7));
+  CYC(b_+O(0), b_+OE(3)); A = W8(wLinkDeathTrigger);
+  CYC(b_+O(3), b_+OE(5)); alu_cp(gb, 0xff);
+  if (!(F & FZ)) CYCT(b_+O(5), b_+OE(7));
   else {
-    CYC(b_+O(5), b_+O(7));
-    CYC(b_+O(7), b_+O(9)); A = 0xfc;
-    CALL_C(b_+O(9), playSound_b00_hook, SYM(playSound_b00), b_+O(12));
-    CYC(b_+O(12), b_+O(14)); A = 0xe7;
-    CYC(b_+O(14), b_+O(17)); W8(wLinkDeathTrigger) = A;
+    CYC(b_+O(5), b_+OE(7));
+    CYC(b_+O(7), b_+OE(9)); A = 0xfc;
+    CALL_C(b_+O(9), playSound_b00_hook, SYM(playSound_b00), b_+OE(12));
+    CYC(b_+O(12), b_+OE(14)); A = 0xe7;
+    CYC(b_+O(14), b_+OE(17)); W8(wLinkDeathTrigger) = A;
   }
-  CYC(b_+O(17), b_+O(20)); A = W8(wGameOverScreenTrigger);
-  CYC(b_+O(20), b_+O(21)); alu_or(gb, A);
-  if (F & FZ) CYCT(b_+O(21), b_+O(23));
+  CYC(b_+O(17), b_+OE(20)); A = W8(wGameOverScreenTrigger);
+  CYC(b_+O(20), b_+OE(21)); alu_or(gb, A);
+  if (F & FZ) CYCT(b_+O(21), b_+OE(23));
   else {
-    CYC(b_+O(21), b_+O(23));
-    CYC(b_+O(23), b_+O(25)); A = 0xe0;
-    CYC(b_+O(25), b_+O(28)); SET_BC(SYM(thread_1b10));
-    CALL_C(b_+O(28), threadRestart_hook, SYM(threadRestart), b_+O(31));
-    CYC(b_+O(31), b_+O(34)); stubThreadStart_hook(gb);
+    CYC(b_+O(21), b_+OE(23));
+    CYC(b_+O(23), b_+OE(25)); A = 0xe0;
+    CYC(b_+O(25), b_+OE(28)); SET_BC(SYM(thread_1b10));
+    CALL_C(b_+O(28), threadRestart_hook, SYM(threadRestart), b_+OE(31));
+    CYC(b_+O(31), b_+OE(34)); stubThreadStart_hook(gb);
     return;
   }
-  CYC(b_+O(34), b_+O(37)); A = mem_rd(gb, wThreadStateBuffer + 0x0f);
-  CYC(b_+O(37), b_+O(38)); bank1_jump_table_from_rst(gb, b_+O(38));
+  CYC(b_+O(34), b_+OE(37)); A = mem_rd(gb, wThreadStateBuffer + 0x0f);
+  CYC(b_+O(37), b_+OE(38)); bank1_jump_table_from_rst(gb, b_+OE(38));
   do { uint16_t jt_ = (HL);
     if (jt_ == SYM(cutscene00) && hook_enabled_at(gb, SYM(cutscene00))) { cutscene00_hook(gb); return; }
     else if (jt_ == SYM(cutscene01) && hook_enabled_at(gb, SYM(cutscene01))) { cutscene01_hook(gb); return; }

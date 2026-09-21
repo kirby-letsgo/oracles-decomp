@@ -525,9 +525,9 @@ static void swap_de_hl_memory(GB *gb) {
 void functionCaller_b02_hook(GB *gb) {
   BASE(functionCaller_b02);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+O(0), b_+O(1)); C = L;
-  CYC(b_+O(1), b_+O(2)); A = H;
-  CYC(b_+O(2), b_+O(3)); push_effect(gb, b_+O(3));
+  CYC(b_+O(0), b_+OE(1)); C = L;
+  CYC(b_+O(1), b_+OE(2)); A = H;
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, b_+OE(3));
   HANDOFF(function_caller_jump_table(gb));
 }
 

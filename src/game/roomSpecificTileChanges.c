@@ -40,15 +40,15 @@ static uint16_t room_tile_changes_jump_table(GB *gb) {
 void applyRoomSpecificTileChanges_hook(GB *gb) {
   BASE(applyRoomSpecificTileChanges);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+O(0), b_+O(3)); A = W8(wActiveRoom);
-  CYC(b_+O(3), b_+O(6)); SET_HL(SYM(roomTileChangerCodeGroupTable));
-  CALL_C(b_+O(6), findRoomSpecificData_hook, SYM(findRoomSpecificData), b_+O(9));
+  CYC(b_+O(0), b_+OE(3)); A = W8(wActiveRoom);
+  CYC(b_+O(3), b_+OE(6)); SET_HL(SYM(roomTileChangerCodeGroupTable));
+  CALL_C(b_+O(6), findRoomSpecificData_hook, SYM(findRoomSpecificData), b_+OE(9));
   if (!(F & FC)) {
-    CYCT(b_+O(9), b_+O(10)); ret_effect(gb);
+    CYCT(b_+O(9), b_+OE(10)); ret_effect(gb);
     return;
   }
-  CYC(b_+O(9), b_+O(10));
-  CYC(b_+O(10), b_+O(11)); push_effect(gb, b_+O(11));
+  CYC(b_+O(9), b_+OE(10));
+  CYC(b_+O(10), b_+OE(11)); push_effect(gb, b_+OE(11));
   HANDOFF(room_tile_changes_jump_table(gb));
 }
 

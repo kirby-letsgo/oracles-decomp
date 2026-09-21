@@ -3328,157 +3328,157 @@ substate7:
 void linkState01_hook(GB *gb) {
   BASE(linkState01);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+O(0), b_+O(2)); A = 0x80;
-  CYC(b_+O(2), b_+O(5)); W8(wForceLinkPushAnimation) = A;
-  CYC(b_+O(5), b_+O(8)); A = W8(wPaletteThread_mode);
-  CYC(b_+O(8), b_+O(9)); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+O(9), b_+O(10)); ret_effect(gb); return; }
-  CYC(b_+O(9), b_+O(10));
-  CYC(b_+O(10), b_+O(13)); A = W8(wScrollMode);
-  CYC(b_+O(13), b_+O(15)); alu_and(gb, 0x0e);
-  if (!(F & FZ)) { CYCT(b_+O(15), b_+O(16)); ret_effect(gb); return; }
-  CYC(b_+O(15), b_+O(16));
-  CALL_C(b_+O(16), updateLinkDamageTaken_hook, SYM(updateLinkDamageTaken), b_+O(19));
-  CYC(b_+O(19), b_+O(22)); A = W8(wLinkDeathTrigger);
-  CYC(b_+O(22), b_+O(23)); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(2)); A = 0x80;
+  CYC(b_+O(2), b_+OE(5)); W8(wForceLinkPushAnimation) = A;
+  CYC(b_+O(5), b_+OE(8)); A = W8(wPaletteThread_mode);
+  CYC(b_+O(8), b_+OE(9)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(9), b_+OE(10)); ret_effect(gb); return; }
+  CYC(b_+O(9), b_+OE(10));
+  CYC(b_+O(10), b_+OE(13)); A = W8(wScrollMode);
+  CYC(b_+O(13), b_+OE(15)); alu_and(gb, 0x0e);
+  if (!(F & FZ)) { CYCT(b_+O(15), b_+OE(16)); ret_effect(gb); return; }
+  CYC(b_+O(15), b_+OE(16));
+  CALL_C(b_+O(16), updateLinkDamageTaken_hook, SYM(updateLinkDamageTaken), b_+OE(19));
+  CYC(b_+O(19), b_+OE(22)); A = W8(wLinkDeathTrigger);
+  CYC(b_+O(22), b_+OE(23)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+O(23), b_+O(26));
+    CYCT(b_+O(23), b_+OE(26));
     TAIL(setLinkStateToDead);
   }
-  CYC(b_+O(23), b_+O(26));
-  CALL_C(b_+O(26), checkLinkForceState_hook, SYM(checkLinkForceState), b_+O(29));
-  CALL_C(b_+O(29), retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+O(32));
-  CYC(b_+O(32), b_+O(35)); A = W8(wDisabledObjects);
-  CYC(b_+O(35), b_+O(37)); alu_and(gb, 0x81);
-  if (!(F & FZ)) { CYCT(b_+O(37), b_+O(38)); ret_effect(gb); return; }
-  CYC(b_+O(37), b_+O(38));
-  CALL_C(b_+O(38), decPegasusSeedCounter_hook, SYM(decPegasusSeedCounter), b_+O(41));
-  CYC(b_+O(41), b_+O(44)); A = W8(w1Companion_id);
+  CYC(b_+O(23), b_+OE(26));
+  CALL_C(b_+O(26), checkLinkForceState_hook, SYM(checkLinkForceState), b_+OE(29));
+  CALL_C(b_+O(29), retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+OE(32));
+  CYC(b_+O(32), b_+OE(35)); A = W8(wDisabledObjects);
+  CYC(b_+O(35), b_+OE(37)); alu_and(gb, 0x81);
+  if (!(F & FZ)) { CYCT(b_+O(37), b_+OE(38)); ret_effect(gb); return; }
+  CYC(b_+O(37), b_+OE(38));
+  CALL_C(b_+O(38), decPegasusSeedCounter_hook, SYM(decPegasusSeedCounter), b_+OE(41));
+  CYC(b_+O(41), b_+OE(44)); A = W8(w1Companion_id);
   if (!game_seasons) {      // Seasons has no Dimitri to check for here
     CYC(b_+44, b_+46); alu_cp(gb, 0x0a);
     if (F & FZ) { CYCT(b_+46, b_+48); goto interactions_done; }
     CYC(b_+46, b_+48);
   }
-  CYC(b_+O(48), b_+O(50)); alu_cp(gb, GV(0x13, 0x0a));
-  if (F & FZ) { CYCT(b_+O(50), b_+O(52)); goto interactions_done; }
-  CYC(b_+O(50), b_+O(52));
-  CYC(b_+O(52), b_+O(55)); A = W8(wLinkObjectIndex);
-  CYC(b_+O(55), b_+O(56)); alu_rrca(gb);
-  if (F & FC) { CYCT(b_+O(56), b_+O(57)); ret_effect(gb); return; }
-  CYC(b_+O(56), b_+O(57));
-  CYC(b_+O(57), b_+O(60)); A = W8(wLinkPlayingInstrument);
-  CYC(b_+O(60), b_+O(61)); B = A;
-  CYC(b_+O(61), b_+O(64)); A = W8(wLinkInAir);
-  CYC(b_+O(64), b_+O(65)); alu_or(gb, B);
-  if (!(F & FZ)) { CYCT(b_+O(65), b_+O(67)); goto interactions_done; }
-  CYC(b_+O(65), b_+O(67));
-  CYC(b_+O(67), b_+O(69)); E = 0x2d;
-  CYC(b_+O(69), b_+O(70)); A = mem_rd(gb, DE);
-  CYC(b_+O(70), b_+O(71)); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+O(71), b_+O(73)); goto interactions_done; }
-  CYC(b_+O(71), b_+O(73));
-  CALL_C(b_+O(73), linkInteractWithAButtonSensitiveObjects_hook, SYM(linkInteractWithAButtonSensitiveObjects), b_+O(76));
-  if (F & FC) { CYCT(b_+O(76), b_+O(77)); ret_effect(gb); return; }
-  CYC(b_+O(76), b_+O(77));
-  CALL_C(b_+O(77), interactWithTileBeforeLink_b00_hook, SYM(interactWithTileBeforeLink_b00), b_+O(80));
-  if (F & FC) { CYCT(b_+O(80), b_+O(81)); ret_effect(gb); return; }
-  CYC(b_+O(80), b_+O(81));
+  CYC(b_+O(48), b_+OE(50)); alu_cp(gb, GV(0x13, 0x0a));
+  if (F & FZ) { CYCT(b_+O(50), b_+OE(52)); goto interactions_done; }
+  CYC(b_+O(50), b_+OE(52));
+  CYC(b_+O(52), b_+OE(55)); A = W8(wLinkObjectIndex);
+  CYC(b_+O(55), b_+OE(56)); alu_rrca(gb);
+  if (F & FC) { CYCT(b_+O(56), b_+OE(57)); ret_effect(gb); return; }
+  CYC(b_+O(56), b_+OE(57));
+  CYC(b_+O(57), b_+OE(60)); A = W8(wLinkPlayingInstrument);
+  CYC(b_+O(60), b_+OE(61)); B = A;
+  CYC(b_+O(61), b_+OE(64)); A = W8(wLinkInAir);
+  CYC(b_+O(64), b_+OE(65)); alu_or(gb, B);
+  if (!(F & FZ)) { CYCT(b_+O(65), b_+OE(67)); goto interactions_done; }
+  CYC(b_+O(65), b_+OE(67));
+  CYC(b_+O(67), b_+OE(69)); E = 0x2d;
+  CYC(b_+O(69), b_+OE(70)); A = mem_rd(gb, DE);
+  CYC(b_+O(70), b_+OE(71)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(71), b_+OE(73)); goto interactions_done; }
+  CYC(b_+O(71), b_+OE(73));
+  CALL_C(b_+O(73), linkInteractWithAButtonSensitiveObjects_hook, SYM(linkInteractWithAButtonSensitiveObjects), b_+OE(76));
+  if (F & FC) { CYCT(b_+O(76), b_+OE(77)); ret_effect(gb); return; }
+  CYC(b_+O(76), b_+OE(77));
+  CALL_C(b_+O(77), interactWithTileBeforeLink_b00_hook, SYM(interactWithTileBeforeLink_b00), b_+OE(80));
+  if (F & FC) { CYCT(b_+O(80), b_+OE(81)); ret_effect(gb); return; }
+  CYC(b_+O(80), b_+OE(81));
 
 interactions_done:
-  CYC(b_+O(81), b_+O(82)); alu_xor(gb, A);
-  CYC(b_+O(82), b_+O(85)); W8(wForceLinkPushAnimation) = A;
-  CYC(b_+O(85), b_+O(88)); W8(wLinkPlayingInstrument) = A;
-  CYC(b_+O(88), b_+O(91)); A = W8(wTilesetFlags);
-  CYC(b_+O(91), b_+O(93)); alu_and(gb, 0x20);
+  CYC(b_+O(81), b_+OE(82)); alu_xor(gb, A);
+  CYC(b_+O(82), b_+OE(85)); W8(wForceLinkPushAnimation) = A;
+  CYC(b_+O(85), b_+OE(88)); W8(wLinkPlayingInstrument) = A;
+  CYC(b_+O(88), b_+OE(91)); A = W8(wTilesetFlags);
+  CYC(b_+O(91), b_+OE(93)); alu_and(gb, 0x20);
   if (!(F & FZ)) {
-    CYCT(b_+O(93), b_+O(96));
+    CYCT(b_+O(93), b_+OE(96));
     TAIL(linkState01_sidescroll);
   }
-  CYC(b_+O(93), b_+O(96));
-  CALL_C(b_+O(96), linkApplyTileTypes_hook, SYM(linkApplyTileTypes), b_+O(99));
-  CALL_C(b_+O(99), checkAndUpdateLinkOnChest_hook, SYM(checkAndUpdateLinkOnChest), b_+O(102));
-  CALL_C(b_+O(102), checkUseItems_b00_hook, SYM(checkUseItems_b00), b_+O(105));
-  CYC(b_+O(105), b_+O(108)); A = W8(wLinkPlayingInstrument);
-  CYC(b_+O(108), b_+O(109)); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+O(109), b_+O(110)); ret_effect(gb); return; }
-  CYC(b_+O(109), b_+O(110));
-  CALL_C(b_+O(110), specialObjectUpdateAdjacentWallsBitset_hook, SYM(specialObjectUpdateAdjacentWallsBitset), b_+O(113));
-  CALL_C(b_+O(113), linkUpdateKnockback_hook, SYM(linkUpdateKnockback), b_+O(116));
-  CYC(b_+O(116), b_+O(119)); A = W8(wLinkSwimmingState);
-  CYC(b_+O(119), b_+O(121)); alu_and(gb, 0x40);
-  if (!(F & FZ)) { CYCT(b_+O(121), b_+O(123)); goto update_in_air; }
-  CYC(b_+O(121), b_+O(123));
-  CYC(b_+O(123), b_+O(126)); A = W8(wMagnetGloveState);
-  CYC(b_+O(126), b_+O(128)); alu_bit(gb, 6, A);
-  if (!(F & FZ)) { CYCT(b_+O(128), b_+O(130)); goto update_in_air; }
-  CYC(b_+O(128), b_+O(130));
-  CYC(b_+O(130), b_+O(133)); A = W8(wLinkInAir);
-  CYC(b_+O(133), b_+O(134)); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+O(134), b_+O(136)); goto update_in_air; }
-  CYC(b_+O(134), b_+O(136));
-  CYC(b_+O(136), b_+O(139)); A = W8(wLinkGrabState);
-  CYC(b_+O(139), b_+O(140)); C = A;
-  CYC(b_+O(140), b_+O(143)); A = W8(wLinkImmobilized);
-  CYC(b_+O(143), b_+O(144)); alu_or(gb, C);
-  if (!(F & FZ)) { CYCT(b_+O(144), b_+O(146)); goto update_in_air; }
-  CYC(b_+O(144), b_+O(146));
-  CALL_C(b_+O(146), checkLinkPushingAgainstBed_hook, SYM(checkLinkPushingAgainstBed), b_+O(149));
+  CYC(b_+O(93), b_+OE(96));
+  CALL_C(b_+O(96), linkApplyTileTypes_hook, SYM(linkApplyTileTypes), b_+OE(99));
+  CALL_C(b_+O(99), checkAndUpdateLinkOnChest_hook, SYM(checkAndUpdateLinkOnChest), b_+OE(102));
+  CALL_C(b_+O(102), checkUseItems_b00_hook, SYM(checkUseItems_b00), b_+OE(105));
+  CYC(b_+O(105), b_+OE(108)); A = W8(wLinkPlayingInstrument);
+  CYC(b_+O(108), b_+OE(109)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(109), b_+OE(110)); ret_effect(gb); return; }
+  CYC(b_+O(109), b_+OE(110));
+  CALL_C(b_+O(110), specialObjectUpdateAdjacentWallsBitset_hook, SYM(specialObjectUpdateAdjacentWallsBitset), b_+OE(113));
+  CALL_C(b_+O(113), linkUpdateKnockback_hook, SYM(linkUpdateKnockback), b_+OE(116));
+  CYC(b_+O(116), b_+OE(119)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(119), b_+OE(121)); alu_and(gb, 0x40);
+  if (!(F & FZ)) { CYCT(b_+O(121), b_+OE(123)); goto update_in_air; }
+  CYC(b_+O(121), b_+OE(123));
+  CYC(b_+O(123), b_+OE(126)); A = W8(wMagnetGloveState);
+  CYC(b_+O(126), b_+OE(128)); alu_bit(gb, 6, A);
+  if (!(F & FZ)) { CYCT(b_+O(128), b_+OE(130)); goto update_in_air; }
+  CYC(b_+O(128), b_+OE(130));
+  CYC(b_+O(130), b_+OE(133)); A = W8(wLinkInAir);
+  CYC(b_+O(133), b_+OE(134)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(134), b_+OE(136)); goto update_in_air; }
+  CYC(b_+O(134), b_+OE(136));
+  CYC(b_+O(136), b_+OE(139)); A = W8(wLinkGrabState);
+  CYC(b_+O(139), b_+OE(140)); C = A;
+  CYC(b_+O(140), b_+OE(143)); A = W8(wLinkImmobilized);
+  CYC(b_+O(143), b_+OE(144)); alu_or(gb, C);
+  if (!(F & FZ)) { CYCT(b_+O(144), b_+OE(146)); goto update_in_air; }
+  CYC(b_+O(144), b_+OE(146));
+  CALL_C(b_+O(146), checkLinkPushingAgainstBed_hook, SYM(checkLinkPushingAgainstBed), b_+OE(149));
   if (game_seasons) CALL_ROM(b_+S(145), SYM(checkLinkPushingAgainstTreeStump));
-  CALL_C(b_+O(149), checkLinkJumpingOffCliff_hook, SYM(checkLinkJumpingOffCliff), b_+O(152));
+  CALL_C(b_+O(149), checkLinkJumpingOffCliff_hook, SYM(checkLinkJumpingOffCliff), b_+OE(152));
 
 update_in_air:
-  CALL_C(b_+O(152), linkUpdateInAir_hook, SYM(linkUpdateInAir), b_+O(155));
-  CYC(b_+O(155), b_+O(158)); A = W8(wLinkInAir);
-  CYC(b_+O(158), b_+O(159)); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+O(159), b_+O(161)); goto not_in_air; }
-  CYC(b_+O(159), b_+O(161));
-  CYC(b_+O(161), b_+O(163)); alu_bit(gb, 7, A);
+  CALL_C(b_+O(152), linkUpdateInAir_hook, SYM(linkUpdateInAir), b_+OE(155));
+  CYC(b_+O(155), b_+OE(158)); A = W8(wLinkInAir);
+  CYC(b_+O(158), b_+OE(159)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(159), b_+OE(161)); goto not_in_air; }
+  CYC(b_+O(159), b_+OE(161));
+  CYC(b_+O(161), b_+OE(163)); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(b_+O(163), b_+O(165));
+    CYCT(b_+O(163), b_+OE(165));
   } else {
-    CYC(b_+O(163), b_+O(165));
-    CYC(b_+O(165), b_+O(167)); E = 0x15;
-    CYC(b_+O(167), b_+O(168)); A = mem_rd(gb, DE);
-    CYC(b_+O(168), b_+O(170)); alu_bit(gb, 7, A);
-    if (F & FZ) CALL_C_CC(b_+O(170), linkUpdateVelocity_hook, SYM(linkUpdateVelocity), b_+O(173));
-    else CYC(b_+O(170), b_+O(173));
+    CYC(b_+O(163), b_+OE(165));
+    CYC(b_+O(165), b_+OE(167)); E = 0x15;
+    CYC(b_+O(167), b_+OE(168)); A = mem_rd(gb, DE);
+    CYC(b_+O(168), b_+OE(170)); alu_bit(gb, 7, A);
+    if (F & FZ) CALL_C_CC(b_+O(170), linkUpdateVelocity_hook, SYM(linkUpdateVelocity), b_+OE(173));
+    else CYC(b_+O(170), b_+OE(173));
   }
-  CYC(b_+O(173), b_+O(176)); SET_HL(wcc95);
-  CYC(b_+O(176), b_+O(178)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 4)));
-  CALL_C(b_+O(178), specialObjectSetAngleRelativeToVar38_hook, SYM(specialObjectSetAngleRelativeToVar38), b_+O(181));
-  CALL_C(b_+O(181), specialObjectUpdatePosition_hook, SYM(specialObjectUpdatePosition), b_+O(184));
-  CYC(b_+O(184), b_+O(187));
+  CYC(b_+O(173), b_+OE(176)); SET_HL(wcc95);
+  CYC(b_+O(176), b_+OE(178)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 4)));
+  CALL_C(b_+O(178), specialObjectSetAngleRelativeToVar38_hook, SYM(specialObjectSetAngleRelativeToVar38), b_+OE(181));
+  CALL_C(b_+O(181), specialObjectUpdatePosition_hook, SYM(specialObjectUpdatePosition), b_+OE(184));
+  CYC(b_+O(184), b_+OE(187));
   TAIL(specialObjectAnimate);
 
 not_in_air:
-  CYC(b_+O(187), b_+O(190)); A = W8(wMagnetGloveState);
-  CYC(b_+O(190), b_+O(192)); alu_bit(gb, 6, A);
+  CYC(b_+O(187), b_+OE(190)); A = W8(wMagnetGloveState);
+  CYC(b_+O(190), b_+OE(192)); alu_bit(gb, 6, A);
   if (!(F & FZ)) {
-    CYCT(b_+O(192), b_+O(195));
+    CYCT(b_+O(192), b_+OE(195));
     TAIL(animateLinkStanding);
   }
-  CYC(b_+O(192), b_+O(195));
-  CYC(b_+O(195), b_+O(197)); E = 0x2d;
-  CYC(b_+O(197), b_+O(198)); A = mem_rd(gb, DE);
-  CYC(b_+O(198), b_+O(199)); alu_or(gb, A);
+  CYC(b_+O(192), b_+OE(195));
+  CYC(b_+O(195), b_+OE(197)); E = 0x2d;
+  CYC(b_+O(197), b_+OE(198)); A = mem_rd(gb, DE);
+  CYC(b_+O(198), b_+OE(199)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+O(199), b_+O(202));
+    CYCT(b_+O(199), b_+OE(202));
     TAIL(func_5631);
   }
-  CYC(b_+O(199), b_+O(202));
-  CYC(b_+O(202), b_+O(203)); H = D;
-  CYC(b_+O(203), b_+O(205)); L = 0x24;
-  CYC(b_+O(205), b_+O(207)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
-  CYC(b_+O(207), b_+O(210)); A = W8(wLinkSwimmingState);
-  CYC(b_+O(210), b_+O(211)); alu_or(gb, A);
+  CYC(b_+O(199), b_+OE(202));
+  CYC(b_+O(202), b_+OE(203)); H = D;
+  CYC(b_+O(203), b_+OE(205)); L = 0x24;
+  CYC(b_+O(205), b_+OE(207)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
+  CYC(b_+O(207), b_+OE(210)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(210), b_+OE(211)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+O(211), b_+O(214));
+    CYCT(b_+O(211), b_+OE(214));
     TAIL(linkUpdateSwimming);
   }
-  CYC(b_+O(211), b_+O(214));
-  CALL_C(b_+O(214), objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+O(217));
-  CYC(b_+O(217), b_+O(220)); A = W8(wLinkObjectIndex);
-  CYC(b_+O(220), b_+O(221)); alu_rrca(gb);
+  CYC(b_+O(211), b_+OE(214));
+  CALL_C(b_+O(214), objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+OE(217));
+  CYC(b_+O(217), b_+OE(220)); A = W8(wLinkObjectIndex);
+  CYC(b_+O(220), b_+OE(221)); alu_rrca(gb);
   if (game_seasons) {       // no underwater state or companion text in Seasons: a companion goes to update_direction
     if (F & FC) { CYCT(b_+S(220), b_+S(222)); goto update_direction; }
     CYC(b_+S(220), b_+S(222));
@@ -3498,16 +3498,16 @@ check_underwater_transition:
     CALL_C(b_+232, checkForUnderwaterTransition_hook, SYM(checkForUnderwaterTransition), b_+235);
   }
 transformed_link:
-  CYC(b_+O(235), b_+O(238)); SET_HL(SYM(getTransformedLinkID));
-  CYC(b_+O(238), b_+O(240)); E = 0x06;
-  CALL_C(b_+O(240), interBankCall_hook, 0x008a, b_+O(243));
-  CYC(b_+O(243), b_+O(244)); A = B;
-  CYC(b_+O(244), b_+O(245)); alu_or(gb, A);
+  CYC(b_+O(235), b_+OE(238)); SET_HL(SYM(getTransformedLinkID));
+  CYC(b_+O(238), b_+OE(240)); E = 0x06;
+  CALL_C(b_+O(240), interBankCall_hook, 0x008a, b_+OE(243));
+  CYC(b_+O(243), b_+OE(244)); A = B;
+  CYC(b_+O(244), b_+OE(245)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+O(245), b_+O(248));
+    CYCT(b_+O(245), b_+OE(248));
     TAIL(setLinkIDOverride);
   }
-  CYC(b_+O(245), b_+O(248));
+  CYC(b_+O(245), b_+OE(248));
   if (!game_seasons) {      // mermaid suit: Ages only
     CYC(b_+248, b_+249); H = D;
     CYC(b_+249, b_+251); L = 0x2f;
@@ -3520,61 +3520,61 @@ transformed_link:
   }
 
 ordinary_movement:
-  CYC(b_+O(260), b_+O(263)); A = W8(wLinkGrabState);
-  CYC(b_+O(263), b_+O(265)); alu_and(gb, 0x0f);
-  CYC(b_+O(265), b_+O(266)); A = alu_dec8(gb, A);
-  CYC(b_+O(266), b_+O(268)); alu_cp(gb, 0x02);
-  if (F & FC) { CYCT(b_+O(268), b_+O(270)); goto normal_movement; }
-  CYC(b_+O(268), b_+O(270));
-  CYC(b_+O(270), b_+O(273)); SET_HL(wIsTileSlippery);
-  CYC(b_+O(273), b_+O(275)); alu_bit(gb, 6, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+O(275), b_+O(277)); goto normal_movement; }
-  CYC(b_+O(275), b_+O(277));
-  CYC(b_+O(277), b_+O(279)); C = 0x88;
-  CALL_C(b_+O(279), updateLinkSpeed_withParam_hook, SYM(updateLinkSpeed_withParam), b_+O(282));
-  CALL_C(b_+O(282), linkUpdateVelocity_hook, SYM(linkUpdateVelocity), b_+O(285));
+  CYC(b_+O(260), b_+OE(263)); A = W8(wLinkGrabState);
+  CYC(b_+O(263), b_+OE(265)); alu_and(gb, 0x0f);
+  CYC(b_+O(265), b_+OE(266)); A = alu_dec8(gb, A);
+  CYC(b_+O(266), b_+OE(268)); alu_cp(gb, 0x02);
+  if (F & FC) { CYCT(b_+O(268), b_+OE(270)); goto normal_movement; }
+  CYC(b_+O(268), b_+OE(270));
+  CYC(b_+O(270), b_+OE(273)); SET_HL(wIsTileSlippery);
+  CYC(b_+O(273), b_+OE(275)); alu_bit(gb, 6, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(275), b_+OE(277)); goto normal_movement; }
+  CYC(b_+O(275), b_+OE(277));
+  CYC(b_+O(277), b_+OE(279)); C = 0x88;
+  CALL_C(b_+O(279), updateLinkSpeed_withParam_hook, SYM(updateLinkSpeed_withParam), b_+OE(282));
+  CALL_C(b_+O(282), linkUpdateVelocity_hook, SYM(linkUpdateVelocity), b_+OE(285));
 
 velocity_updated:
-  CYC(b_+O(285), b_+O(288)); A = W8(wLinkAngle);
-  CYC(b_+O(288), b_+O(289)); alu_rlca(gb);
-  CYC(b_+O(289), b_+O(291)); C = 0x02;
-  if (F & FC) { CYCT(b_+O(291), b_+O(293)); goto update_movement; }
-  CYC(b_+O(291), b_+O(293));
-  CYCT(b_+O(293), b_+O(295));
+  CYC(b_+O(285), b_+OE(288)); A = W8(wLinkAngle);
+  CYC(b_+O(288), b_+OE(289)); alu_rlca(gb);
+  CYC(b_+O(289), b_+OE(291)); C = 0x02;
+  if (F & FC) { CYCT(b_+O(291), b_+OE(293)); goto update_movement; }
+  CYC(b_+O(291), b_+OE(293));
+  CYCT(b_+O(293), b_+OE(295));
   goto walking;
 
 normal_movement:
-  CYC(b_+O(295), b_+O(298)); A = W8(wcc95);
-  CYC(b_+O(298), b_+O(299)); B = A;
-  CYC(b_+O(299), b_+O(301)); E = 0x09;
-  CYC(b_+O(301), b_+O(304)); A = W8(wLinkAngle);
-  CYC(b_+O(304), b_+O(305)); mem_wr(gb, DE, A);
-  CYC(b_+O(305), b_+O(306)); alu_or(gb, B);
-  CYC(b_+O(306), b_+O(307)); alu_rlca(gb);
-  CYC(b_+O(307), b_+O(309)); C = 0x00;
-  if (F & FC) { CYCT(b_+O(309), b_+O(311)); goto update_movement; }
-  CYC(b_+O(309), b_+O(311));
-  CYC(b_+O(311), b_+O(313)); C = 0x01;
-  CYC(b_+O(313), b_+O(316)); A = W8(wLinkImmobilized);
-  CYC(b_+O(316), b_+O(317)); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+O(317), b_+O(319)); goto update_movement; }
-  CYC(b_+O(317), b_+O(319));
-  CALL_C(b_+O(319), updateLinkSpeed_standard_hook, SYM(updateLinkSpeed_standard), b_+O(322));
+  CYC(b_+O(295), b_+OE(298)); A = W8(wcc95);
+  CYC(b_+O(298), b_+OE(299)); B = A;
+  CYC(b_+O(299), b_+OE(301)); E = 0x09;
+  CYC(b_+O(301), b_+OE(304)); A = W8(wLinkAngle);
+  CYC(b_+O(304), b_+OE(305)); mem_wr(gb, DE, A);
+  CYC(b_+O(305), b_+OE(306)); alu_or(gb, B);
+  CYC(b_+O(306), b_+OE(307)); alu_rlca(gb);
+  CYC(b_+O(307), b_+OE(309)); C = 0x00;
+  if (F & FC) { CYCT(b_+O(309), b_+OE(311)); goto update_movement; }
+  CYC(b_+O(309), b_+OE(311));
+  CYC(b_+O(311), b_+OE(313)); C = 0x01;
+  CYC(b_+O(313), b_+OE(316)); A = W8(wLinkImmobilized);
+  CYC(b_+O(316), b_+OE(317)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(317), b_+OE(319)); goto update_movement; }
+  CYC(b_+O(317), b_+OE(319));
+  CALL_C(b_+O(319), updateLinkSpeed_standard_hook, SYM(updateLinkSpeed_standard), b_+OE(322));
 
 walking:
-  CYC(b_+O(322), b_+O(324)); C = 0x07;
+  CYC(b_+O(322), b_+OE(324)); C = 0x07;
 
 update_movement:
-  CALL_C(b_+O(324), linkUpdateMovement_hook, SYM(linkUpdateMovement), b_+O(327));
+  CALL_C(b_+O(324), linkUpdateMovement_hook, SYM(linkUpdateMovement), b_+OE(327));
 
 update_direction_if_not_using_item:
-  CYC(b_+O(327), b_+O(330)); A = W8(wLinkTurningDisabled);
-  CYC(b_+O(330), b_+O(331)); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+O(331), b_+O(332)); ret_effect(gb); return; }
-  CYC(b_+O(331), b_+O(332));
+  CYC(b_+O(327), b_+OE(330)); A = W8(wLinkTurningDisabled);
+  CYC(b_+O(330), b_+OE(331)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(331), b_+OE(332)); ret_effect(gb); return; }
+  CYC(b_+O(331), b_+OE(332));
 
 update_direction:
-  CYC(b_+O(332), b_+O(335));
+  CYC(b_+O(332), b_+OE(335));
   TAIL(updateLinkDirectionFromAngle);
 }
 
@@ -4429,26 +4429,26 @@ simple_collision:
 void calculateAdjacentWallsBitset_hook(GB *gb) {
   BASE(calculateAdjacentWallsBitset);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+O(0), b_+O(2)); A = 0x01;
-  CYC(b_+O(2), b_+O(4)); H8(hFF8B) = A;
-  CYC(b_+O(4), b_+O(7)); SET_HL(adjacentWallOverworldOffsets_bank05);
-  CYC(b_+O(7), b_+O(10)); A = W8(wTilesetFlags);
-  CYC(b_+O(10), b_+O(12)); alu_and(gb, 0x20);
+  CYC(b_+O(0), b_+OE(2)); A = 0x01;
+  CYC(b_+O(2), b_+OE(4)); H8(hFF8B) = A;
+  CYC(b_+O(4), b_+OE(7)); SET_HL(adjacentWallOverworldOffsets_bank05);
+  CYC(b_+O(7), b_+OE(10)); A = W8(wTilesetFlags);
+  CYC(b_+O(10), b_+OE(12)); alu_and(gb, 0x20);
   if (F & FZ) {
-    CYCT(b_+O(12), b_+O(14));
+    CYCT(b_+O(12), b_+OE(14));
   } else {
-    CYC(b_+O(12), b_+O(14));
-    CYC(b_+O(14), b_+O(17)); SET_HL(adjacentWallSidescrollOffsets_bank05);
+    CYC(b_+O(12), b_+OE(14));
+    CYC(b_+O(14), b_+OE(17)); SET_HL(adjacentWallSidescrollOffsets_bank05);
   }
 
   for (;;) {
-    CYC(b_+O(17), b_+O(18)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+O(18), b_+O(19)); alu_add(gb, B);
-    CYC(b_+O(19), b_+O(20)); B = A;
-    CYC(b_+O(20), b_+O(21)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+O(21), b_+O(22)); alu_add(gb, C);
-    CYC(b_+O(22), b_+O(23)); C = A;
-    CYC(b_+O(23), b_+O(24)); push_effect(gb, HL);
+    CYC(b_+O(17), b_+OE(18)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(18), b_+OE(19)); alu_add(gb, B);
+    CYC(b_+O(19), b_+OE(20)); B = A;
+    CYC(b_+O(20), b_+OE(21)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(21), b_+OE(22)); alu_add(gb, C);
+    CYC(b_+O(22), b_+OE(23)); C = A;
+    CYC(b_+O(23), b_+OE(24)); push_effect(gb, HL);
     if (!game_seasons) {    // raised floors: Ages only
       CYC(b_+24, b_+27); A = W8(wLinkRaisedFloorOffset);
       CYC(b_+27, b_+28); alu_or(gb, A);
@@ -4462,18 +4462,18 @@ void calculateAdjacentWallsBitset_hook(GB *gb) {
         CYC(b_+33, b_+35);
       }
     } else {
-      CALL_C(b_+O(35), checkTileCollisionAt_allowHoles_hook, SYM(checkTileCollisionAt_allowHoles), b_+O(38));
+      CALL_C(b_+O(35), checkTileCollisionAt_allowHoles_hook, SYM(checkTileCollisionAt_allowHoles), b_+OE(38));
     }
-    CYC(b_+O(38), b_+O(39)); SET_HL(pop_effect(gb));
-    CYC(b_+O(39), b_+O(41)); A = H8(hFF8B);
-    CYC(b_+O(41), b_+O(42)); alu_rla(gb);
-    CYC(b_+O(42), b_+O(44)); H8(hFF8B) = A;
+    CYC(b_+O(38), b_+OE(39)); SET_HL(pop_effect(gb));
+    CYC(b_+O(39), b_+OE(41)); A = H8(hFF8B);
+    CYC(b_+O(41), b_+OE(42)); alu_rla(gb);
+    CYC(b_+O(42), b_+OE(44)); H8(hFF8B) = A;
     if (!(F & FC)) {
-      CYCT(b_+O(44), b_+O(46));
+      CYCT(b_+O(44), b_+OE(46));
       continue;
     }
-    CYC(b_+O(44), b_+O(46));
-    CYC(b_+O(46), b_+O(47)); ret_effect(gb);
+    CYC(b_+O(44), b_+OE(46));
+    CYC(b_+O(46), b_+OE(47)); ret_effect(gb);
     return;
   }
 }

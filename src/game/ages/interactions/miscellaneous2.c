@@ -1089,9 +1089,9 @@ void interactiondc_subid17_hook(GB *gb) {
 void interactionCodedc_hook(GB *gb) {
   BASE(interactionCodedc);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+O(0), b_+O(2)); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+O(2), b_+O(3)); A = mem_rd(gb, DE);
-  CYC(b_+O(3), b_+O(4)); push_effect(gb, b_+O(4));
+  CYC(b_+O(0), b_+OE(2)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (interactiondc_jump_table(gb));
     if (jt_ == SYM(interactiondc_subid00) && hook_enabled_at(gb, SYM(interactiondc_subid00))) { interactiondc_subid00_hook(gb); return; }
     else if (jt_ == SYM(interactiondc_subid01) && hook_enabled_at(gb, SYM(interactiondc_subid01))) { interactiondc_subid01_hook(gb); return; }

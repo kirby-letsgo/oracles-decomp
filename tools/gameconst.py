@@ -66,10 +66,14 @@ class Tool:
         self.cur_file = None
         self.literal_fixes = 0
         self.auditing = False
-        self.ofs_routines = set()
-        self.cur_ofs = {}
+        self.ofs_routines, self.ofs_anchors = set(), {}
+        self.cur_ofs, self.cur_ofs_end = {}, {}
         if os.path.exists('src/hooks/ofs_routines.txt'):
-            self.ofs_routines = {l.split('#')[0].strip() for l in open('src/hooks/ofs_routines.txt') if l.split('#')[0].strip()}
+            for l in open('src/hooks/ofs_routines.txt'):
+                p = l.split('#')[0].split()
+                if not p: continue
+                self.ofs_routines.add(p[0])
+                self.ofs_anchors[p[0]] = [tuple(int(x) for x in t.split('=')) for t in p[1:]]
 
     def eval_expr(self, expr, game, base=None):
         """Evaluate a C address/constant expression for a game (0 ages, 1 seasons); None if unknown."""
@@ -79,6 +83,7 @@ class Tool:
             e = re.sub(r'(?<!SYM\()\b([A-Za-z_]\w*)\b', lambda m: f'({macros[m.group(1)]})' if m.group(1) in macros else m.group(0), e)
         if base is not None: e = re.sub(r'\bb_\b', str(base), e)
         e = re.sub(r'\bS\((\d+)\)', r'\1', e)
+        e = re.sub(r'\bOE\((\d+)\)', lambda m: str(self.cur_ofs_end.get(int(m.group(1)), -0x10000) if game else int(m.group(1))), e)
         e = re.sub(r'\bO\((\d+)\)', lambda m: str(self.cur_ofs.get(int(m.group(1)), -0x10000) if game else int(m.group(1))), e)
         if '-65536' in e: return None
         while True:
@@ -118,10 +123,11 @@ class Tool:
         an = self.A.body(ab, aa); sn = self.S.body(sb, sa)
         if name in self.ofs_routines:       # per-game offsets: audit the aligned instructions only
             from ofsmap import align
-            self.cur_ofs = align(self.A, self.S, (ab, aa), (sb, sa))[0]
+            self.cur_ofs = align(self.A, self.S, (ab, aa), (sb, sa), self.ofs_anchors.get(name, ()))[0]
+            self.cur_ofs_end = dict(align.ends)
             pairs_ = [(an[x], sn[y]) for x, y in align.aligned]
         elif len(an) != len(sn): self.report.append(f'{name}: shape differs'); return False
-        else: pairs_ = list(zip(an, sn)); self.cur_ofs = {}
+        else: pairs_ = list(zip(an, sn)); self.cur_ofs, self.cur_ofs_end = {}, {}
         funcs = self.funcs.get(base_sid)
         if not funcs: self.report.append(f'{name}: no C function with BASE({base_sid})'); return False
         ok = True
@@ -150,10 +156,10 @@ class Tool:
                 while code.count('(') > code.count(')') and j + 1 <= e:
                     j += 1; code += ' ' + lines[j].split('//')[0].strip()
                 return code
-            anchor = [i for i in range(s, e + 1) if re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+(?:O\()?{off}\b', lines[i].split('//')[0])]
+            anchor = [i for i in range(s, e + 1) if re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+(?:OE?\()?{off}\b', lines[i].split('//')[0])]
             if not anchor:
                 for i in range(s, e + 1):
-                    for m in re.finditer(r'\bCYCT?\(b_\+(?:O\()?(\d+)\)?, b_\+(?:O\()?(\d+)\)?\)', lines[i].split('//')[0]):
+                    for m in re.finditer(r'\bCYCT?\(b_\+(?:OE?\()?(\d+)\)?, b_\+(?:OE?\()?(\d+)\)?\)', lines[i].split('//')[0]):
                         if int(m.group(1)) < off < int(m.group(2)): anchor.append(i)
             if not anchor and helpers:
                 # a helper that burns a run of instructions from its address argument (bank_push, obj helpers)

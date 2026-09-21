@@ -9668,40 +9668,40 @@ void updateInteraction_hook(GB *gb) {
   BASE(updateInteraction);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   E = 0x41;
-  CYC(b_+O(0), b_+O(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, DE);
   B = 0x08;
   alu_cp(gb, GV(0x3e, 0x5e));
-  if (F & FC) CYCT(b_+O(3), b_+O(9));
+  if (F & FC) CYCT(b_+O(3), b_+OE(9));
   else {
-    CYC(b_+O(3), b_+O(9));
+    CYC(b_+O(3), b_+OE(9));
     B = alu_inc8(gb, B);
     alu_cp(gb, GV(0x67, 0x89));
-    if (F & FC) CYCT(b_+O(9), b_+O(14));
+    if (F & FC) CYCT(b_+O(9), b_+OE(14));
     else {
-      CYC(b_+O(9), b_+O(14));
+      CYC(b_+O(9), b_+OE(14));
       B = alu_inc8(gb, B);
       alu_cp(gb, GV(0x98, 0xc8));
-      if (F & FC) CYCT(b_+O(14), b_+O(19));
+      if (F & FC) CYCT(b_+O(14), b_+OE(19));
       else {
-        CYC(b_+O(14), b_+O(19));
+        CYC(b_+O(14), b_+OE(19));
         if (game_seasons) B = 0x0f; else B = alu_inc8(gb, B);    // Seasons skips bank $0e here
         alu_cp(gb, GV(0xdc, 0xd8));
-        if (F & FC) CYCT(b_+O(19), b_+O(24));
-        else { CYC(b_+O(19), b_+O(26)); B = GV(0x10, 0x15); }
+        if (F & FC) CYCT(b_+O(19), b_+OE(24));
+        else { CYC(b_+O(19), b_+OE(26)); B = GV(0x10, 0x15); }
       }
     }
   }
   A = B;
-  CYC(b_+O(26), b_+O(29)); H8(hRomBank) = A;
-  CYC(b_+O(29), b_+O(32)); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+O(32), b_+O(33)); A = mem_rd(gb, DE);
+  CYC(b_+O(26), b_+OE(29)); H8(hRomBank) = A;
+  CYC(b_+O(29), b_+OE(32)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(32), b_+OE(33)); A = mem_rd(gb, DE);
   SET_HL(interactionCodeTable);
-  CYC(b_+O(33), b_+O(37));
+  CYC(b_+O(33), b_+OE(37));
   add_double_index_to_hl(gb);
-  CYC(b_+O(37), b_+O(38)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+O(38), b_+O(39)); H = mem_rd(gb, HL);
+  CYC(b_+O(37), b_+OE(38)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(38), b_+OE(39)); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+O(39), b_+O(41));
+  CYC(b_+O(39), b_+OE(41));
   HANDOFF(HL);
 }
 
@@ -9914,29 +9914,35 @@ static void load_tileset_layout_helper(GB *gb) {
 
 void loadTilesetLayout_hook(GB *gb) {
   BASE(loadTilesetLayout);
-  CYC(b_+0, b_+3); A = W8(wTilesetLayout);
-  CALL_ROM(b_+3, ROM_loadTileset);
-  switch_bank(gb, b_+6, 0x18);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wTilesetLayout);
+  CALL_ROM(b_+O(3), ROM_loadTileset);
+  switch_bank(gb, b_+O(6), GV(0x18, 0x17));
   A = 0x03;
-  CYC(b_+13, b_+17); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(13), b_+OE(17)); mem_wr(gb, IO_SVBK, A);
   SET_HL(w3TileMappingIndices);
   SET_DE(w3TileMappingData);
   B = 0x00;
-  CYC(b_+17, b_+25);
+  CYC(b_+O(17), b_+OE(25));
   for (;;) {
-    CYC(b_+25, b_+26); push_effect(gb, BC);
-    CYC(b_+26, b_+29);
+    CYC(b_+O(25), b_+OE(26)); push_effect(gb, BC);
+    CYC(b_+O(26), b_+OE(29));
     load_tileset_layout_helper(gb);
-    CYC(b_+29, b_+30); SET_BC(pop_effect(gb));
+    CYC(b_+O(29), b_+OE(30)); SET_BC(pop_effect(gb));
     B = alu_dec8(gb, B);
-    if (B) { CYCT(b_+30, b_+33); continue; }
-    CYC(b_+30, b_+33);
+    if (B) { CYCT(b_+O(30), b_+OE(33)); continue; }
+    CYC(b_+O(30), b_+OE(33));
     break;
   }
-  SET_HL(ROM_b04_setPastCliffPalettesToRed);
-  E = 0x04;
-  CYC(b_+33, b_+41);
-  interBankCall_hook(gb);
+  if (!game_seasons) {      // past cliff palettes: Ages only
+    SET_HL(ROM_b04_setPastCliffPalettesToRed);
+    E = 0x04;
+    CYC(b_+33, b_+41);
+    interBankCall_hook(gb);
+    return;
+  }
+  alu_xor(gb, A);
+  CYC(b_+S(33), b_+S(36)); mem_wr(gb, IO_SVBK, A);
+  RET(b_+S(36)); return;
 }
 
 static void load_tileset_unique_gfx(GB *gb) {
@@ -11111,138 +11117,138 @@ void func_0eda_hook(GB *gb) {
 static void draw_object(GB *gb) {
   BASE(drawAllSpritesUnconditionally__drawObject);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+O(0), b_+O(1)); push_effect(gb, HL);
+  CYC(b_+O(0), b_+OE(1)); push_effect(gb, HL);
   L = alu_inc8(gb, L);
-  CYC(b_+O(1), b_+O(3)); H = mem_rd(gb, HL);
+  CYC(b_+O(1), b_+OE(3)); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+O(3), b_+O(4));
-  CALL_C(b_+O(4), wRamFunction, wRamFunctionAddr, b_+O(7));
-  if (!(F & FC)) { CYCT(b_+O(7), b_+O(9)); goto ret; }
-  CYC(b_+O(7), b_+O(9));
-  CYC(b_+O(9), b_+O(10)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+O(10), b_+O(12)); H8(hFF8F) = A;
-  CYC(b_+O(12), b_+O(13)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+O(13), b_+O(15)); H8(hFF8E) = A;
-  CYC(b_+O(15), b_+O(16)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+O(16), b_+O(17)); H = mem_rd(gb, HL);
+  CYC(b_+O(3), b_+OE(4));
+  CALL_C(b_+O(4), wRamFunction, wRamFunctionAddr, b_+OE(7));
+  if (!(F & FC)) { CYCT(b_+O(7), b_+OE(9)); goto ret; }
+  CYC(b_+O(7), b_+OE(9));
+  CYC(b_+O(9), b_+OE(10)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(10), b_+OE(12)); H8(hFF8F) = A;
+  CYC(b_+O(12), b_+OE(13)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(13), b_+OE(15)); H8(hFF8E) = A;
+  CYC(b_+O(15), b_+OE(16)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(16), b_+OE(17)); H = mem_rd(gb, HL);
   L = A;
   A = H;
   alu_and(gb, 0xc0);
   alu_rlca(gb);
   alu_rlca(gb);
   alu_add(gb, SYMBANK(itemOamData4cf40));
-  CYC(b_+O(17), b_+O(25));
-  CYC(b_+O(25), b_+O(27)); H8(hRomBank) = A;
-  CYC(b_+O(27), b_+O(30)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(17), b_+OE(25));
+  CYC(b_+O(25), b_+OE(27)); H8(hRomBank) = A;
+  CYC(b_+O(27), b_+OE(30)); mem_wr(gb, MBC_ROM_BANK, A);
   H = (uint8_t)((H | 0x40) & 0x7f);
-  CYC(b_+O(30), b_+O(34));
-  CYC(b_+O(34), b_+O(35)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(30), b_+OE(34));
+  CYC(b_+O(34), b_+OE(35)); A = mem_rd(gb, HL); SET_HL(HL + 1);
   alu_or(gb, A);
-  CYC(b_+O(35), b_+O(36));
-  if (F & FZ) { CYCT(b_+O(36), b_+O(38)); goto ret; }
-  CYC(b_+O(36), b_+O(38));
+  CYC(b_+O(35), b_+OE(36));
+  if (F & FZ) { CYCT(b_+O(36), b_+OE(38)); goto ret; }
+  CYC(b_+O(36), b_+OE(38));
   C = A;
-  CYC(b_+O(38), b_+O(39));
-  CYC(b_+O(39), b_+O(41)); A = H8(hOamTail);
+  CYC(b_+O(38), b_+OE(39));
+  CYC(b_+O(39), b_+OE(41)); A = H8(hOamTail);
   E = A;
   A = wOamEnd & 0xff;
   alu_sub(gb, E);
-  CYC(b_+O(41), b_+O(45));
-  if (F & FZ) { CYCT(b_+O(45), b_+O(47)); goto ret; }
-  CYC(b_+O(45), b_+O(47));
+  CYC(b_+O(41), b_+OE(45));
+  if (F & FZ) { CYCT(b_+O(45), b_+OE(47)); goto ret; }
+  CYC(b_+O(45), b_+OE(47));
   alu_rrca(gb);
   alu_rrca(gb);
   B = A;
   D = wOam >> 8;
-  CYC(b_+O(47), b_+O(52));
+  CYC(b_+O(47), b_+OE(52));
   for (;;) {
-    CYC(b_+O(52), b_+O(54)); A = H8(hFF8C);
-    CYC(b_+O(54), b_+O(55)); alu_add(gb, mem_rd(gb, HL));
+    CYC(b_+O(52), b_+OE(54)); A = H8(hFF8C);
+    CYC(b_+O(54), b_+OE(55)); alu_add(gb, mem_rd(gb, HL));
     SET_HL(HL + 1);
     alu_cp(gb, 0xa0);
-    CYC(b_+O(55), b_+O(58));
-    if (!(F & FC)) { CYCT(b_+O(58), b_+O(60)); goto skipSprite; }
-    CYC(b_+O(58), b_+O(60));
-    CYC(b_+O(60), b_+O(61)); mem_wr(gb, DE, A);
-    CYC(b_+O(61), b_+O(63)); A = H8(hFF8D);
-    CYC(b_+O(63), b_+O(64)); alu_add(gb, mem_rd(gb, HL));
+    CYC(b_+O(55), b_+OE(58));
+    if (!(F & FC)) { CYCT(b_+O(58), b_+OE(60)); goto skipSprite; }
+    CYC(b_+O(58), b_+OE(60));
+    CYC(b_+O(60), b_+OE(61)); mem_wr(gb, DE, A);
+    CYC(b_+O(61), b_+OE(63)); A = H8(hFF8D);
+    CYC(b_+O(63), b_+OE(64)); alu_add(gb, mem_rd(gb, HL));
     alu_cp(gb, 0xa8);
-    CYC(b_+O(64), b_+O(66));
-    if (!(F & FC)) { CYCT(b_+O(66), b_+O(68)); goto skipSprite; }
-    CYC(b_+O(66), b_+O(68));
+    CYC(b_+O(64), b_+OE(66));
+    if (!(F & FC)) { CYCT(b_+O(66), b_+OE(68)); goto skipSprite; }
+    CYC(b_+O(66), b_+OE(68));
     E = alu_inc8(gb, E);
-    CYC(b_+O(68), b_+O(69));
-    CYC(b_+O(69), b_+O(70)); mem_wr(gb, DE, A);
+    CYC(b_+O(68), b_+OE(69));
+    CYC(b_+O(69), b_+OE(70)); mem_wr(gb, DE, A);
     SET_HL(HL + 1);
     E = alu_inc8(gb, E);
-    CYC(b_+O(70), b_+O(72));
-    CYC(b_+O(72), b_+O(74)); A = H8(hFF8E);
-    CYC(b_+O(74), b_+O(75)); alu_add(gb, mem_rd(gb, HL));
-    CYC(b_+O(75), b_+O(76)); mem_wr(gb, DE, A);
+    CYC(b_+O(70), b_+OE(72));
+    CYC(b_+O(72), b_+OE(74)); A = H8(hFF8E);
+    CYC(b_+O(74), b_+OE(75)); alu_add(gb, mem_rd(gb, HL));
+    CYC(b_+O(75), b_+OE(76)); mem_wr(gb, DE, A);
     SET_HL(HL + 1);
     E = alu_inc8(gb, E);
-    CYC(b_+O(76), b_+O(78));
-    CYC(b_+O(78), b_+O(80)); A = H8(hFF8F);
-    CYC(b_+O(80), b_+O(81)); alu_xor(gb, mem_rd(gb, HL));
-    CYC(b_+O(81), b_+O(82)); mem_wr(gb, DE, A);
+    CYC(b_+O(76), b_+OE(78));
+    CYC(b_+O(78), b_+OE(80)); A = H8(hFF8F);
+    CYC(b_+O(80), b_+OE(81)); alu_xor(gb, mem_rd(gb, HL));
+    CYC(b_+O(81), b_+OE(82)); mem_wr(gb, DE, A);
     SET_HL(HL + 1);
     E = alu_inc8(gb, E);
     B = alu_dec8(gb, B);
-    CYC(b_+O(82), b_+O(85));
-    if (F & FZ) { CYCT(b_+O(85), b_+O(87)); break; }
-    CYC(b_+O(85), b_+O(87));
+    CYC(b_+O(82), b_+OE(85));
+    if (F & FZ) { CYCT(b_+O(85), b_+OE(87)); break; }
+    CYC(b_+O(85), b_+OE(87));
     C = alu_dec8(gb, C);
-    CYC(b_+O(87), b_+O(88));
-    if (!(F & FZ)) { CYCT(b_+O(88), b_+O(90)); continue; }
-    CYC(b_+O(88), b_+O(90));
+    CYC(b_+O(87), b_+OE(88));
+    if (!(F & FZ)) { CYCT(b_+O(88), b_+OE(90)); continue; }
+    CYC(b_+O(88), b_+OE(90));
     break;
   skipSprite:
     SET_HL(HL + 3);
     C = alu_dec8(gb, C);
-    CYC(b_+O(97), b_+O(101));
-    if (!(F & FZ)) { CYCT(b_+O(101), b_+O(103)); continue; }
-    CYC(b_+O(101), b_+O(103));
-    CYCT(b_+O(103), b_+O(105));
+    CYC(b_+O(97), b_+OE(101));
+    if (!(F & FZ)) { CYCT(b_+O(101), b_+OE(103)); continue; }
+    CYC(b_+O(101), b_+OE(103));
+    CYCT(b_+O(103), b_+OE(105));
     break;
   }
   A = E;
-  CYC(b_+O(90), b_+O(91));
-  CYC(b_+O(91), b_+O(93)); H8(hOamTail) = A;
+  CYC(b_+O(90), b_+OE(91));
+  CYC(b_+O(91), b_+OE(93)); H8(hOamTail) = A;
 ret:
-  CYC(b_+O(93), b_+O(94)); SET_HL(pop_effect(gb));
-  CYC(b_+O(94), b_+O(96)); mem_wr(gb, HL, 0x00);
-  CYC(b_+O(96), b_+O(97));
+  CYC(b_+O(93), b_+OE(94)); SET_HL(pop_effect(gb));
+  CYC(b_+O(94), b_+OE(96)); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(96), b_+OE(97));
 }
 
 static void draw_object_terrain_effects(GB *gb) {
   BASE(_drawObjectTerrainEffects);
-  CYC(b_+O(0), b_+O(3)); A = W8(wTilesetFlags);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wTilesetFlags);
   alu_and(gb, 0x20);
-  if (!(F & FZ)) { CYCT(b_+O(3), b_+O(6)); return; }
-  CYC(b_+O(3), b_+O(6));
+  if (!(F & FZ)) { CYCT(b_+O(3), b_+OE(6)); return; }
+  CYC(b_+O(3), b_+OE(6));
   A = B;
   alu_cp(gb, 0x97);
-  if (!(F & FC)) { CYCT(b_+O(6), b_+O(10)); return; }
-  CYC(b_+O(6), b_+O(10));
+  if (!(F & FC)) { CYCT(b_+O(6), b_+OE(10)); return; }
+  CYC(b_+O(6), b_+OE(10));
   alu_bit(gb, 7, E);
   if (F & FZ) {
-    CYCT(b_+O(10), b_+O(14));
-    CYC(b_+O(47), b_+O(50)); A = W8(wScrollMode);
+    CYCT(b_+O(10), b_+OE(14));
+    CYC(b_+O(47), b_+OE(50)); A = W8(wScrollMode);
     alu_cp(gb, 0x08);
-    if (F & FZ) { CYCT(b_+O(50), b_+O(53)); return; }
-    CYC(b_+O(50), b_+O(53));
-    CYC(b_+O(53), b_+O(54)); push_effect(gb, HL);
+    if (F & FZ) { CYCT(b_+O(50), b_+OE(53)); return; }
+    CYC(b_+O(50), b_+OE(53));
+    CYC(b_+O(53), b_+OE(54)); push_effect(gb, HL);
     A = L;
     alu_and(gb, 0xc0);
     alu_add(gb, OBJ_YH);
     L = A;
-    CYC(b_+O(54), b_+O(61)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(54), b_+OE(61)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     B = A;
     alu_add(gb, 0x05);
     alu_and(gb, 0xf0);
     C = A;
     L = alu_inc8(gb, L);
-    CYC(b_+O(61), b_+O(69)); L = mem_rd(gb, HL);
+    CYC(b_+O(61), b_+OE(69)); L = mem_rd(gb, HL);
     A = L;
     alu_xor(gb, B);
     H = A;
@@ -11252,7 +11258,7 @@ static void draw_object_terrain_effects(GB *gb) {
     alu_or(gb, C);
     C = A;
     B = wRoomLayout >> 8;
-    CYC(b_+O(69), b_+O(82)); A = mem_rd(gb, BC);
+    CYC(b_+O(69), b_+OE(82)); A = mem_rd(gb, BC);
     alu_cp(gb, 0xf8);
     if (game_seasons) {     // tiles $f8-$fc are terrain effects here: $f8/$f9 grass, $fa-$fc puddle
       if (F & FC) { CYCT(b_+S(82), b_+S(86)); goto exit; }
@@ -11266,68 +11272,68 @@ static void draw_object_terrain_effects(GB *gb) {
       goto puddle;
     }
     if (F & FZ) {
-      CYCT(b_+O(82), b_+O(86));
+      CYCT(b_+O(82), b_+OE(86));
 grass:
       alu_bit(gb, 2, H);
-      CYC(b_+O(99), b_+O(104)); A = W8(wGrassAnimationModifier);
-      if (F & FZ) CYCT(b_+O(104), b_+O(106));
-      else { CYC(b_+O(104), b_+O(108)); alu_add(gb, 0x24); }
+      CYC(b_+O(99), b_+OE(104)); A = W8(wGrassAnimationModifier);
+      if (F & FZ) CYCT(b_+O(104), b_+OE(106));
+      else { CYC(b_+O(104), b_+OE(108)); alu_add(gb, 0x24); }
       C = A;
       B = 0x00;
       SET_HL(greenGrassAnimationFrame0_bank14);
       alu_add_hl(gb, BC);
-      CYC(b_+O(108), b_+O(115));
+      CYC(b_+O(108), b_+OE(115));
     } else {
-      CYC(b_+O(82), b_+O(86));
+      CYC(b_+O(82), b_+OE(86));
       alu_cp(gb, GV(0xf9, 0xfd));
       if (!(F & FZ)) {
-        CYCT(b_+O(86), b_+O(90));
+        CYCT(b_+O(86), b_+OE(90));
 exit:
-        CYC(b_+O(120), b_+O(121)); SET_HL(pop_effect(gb));
-        CYC(b_+O(121), b_+O(122));
+        CYC(b_+O(120), b_+OE(121)); SET_HL(pop_effect(gb));
+        CYC(b_+O(121), b_+OE(122));
         return;
       }
-      CYC(b_+O(86), b_+O(90));
+      CYC(b_+O(86), b_+OE(90));
 puddle:
       E = alu_inc8(gb, E);
       SET_HL(wPuddleAnimationPointer);
-      CYC(b_+O(90), b_+O(95)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+O(95), b_+O(96)); H = mem_rd(gb, HL);
+      CYC(b_+O(90), b_+OE(95)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+O(95), b_+OE(96)); H = mem_rd(gb, HL);
       L = A;
-      CYC(b_+O(96), b_+O(99));
+      CYC(b_+O(96), b_+OE(99));
     }
-    CYC(b_+O(115), b_+O(116)); push_effect(gb, DE);
-    CYC(b_+O(116), b_+O(119));
+    CYC(b_+O(115), b_+OE(116)); push_effect(gb, DE);
+    CYC(b_+O(116), b_+OE(119));
     draw_sprite_list(gb);
-    CYC(b_+O(119), b_+O(120)); SET_DE(pop_effect(gb));
-    CYC(b_+O(120), b_+O(121)); SET_HL(pop_effect(gb));
-    CYC(b_+O(121), b_+O(122));
+    CYC(b_+O(119), b_+OE(120)); SET_DE(pop_effect(gb));
+    CYC(b_+O(120), b_+OE(121)); SET_HL(pop_effect(gb));
+    CYC(b_+O(121), b_+OE(122));
     return;
   }
-  CYC(b_+O(10), b_+O(14));
-  CYC(b_+O(14), b_+O(17)); A = W8(wFrameCounter);
+  CYC(b_+O(10), b_+OE(14));
+  CYC(b_+O(14), b_+OE(17)); A = W8(wFrameCounter);
   alu_xor(gb, H);
   alu_rrca(gb);
-  if (!(F & FC)) { CYCT(b_+O(17), b_+O(20)); return; }
-  CYC(b_+O(17), b_+O(20));
-  CYC(b_+O(20), b_+O(21)); push_effect(gb, HL);
-  CYC(b_+O(21), b_+O(23)); A = H8(hTerrainEffectsBufferUsedSize);
+  if (!(F & FC)) { CYCT(b_+O(17), b_+OE(20)); return; }
+  CYC(b_+O(17), b_+OE(20));
+  CYC(b_+O(20), b_+OE(21)); push_effect(gb, HL);
+  CYC(b_+O(21), b_+OE(23)); A = H8(hTerrainEffectsBufferUsedSize);
   alu_add(gb, 0xc0);
   L = A;
   H = wTerrainEffectsBuffer >> 8;
-  CYC(b_+O(23), b_+O(30)); A = H8(hFF8C);
-  CYC(b_+O(30), b_+O(31)); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+O(31), b_+O(33)); A = H8(hFF8D);
-  CYC(b_+O(33), b_+O(34)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(23), b_+OE(30)); A = H8(hFF8C);
+  CYC(b_+O(30), b_+OE(31)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(31), b_+OE(33)); A = H8(hFF8D);
+  CYC(b_+O(33), b_+OE(34)); mem_wr(gb, HL, A); SET_HL(HL + 1);
   A = 0x00;
-  CYC(b_+O(34), b_+O(37)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(34), b_+OE(37)); mem_wr(gb, HL, A); SET_HL(HL + 1);
   A = 0x40;
-  CYC(b_+O(37), b_+O(40)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(37), b_+OE(40)); mem_wr(gb, HL, A); SET_HL(HL + 1);
   A = L;
   alu_sub(gb, 0xc0);
-  CYC(b_+O(40), b_+O(45)); H8(hTerrainEffectsBufferUsedSize) = A;
-  CYC(b_+O(45), b_+O(46)); SET_HL(pop_effect(gb));
-  CYC(b_+O(46), b_+O(47));
+  CYC(b_+O(40), b_+OE(45)); H8(hTerrainEffectsBufferUsedSize) = A;
+  CYC(b_+O(45), b_+OE(46)); SET_HL(pop_effect(gb));
+  CYC(b_+O(46), b_+OE(47));
 }
 
 void _drawObjectTerrainEffects_hook(GB *gb) {
@@ -11384,9 +11390,9 @@ void _getObjectPositionOnScreen_hook(GB *gb) {
 
 static void draw_all_sprites_unconditionally(GB *gb) {
   BASE(drawAllSpritesUnconditionally);
-  CYC(b_+O(0), b_+O(2)); A = H8(hRomBank);
-  CYC(b_+O(2), b_+O(3)); push_effect(gb, AF);
-  CYC(b_+O(3), b_+O(6));
+  CYC(b_+O(0), b_+OE(2)); A = H8(hRomBank);
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, AF);
+  CYC(b_+O(3), b_+OE(6));
   queue_draw_everything(gb);
   if (!game_seasons) {
     CYC(b_+6, b_+9); A = W8(wLinkRaisedFloorOffset);
@@ -11396,136 +11402,136 @@ static void draw_all_sprites_unconditionally(GB *gb) {
   }
   SET_DE(w1Link);
   B = 0x0b;
-  CYC(b_+O(14), b_+O(22)); A = W8(wTextboxFlags);
+  CYC(b_+O(14), b_+OE(22)); A = W8(wTextboxFlags);
   alu_and(gb, 0x04);
   if (!(F & FZ)) {
-    CYC(b_+O(22), b_+O(26));
-    CYC(b_+O(26), b_+O(29));
+    CYC(b_+O(22), b_+OE(26));
+    CYC(b_+O(26), b_+OE(29));
     object_queue_draw(gb);
-    CYC(b_+O(29), b_+O(31));
+    CYC(b_+O(29), b_+OE(31));
   } else {
-    CYCT(b_+O(22), b_+O(26));
+    CYCT(b_+O(22), b_+OE(26));
     for (;;) {
-      CYC(b_+O(31), b_+O(34));
+      CYC(b_+O(31), b_+OE(34));
       object_queue_draw(gb);
       D = alu_inc8(gb, D);
       A = D;
       alu_cp(gb, 0xd6);
-      if (F & FC) { CYCT(b_+O(34), b_+O(40)); continue; }
-      CYC(b_+O(34), b_+O(40));
+      if (F & FC) { CYCT(b_+O(34), b_+OE(40)); continue; }
+      CYC(b_+O(34), b_+OE(40));
       break;
     }
   }
   switch_bank(gb, b_+O(40), GV(0x14, 0x13));
-  CYC(b_+O(47), b_+O(50)); A = W8(wFrameCounter);
+  CYC(b_+O(47), b_+OE(50)); A = W8(wFrameCounter);
   alu_add(gb, A);
   A = alu_swap(gb, A);
   alu_and(gb, 0x03);
   SET_HL(puddleAnimationFrames_bank14);
-  CYC(b_+O(50), b_+O(59));
+  CYC(b_+O(50), b_+OE(59));
   add_double_index_to_hl(gb);
-  CYC(b_+O(59), b_+O(60)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+O(60), b_+O(63)); W8(wPuddleAnimationPointer) = A;
-  CYC(b_+O(63), b_+O(64)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+O(64), b_+O(67)); mem_wr(gb, wPuddleAnimationPointer + 1, A);
+  CYC(b_+O(59), b_+OE(60)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(60), b_+OE(63)); W8(wPuddleAnimationPointer) = A;
+  CYC(b_+O(63), b_+OE(64)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(64), b_+OE(67)); mem_wr(gb, wPuddleAnimationPointer + 1, A);
   SET_HL(wRamFunctionAddr);
   A = 0xc3;
-  CYC(b_+O(67), b_+O(73)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(67), b_+OE(73)); mem_wr(gb, HL, A); SET_HL(HL + 1);
   A = GV(0x82, 0x50);
-  CYC(b_+O(73), b_+O(76)); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+O(76), b_+O(78)); mem_wr(gb, HL, 0x0f);
-  CYC(b_+O(78), b_+O(81)); A = W8(wScrollMode);
+  CYC(b_+O(73), b_+OE(76)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(76), b_+OE(78)); mem_wr(gb, HL, 0x0f);
+  CYC(b_+O(78), b_+OE(81)); A = W8(wScrollMode);
   alu_cp(gb, 0x08);
-  if (!(F & FZ)) CYCT(b_+O(81), b_+O(85));
+  if (!(F & FZ)) CYCT(b_+O(81), b_+OE(85));
   else {
-    CYC(b_+O(81), b_+O(85));
+    CYC(b_+O(81), b_+OE(85));
     A = 0x0f;
-    CYC(b_+O(85), b_+O(88)); mem_wr(gb, HL, A); SET_HL(HL - 1);
-    CYC(b_+O(88), b_+O(90)); mem_wr(gb, HL, GV(0xc1, 0x8f));
+    CYC(b_+O(85), b_+OE(88)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(b_+O(88), b_+OE(90)); mem_wr(gb, HL, GV(0xc1, 0x8f));
     alu_xor(gb, A);
     B = A;
     A = alu_inc8(gb, A);
-    CYC(b_+O(90), b_+O(95)); H8(hFF8A) = A;
-    CYC(b_+O(95), b_+O(98)); A = W8(wRoomIsLarge);
+    CYC(b_+O(90), b_+OE(95)); H8(hFF8A) = A;
+    CYC(b_+O(95), b_+OE(98)); A = W8(wRoomIsLarge);
     alu_or(gb, A);
-    if (F & FZ) CYCT(b_+O(98), b_+O(101));
-    else { CYC(b_+O(98), b_+O(103)); A = 0x04; }
+    if (F & FZ) CYCT(b_+O(98), b_+OE(101));
+    else { CYC(b_+O(98), b_+OE(103)); A = 0x04; }
     C = A;
-    CYC(b_+O(103), b_+O(107)); A = W8(wScreenTransitionDirection);
+    CYC(b_+O(103), b_+OE(107)); A = W8(wScreenTransitionDirection);
     alu_add(gb, C);
     alu_add(gb, A);
     alu_add(gb, A);
     C = A;
     SET_HL(data_1058);
     alu_add_hl(gb, BC);
-    CYC(b_+O(107), b_+O(116)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+O(116), b_+O(118)); H8(hFF90) = A;
-    CYC(b_+O(118), b_+O(119)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+O(119), b_+O(121)); H8(hFF91) = A;
-    CYC(b_+O(121), b_+O(122)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+O(122), b_+O(124)); H8(hFF92) = A;
-    CYC(b_+O(124), b_+O(125)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+O(125), b_+O(127)); H8(hFF93) = A;
+    CYC(b_+O(107), b_+OE(116)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(116), b_+OE(118)); H8(hFF90) = A;
+    CYC(b_+O(118), b_+OE(119)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(119), b_+OE(121)); H8(hFF91) = A;
+    CYC(b_+O(121), b_+OE(122)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(122), b_+OE(124)); H8(hFF92) = A;
+    CYC(b_+O(124), b_+OE(125)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(125), b_+OE(127)); H8(hFF93) = A;
   }
   SET_HL(wObjectsToDraw);
-  CYC(b_+O(127), b_+O(130));
+  CYC(b_+O(127), b_+OE(130));
   for (;;) {
-    CYC(b_+O(130), b_+O(131)); A = mem_rd(gb, HL);
+    CYC(b_+O(130), b_+OE(131)); A = mem_rd(gb, HL);
     alu_or(gb, A);
-    CYC(b_+O(131), b_+O(132));
-    if (!(F & FZ)) { CYCT(b_+O(132), b_+O(135)); draw_object(gb); }
-    else CYC(b_+O(132), b_+O(135));
+    CYC(b_+O(131), b_+OE(132));
+    if (!(F & FZ)) { CYCT(b_+O(132), b_+OE(135)); draw_object(gb); }
+    else CYC(b_+O(132), b_+OE(135));
     L = alu_inc8(gb, L);
     L = alu_inc8(gb, L);
     alu_bit(gb, 7, L);
-    if (F & FZ) { CYCT(b_+O(135), b_+O(141)); continue; }
-    CYC(b_+O(135), b_+O(141));
+    if (F & FZ) { CYCT(b_+O(135), b_+OE(141)); continue; }
+    CYC(b_+O(135), b_+OE(141));
     break;
   }
   SET_HL(wTerrainEffectsBuffer);
-  CYC(b_+O(141), b_+O(146)); A = H8(hTerrainEffectsBufferUsedSize);
+  CYC(b_+O(141), b_+OE(146)); A = H8(hTerrainEffectsBufferUsedSize);
   alu_rrca(gb);
   A = alu_srl(gb, A);
   B = A;
-  if (F & FZ) CYCT(b_+O(146), b_+O(152));
+  if (F & FZ) CYCT(b_+O(146), b_+OE(152));
   else {
-    CYC(b_+O(146), b_+O(152));
+    CYC(b_+O(146), b_+OE(152));
     for (;;) {
-      CYC(b_+O(152), b_+O(153)); push_effect(gb, BC);
-      CYC(b_+O(153), b_+O(154)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+O(154), b_+O(156)); H8(hFF8C) = A;
-      CYC(b_+O(156), b_+O(157)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+O(157), b_+O(159)); H8(hFF8D) = A;
-      CYC(b_+O(159), b_+O(160)); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+O(160), b_+O(161)); push_effect(gb, HL);
-      CYC(b_+O(161), b_+O(162)); H = mem_rd(gb, HL);
+      CYC(b_+O(152), b_+OE(153)); push_effect(gb, BC);
+      CYC(b_+O(153), b_+OE(154)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+O(154), b_+OE(156)); H8(hFF8C) = A;
+      CYC(b_+O(156), b_+OE(157)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+O(157), b_+OE(159)); H8(hFF8D) = A;
+      CYC(b_+O(159), b_+OE(160)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+O(160), b_+OE(161)); push_effect(gb, HL);
+      CYC(b_+O(161), b_+OE(162)); H = mem_rd(gb, HL);
       L = A;
-      CYC(b_+O(162), b_+O(166));
+      CYC(b_+O(162), b_+OE(166));
       draw_sprite_list(gb);
-      CYC(b_+O(166), b_+O(167)); SET_HL(pop_effect(gb));
+      CYC(b_+O(166), b_+OE(167)); SET_HL(pop_effect(gb));
       L = alu_inc8(gb, L);
-      CYC(b_+O(167), b_+O(169)); SET_BC(pop_effect(gb));
+      CYC(b_+O(167), b_+OE(169)); SET_BC(pop_effect(gb));
       B = alu_dec8(gb, B);
-      if (B) { CYCT(b_+O(169), b_+O(172)); continue; }
-      CYC(b_+O(169), b_+O(172));
+      if (B) { CYCT(b_+O(169), b_+OE(172)); continue; }
+      CYC(b_+O(169), b_+OE(172));
       break;
     }
   }
-  CYC(b_+O(172), b_+O(174)); A = H8(hOamTail);
+  CYC(b_+O(172), b_+OE(174)); A = H8(hOamTail);
   alu_cp(gb, 0xa0);
-  if (!(F & FC)) CYCT(b_+O(174), b_+O(178));
+  if (!(F & FC)) CYCT(b_+O(174), b_+OE(178));
   else {
-    CYC(b_+O(174), b_+O(178));
+    CYC(b_+O(174), b_+OE(178));
     H = wOam >> 8;
     B = 0xe0;
-    CYC(b_+O(178), b_+O(182));
+    CYC(b_+O(178), b_+OE(182));
     for (;;) {
       L = A;
-      CYC(b_+O(182), b_+O(184)); mem_wr(gb, HL, B);
+      CYC(b_+O(182), b_+OE(184)); mem_wr(gb, HL, B);
       alu_add(gb, 0x04);
       alu_cp(gb, 0xa0);
-      if (F & FC) { CYCT(b_+O(184), b_+O(190)); continue; }
-      CYC(b_+O(184), b_+O(190));
+      if (F & FC) { CYCT(b_+O(184), b_+OE(190)); continue; }
+      CYC(b_+O(184), b_+OE(190));
       break;
     }
   }
@@ -11537,10 +11543,10 @@ static void draw_all_sprites_unconditionally(GB *gb) {
     CYC(b_+193, b_+199); alu_add(gb, mem_rd(gb, HL));
     CYC(b_+199, b_+200); mem_wr(gb, HL, A);
   }
-  CYC(b_+O(200), b_+O(201)); SET_AF(pop_effect(gb));
-  CYC(b_+O(201), b_+O(203)); H8(hRomBank) = A;
-  CYC(b_+O(203), b_+O(206)); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+O(206), b_+O(207));
+  CYC(b_+O(200), b_+OE(201)); SET_AF(pop_effect(gb));
+  CYC(b_+O(201), b_+OE(203)); H8(hRomBank) = A;
+  CYC(b_+O(203), b_+OE(206)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(206), b_+OE(207));
 }
 
 void drawAllSpritesUnconditionally_hook(GB *gb) {
