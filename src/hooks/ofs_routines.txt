@@ -5,6 +5,7 @@ calculateAdjacentWallsBitset
 checkItemUsed 7=13
 checkLinkJumpingOffCliff
 checkTileWarps
+checkUseItems_b06
 cutscene01
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject

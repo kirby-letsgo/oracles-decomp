@@ -121,9 +121,10 @@ class Tool:
         base_sid = self.sid_for(parent, ab)
         self.base_sid = base_sid
         an = self.A.body(ab, aa); sn = self.S.body(sb, sa)
-        if name in self.ofs_routines:       # per-game offsets: audit the aligned instructions only (call-only @locals too)
+        ofs_key = name if name in self.ofs_routines else f'{name}_b{ab:02x}' if f'{name}_b{ab:02x}' in self.ofs_routines else None
+        if ofs_key:       # per-game offsets: audit the aligned instructions only (call-only @locals too)
             from ofsmap import align_all
-            self.cur_ofs, self.cur_ofs_end, segments = align_all(self.A, self.S, name, (ab, aa), (sb, sa), self.ofs_anchors.get(name, ()))
+            self.cur_ofs, self.cur_ofs_end, segments = align_all(self.A, self.S, name, (ab, aa), (sb, sa), self.ofs_anchors.get(ofs_key, ()))
             pairs_ = [(ba_[x], bs_[y]) for ba_, bs_, al_, da, ds, *_ in segments for x, y in al_]
         elif len(an) != len(sn): self.report.append(f'{name}: shape differs'); return False
         else:
@@ -328,7 +329,7 @@ def main():
             if m and len(ainst) > 1: ainst = [x for x in ainst if x[0] == int(m.group(1), 16)]
         if not ainst: continue
         ab, aa = ainst[0]; sb, sa = int(where[:2], 16), int(where[3:], 16)
-        tool.auditing = v in ('IDENTICAL', 'JT_ONLY') and bare not in tool.ofs_routines
+        tool.auditing = v in ('IDENTICAL', 'JT_ONLY') and bare not in tool.ofs_routines and n.replace('__', '@') not in tool.ofs_routines
         if tool.process(bare, ab, aa, sb, sa, apply) and v == 'SAME_SHAPE': ok_names.append(n)
     if apply:
         for f, lines in tool.files.items():

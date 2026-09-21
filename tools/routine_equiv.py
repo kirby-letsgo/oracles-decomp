@@ -282,6 +282,9 @@ def main():
         s_insts = seasons.instances.get(bare) or ([seasons.labels[bare]] if bare in seasons.labels else None)
         if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', bare.split('@')[0]):
             s_insts = [pairs[(bare,) + a] for a in insts if (bare,) + a in pairs] or None
+        elif s_insts and len(s_insts) > 1:      # copies in several banks: the paired copy only
+            paired = [pairs[(bare,) + a] for a in insts if (bare,) + a in pairs]
+            if paired: s_insts = paired
         if not s_insts:
             results[n] = ('AGES_ONLY', '', 0)
             continue
