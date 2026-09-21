@@ -448,6 +448,20 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21 (evening): DIFFERENT routines start running under Seasons: `tools/ofsmap.py`
+  aligns the two instruction streams and gives a routine a per-game offset table
+  (`src/game/ofs.c`, `b_+O(N)`), so one C serves both games once the Ages-only and Seasons-only
+  instructions are wrapped by hand. Done: `drawAllSpritesUnconditionally` (51% of the Seasons
+  interpreter time), `_drawObjectTerrainEffects`, `updateInteraction`, `calculateAdjacentWallsBitset`,
+  `updateSpecialObjects`, `linkState01` (with a Seasons-only `checkLinkPushingAgainstTreeStump`
+  call), plus 16 routines that differ only by the size of a jump table. `routine_equiv` rates a
+  routine whose jump-table entries alone differ `JT_ONLY`; the selector accepts it when the C
+  chain has an interpreter fallback (5 chains in the tree have none). `gameconst` audits the
+  aligned instructions of mapped routines and names a ROM address both games label
+  (`SYM(getTransformedLinkID)` replaced an Ages-only label+9). Seasons hooks 3,500 to 3,525;
+  interpreted instructions on the playthrough 64.7M to 31.2M before the last batch. Gates: ctest
+  9/9, whole movie, Ages verify 30k, Seasons playthrough `VERIFY_ALL` 0 failures, lint 0.
+
 - 2026-09-21: merged Fable's native runtime skeleton (`bc55b55`, below) into main. The merge
   only conflicted on `table_seasons.h`; every generated file was regenerated (`guard_tailcalls`
   guarded 1,069 new tail sites in the registered locals, `audit_calls`/`audit_burns`/`audit_cyc`

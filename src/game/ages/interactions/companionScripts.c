@@ -724,19 +724,19 @@ l5a30:
 // INTERAC_COMPANION_SCRIPTS
 void interactionCode71_hook(GB *gb) {
   BASE(interactionCode71);
-  CYC(b_+0, b_+3); A = W8(wLinkDeathTrigger);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+4, b_+6); goto l5915; } // jr z
-  CYC(b_+4, b_+6);
-  CYC(b_+6, b_+7); alu_xor(gb, A);
-  CYC(b_+7, b_+10); W8(wDisabledObjects) = A;
-  CYC(b_+10, b_+13); TAIL(interactionDelete); // jp
+  CYC(b_+O(0), b_+O(3)); A = W8(wLinkDeathTrigger);
+  CYC(b_+O(3), b_+O(4)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(4), b_+O(6)); goto l5915; } // jr z
+  CYC(b_+O(4), b_+O(6));
+  CYC(b_+O(6), b_+O(7)); alu_xor(gb, A);
+  CYC(b_+O(7), b_+O(10)); W8(wDisabledObjects) = A;
+  CYC(b_+O(10), b_+O(13)); TAIL(interactionDelete); // jp
 
 l5915:
-  CYC(b_+13, b_+15); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
+  CYC(b_+O(13), b_+O(15)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(15), b_+O(16)); A = mem_rd(gb, DE);
   {
-    CYC(b_+16, b_+17); push_effect(gb, b_+17);
+    CYC(b_+O(16), b_+O(17)); push_effect(gb, b_+O(17));
     uint16_t target = companionScripts_jump_table(gb);
     if (target == SYM(companionScript_subid01)) { companionScript_subid01_hook(gb); return; }
     if (target == SYM(companionScript_subid02)) { companionScript_subid02_hook(gb); return; }

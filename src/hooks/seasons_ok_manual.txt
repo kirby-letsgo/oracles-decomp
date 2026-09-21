@@ -14,3 +14,5 @@ mapMenu_drawSprites              # TAIL_GV(mapMenu_drawTimePortal, mapMenu_drawJ
 getEntryFromObjectTable1         # bank12_table_pointer carries GV(0x12, 0x11)
 loadGfxHeader                    # SYM(gfxHeaderTable) is uncmpGfxHeader36's address in Seasons
 objectCreateFloatingSnore        # bank_push GV(0x0b, 0x0a)
+func_4553@getLinkWalkingAnimation   # Ages-only preamble guarded by the label coinciding with @notUnderwater in Seasons
+updateSpecialObjects@updateSpecialObject   # only the jump table differs (subrosiaDanceLink); the if-chain hands the rest off

@@ -61,18 +61,18 @@ static uint16_t headThwomp_jump_table(GB *gb) {
 void enemyCode79_hook(GB *gb) {
   BASE(enemyCode79);
   uint16_t sp0_ = gb->sp;
-  if (F & FZ) { CYCT(b_+0, b_+2); goto normalStatus; } // jr z
-  CYC(b_+0, b_+2);
-  CYC(b_+2, b_+4); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(b_+4); return; } // ret c
-  CYC(b_+4, b_+5);
-  if (F & FZ) { CYCT(b_+5, b_+8); enemyBoss_dead_b0f_hook(gb); return; } // jp z
-  CYC(b_+5, b_+8);
+  if (F & FZ) { CYCT(b_+O(0), b_+O(2)); goto normalStatus; } // jr z
+  CYC(b_+O(0), b_+O(2));
+  CYC(b_+O(2), b_+O(4)); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+O(4)); return; } // ret c
+  CYC(b_+O(4), b_+O(5));
+  if (F & FZ) { CYCT(b_+O(5), b_+O(8)); enemyBoss_dead_b0f_hook(gb); return; } // jp z
+  CYC(b_+O(5), b_+O(8));
 
 normalStatus:
-  CYC(b_+8, b_+10); E = ENEMY_BASE + OBJ_STATE;
-  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
-  CYC(b_+11, b_+12); push_effect(gb, b_+12);
+  CYC(b_+O(8), b_+O(10)); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+O(10), b_+O(11)); A = mem_rd(gb, DE);
+  CYC(b_+O(11), b_+O(12)); push_effect(gb, b_+O(12));
   {
     uint16_t target = headThwomp_jump_table(gb);
     if (target == SYM(headThwomp_state_uninitialized)) { headThwomp_state_uninitialized_hook(gb); return; }

@@ -28,10 +28,37 @@ def main():
     for l in open(tsv):
         n, v, *_ = l.rstrip('\n').split('\t')
         verdict[n] = v
+    # JT_ONLY: identical apart from jump-table entries; fine when every jump table the C
+    # dispatches in that routine's functions falls back to the interpreter
+    safe_jt = set()
+    for path in glob.glob('src/game/**/*.c', recursive=True):
+        if os.path.basename(path).startswith('gen_'): continue
+        text = open(path, errors='replace').read()
+        for fm in re.finditer(r'\n(?:static )?(?:void|uint16_t|uint8_t|bool|int|unsigned) \*?\w+\([^)]*\)\s*\{(.*?)\n\}', text, re.S):
+            body = fm.group(1)
+            bm = re.search(r'\bBASE\((\w+)\)', body)
+            if not bm: continue
+            name = bm.group(1).replace('__', '@')
+            if 'jump_table' in body and not re.search(r'HANDOFF\(|hook_continue\(|hook_handoff\(', body): safe_jt.add(name + '!'); continue
+            safe_jt.add(name)
+    for n in list(verdict):
+        if verdict[n] == 'JT_ONLY':
+            base = re.sub(r'_b[0-9a-f]{2}$', '', n)
+            verdict[n] = 'IDENTICAL' if (base in safe_jt or n in safe_jt) and (base + '!') not in safe_jt and (n + '!') not in safe_jt else 'DIFFERENT'
     if os.path.exists('src/hooks/seasons_ok.txt'):
         for l in open('src/hooks/seasons_ok.txt'):
             n = l.strip()
             if n and verdict.get(n) == 'SAME_SHAPE': verdict[n] = 'IDENTICAL'
+    # hand-checked routines: per-game offsets and edited C (tools/ofsmap.py), or C that already
+    # tells the games apart (seasons_ok_manual.txt, whatever routine_equiv says); a jump table
+    # without an interpreter fallback still disqualifies (a Seasons-only entry would be lost)
+    for path in ('src/hooks/ofs_routines.txt', 'src/hooks/seasons_ok_manual.txt'):
+        if not os.path.exists(path): continue
+        for l in open(path):
+            n = l.split('#')[0].strip()
+            if not n: continue
+            if (n + '!') in safe_jt: print(f'{path}: {n} dispatches a jump table without a fallback, left out'); continue
+            verdict[n] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
     callees, burns, local_calls, tails = {}, {}, {}, {}

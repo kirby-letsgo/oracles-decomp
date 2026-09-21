@@ -150,72 +150,74 @@ static void update_special_object(GB *gb) {
 void updateSpecialObjects_hook(GB *gb) {
   BASE(updateSpecialObjects);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(wLinkIDOverride);
-  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
-  CYC(b_+4, b_+6); mem_wr(gb, HL, 0);
-  CYC(b_+6, b_+7); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+7, b_+9); goto no_transformation; }
-  CYC(b_+7, b_+9);
-  CYC(b_+9, b_+11); alu_and(gb, 0x7f);
-  CYC(b_+11, b_+14); mem_wr(gb, w1Link_id, A);
+  CYC(b_+O(0), b_+O(3)); SET_HL(wLinkIDOverride);
+  CYC(b_+O(3), b_+O(4)); A = mem_rd(gb, HL);
+  CYC(b_+O(4), b_+O(6)); mem_wr(gb, HL, 0);
+  CYC(b_+O(6), b_+O(7)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(7), b_+O(9)); goto no_transformation; }
+  CYC(b_+O(7), b_+O(9));
+  CYC(b_+O(9), b_+O(11)); alu_and(gb, 0x7f);
+  CYC(b_+O(11), b_+O(14)); mem_wr(gb, w1Link_id, A);
 no_transformation:
-  CYC(b_+14, b_+17); SET_HL(w1Link_var2f);
-  CYC(b_+17, b_+18); A = mem_rd(gb, HL);
-  CYC(b_+18, b_+20); alu_and(gb, 0x3f);
-  CYC(b_+20, b_+21); mem_wr(gb, HL, A);
-  CYC(b_+21, b_+23); A = 0x4a;
-  CALL_C(b_+23, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+26);
-  if (!(F & FC)) { CYCT(b_+26, b_+28); goto no_seed_shooter; }
-  CYC(b_+26, b_+28);
-  CYC(b_+28, b_+30); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x40));
+  if (!game_seasons) {      // seed shooter and sidescrolling flags in w1Link.var2f: Ages only
+    CYC(b_+14, b_+17); SET_HL(w1Link_var2f);
+    CYC(b_+17, b_+18); A = mem_rd(gb, HL);
+    CYC(b_+18, b_+20); alu_and(gb, 0x3f);
+    CYC(b_+20, b_+21); mem_wr(gb, HL, A);
+    CYC(b_+21, b_+23); A = 0x4a;
+    CALL_C(b_+23, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+26);
+    if (!(F & FC)) { CYCT(b_+26, b_+28); goto no_seed_shooter; }
+    CYC(b_+26, b_+28);
+    CYC(b_+28, b_+30); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x40));
 no_seed_shooter:
-  CYC(b_+30, b_+33); A = mem_rd(gb, wTilesetFlags);
-  CYC(b_+33, b_+35); alu_and(gb, 0x40);
-  if (F & FZ) { CYCT(b_+35, b_+37); goto no_input_block; }
-  CYC(b_+35, b_+37);
-  CYC(b_+37, b_+39); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
-no_input_block:
-  CYC(b_+39, b_+40); alu_xor(gb, A);
-  CYC(b_+40, b_+43); mem_wr(gb, wBraceletGrabbingNothing, A);
-  CYC(b_+43, b_+46); mem_wr(gb, wcc92, A);
-  CYC(b_+46, b_+49); mem_wr(gb, wForceLinkPushAnimation, A);
-  CYC(b_+49, b_+52); SET_HL(wcc95);
-  CYC(b_+52, b_+53); A = mem_rd(gb, HL);
-  CYC(b_+53, b_+55); alu_or(gb, 0x7f);
-  CYC(b_+55, b_+56); mem_wr(gb, HL, A);
-  CYC(b_+56, b_+59); SET_HL(wLinkTurningDisabled);
-  CYC(b_+59, b_+61); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0x7f));
-  CALL_C(b_+61, updateGameKeysPressed_hook, SYM(updateGameKeysPressed), b_+64);
-  CYC(b_+64, b_+67); SET_HL(w1Companion);
-  CYC(b_+67, b_+70); push_effect(gb, b_+70);
+    CYC(b_+30, b_+33); A = mem_rd(gb, wTilesetFlags);
+    CYC(b_+33, b_+35); alu_and(gb, 0x40);
+    if (F & FZ) { CYCT(b_+35, b_+37); goto no_input_block; }
+    CYC(b_+35, b_+37);
+    CYC(b_+37, b_+39); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+no_input_block:;
+  }
+  CYC(b_+O(39), b_+O(40)); alu_xor(gb, A);
+  CYC(b_+O(40), b_+O(43)); mem_wr(gb, wBraceletGrabbingNothing, A);
+  CYC(b_+O(43), b_+O(46)); mem_wr(gb, wcc92, A);
+  CYC(b_+O(46), b_+O(49)); mem_wr(gb, wForceLinkPushAnimation, A);
+  CYC(b_+O(49), b_+O(52)); SET_HL(wcc95);
+  CYC(b_+O(52), b_+O(53)); A = mem_rd(gb, HL);
+  CYC(b_+O(53), b_+O(55)); alu_or(gb, 0x7f);
+  CYC(b_+O(55), b_+O(56)); mem_wr(gb, HL, A);
+  CYC(b_+O(56), b_+O(59)); SET_HL(wLinkTurningDisabled);
+  CYC(b_+O(59), b_+O(61)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0x7f));
+  CALL_C(b_+O(61), updateGameKeysPressed_hook, SYM(updateGameKeysPressed), b_+O(64));
+  CYC(b_+O(64), b_+O(67)); SET_HL(w1Companion);
+  CYC(b_+O(67), b_+O(70)); push_effect(gb, b_+O(70));
   update_special_object(gb);
-  CYC(b_+70, b_+71); alu_xor(gb, A);
-  CYC(b_+71, b_+74); mem_wr(gb, wLinkClimbingVine, A);
-  CYC(b_+74, b_+77); mem_wr(gb, wDisallowMountingCompanion, A);
-  CYC(b_+77, b_+80); SET_HL(w1Link);
-  CYC(b_+80, b_+83); push_effect(gb, b_+83);
+  CYC(b_+O(70), b_+O(71)); alu_xor(gb, A);
+  CYC(b_+O(71), b_+O(74)); mem_wr(gb, wLinkClimbingVine, A);
+  if (!game_seasons) { CYC(b_+74, b_+77); mem_wr(gb, wDisallowMountingCompanion, A); }
+  CYC(b_+O(77), b_+O(80)); SET_HL(w1Link);
+  CYC(b_+O(80), b_+O(83)); push_effect(gb, b_+O(83));
   update_special_object(gb);
-  CALL_C(b_+83, updateLinkInvincibilityCounter_hook, SYM(updateLinkInvincibilityCounter), b_+86);
-  CYC(b_+86, b_+89); A = mem_rd(gb, wLinkPlayingInstrument);
-  CYC(b_+89, b_+92); mem_wr(gb, wLinkRidingObject, A);
-  CYC(b_+92, b_+95); SET_HL(wLinkImmobilized);
-  CYC(b_+95, b_+96); A = mem_rd(gb, HL);
-  CYC(b_+96, b_+98); alu_and(gb, 0x0f);
-  CYC(b_+98, b_+99); mem_wr(gb, HL, A);
-  CYC(b_+99, b_+100); alu_xor(gb, A);
-  CYC(b_+100, b_+103); mem_wr(gb, wcc67, A);
-  CYC(b_+103, b_+106); mem_wr(gb, w1Link_var2a, A);
-  CYC(b_+106, b_+109); mem_wr(gb, wccd8, A);
-  CYC(b_+109, b_+112); SET_HL(wInstrumentsDisabledCounter);
-  CYC(b_+112, b_+113); A = mem_rd(gb, HL);
-  CYC(b_+113, b_+114); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+114, b_+116); goto clear; }
-  CYC(b_+114, b_+116);
-  CYC(b_+116, b_+117); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+O(83), updateLinkInvincibilityCounter_hook, SYM(updateLinkInvincibilityCounter), b_+O(86));
+  CYC(b_+O(86), b_+O(89)); A = mem_rd(gb, wLinkPlayingInstrument);
+  CYC(b_+O(89), b_+O(92)); mem_wr(gb, wLinkRidingObject, A);
+  CYC(b_+O(92), b_+O(95)); SET_HL(wLinkImmobilized);
+  CYC(b_+O(95), b_+O(96)); A = mem_rd(gb, HL);
+  CYC(b_+O(96), b_+O(98)); alu_and(gb, 0x0f);
+  CYC(b_+O(98), b_+O(99)); mem_wr(gb, HL, A);
+  CYC(b_+O(99), b_+O(100)); alu_xor(gb, A);
+  CYC(b_+O(100), b_+O(103)); mem_wr(gb, wcc67, A);
+  CYC(b_+O(103), b_+O(106)); mem_wr(gb, w1Link_var2a, A);
+  CYC(b_+O(106), b_+O(109)); mem_wr(gb, wccd8, A);
+  CYC(b_+O(109), b_+O(112)); SET_HL(wInstrumentsDisabledCounter);
+  CYC(b_+O(112), b_+O(113)); A = mem_rd(gb, HL);
+  CYC(b_+O(113), b_+O(114)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(114), b_+O(116)); goto clear; }
+  CYC(b_+O(114), b_+O(116));
+  CYC(b_+O(116), b_+O(117)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
 clear:
-  CYC(b_+117, b_+120); SET_HL(wGrabbableObjectBuffer);
-  CYC(b_+120, b_+122); B = 0x10;
-  CYC(b_+122, b_+125);
+  CYC(b_+O(117), b_+O(120)); SET_HL(wGrabbableObjectBuffer);
+  CYC(b_+O(120), b_+O(122)); B = 0x10;
+  CYC(b_+O(122), b_+O(125));
   TAIL(clearMemory);
 }
 

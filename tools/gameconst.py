@@ -66,6 +66,10 @@ class Tool:
         self.cur_file = None
         self.literal_fixes = 0
         self.auditing = False
+        self.ofs_routines = set()
+        self.cur_ofs = {}
+        if os.path.exists('src/hooks/ofs_routines.txt'):
+            self.ofs_routines = {l.split('#')[0].strip() for l in open('src/hooks/ofs_routines.txt') if l.split('#')[0].strip()}
 
     def eval_expr(self, expr, game, base=None):
         """Evaluate a C address/constant expression for a game (0 ages, 1 seasons); None if unknown."""
@@ -74,6 +78,9 @@ class Tool:
         for _ in range(3):
             e = re.sub(r'(?<!SYM\()\b([A-Za-z_]\w*)\b', lambda m: f'({macros[m.group(1)]})' if m.group(1) in macros else m.group(0), e)
         if base is not None: e = re.sub(r'\bb_\b', str(base), e)
+        e = re.sub(r'\bS\((\d+)\)', r'\1', e)
+        e = re.sub(r'\bO\((\d+)\)', lambda m: str(self.cur_ofs.get(int(m.group(1)), -0x10000) if game else int(m.group(1))), e)
+        if '-65536' in e: return None
         while True:
             m = re.search(r'\bGV[WH]?\(', e)
             if not m: break
@@ -109,15 +116,21 @@ class Tool:
         base_sid = self.sid_for(parent, ab)
         self.base_sid = base_sid
         an = self.A.body(ab, aa); sn = self.S.body(sb, sa)
-        if len(an) != len(sn): self.report.append(f'{name}: shape differs'); return False
+        if name in self.ofs_routines:       # per-game offsets: audit the aligned instructions only
+            from ofsmap import align
+            self.cur_ofs = align(self.A, self.S, (ab, aa), (sb, sa))[0]
+            pairs_ = [(an[x], sn[y]) for x, y in align.aligned]
+        elif len(an) != len(sn): self.report.append(f'{name}: shape differs'); return False
+        else: pairs_ = list(zip(an, sn)); self.cur_ofs = {}
         funcs = self.funcs.get(base_sid)
         if not funcs: self.report.append(f'{name}: no C function with BASE({base_sid})'); return False
         ok = True
-        for (a1, l1, k1, t1, o1), (a2, l2, k2, t2, o2) in zip(an, sn):
+        for (a1, l1, k1, t1, o1), (a2, l2, k2, t2, o2) in pairs_:
             if k1 == 'jumptable': continue
             if t1 != t2 or len(o1) != len(o2): self.report.append(f'{name}: template differs at +{a1 - aa}'); ok = False; continue
             off = a1 - pbase
             for (k, v1), (_, v2) in zip(o1, o2):
+                if self.cur_ofs and k in ('rom', 'any') and self.cur_ofs.get(v1 - pbase) == v2 - (sa - (aa - pbase)): continue   # in-routine target, mapped
                 ra, rs = self.A.rom_sym(ab, v1), self.S.rom_sym(sb, v2)
                 ra, rs = self.A.peer_sym(ra, rs), self.S.peer_sym(rs, ra)
                 if k == 'rom' and ra == rs and not ra.startswith('$'): continue
@@ -137,10 +150,10 @@ class Tool:
                 while code.count('(') > code.count(')') and j + 1 <= e:
                     j += 1; code += ' ' + lines[j].split('//')[0].strip()
                 return code
-            anchor = [i for i in range(s, e + 1) if re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+{off}\b', lines[i].split('//')[0])]
+            anchor = [i for i in range(s, e + 1) if re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+(?:O\()?{off}\b', lines[i].split('//')[0])]
             if not anchor:
                 for i in range(s, e + 1):
-                    for m in re.finditer(r'\bCYCT?\(b_\+(\d+), b_\+(\d+)\)', lines[i].split('//')[0]):
+                    for m in re.finditer(r'\bCYCT?\(b_\+(?:O\()?(\d+)\)?, b_\+(?:O\()?(\d+)\)?\)', lines[i].split('//')[0]):
                         if int(m.group(1)) < off < int(m.group(2)): anchor.append(i)
             if not anchor and helpers:
                 # a helper that burns a run of instructions from its address argument (bank_push, obj helpers)
@@ -243,7 +256,13 @@ class Tool:
                     self.changed[f] += 1
                     return True
                 if wm: self.report.append(f'{name}: +{off} RAM 0x{v2:04x} has no Seasons name at {f}:{i + 1}'); return False
-                new = code[:st] + f'{lead}GV({ex.strip()}, {sval})' + code[en:]
+                shared = None
+                if v1 < 0x8000 and v2 < 0x8000:     # a ROM label both games have at these addresses: name it
+                    na = {n for (b, a), n in self.A.by_addr.items() if a == v1 and '@' not in n}
+                    ns = {n for (b, a), n in self.S.by_addr.items() if a == v2 and '@' not in n}
+                    both = sorted(na & ns)
+                    if len(both) == 1 and both[0] in self.syms: shared = both[0]
+                new = code[:st] + (f'{lead}SYM({shared})' if shared else f'{lead}GV({ex.strip()}, {sval})') + code[en:]
                 if apply: lines[i] = new + lines[i][len(code):]
                 self.changed[f] += 1
                 return True
@@ -286,7 +305,7 @@ def main():
     n_same = 0
     for line in open('/tmp/routine_equiv.tsv'):
         n, v, where, d = line.rstrip('\n').split('\t')
-        if v not in ('SAME_SHAPE', 'IDENTICAL'): continue
+        if v not in ('SAME_SHAPE', 'IDENTICAL', 'JT_ONLY') and n.replace('__', '@') not in tool.ofs_routines: continue
         if v == 'SAME_SHAPE': n_same += 1
         bare = re.sub(r'_b[0-9a-f]{2}$', '', n).replace('__', '@')
         parent = bare.split('@')[0]
@@ -297,7 +316,7 @@ def main():
             if m and len(ainst) > 1: ainst = [x for x in ainst if x[0] == int(m.group(1), 16)]
         if not ainst: continue
         ab, aa = ainst[0]; sb, sa = int(where[:2], 16), int(where[3:], 16)
-        tool.auditing = v == 'IDENTICAL'
+        tool.auditing = v in ('IDENTICAL', 'JT_ONLY') and bare not in tool.ofs_routines
         if tool.process(bare, ab, aa, sb, sa, apply) and v == 'SAME_SHAPE': ok_names.append(n)
     if apply:
         for f, lines in tool.files.items():

@@ -201,6 +201,12 @@ class Game:
         return out, shape
 
 
+def mask_jumptables(norm):
+    """The body with jump-table entries blanked: a table that only differs in its entries is
+    dispatched by the C as an if-chain over the targets with an interpreter fallback (JT_ONLY)."""
+    return [(o, 'jumptable' if t.startswith('jumptable') else t) for o, t in norm]
+
+
 def reconcile(an, sn, ages, seasons, unnamed_pairs=None):
     """Resolve `$xxxx` operands on either side through the other side's label (Game.peer_sym), and
     unnamed labels (`_label_XX_N`) through the pairs symfiles inferred from references."""
@@ -273,12 +279,13 @@ def main():
                 sn, ssh = seasons.normalized(sb, sa)
                 if an != sn and ash == ssh: an, sn = reconcile(an, sn, ages, seasons, unnamed_pairs)
                 if an == sn: best = ('IDENTICAL', f'{sb:02x}:{sa:04x}'); break
+                if ash == ssh and mask_jumptables(an) == mask_jumptables(sn): best = ('JT_ONLY', f'{sb:02x}:{sa:04x}'); break
                 if ash == ssh:
                     diffs = sum(1 for x, y in zip(an, sn) if x != y)
                     if best is None or best[0] != 'SAME_SHAPE' or diffs < best[2]: best = ('SAME_SHAPE', f'{sb:02x}:{sa:04x}', diffs)
                 elif best is None: best = ('DIFFERENT', f'{sb:02x}:{sa:04x}', abs(len(an) - len(sn)) or 1)
             verdicts.append(best)
-        rank = {'IDENTICAL': 0, 'SAME_SHAPE': 1, 'DIFFERENT': 2}
+        rank = {'IDENTICAL': 0, 'JT_ONLY': 1, 'SAME_SHAPE': 2, 'DIFFERENT': 3}
         worst = max(verdicts, key=lambda v: rank[v[0]])
         results[n] = (worst[0], worst[1], worst[2] if len(worst) > 2 else 0)
 
@@ -286,7 +293,7 @@ def main():
     for v, *_ in results.values(): counts[v] = counts.get(v, 0) + 1
     total = len(results)
     print(f'{total} rewritten routines compared')
-    for k in ('IDENTICAL', 'SAME_SHAPE', 'DIFFERENT', 'AGES_ONLY'):
+    for k in ('IDENTICAL', 'JT_ONLY', 'SAME_SHAPE', 'DIFFERENT', 'AGES_ONLY'):
         c = counts.get(k, 0)
         print(f'  {k:11s} {c:5d}  ({100.0 * c / total:5.1f}%)')
     if tsv:

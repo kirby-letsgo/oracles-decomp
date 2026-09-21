@@ -11,7 +11,7 @@ def err(path, ln, msg):
     bad += 1
     print(f'{path}:{ln}: {msg}')
 for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
-    if os.path.basename(path).startswith('gen_') or os.path.basename(path) in ('ram_code.c', 'kernel.c', 'cyc.c'): continue
+    if os.path.basename(path).startswith('gen_') or os.path.basename(path) in ('ram_code.c', 'kernel.c', 'cyc.c', 'ofs.c', 'syms.c'): continue
     in_hook = False
     for ln, line in enumerate(open(path), 1):
         if re.match(r'void \w+_hook\(GB \*gb\)', line): in_hook = True

@@ -9,20 +9,20 @@
 void parseGivenObjectData_b12_hook(GB *gb) {
   BASE(parseGivenObjectData_b12);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); A = mem_rd(gb, DE);
-  CYC(b_+1, b_+3); alu_cp(gb, 0xfe);
-  if (!(F & FZ)) CYCT(b_+3, b_+5);
+  CYC(b_+O(0), b_+O(1)); A = mem_rd(gb, DE);
+  CYC(b_+O(1), b_+O(3)); alu_cp(gb, 0xfe);
+  if (!(F & FZ)) CYCT(b_+O(3), b_+O(5));
   else {
-    CYC(b_+3, b_+5);
-    CYC(b_+5, b_+6); SET_DE(pop_effect(gb));
+    CYC(b_+O(3), b_+O(5));
+    CYC(b_+O(5), b_+O(6)); SET_DE(pop_effect(gb));
   }
-  CYC(b_+6, b_+7); A = mem_rd(gb, DE);
-  CYC(b_+7, b_+9); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(b_+9, b_+10); ret_effect(gb); return; }
-  CYC(b_+9, b_+10);
-  CYC(b_+10, b_+11); SET_DE(DE + 1);
-  CYC(b_+11, b_+13); alu_and(gb, 0x0f);
-  CYC(b_+13, b_+14); push_effect(gb, b_+14);
+  CYC(b_+O(6), b_+O(7)); A = mem_rd(gb, DE);
+  CYC(b_+O(7), b_+O(9)); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+O(9), b_+O(10)); ret_effect(gb); return; }
+  CYC(b_+O(9), b_+O(10));
+  CYC(b_+O(10), b_+O(11)); SET_DE(DE + 1);
+  CYC(b_+O(11), b_+O(13)); alu_and(gb, 0x0f);
+  CYC(b_+O(13), b_+O(14)); push_effect(gb, b_+O(14));
   burn_rom(gb, 0, 0x0000, 0x0001, false); alu_add(gb, A);
   burn_rom(gb, 0, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
   burn_rom(gb, 0, 0x0002, 0x0003, false); alu_add(gb, L);

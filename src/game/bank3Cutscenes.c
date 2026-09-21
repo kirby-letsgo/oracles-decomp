@@ -868,8 +868,8 @@ void runIntroCinematic_hook(GB *gb) {
 void introCinematic_ridingHorse_hook(GB *gb) {
   BASE(introCinematic_ridingHorse);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 7);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+O(3)); A = mem_rd(gb, wThreadStateBuffer + 7);
+  CYC(b_+O(3), b_+O(4)); push_effect(gb, b_+O(4));
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(introCinematic_ridingHorse_state0) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state0))) { introCinematic_ridingHorse_state0_hook(gb); return; }
     else if (jt_ == SYM(introCinematic_ridingHorse_state1) && hook_enabled_at(gb, SYM(introCinematic_ridingHorse_state1))) { introCinematic_ridingHorse_state1_hook(gb); return; }
@@ -889,8 +889,8 @@ void introCinematic_ridingHorse_hook(GB *gb) {
 void introCinematic_inTemple_hook(GB *gb) {
   BASE(introCinematic_inTemple);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); A = mem_rd(gb, wThreadStateBuffer + 7);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+O(3)); A = mem_rd(gb, wThreadStateBuffer + 7);
+  CYC(b_+O(3), b_+O(4)); push_effect(gb, b_+O(4));
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(introCinematic_inTemple_state0) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state0))) { introCinematic_inTemple_state0_hook(gb); return; }
     else if (jt_ == SYM(introCinematic_inTemple_state1) && hook_enabled_at(gb, SYM(introCinematic_inTemple_state1))) { introCinematic_inTemple_state1_hook(gb); return; }
@@ -2133,19 +2133,19 @@ void cutscene_clearObjects_hook(GB *gb) {
 void endgameCutsceneHandler_body_hook(GB *gb) {
   BASE(endgameCutsceneHandler_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(wCutsceneState);
-  CYC(b_+3, b_+5); alu_bit(gb, 0, mem_rd(gb, HL));
+  CYC(b_+O(0), b_+O(3)); SET_HL(wCutsceneState);
+  CYC(b_+O(3), b_+O(5)); alu_bit(gb, 0, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+5, b_+7);
+    CYCT(b_+O(5), b_+O(7));
   } else {
-    CYC(b_+5, b_+7);
-    CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-    CYC(b_+8, b_+11); SET_HL(wTmpcbb3);
-    CYC(b_+11, b_+13); B = 0x10;
-    CALL_C(b_+13, clearMemory_hook, SYM(clearMemory), b_+16);
+    CYC(b_+O(5), b_+O(7));
+    CYC(b_+O(7), b_+O(8)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    CYC(b_+O(8), b_+O(11)); SET_HL(wTmpcbb3);
+    CYC(b_+O(11), b_+O(13)); B = 0x10;
+    CALL_C(b_+O(13), clearMemory_hook, SYM(clearMemory), b_+O(16));
   }
-  CYC(b_+16, b_+17); A = E;
-  CYC(b_+17, b_+18); push_effect(gb, b_+18);
+  CYC(b_+O(16), b_+O(17)); A = E;
+  CYC(b_+O(17), b_+O(18)); push_effect(gb, b_+O(18));
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(endgameCutsceneHandler_09)) {
       TAIL(endgameCutsceneHandler_09);

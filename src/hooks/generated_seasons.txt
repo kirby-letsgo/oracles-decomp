@@ -131,7 +131,13 @@
 00:0ce3 timerInterrupt_hook -
 00:0d3a addSpritesToOam_hook -
 00:0d3d addSpritesToOam_withOffset_hook -
+00:0d76 drawAllSprites_hook -
+00:0d7e drawAllSpritesUnconditionally_hook -
 00:0ea4 func_0eda_hook -
+00:0ed2 _drawObjectTerrainEffects_hook -
+00:0f50 _getObjectPositionOnScreen_hook -
+00:0f7d _label_00_152_hook -
+00:0f8f _getObjectPositionOnScreen_duringScreenTransition_hook -
 00:1046 queueDrawEverything_hook -
 00:1076 objectQueueDraw_hook -
 00:109a getChestData_hook -
@@ -538,6 +544,7 @@
 00:3ad9 interactionDelete_hook -
 00:3ae7 _updateInteractionsIfStateIsZero_hook -
 00:3b0a updateInteractions_hook -
+00:3b36 updateInteraction_hook -
 00:3d53 interactionSetSimpleScript_hook -
 00:3d5b interactionRunSimpleScript_hook -
 00:3e6e interactionFunc_3e6d_hook -
@@ -651,6 +658,7 @@
 01:5510 loadDungeonLayout_b01__end_hook -
 01:5516 clearDungeonLayout_hook -
 01:553f getFirstDungeonLayoutAddress_hook -
+01:554f paletteFadeHandler_hook -
 01:556d paletteFadeHandler09_hook -
 01:5571 paletteFadeHandler01_hook -
 01:5586 updateFadingPalettes_hook -
@@ -1190,12 +1198,14 @@
 03:4e04 intro_titlescreen_state2_hook -
 03:4e0c intro_titlescreen_state3_hook -
 03:4e8e runIntroCinematic_hook -
+03:4e98 introCinematic_ridingHorse_hook -
 03:4f68 introCinematic_ridingHorse_state7_hook -
 03:4f86 introCinematic_ridingHorse_state8_hook -
 03:4fce introCinematic_ridingHorse_state9_hook -
 03:5008 introCinematic_ridingHorse_state10_hook -
 03:5013 introCinematic_preTitlescreen_updateScrollingTree_hook -
 03:504b incIntroCinematicState_hook -
+03:5054 introCinematic_inTemple_hook -
 03:5070 introCinematic_inTemple_state0_hook -
 03:50bc introCinematic_inTemple_state0__nextTriforce_hook -
 03:50d6 introCinematic_inTemple_state0__doneSpawningTriforce_hook -
@@ -1274,8 +1284,10 @@
 04:5f7b replaceSwitchTiles__next6297_hook -
 04:5f8b replaceSwitchTiles__skip3Bytes62a7_hook -
 04:5f8c replaceSwitchTiles__skip2Bytes62a8_hook -
+04:60ab applyRoomSpecificTileChanges_hook -
 04:669d fillRectInRoomLayout_hook -
 04:66cc getIndexOfGashaSpotInRoom_body_hook -
+04:66ef applyRoomSpecificTileChangesAfterGfxLoad_hook -
 04:6a54 readParametersForRectangleDrawing_hook -
 04:6a5d drawRectangleToVramTiles_withParameters_hook -
 04:6a66 drawRectangleToVramTiles_hook -
@@ -1296,6 +1308,7 @@
 04:6c17 queueTileWriteAtVBlank_hook -
 04:6c40 queueTileWriteAtVBlank__copy2Bytes6d4d_hook -
 04:6c47 queueTileWriteAtVBlank__getTilePositionInVram6d54_hook -
+05:4000 updateSpecialObjects_hook -
 05:4097 updateGameKeysPressed_hook -
 05:41b5 specialObjectSetOamVariables_hook -
 05:41f3 dealSpikeDamageToLink_hook -
@@ -1381,6 +1394,7 @@
 05:540f linkState11_hook -
 05:5468 checkLinkForceState_hook -
 05:5471 linkSetState_hook -
+05:5485 linkState01_hook -
 05:55bb linkResetSpeed_hook -
 05:55c0 func_5631_hook -
 05:55cd updateHeartRingCounter_hook -
@@ -1404,6 +1418,7 @@
 05:5c88 specialObjectUpdatePosition_hook -
 05:5c90 specialObjectUpdatePositionGivenVelocity_hook -
 05:5d74 checkPositionSurroundedByWalls_hook -
+05:5d85 calculateAdjacentWallsBitset_hook -
 05:5dc9 clearLinkImmobilizedBit4_hook -
 05:5dd1 setLinkImmobilizedBit4_hook -
 05:5dd9 linkPullIntoHole_hook -
@@ -1468,6 +1483,7 @@
 05:6fe4 rickyStopUntilLandedOnGround_hook -
 05:7005 rickyCheckHazards2_hook -
 05:700d rickyFunc_70cc_hook -
+05:701e rickyStateA_hook -
 05:703c rickyStateASubstate0_hook -
 05:7054 rickyStateASubstate1_hook -
 05:706e rickySetJumpSpeedForCutsceneAndSetAngle_hook -
@@ -1557,6 +1573,7 @@
 06:4428 specialObjectNextAnimationFrame_hook -
 06:44bf loadLinkAndCompanionAnimationFrame_body_hook -
 06:450c getSpecialObjectGraphicsFrame_hook -
+06:4549 func_4553_hook -
 06:460c getTransformedLinkID_hook -
 06:4647 linkUpdateDamageToApplyForRings_hook -
 06:469a linkApplyDamage_b06_hook -
@@ -1601,6 +1618,7 @@
 06:5656 minecartCheckCollisions_hook -
 06:5727 minecartCreateCollisionItem_hook -
 06:69c9 specialObjectCode_companionCutscene_b06_hook -
+06:6dec specialObjectCode_linkInCutscene_b06_hook -
 06:6eb0 linkCutscene_createGlowingOrb_hook -
 06:6ec6 linkCutscene_oscillateZ_1_hook -
 06:6ef8 linkCutscene0_substate6_hook -
@@ -3116,6 +3134,7 @@
 10:5e56 createEnergySwirlGoingOut_body_hook -
 10:5e5a createEnergySwirlGoingIn_body_hook -
 10:5e80 func_5e1a_hook -
+10:5fbc functionCaller_b02_hook -
 10:5fcb addRoomToEnemiesKilledList_b02_hook -
 10:5ffc stub_02_77f4_hook -
 10:5ffd markEnemyAsKilledInRoom_b02_hook -
@@ -3144,8 +3163,10 @@
 10:6f65 kingMoblinBomb_state8_hook -
 10:6fed kingMoblinBomb_checkCollisionWithLink_hook -
 10:7015 kingMoblinBomb_checkCollisionWithKingMoblin_hook -
+11:58df parseGivenObjectData_b12_hook -
 11:5901 func_55f8_hook -
 11:5903 parseGivenObjectData_hl_hook -
+11:5927 objectDataOp0_hook -
 11:595c objectDataOp1_hook -
 11:5969 skipToOpEnd_2byte_hook -
 11:5974 objectDataOp2_hook -
@@ -3155,6 +3176,9 @@
 11:59bd objectDataOp3_hook -
 11:59c4 objectDataOp4_hook -
 11:59d2 objectDataOp5_hook -
+11:59e0 objectDataOp6_hook -
+11:5a37 objectDataOp7_hook -
+11:5a7d objectDataOp8_hook -
 11:5a9e objectDataOp9_hook -
 11:5ace continueObjectLoopIfOpDone_hook -
 11:5ad6 read2Bytes_hook -
@@ -3272,6 +3296,7 @@
 15:59be child_giveRupees_hook -
 15:620f oldMan_takeRupees_hook -
 15:6226 oldMan_giveRupees_hook -
+15:6669 interactionCodedc_hook -
 15:6cea interactionCodedf_hook -
 39:4000 b39_initSound_hook -
 39:4003 b39_updateSound_hook -

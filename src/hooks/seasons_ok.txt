@@ -128,6 +128,7 @@ func_02_5afc
 func_0eda
 func_11_5e8a
 func_2d48
+func_4553@getLinkWalkingAnimation
 func_49c9
 gameLink_getFile1
 gameLink_getFile2
@@ -140,8 +141,6 @@ getChestData
 getEntryFromObjectTable1
 getIndexOfGashaSpotInRoom
 getLinkWarpQuadrant
-getMinimapPopupType
-getNextActiveRoom
 getRingTiles
 ghini_chooseTargetPosition
 ghini_subid00
@@ -161,8 +160,6 @@ interac11_subid00
 interactionAnimate
 interactionCode10
 interactionCode1c
-interactionCode36
-interactionCode37
 interactionCode7d
 interactionCodeae
 interactionCodeaf
@@ -202,7 +199,6 @@ linkCutscene_initOam_setVisible_incState
 linkInteractWithAButtonSensitiveObjects
 linkState00
 linkState05
-linkState0a
 linkUpdateInAir
 linkedNpc_generateSecret
 loadEquippedItemSpriteData
@@ -237,7 +233,6 @@ objectQueueDraw
 objectRemoveFromAButtonSensitiveObjectList
 objectRunMovementScript
 octorok_state_uninitialized
-parentItemUpdate
 parseGivenObjectData_b00
 partAnimate
 partCheckCollisions
@@ -264,10 +259,8 @@ ringMenu_state2
 ringMenu_state2__substate1
 ringMenu_unappraisedRings_state1
 rope_changeDirection
-runGameLogic
 saveFile_b07
 scriptCmd_loadSprite
-scriptCmd_showPasswordScreen
 secretListMenu_printSecret__getSecretText
 secretListMenu_printSecret__val0
 secretListMenu_state0
@@ -283,8 +276,6 @@ shopkeeperPromptChestGame
 shopkeeperState5
 sidescrollUpdateActiveTile
 spark_state9
-specialObjectCode_companionCutscene_b06
-specialObjectCode_link
 specialObjectCode_linkRidingAnimal
 specialObjectCode_minecart_b05
 specialObjectCode_minecart_b06
@@ -303,7 +294,7 @@ twinrova_state9
 twinrova_stateE
 updateAllObjects
 updateHeartRingCounter
-updateItemPost
+updateSpecialObjects@updateSpecialObject
 updateSwingableItemAnimation
 updateTextbox__standardText
 updateTextbox__updateText

@@ -985,10 +985,10 @@ state1:
 // INTERAC_MISCELLANEOUS_1
 void interactionCode6b_hook(GB *gb) {
   BASE(interactionCode6b);
-  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+O(0), b_+O(2)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(2), b_+O(3)); A = mem_rd(gb, DE);
   {
-    CYC(b_+3, b_+4); push_effect(gb, b_+4);
+    CYC(b_+O(3), b_+O(4)); push_effect(gb, b_+O(4));
     uint16_t target = interaction6b_subid01_jump_table(gb);
     if (target == SYM(interaction6b_subid00)) { interaction6b_subid00_hook(gb); return; }
     if (target == SYM(interaction6b_subid01)) { interaction6b_subid01_hook(gb); return; }

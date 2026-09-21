@@ -914,6 +914,7 @@ enum {
   S_checkLinkJumpingOffCliff__wallDirections,
   S_checkLinkOnGround,
   S_checkLinkPushingAgainstBed,
+  S_checkLinkPushingAgainstTreeStump,
   S_checkLinkPushingAgainstWall,
   S_checkLinkPushingAgainstWall__collisionDirections,
   S_checkLinkVulnerable,
@@ -13642,7 +13643,8 @@ extern const uint32_t *game_syms;
 extern const uint32_t *game_ram;
 #define SYM(l) ((uint16_t)game_syms[S_##l])
 #define SYMBANK(l) ((uint8_t)(game_syms[S_##l] >> 16))
-#define BASE(l) const uint16_t b_ = SYM(l); const uint8_t bk_ = SYMBANK(l); (void)bk_
+#include "game/ofs.h"
+#define BASE(l) const uint16_t b_ = SYM(l); const uint8_t bk_ = SYMBANK(l); const uint16_t *om_ = game_seasons ? ofs_for_sym(S_##l) : 0; (void)bk_; (void)om_
 #define BANKOF(l) const uint8_t bk_ = SYMBANK(l); (void)bk_
 #define RAMSYM(i) ((uint16_t)game_ram[i])
 extern int game_seasons;

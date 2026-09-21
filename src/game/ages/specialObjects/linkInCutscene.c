@@ -1545,9 +1545,9 @@ state0:
 void specialObjectCode_linkInCutscene_b06_hook(GB *gb) {
   BASE(specialObjectCode_linkInCutscene_b06);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = 0x02;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+O(2)); E = 0x02;
+  CYC(b_+O(2), b_+O(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+O(4)); push_effect(gb, b_+O(4));
   do { uint16_t jt_ = (link_cutscene_jump_table(gb));
     if (jt_ == SYM(linkCutscene0) && hook_enabled_at(gb, SYM(linkCutscene0))) { linkCutscene0_hook(gb); return; }
     else if (jt_ == SYM(linkCutscene1) && hook_enabled_at(gb, SYM(linkCutscene1))) { linkCutscene1_hook(gb); return; }

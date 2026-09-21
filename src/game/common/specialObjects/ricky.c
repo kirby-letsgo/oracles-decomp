@@ -932,9 +932,9 @@ setHazard:
 void rickyStateA_hook(GB *gb) {
   BASE(rickyStateA);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = 0x03;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+O(2)); E = 0x03;
+  CYC(b_+O(2), b_+O(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+O(4)); push_effect(gb, b_+O(4));
   do { uint16_t jt_ = (ricky_jump_table(gb));
     if (jt_ == SYM(rickyStateASubstate0) && hook_enabled_at(gb, SYM(rickyStateASubstate0))) { rickyStateASubstate0_hook(gb); return; }
     else if (jt_ == SYM(rickyStateASubstate1) && hook_enabled_at(gb, SYM(rickyStateASubstate1))) { rickyStateASubstate1_hook(gb); return; }
