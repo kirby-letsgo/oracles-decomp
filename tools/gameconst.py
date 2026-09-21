@@ -52,6 +52,7 @@ class Tool:
             self.file_macros[f] = {m.group(1): m.group(2) for m in re.finditer(r'^#define (\w+) ((?:0x[0-9a-f]+|SYM\(\w+\)|\d+)(?: [+-] (?:0x[0-9a-f]+|\d+))?)\s*$', text, re.M)}
         # BASE label -> list of (file, start_line, end_line)
         self.funcs = defaultdict(list)
+        self.func_base = {}
         for f, lines in self.files.items():
             start = None
             for i, l in enumerate(lines):
@@ -61,6 +62,8 @@ class Tool:
                     j = i
                     while j < len(lines) and lines[j] != '}': j += 1
                     self.funcs[m.group(1)].append((f, start, j))
+                    fm = re.match(r'^(?:static )?\w+ \*?(\w+)\(', lines[start])
+                    if fm: self.func_base[fm.group(1)] = (m.group(1), f, start, j)     # function name -> its BASE label
         self.changed = defaultdict(int)
         self.report = []
         self.cur_file = None
@@ -135,6 +138,12 @@ class Tool:
                 ps = [x for x in self.S.instances.get(parent, []) if x[0] == sb] or [self.S.labels[parent]]
                 self.cur_ofs, self.cur_ofs_end, _ = align_all(self.A, self.S, parent, pa[0], ps[0], self.ofs_anchors.get(parent, ()))
         funcs = self.funcs.get(base_sid)
+        if not funcs and base_sid + '_hook' in self.func_base:
+            # the hook's C burns from another routine's base (an entry point spelled as a routine)
+            other, f, st, en = self.func_base[base_sid + '_hook']
+            if other in self.syms:
+                base_sid = other; pbase = self.syms[other][0] & 0xffff; self.base_sid = other
+                funcs = self.funcs.get(other)
         if not funcs: self.report.append(f'{name}: no C function with BASE({base_sid})'); return False
         ok = True
         for (a1, l1, k1, t1, o1), (a2, l2, k2, t2, o2) in pairs_:

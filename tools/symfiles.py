@@ -53,7 +53,7 @@ def extra_labels(sym):
     return out
 
 
-def rom_labels(sym):
+def rom_labels(sym, extras=True):
     """label name -> [(bank, addr)] sorted by bank, for every ROM label including @locals, plus
     the extra labels (RAM code keeps its RAM address)."""
     labels = {}
@@ -64,7 +64,7 @@ def rom_labels(sym):
         if a >= 0x8000: continue
         lst = labels.setdefault(n, [])
         if (b, a) not in lst: lst.append((b, a))
-    for b, a, n, src, ext in extra_labels(sym):
+    for b, a, n, src, ext in (extra_labels(sym) if extras else []):
         lst = labels.setdefault(n, [])
         if (b, a) not in lst: lst.append((b, a))
     for n in labels: labels[n].sort()

@@ -125,6 +125,7 @@ func_02_5afc
 func_0eda
 func_11_5e8a
 func_2d48
+func_39_400c
 func_4553@getLinkWalkingAnimation
 func_49c9
 gameLink_getFile1
@@ -286,6 +287,7 @@ specialObjectCode_minecart_b06
 specialObjectCode_transformedLink
 specialObjectUpdateAdjacentWallsBitset
 stalfos_moveInRandomAngle
+standardTextStateF
 swordDarknut_updateEnemyCollisionMode
 swordEnemy_chooseRandomAngleAndCounter1
 swordEnemy_updateEnemyCollisionMode
