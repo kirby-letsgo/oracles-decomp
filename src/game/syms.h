@@ -13376,6 +13376,10 @@ enum {
   S_cutsceneDinDancing_loadListOfTiles,
   S_seasonsFunc_03_75a5,
   S_incCutsceneState2,
+  S_cutsceneDinImprisoned,
+  S_seasonsFunc_03_7a6b,
+  S_seasonsFunc_03_7a88,
+  S_seasonsFunc_03_7aa9,
   SYM_COUNT
 };
 enum {

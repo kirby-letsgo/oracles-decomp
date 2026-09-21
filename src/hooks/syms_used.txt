@@ -13372,3 +13372,7 @@ seasonsFunc_03_7516 seasonsFunc_03_7516 -
 cutsceneDinDancing_loadListOfTiles cutsceneDinDancing_loadListOfTiles -
 seasonsFunc_03_75a5 seasonsFunc_03_75a5 -
 incCutsceneState2 incCutsceneState2 -
+cutsceneDinImprisoned cutsceneDinImprisoned -
+seasonsFunc_03_7a6b seasonsFunc_03_7a6b -
+seasonsFunc_03_7a88 seasonsFunc_03_7a88 -
+seasonsFunc_03_7aa9 seasonsFunc_03_7aa9 -

@@ -31,3 +31,7 @@ seasonsFunc_03_7516
 cutsceneDinDancing_loadListOfTiles
 seasonsFunc_03_75a5
 incCutsceneState2
+cutsceneDinImprisoned
+seasonsFunc_03_7a6b
+seasonsFunc_03_7a88
+seasonsFunc_03_7aa9

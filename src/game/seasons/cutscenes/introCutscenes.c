@@ -525,3 +525,328 @@ void s_cutscene06Funcf_hook(GB *gb) {
   CYC(b_+27, b_+30);
   TAIL(fadeoutToWhite);
 }
+
+// Din imprisoned (CUTSCENE_S_DIN_IMPRISONED): Onox's castle outside and inside, the flash and
+// the text, then on to the temple sinking. wTmpcfc0+$10 is the stage counter the Din-imprisoned
+// event interactions advance; $cc1d (unnamed in the disassembly) holds the first one's index.
+#define wcc1d (wFrameCounter + 0x1d)
+
+void s_cutsceneDinImprisoned_hook(GB *gb) {
+  BASE(cutsceneDinImprisoned);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); SET_DE(wCutsceneState);
+  CYC(b_+3, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+4, b_+5); push_effect(gb, b_+5);
+  do { uint16_t jt_ = (intro_jump_table(gb));
+    if (jt_ == b_+25) { goto state0; }
+    else if (jt_ == b_+61) { goto state1; }
+    else if (jt_ == b_+102) { goto state2; }
+    else if (jt_ == b_+191) { goto state3; }
+    else if (jt_ == b_+219) { goto state4; }
+    else if (jt_ == b_+235) { goto state5; }
+    else if (jt_ == b_+296) { goto state6; }
+    else if (jt_ == b_+332) { goto state7; }
+    else if (jt_ == b_+347) { goto state8; }
+    else if (jt_ == b_+375) { goto state9; }
+    else { HANDOFF(HL); }
+  } while (0);
+
+state0:
+  CYC(b_+25, b_+28); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+28, b_+29); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+29); return; }
+  CYC(b_+29, b_+30);
+  CYC(b_+30, b_+32); A = 0x01;
+  CYC(b_+32, b_+33); mem_wr(gb, DE, A);
+  CYC(b_+33, b_+35); A = 0x09;
+  CYC(b_+35, b_+38); mem_wr(gb, wTmpcfc0 + 0x10, A);
+  CYC(b_+38, b_+41); SET_HL(wTmpcbb3);
+  CYC(b_+41, b_+43); mem_wr(gb, HL, 0x58);
+  CYC(b_+43, b_+44); L = alu_inc8(gb, L);
+  CYC(b_+44, b_+46); mem_wr(gb, HL, 0x01);
+  CYC(b_+46, b_+48); A = 0x09;
+  CYC(b_+48, b_+50); B = 0x00;
+  CALL_C(b_+50, s_seasonsFunc_03_7aa9_hook, SYM(seasonsFunc_03_7aa9), b_+53);
+  CYC(b_+53, b_+55); A = 0x1c; // MUS_ONOX_CASTLE
+  CALL_C(b_+55, playSound_b00_hook, SYM(playSound_b00), b_+58);
+  CYC(b_+58, b_+61);
+  TAIL(fadeinFromWhite);
+
+state1:
+  CYC(b_+61, b_+64); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+64, b_+65); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+65); return; }
+  CYC(b_+65, b_+66);
+  CYC(b_+66, b_+69); SET_HL(wTmpcbb3);
+  CALL_C(b_+69, decHlRef16WithCap_hook, SYM(decHlRef16WithCap), b_+72);
+  if (!(F & FZ)) { CYCT(b_+72, b_+74); goto scroll_up; }
+  CYC(b_+72, b_+74);
+  CYC(b_+74, b_+75); alu_xor(gb, A);
+  CYC(b_+75, b_+78); mem_wr(gb, wGfxRegs1_SCY, A);
+  CALL_C(b_+78, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+81);
+  CYC(b_+81, b_+84);
+  TAIL(fadeoutToWhite);
+scroll_up:
+  CYC(b_+84, b_+87); SET_HL(wTmpcbb3);
+  CYC(b_+87, b_+88); A = mem_rd(gb, HL);
+  CYC(b_+88, b_+90); alu_and(gb, 0x01);
+  if (!(F & FZ)) { RET_TAKEN(b_+90); return; }
+  CYC(b_+90, b_+91);
+  CYC(b_+91, b_+94); SET_HL(wGfxRegs1_SCY);
+  CYC(b_+94, b_+95); A = mem_rd(gb, HL);
+  CYC(b_+95, b_+96); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+96); return; }
+  CYC(b_+96, b_+97);
+  CYC(b_+97, b_+98); A = alu_dec8(gb, A);
+  CYC(b_+98, b_+99); mem_wr(gb, HL, A);
+  CYC(b_+99, b_+101); mem_wr(gb, hCameraY, A);
+  RET(b_+101); return;
+
+state2:
+  CYC(b_+102, b_+105); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+105, b_+106); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+106); return; }
+  CYC(b_+106, b_+107);
+  CALL_C(b_+107, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+110);
+  CYC(b_+110, b_+112); A = 0x0a;
+  CYC(b_+112, b_+115); mem_wr(gb, wTmpcfc0 + 0x10, A);
+  CALL_C(b_+115, disableLcd_hook, SYM(disableLcd), b_+118);
+  CYC(b_+118, b_+119); alu_xor(gb, A);
+  CYC(b_+119, b_+122); mem_wr(gb, wScreenOffsetY, A);
+  CYC(b_+122, b_+125); mem_wr(gb, wScreenOffsetX, A);
+  CYC(b_+125, b_+127); A = 0x2e; // GFXH_SCENE_INSIDE_ONOX_CASTLE
+  CALL_C(b_+127, loadGfxHeader_hook, SYM(loadGfxHeader), b_+130);
+  CYC(b_+130, b_+132); A = 0x97; // PALH_SEASONS_97
+  CALL_C(b_+132, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+135);
+  CYC(b_+135, b_+137); A = 0x01;
+  CYC(b_+137, b_+140); mem_wr(gb, wScrollMode, A);
+  CYC(b_+140, b_+142); A = 0x18;
+  CYC(b_+142, b_+145); mem_wr(gb, wTilesetAnimation, A);
+  CALL_C(b_+145, loadAnimationData_hook, SYM(loadAnimationData), b_+148);
+  CALL_C(b_+148, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+151);
+  if (!(F & FZ)) { CYCT(b_+151, b_+153); goto objects_ready; }
+  CYC(b_+151, b_+153);
+  CYC(b_+153, b_+155); A = 0x4f; // INTERAC_DIN_IMPRISONED_EVENT
+  CYC(b_+155, b_+156); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+156, b_+158); mem_wr(gb, HL, 0x00);
+  CYC(b_+158, b_+161); mem_wr(gb, wcc1d, A);
+  CALL_C(b_+161, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+164);
+  if (!(F & FZ)) { CYCT(b_+164, b_+166); goto objects_ready; }
+  CYC(b_+164, b_+166);
+  CYC(b_+166, b_+168); mem_wr(gb, HL, 0x4f);
+  CYC(b_+168, b_+169); L = alu_inc8(gb, L);
+  CYC(b_+169, b_+171); mem_wr(gb, HL, 0x01);
+objects_ready:
+  CALL_C(b_+171, refreshObjectGfx_hook, SYM(refreshObjectGfx), b_+174);
+  CYC(b_+174, b_+176); A = 0x0d;
+  CALL_C(b_+176, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+179);
+  CYC(b_+179, b_+182); SET_HL(wGfxRegs1_SCY);
+  CYC(b_+182, b_+183); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+183, b_+185); mem_wr(gb, hCameraY, A);
+  CYC(b_+185, b_+186); A = mem_rd(gb, HL);
+  CYC(b_+186, b_+188); mem_wr(gb, hCameraX, A);
+  CYC(b_+188, b_+191);
+  TAIL(fadeinFromWhite);
+
+state3:
+  CYC(b_+191, b_+194); SET_HL(wTmpcfc0 + 0x10);
+  CYC(b_+194, b_+195); A = mem_rd(gb, HL);
+  CYC(b_+195, b_+197); alu_cp(gb, 0x0b);
+  if (!(F & FZ)) { RET_TAKEN(b_+197); return; }
+  CYC(b_+197, b_+198);
+  CYC(b_+198, b_+200); B = 0x04;
+  for (;;) {
+    CALL_C(b_+200, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+203);
+    if (!(F & FZ)) { CYCT(b_+203, b_+205); break; }
+    CYC(b_+203, b_+205);
+    CYC(b_+205, b_+207); mem_wr(gb, HL, 0x4f); // INTERAC_DIN_IMPRISONED_EVENT
+    CYC(b_+207, b_+208); L = alu_inc8(gb, L);
+    CYC(b_+208, b_+210); mem_wr(gb, HL, 0x02);
+    CYC(b_+210, b_+211); L = alu_inc8(gb, L);
+    CYC(b_+211, b_+212); B = alu_dec8(gb, B);
+    CYC(b_+212, b_+213); A = B;
+    CYC(b_+213, b_+214); mem_wr(gb, HL, A);
+    if (!(F & FZ)) { CYCT(b_+214, b_+216); continue; }
+    CYC(b_+214, b_+216);
+    break;
+  }
+  CYC(b_+216, b_+219);
+  TAIL_S(incCutsceneState2);
+
+state4:
+  CYC(b_+219, b_+222); A = mem_rd(gb, wTmpcfc0 + 0x10);
+  CYC(b_+222, b_+224); alu_sub(gb, 0x0c);
+  if (!(F & FZ)) { RET_TAKEN(b_+224); return; }
+  CYC(b_+224, b_+225);
+  CYC(b_+225, b_+228); mem_wr(gb, wTmpcbb3, A);
+  CYC(b_+228, b_+229); A = alu_dec8(gb, A);
+  CYC(b_+229, b_+232); mem_wr(gb, wTmpcbba, A);
+  CYC(b_+232, b_+235);
+  TAIL_S(incCutsceneState2);
+
+state5:
+  CYC(b_+235, b_+238); SET_HL(wTmpcbb3);
+  CYC(b_+238, b_+240); B = 0x01;
+  CALL_C(b_+240, flashScreen_hook, SYM(flashScreen), b_+243);
+  if (F & FZ) { RET_TAKEN(b_+243); return; }
+  CYC(b_+243, b_+244);
+  CALL_C(b_+244, disableLcd_hook, SYM(disableLcd), b_+247);
+  CYC(b_+247, b_+249); A = 0x01;
+  CYC(b_+249, b_+251); mem_wr(gb, hDirtyBgPalettes, A);
+  CYC(b_+251, b_+253); A = 0xfe;
+  CYC(b_+253, b_+255); mem_wr(gb, hBgPaletteSources, A);
+  CYC(b_+255, b_+257); A = 0x81;
+  CALL_C(b_+257, s_seasonsFunc_03_7a6b_hook, SYM(seasonsFunc_03_7a6b), b_+260);
+  CYC(b_+260, b_+262); A = 0x81;
+  CYC(b_+262, b_+265); mem_wr(gb, wOpenedMenuType, A);
+  CALL_C(b_+265, s_seasonsFunc_03_7a88_hook, SYM(seasonsFunc_03_7a88), b_+268);
+  CYC(b_+268, b_+271); SET_BC(0x1e05); // TX_1e05
+  CALL_C(b_+271, showText_hook, SYM(showText), b_+274);
+  CYC(b_+274, b_+276); A = 0x0d;
+  CALL_C(b_+276, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+279);
+  CYC(b_+279, b_+282); SET_HL(wGfxRegs1_SCY);
+  CYC(b_+282, b_+283); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+283, b_+285); mem_wr(gb, hCameraY, A);
+  CYC(b_+285, b_+286); A = mem_rd(gb, HL);
+  CYC(b_+286, b_+288); mem_wr(gb, hCameraX, A);
+  CYC(b_+288, b_+291); SET_HL(wTmpcfc0 + 0x10);
+  CYC(b_+291, b_+293); mem_wr(gb, HL, 0x0d);
+  CYC(b_+293, b_+296);
+  TAIL_S(incCutsceneState2);
+
+state6:
+  CALL_C(b_+296, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+299);
+  CALL_C(b_+299, disableLcd_hook, SYM(disableLcd), b_+302);
+  CYC(b_+302, b_+304); A = 0x0e; // UNCMP_GFXH_0e
+  CALL_C(b_+304, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+307);
+  CYC(b_+307, b_+309); A = 0x50; // SND_CLINK
+  CALL_C(b_+309, playSound_b00_hook, SYM(playSound_b00), b_+312);
+  CYC(b_+312, b_+314); A = 0x0d;
+  CALL_C(b_+314, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+317);
+  CALL_C(b_+317, fadeinFromWhite_hook, SYM(fadeinFromWhite), b_+320);
+  CYC(b_+320, b_+323); SET_HL(wTmpcbb3);
+  CYC(b_+323, b_+325); mem_wr(gb, HL, 0xf0);
+  CYC(b_+325, b_+326); alu_xor(gb, A);
+  CYC(b_+326, b_+329); mem_wr(gb, wOpenedMenuType, A);
+  CYC(b_+329, b_+332);
+  TAIL_S(incCutsceneState2);
+
+state7:
+  CYC(b_+332, b_+335); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+335, b_+336); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+336); return; }
+  CYC(b_+336, b_+337);
+  CALL_C(b_+337, decCbb3_hook, SYM(decCbb3), b_+340);
+  if (!(F & FZ)) { RET_TAKEN(b_+340); return; }
+  CYC(b_+340, b_+341);
+  CALL_C(b_+341, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+344);
+  CYC(b_+344, b_+347);
+  TAIL(fadeoutToWhite);
+
+state8:
+  CYC(b_+347, b_+350); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+350, b_+351); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+351); return; }
+  CYC(b_+351, b_+352);
+  CALL_C(b_+352, s_incCutsceneState2_hook, SYM(incCutsceneState2), b_+355);
+  CYC(b_+355, b_+357); A = 0xff;
+  CYC(b_+357, b_+360); mem_wr(gb, wTilesetAnimation, A);
+  CYC(b_+360, b_+362); A = 0x0e;
+  CYC(b_+362, b_+365); mem_wr(gb, wTmpcfc0 + 0x10, A);
+  CYC(b_+365, b_+367); A = 0x07;
+  CYC(b_+367, b_+369); B = 0x01;
+  CALL_C(b_+369, s_seasonsFunc_03_7aa9_hook, SYM(seasonsFunc_03_7aa9), b_+372);
+  CYC(b_+372, b_+375);
+  TAIL(fadeinFromWhite);
+
+state9:
+  CYC(b_+375, b_+378); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+378, b_+379); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+379); return; }
+  CYC(b_+379, b_+380);
+  CYC(b_+380, b_+383); SET_HL(wTmpcfc0 + 0x10);
+  CYC(b_+383, b_+384); A = mem_rd(gb, HL);
+  CYC(b_+384, b_+386); alu_cp(gb, 0x0f);
+  if (!(F & FZ)) { RET_TAKEN(b_+386); return; }
+  CYC(b_+386, b_+387);
+  CALL_C(b_+387, clearDynamicInteractions_hook, SYM(clearDynamicInteractions), b_+390);
+  CYC(b_+390, b_+392); A = 0x08; // CUTSCENE_S_TEMPLE_SINKING
+  CYC(b_+392, b_+395); mem_wr(gb, wThreadStateBuffer + 0x0f, A); // wCutsceneIndex
+  CYC(b_+395, b_+396); alu_xor(gb, A);
+  CYC(b_+396, b_+399); mem_wr(gb, wCutsceneState, A);
+  CYC(b_+399, b_+402);
+  TAIL(fadeoutToWhite);
+}
+
+// Fills VRAM bank 1's tile map at $9800 with a (attributes) and clears bank 0's.
+void s_seasonsFunc_03_7a6b_hook(GB *gb) {
+  BASE(seasonsFunc_03_7a6b);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); mem_wr(gb, hFF8B, A);
+  CYC(b_+2, b_+4); A = 0x01;
+  CYC(b_+4, b_+6); mem_wr(gb, IO_VBK, A);
+  CYC(b_+6, b_+9); SET_HL(0x9800);
+  CYC(b_+9, b_+12); SET_BC(0x0400);
+  CYC(b_+12, b_+14); A = mem_rd(gb, hFF8B);
+  CALL_C(b_+14, fillMemoryBc_hook, SYM(fillMemoryBc), b_+17);
+  CYC(b_+17, b_+18); alu_xor(gb, A);
+  CYC(b_+18, b_+20); mem_wr(gb, IO_VBK, A);
+  CYC(b_+20, b_+23); SET_HL(0x9800);
+  CYC(b_+23, b_+26); SET_BC(0x0400);
+  CYC(b_+26, b_+29);
+  TAIL(clearMemoryBc);
+}
+
+// Same for the WRAM bank 4 tile map buffers: $d000 cleared, $d400 filled with a.
+void s_seasonsFunc_03_7a88_hook(GB *gb) {
+  BASE(seasonsFunc_03_7a88);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); mem_wr(gb, hFF8B, A);
+  CYC(b_+2, b_+4); A = mem_rd(gb, IO_SVBK);
+  CYC(b_+4, b_+5); push_effect(gb, AF);
+  CYC(b_+5, b_+7); A = 0x04;
+  CYC(b_+7, b_+9); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+9, b_+12); SET_HL(w4RandomBuffer);
+  CYC(b_+12, b_+15); SET_BC(0x0240);
+  CALL_C(b_+15, clearMemoryBc_hook, SYM(clearMemoryBc), b_+18);
+  CYC(b_+18, b_+21); SET_HL(w4RandomBuffer + 0x400);
+  CYC(b_+21, b_+24); SET_BC(0x0240);
+  CYC(b_+24, b_+26); A = mem_rd(gb, hFF8B);
+  CALL_C(b_+26, fillMemoryBc_hook, SYM(fillMemoryBc), b_+29);
+  CYC(b_+29, b_+30); SET_AF(pop_effect(gb));
+  CYC(b_+30, b_+32); mem_wr(gb, IO_SVBK, A);
+  RET(b_+32); return;
+}
+
+// Loads the outside-Onox-castle scene: a = gfx register state index, b = INTERAC_88 subid.
+void s_seasonsFunc_03_7aa9_hook(GB *gb) {
+  BASE(seasonsFunc_03_7aa9);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+1); D = A;
+  CYC(b_+1, b_+2); A = B;
+  CYC(b_+2, b_+3); E = A;
+  CALL_C(b_+3, disableLcd_hook, SYM(disableLcd), b_+6);
+  CYC(b_+6, b_+7); push_effect(gb, DE);
+  CYC(b_+7, b_+9); A = 0x2f; // GFXH_SCENE_OUTSIDE_ONOX_CASTLE
+  CALL_C(b_+9, loadGfxHeader_hook, SYM(loadGfxHeader), b_+12);
+  CYC(b_+12, b_+14); A = 0x0f; // PALH_0f
+  CALL_C(b_+14, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+17);
+  CYC(b_+17, b_+19); A = 0x3b; // PALH_TILESET_ONOX_CASTLE_OUTSIDE_WINTER
+  CALL_C(b_+19, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+22);
+  CYC(b_+22, b_+23); SET_DE(pop_effect(gb));
+  CALL_C(b_+23, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+26);
+  if (!(F & FZ)) { CYCT(b_+26, b_+28); goto load_regs; }
+  CYC(b_+26, b_+28);
+  CYC(b_+28, b_+30); mem_wr(gb, HL, 0x88); // INTERAC_88
+  CYC(b_+30, b_+31); L = alu_inc8(gb, L);
+  CYC(b_+31, b_+32); mem_wr(gb, HL, E);
+load_regs:
+  CYC(b_+32, b_+33); A = D;
+  CALL_C(b_+33, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), b_+36);
+  CYC(b_+36, b_+39); SET_HL(wGfxRegs1_SCY);
+  CYC(b_+39, b_+40); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+40, b_+42); mem_wr(gb, hCameraY, A);
+  CYC(b_+42, b_+43); A = mem_rd(gb, HL);
+  CYC(b_+43, b_+45); mem_wr(gb, hCameraX, A);
+  RET(b_+45); return;
+}
