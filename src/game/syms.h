@@ -13454,6 +13454,12 @@ enum {
   S_dinScript_stubInit,
   S_dinScript_subid8Init,
   S_dinScript_discoverLinkCollapsed,
+  S_introCinematic_inTemple_state1_5,
+  S_makuTree_checkGateHit,
+  S_piratian_waitUntilJumpDone,
+  S_dinDancing_spinLink,
+  S_dinDancingEvent_setTextAdd_0a_ifLinked,
+  S_din_createExclamationMark,
   SYM_COUNT
 };
 enum {

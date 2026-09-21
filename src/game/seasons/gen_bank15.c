@@ -833,47 +833,12 @@ L_4264:
   RET(0x4268); return;  // ret
 }
 
-// 15:5ae2
-void s_dinDancingEvent_setTextAdd_0a_ifLinked(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5ae2, 1); B = A;  // ld b,a
-  I(0x5ae3, 2); C = 0x00;  // ld c,$00
-  CALL(0x5ae5, checkIsLinkedGame_hook, 0x196b, 0x5ae8);  // call $196b
-  if ((F & FZ)) { I(0x5ae8, 3); goto L_5aec; } I(0x5ae8, 2);  // jr z,$5aec
-  I(0x5aea, 2); C = 0x0a;  // ld c,$0a
-L_5aec:
-  I(0x5aec, 1); A = B;  // ld a,b
-  I(0x5aed, 1); alu_add(gb, C);  // add c
-  I(0x5aee, 1); H = D;  // ld h,d
-  I(0x5aef, 2); L = 0x72;  // ld l,$72
-  I(0x5af1, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x5af2, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  RET(0x5af4); return;  // ret
-}
-
-// 15:5ad7
-void s_dinDancing_spinLink(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5ad7, 3); SET_HL(0xd008);  // ld hl,$d008
-  I(0x5ada, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5adb, 2); alu_xor(gb, 0x02);  // xor $02
-  I(0x5add, 2); alu_add(gb, 0x09);  // add $09
-  I(0x5adf, 4); if (hook_is(gb, 0x25cb, interactionSetAnimation_hook)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x25cb);  // jp $25cb
-}
-
 // 15:62ca
 void s_din_animateAndLookAtLink(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x62ca, objectGetAngleTowardLink_hook, 0x1e5a, 0x62cd);  // call $1e5a
   CALL(0x62cd, convertAngleToDirection_hook, 0x26a4, 0x62d0);  // call $26a4
   I(0x62d0, 4); if (hook_is(gb, 0x25cb, interactionSetAnimation_hook)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x25cb);  // jp $25cb
-}
-
-// 15:62d3
-void s_din_createExclamationMark(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x62d3, 3); SET_BC(0xf300);  // ld bc,$f300
-  I(0x62d6, 4); if (hook_is(gb, 0x2727, objectCreateExclamationMark_hook)) { objectCreateExclamationMark_hook(gb); return; } HANDOFF(0x2727);  // jp $2727
 }
 
 // 15:45d2
@@ -7114,22 +7079,6 @@ void s_makuTree_add1bToLowTextIfLinked(GB *gb) {
   RET(0x6115); return;  // ret
 }
 
-// 15:5757
-void s_makuTree_checkGateHit(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5757, 4); A = mem_rd(gb, 0xd601);  // ld a,($d601)
-  I(0x575a, 2); alu_cp(gb, 0x05);  // cp $05
-  if (!(F & FZ)) { RET_TAKEN(0x575c); return; } I(0x575c, 2);  // ret nz
-  I(0x575d, 4); A = mem_rd(gb, 0xcc7e);  // ld a,($cc7e)
-  I(0x5760, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5761); return; } I(0x5761, 2);  // ret nz
-  CALL(0x5762, objectCheckCollidedWithLink_notDead_hook, 0x1bf4, 0x5765);  // call $1bf4
-  if (!(F & FC)) { RET_TAKEN(0x5765); return; } I(0x5765, 2);  // ret nc
-  I(0x5766, 2); A = 0x01;  // ld a,$01
-  I(0x5768, 4); mem_wr(gb, 0xcfc0, A);  // ld ($cfc0),a
-  RET(0x576b); return;  // ret
-}
-
 // 15:618e
 void s_makuTree_disableEverythingIfUnlinked(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -8708,18 +8657,6 @@ void s_piratian_replaceTileAtPiratian(GB *gb) {
   I(0x5a07, 1); C = A;  // ld c,a
   I(0x5a08, 1); A = B;  // ld a,b
   I(0x5a09, 4); if (hook_is(gb, 0x3a52, setTile_hook)) { setTile_hook(gb); return; } HANDOFF(0x3a52);  // jp $3a52
-}
-
-// 15:59f3
-void s_piratian_waitUntilJumpDone(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x59f3, 2); C = 0x30;  // ld c,$30
-  CALL(0x59f5, objectUpdateSpeedZ_paramC_hook, 0x1f04, 0x59f8);  // call $1f04
-  if (!(F & FZ)) { RET_TAKEN(0x59f8); return; } I(0x59f8, 2);  // ret nz
-  I(0x59f9, 1); H = D;  // ld h,d
-  I(0x59fa, 2); L = 0x7d;  // ld l,$7d
-  I(0x59fc, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  RET(0x59fe); return;  // ret
 }
 
 // 15:63c7

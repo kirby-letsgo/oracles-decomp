@@ -7760,18 +7760,6 @@ void s_introCinematic_inTemple_state1(GB *gb) {
   I(0x50ea, 4); if (hook_is(gb, 0x4d33, intro_incState_hook)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
 }
 
-// 03:50ed
-void s_introCinematic_inTemple_state1_5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x50ed, 4); A = mem_rd(gb, 0xcbc3);  // ld a,($cbc3)
-  I(0x50f0, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { I(0x50f1, 4); if (hook_is(gb, 0x5336, introCinematic_inTemple_updateCamera_hook)) { introCinematic_inTemple_updateCamera_hook(gb); return; } HANDOFF(0x5336); } I(0x50f1, 3);  // jp nc,$5336
-  I(0x50f4, 1); alu_xor(gb, A);  // xor a
-  I(0x50f5, 4); mem_wr(gb, 0xcbc3, A);  // ld ($cbc3),a
-  CALL(0x50f8, introCinematic_inTemple_updateCamera_hook, 0x5336, 0x50fb);  // call $5336
-  I(0x50fb, 4); if (hook_is(gb, 0x4d33, intro_incState_hook)) { intro_incState_hook(gb); return; } HANDOFF(0x4d33);  // jp $4d33
-}
-
 // 03:5317
 void s_introCinematic_preTitlescreen_state2__titleDone(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

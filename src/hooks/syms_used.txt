@@ -13450,3 +13450,9 @@ dinScript_subid4Init dinScript_subid4Init -
 dinScript_stubInit dinScript_stubInit -
 dinScript_subid8Init dinScript_subid8Init -
 dinScript_discoverLinkCollapsed dinScript_discoverLinkCollapsed -
+introCinematic_inTemple_state1_5 introCinematic_inTemple_state1.5 -
+makuTree_checkGateHit makuTree_checkGateHit -
+piratian_waitUntilJumpDone piratian_waitUntilJumpDone -
+dinDancing_spinLink dinDancing_spinLink -
+dinDancingEvent_setTextAdd_0a_ifLinked dinDancingEvent_setTextAdd_0a_ifLinked -
+din_createExclamationMark din_createExclamationMark -

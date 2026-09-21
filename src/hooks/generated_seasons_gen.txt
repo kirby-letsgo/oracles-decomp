@@ -55,10 +55,10 @@
 15:5d74 s_d4Keyhole_setState0eDisableAllSorts -
 15:65a8 s_dekuScrub_upgradeSatchel -
 15:4264 s_determineRingFortuneRing__sameFileLineage L
-15:5ae2 s_dinDancingEvent_setTextAdd_0a_ifLinked -
-15:5ad7 s_dinDancing_spinLink -
+15:5ae2 s_dinDancingEvent_setTextAdd_0a_ifLinked_hook -
+15:5ad7 s_dinDancing_spinLink_hook -
 15:62ca s_din_animateAndLookAtLink -
-15:62d3 s_din_createExclamationMark -
+15:62d3 s_din_createExclamationMark_hook -
 15:45d2 s_doorController_decideActionBasedOnTriggers__triggerInactive L
 15:45da s_doorController_decideActionBasedOnTriggers__end L
 15:45de s_doorController_decideActionBasedOnTriggers__checkTileIsShutterDoor L
@@ -321,7 +321,7 @@
 15:4ebb s_loadStaticObjects_body__copyLoop L
 15:6184 s_makuTree_OnoxTauntingAfterMakuSeedGet -
 15:610c s_makuTree_add1bToLowTextIfLinked -
-15:5757 s_makuTree_checkGateHit -
+15:5757 s_makuTree_checkGateHit_hook -
 15:618e s_makuTree_disableEverythingIfUnlinked -
 15:6132 s_makuTree_dropGnarledKey -
 15:617e s_makuTree_dropMakuSeed -
@@ -372,7 +372,7 @@
 15:5a5b s_piratianCaptain_setLinkInvisible -
 15:5a45 s_piratianCaptain_simulatedInput -
 15:59ff s_piratian_replaceTileAtPiratian -
-15:59f3 s_piratian_waitUntilJumpDone -
+15:59f3 s_piratian_waitUntilJumpDone_hook -
 15:63c7 s_playLinkCutscene2 -
 15:5cb0 s_putAwayLinksItems -
 15:5cdc s_putAwayLinksItems__saveItemToB L
@@ -3223,7 +3223,7 @@
 03:71f1 s_incTmpcbb3 -
 03:71f6 s_incTmpcbb4 -
 03:50e5 s_introCinematic_inTemple_state1 -
-03:50ed s_introCinematic_inTemple_state1_5 -
+03:50ed s_introCinematic_inTemple_state1_5_hook -
 03:5317 s_introCinematic_preTitlescreen_state2__titleDone L
 03:503f s_introCinematic_preTitlescreen_updateScrollingTree__label_03_063 L
 03:5048 s_introCinematic_preTitlescreen_updateScrollingTree__ret L

@@ -97,3 +97,9 @@ dinState1_subid8
 dinState1_subid9
 seasonsFunc_0a_6710
 seasonsFunc_0a_6717
+introCinematic_inTemple_state1_5
+makuTree_checkGateHit
+piratian_waitUntilJumpDone
+dinDancing_spinLink
+dinDancingEvent_setTextAdd_0a_ifLinked
+din_createExclamationMark
