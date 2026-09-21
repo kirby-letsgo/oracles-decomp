@@ -41,7 +41,7 @@ void tuniNut_gotoState4_hook(GB *gb) {
   CYC(b_+10, b_+12); A = 0x06;
   CALL_C(b_+12, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+15);
   CYC(b_+15, b_+18);
-  objectSetVisible82_hook(gb);
+  TAIL(objectSetVisible82);
 }
 
 static void tuni_nut_state0_after_graphics(GB *gb, uint16_t sp0_) {
@@ -105,7 +105,7 @@ void tuniNut_beginMovingIntoPlace_hook(GB *gb) {
   CALL_C(b_+26, playSound_b00_hook, SYM(playSound_b00), b_+29);
   CALL_C(b_+29, objectSetVisiblec0_hook, SYM(objectSetVisiblec0), b_+32);
   CYC(b_+32, b_+35);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void tuniNut_state1_hook(GB *gb) {
@@ -159,7 +159,7 @@ void tuniNut_state1_hook(GB *gb) {
   CYC(b_+54, b_+56); A = 0x0b;
   CYC(b_+56, b_+59); mem_wr(gb, wLinkForceState, A);
   CYC(b_+59, b_+62);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void tuniNut_state2_hook(GB *gb) {
@@ -171,7 +171,7 @@ void tuniNut_state2_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  tuniNut_beginMovingIntoPlace_hook(gb);
+  TAIL(tuniNut_beginMovingIntoPlace);
 }
 
 static void tuni_nut_set_row(GB *gb) {

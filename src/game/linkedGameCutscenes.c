@@ -134,7 +134,7 @@ void flameOfSorrowState1__substate0_hook(GB *gb) {
   CYC(b_+28, b_+30); A = 0x28;
   CYC(b_+30, b_+33); mem_wr(gb, wTmpcbb5, A);
   CYC(b_+33, b_+36);
-  linkedCutscene_incSubstate_hook(gb);
+  TAIL(linkedCutscene_incSubstate);
 }
 
 void flameOfSorrowState1__substate1_hook(GB *gb) {
@@ -162,7 +162,7 @@ void flameOfSorrowState1__substate1_hook(GB *gb) {
   CYC(b_+70, b_+71); A = alu_dec8(gb, A);
   CYC(b_+71, b_+74); mem_wr(gb, wTmpcbba, A);
   CALL_C(b_+74, linkedCutscene_incSubstate_hook, SYM(linkedCutscene_incSubstate), b_+77);
-  flameOfSorrowState1__substate2_hook(gb);
+  TAIL(flameOfSorrowState1__substate2);
 }
 
 void flameOfSorrowState1__substate2_hook(GB *gb) {
@@ -175,7 +175,7 @@ void flameOfSorrowState1__substate2_hook(GB *gb) {
   CYC(b_+85, b_+86);
   CALL_C(b_+86, clearPaletteFadeVariablesAndRefreshPalettes_hook, SYM(clearPaletteFadeVariablesAndRefreshPalettes), b_+89);
   CYC(b_+89, b_+92);
-  linkedCutscene_incSubstate_hook(gb);
+  TAIL(linkedCutscene_incSubstate);
 }
 
 void flameOfSorrowState1__substate3_hook(GB *gb) {
@@ -195,7 +195,7 @@ void flameOfSorrowState1__substate3_hook(GB *gb) {
   CYC(b_+111, b_+113); mem_wr(gb, hDirtySprPalettes, A);
   CYC(b_+113, b_+115); A = 0x04;
   CYC(b_+115, b_+118);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void flameOfSorrowState1__substate4_hook(GB *gb) {
@@ -208,7 +208,7 @@ void flameOfSorrowState1__substate4_hook(GB *gb) {
   CYC(b_+124, b_+127); mem_wr(gb, wTextboxFlags, A);
   CYC(b_+127, b_+129); C = 0x1b;
   CYC(b_+129, b_+132);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void flameOfSorrowState1__substate5_hook(GB *gb) {
@@ -221,7 +221,7 @@ void flameOfSorrowState1__substate5_hook(GB *gb) {
   CALL_C(b_+138, flameOfSorrowState1__func_78fd_hook, b_+146, b_+141);
   CYC(b_+141, b_+143); A = 0x1e;
   CYC(b_+143, b_+146);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void flameOfSorrowState1__func_78fd_hook(GB *gb) {
@@ -236,7 +236,7 @@ void flameOfSorrowState1__func_78fd_hook(GB *gb) {
   CYC(b_+160, b_+163); mem_wr(gb, wFadeBgPaletteSources, A);
   CYC(b_+163, b_+165); A = 0x72;
   CYC(b_+165, b_+168);
-  playSound_b00_hook(gb);
+  TAIL(playSound_b00);
 }
 
 void flameOfSorrowState1__substate6_hook(GB *gb) {
@@ -257,7 +257,7 @@ void flameOfSorrowState1__substate6_hook(GB *gb) {
   CYC(b_+195, b_+198); mem_wr(gb, wTmpcfc0_genericCutscene_cfc6, A);
   CYC(b_+198, b_+200); A = 0x1e;
   CYC(b_+200, b_+203);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void flameOfSorrowState1__substate7_hook(GB *gb) {
@@ -268,7 +268,7 @@ void flameOfSorrowState1__substate7_hook(GB *gb) {
   CYC(b_+206, b_+207);
   CYC(b_+207, b_+209); C = 0x29;
   CYC(b_+209, b_+212);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void flameOfSorrowState1__substate8_hook(GB *gb) {
@@ -279,7 +279,7 @@ void flameOfSorrowState1__substate8_hook(GB *gb) {
   CYC(b_+215, b_+216);
   CYC(b_+216, b_+218); C = 0x1c;
   CYC(b_+218, b_+221);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void flameOfSorrowState1__substate9_hook(GB *gb) {
@@ -290,7 +290,7 @@ void flameOfSorrowState1__substate9_hook(GB *gb) {
   CYC(b_+224, b_+225);
   CYC(b_+225, b_+227); C = 0x1d;
   CYC(b_+227, b_+230);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void flameOfSorrowState1__substateA_hook(GB *gb) {
@@ -320,7 +320,7 @@ void flameOfSorrowState1__substateB_hook(GB *gb) {
   CYC(b_+261, b_+264); mem_wr(gb, wcc50, A);
   CYC(b_+264, b_+266); A = 0x0f;
   CYC(b_+266, b_+269);
-  loadPaletteHeader_hook(gb);
+  TAIL(loadPaletteHeader);
 }
 
 void func_03_7849_hook(GB *gb) {
@@ -339,7 +339,7 @@ void zeldaKidnappedState1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, zeldaKidnappedState1__runStates_hook, b_+6, b_+3);
   CYC(b_+3, b_+6);
-  updateStatusBar_hook(gb);
+  TAIL(updateStatusBar);
 }
 
 void zeldaKidnappedState1__runStates_hook(GB *gb) {
@@ -392,7 +392,7 @@ void zeldaKidnappedState1__substate0_hook(GB *gb) {
   CALL_C(b_+83, fadeinFromWhite_hook, SYM(fadeinFromWhite), b_+86);
   CYC(b_+86, b_+88); A = 0x3c;
   CYC(b_+88, b_+91);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate1_hook(GB *gb) {
@@ -405,7 +405,7 @@ void zeldaKidnappedState1__substate1_hook(GB *gb) {
   CYC(b_+98, b_+100); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   CYC(b_+100, b_+102); A = 0x01;
   CYC(b_+102, b_+105);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate2_hook(GB *gb) {
@@ -422,7 +422,7 @@ void zeldaKidnappedState1__substate2_hook(GB *gb) {
   CALL_C(b_+116, func_7c68_hook, SYM(func_7c68), b_+119);
   CYC(b_+119, b_+121); A = 0x1e;
   CYC(b_+121, b_+124);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate3_hook(GB *gb) {
@@ -437,7 +437,7 @@ void zeldaKidnappedState1__substate3_hook(GB *gb) {
   CYC(b_+135, b_+137); mem_wr(gb, HL, mem_rd(gb, HL) | 0x04);
   CYC(b_+137, b_+139); A = 0x1e;
   CYC(b_+139, b_+142);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate4_hook(GB *gb) {
@@ -450,7 +450,7 @@ void zeldaKidnappedState1__substate4_hook(GB *gb) {
   CALL_C(b_+148, func_7c68_hook, SYM(func_7c68), b_+151);
   CYC(b_+151, b_+153); A = 0x1e;
   CYC(b_+153, b_+156);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate5_hook(GB *gb) {
@@ -465,7 +465,7 @@ void zeldaKidnappedState1__substate5_hook(GB *gb) {
   CYC(b_+168, b_+170); mem_wr(gb, HL, mem_rd(gb, HL) | 0x08);
   CYC(b_+170, b_+172); A = 0x1e;
   CYC(b_+172, b_+175);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate6_hook(GB *gb) {
@@ -476,7 +476,7 @@ void zeldaKidnappedState1__substate6_hook(GB *gb) {
   CYC(b_+180, b_+181);
   CYC(b_+181, b_+183); A = 0x1e;
   CYC(b_+183, b_+186);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate7_hook(GB *gb) {
@@ -489,7 +489,7 @@ void zeldaKidnappedState1__substate7_hook(GB *gb) {
   CYC(b_+193, b_+195); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
   CYC(b_+195, b_+197); A = 0x28;
   CYC(b_+197, b_+200);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate8_hook(GB *gb) {
@@ -529,7 +529,7 @@ void zeldaKidnappedState1__func_7a63_hook(GB *gb) {
   CYC(b_+233, b_+235); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
   CYC(b_+235, b_+237); A = 0x3c;
   CYC(b_+237, b_+240);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substateA_hook(GB *gb) {
@@ -548,7 +548,7 @@ void zeldaKidnappedState1__substateA_hook(GB *gb) {
   CYC(b_+262, b_+265); mem_wr(gb, wTmpcfc0_genericCutscene_cfc6, A);
   CYC(b_+265, b_+267); A = 0x1e;
   CYC(b_+267, b_+270);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substateB_hook(GB *gb) {
@@ -563,7 +563,7 @@ void zeldaKidnappedState1__substateB_hook(GB *gb) {
   CYC(b_+279, b_+280);
   CYC(b_+280, b_+282); C = 0x20;
   CYC(b_+282, b_+285);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void zeldaKidnappedState1__substateC_hook(GB *gb) {
@@ -574,7 +574,7 @@ void zeldaKidnappedState1__substateC_hook(GB *gb) {
   CYC(b_+288, b_+289);
   CYC(b_+289, b_+291); C = 0x21;
   CYC(b_+291, b_+294);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void zeldaKidnappedState1__substateD_hook(GB *gb) {
@@ -585,7 +585,7 @@ void zeldaKidnappedState1__substateD_hook(GB *gb) {
   CYC(b_+297, b_+298);
   CYC(b_+298, b_+300); C = 0x22;
   CYC(b_+300, b_+303);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void zeldaKidnappedState1__substateE_hook(GB *gb) {
@@ -597,7 +597,7 @@ void zeldaKidnappedState1__substateE_hook(GB *gb) {
   CYC(b_+307, b_+310); SET_HL(wTmpcfc0_genericCutscene_state);
   CYC(b_+310, b_+312); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x01);
   CYC(b_+312, b_+315);
-  linkedCutscene_incSubstate_hook(gb);
+  TAIL(linkedCutscene_incSubstate);
 }
 
 void zeldaKidnappedState1__substateF_hook(GB *gb) {
@@ -628,7 +628,7 @@ void zeldaKidnappedState1__substate11_hook(GB *gb) {
   CALL_C(b_+369, fadeinFromWhiteWithDelay_hook, SYM(fadeinFromWhiteWithDelay), b_+372);
   CYC(b_+372, b_+374); A = 0x1e;
   CYC(b_+374, b_+377);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate12_hook(GB *gb) {
@@ -639,7 +639,7 @@ void zeldaKidnappedState1__substate12_hook(GB *gb) {
   CYC(b_+380, b_+381);
   CYC(b_+381, b_+383); C = 0x23;
   CYC(b_+383, b_+386);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void zeldaKidnappedState1__substate13_hook(GB *gb) {
@@ -650,7 +650,7 @@ void zeldaKidnappedState1__substate13_hook(GB *gb) {
   CYC(b_+389, b_+390);
   CYC(b_+390, b_+392); C = 0x24;
   CYC(b_+392, b_+395);
-  func_03_7b81_hook(gb);
+  TAIL(func_03_7b81);
 }
 
 void zeldaKidnappedState1__substate14_hook(GB *gb) {
@@ -665,7 +665,7 @@ void zeldaKidnappedState1__substate14_hook(GB *gb) {
   CYC(b_+407, b_+409); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
   CYC(b_+409, b_+411); A = 0x5a;
   CYC(b_+411, b_+414);
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void zeldaKidnappedState1__substate15_hook(GB *gb) {
@@ -681,7 +681,7 @@ void zeldaKidnappedState1__substate15_hook(GB *gb) {
   CYC(b_+427, b_+429); A = 0xf0;
   CALL_C(b_+429, playSound_b00_hook, SYM(playSound_b00), b_+432);
   CYC(b_+432, b_+435);
-  linkedCutscene_incSubstate_hook(gb);
+  TAIL(linkedCutscene_incSubstate);
 }
 
 void zeldaKidnappedState1__substate16_hook(GB *gb) {
@@ -771,7 +771,7 @@ void func_7b48__cbb4_04_hook(GB *gb) {
 void func_7b48__cbb4_05_hook(GB *gb) {
   BASE(func_7b48);
   CYC(b_+54, b_+57);
-  func_7ba1_hook(gb);
+  TAIL(func_7ba1);
 }
 
 void func_03_7b81_hook(GB *gb) {
@@ -780,13 +780,13 @@ void func_03_7b81_hook(GB *gb) {
   CYC(b_+0, b_+2); B = 0x28;
   CALL_C(b_+2, showText_hook, SYM(showText), b_+5);
   CYC(b_+5, b_+7); A = 0x1e;
-  linkedCutscene_aIntoCBB5_incSubstate_hook(gb);
+  TAIL(linkedCutscene_aIntoCBB5_incSubstate);
 }
 
 void linkedCutscene_aIntoCBB5_incSubstate_hook(GB *gb) {
   BASE(linkedCutscene_aIntoCBB5_incSubstate);
   CYC(b_+0, b_+3); W8(wTmpcbb5) = A;
-  linkedCutscene_incSubstate_hook(gb);
+  TAIL(linkedCutscene_incSubstate);
 }
 
 void linkedCutscene_incSubstate_hook(GB *gb) {
@@ -863,7 +863,7 @@ void func_7bd0_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_BC(SYM(table_7be5));
   CALL_C(b_+3, func_7bd9_hook, SYM(func_7bd9), b_+6);
   CYC(b_+6, b_+9); SET_BC(SYM(table_7be8));
-  func_7bd9_hook(gb);
+  TAIL(func_7bd9);
 }
 
 void func_7bd9_hook(GB *gb) {
@@ -895,7 +895,7 @@ void func_7bf6_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_BC(SYM(table_7c19));
   CALL_C(b_+3, func_7bff_hook, SYM(func_7bff), b_+6);
   CYC(b_+6, b_+9); SET_BC(SYM(table_7c1c));
-  func_7bff_hook(gb);
+  TAIL(func_7bff);
 }
 
 void func_7bff_hook(GB *gb) {
@@ -909,7 +909,7 @@ void func_7bff_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, BC);
   CYC(b_+8, b_+9); SET_BC(BC + 1);
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
-  func_7c09_hook(gb);
+  TAIL(func_7c09);
 }
 
 void func_7c09_hook(GB *gb) {
@@ -942,7 +942,7 @@ void func_7c2a_hook(GB *gb) {
 void func_7c2f_hook(GB *gb) {
   BASE(func_7c2f);
   CYC(b_+0, b_+3); SET_BC(SYM(table_7c5d));
-  spawnZeldaKidnappedNPCs_hook(gb);
+  TAIL(spawnZeldaKidnappedNPCs);
 }
 
 void spawnZeldaKidnappedNPCs_hook(GB *gb) {

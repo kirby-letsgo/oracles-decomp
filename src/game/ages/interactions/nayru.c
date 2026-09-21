@@ -816,7 +816,7 @@ void nayruSubid02Substate0_hook(GB *gb) {
 
 createNotes:
   CYC(b_+23, b_+26); push_effect(gb, SYM(nayruAnimateAndRunScript)); nayru_createMusicNotes(gb);
-  nayruAnimateAndRunScript_hook(gb);
+  TAIL(nayruAnimateAndRunScript);
 }
 
 void nayruAnimateAndRunScript_hook(GB *gb) {
@@ -856,7 +856,7 @@ void nayruFlipDirectionAtRandomIntervals_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_xor(gb, 0x02);
   CYC(b_+9, b_+10); mem_wr(gb, HL, A);
   CALL_C(b_+10, interactionSetAnimation_hook, SYM(interactionSetAnimation), SYM(nayruSetCounter1Randomly));
-  nayruSetCounter1Randomly_hook(gb);
+  TAIL(nayruSetCounter1Randomly);
 }
 
 void nayruSetCounter1Randomly_hook(GB *gb) {
@@ -1203,7 +1203,7 @@ void nayruSubid10_hook(GB *gb) {
   CYC(b_+20, b_+22);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
   CALL_C(b_+23, interactionSetAnimation_hook, SYM(interactionSetAnimation), SYM(nayruSubid0a));
-  nayruSubid0a_hook(gb);
+  TAIL(nayruSubid0a);
 }
 
 // Subid $0a: Cutscene where Ralph's heritage is revealed (linked?)
@@ -1223,7 +1223,7 @@ void nayruSubid0a_hook(GB *gb) {
 void nayruSubid13_hook(GB *gb) {
   BASE(nayruSubid13);
   CYC(b_+0, b_+3); push_effect(gb, SYM(nayruRunScriptWithConditionalAnimation)); nayru_createMusicNotes(gb);
-  nayruRunScriptWithConditionalAnimation_hook(gb);
+  TAIL(nayruRunScriptWithConditionalAnimation);
 }
 
 // This is called by Ralph as well.

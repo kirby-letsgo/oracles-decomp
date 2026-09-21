@@ -137,7 +137,7 @@ setSpeed:
   CYC(b_+141, b_+142); A = C;
   CALL_C(b_+142, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+145);
   CYC(b_+145, b_+148); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions);
-  CYC(b_+148, b_+151); mem_wr(gb, HL, 0x02);
+  CYC(b_+148, b_+150); mem_wr(gb, HL, 0x02);
   RET(b_+150); return;
 label_10_330:
   CYC(b_+151, b_+153); L = INTERACTION_BASE + OBJ_SUBID;

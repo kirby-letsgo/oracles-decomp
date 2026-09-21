@@ -192,7 +192,7 @@ didntMount:
   CYC(b_+27, b_+30);
   CYC(b_+30, b_+33); SET_BC(0xff00);
   CALL_C(b_+33, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), SYM(rickyCheckHazards));
-  rickyCheckHazards_hook(gb);
+  TAIL(rickyCheckHazards);
 }
 
 void rickyCheckHazards_hook(GB *gb) {
@@ -204,7 +204,7 @@ void rickyCheckHazards_hook(GB *gb) {
     TAIL(rickyFunc_70cc);
   }
   CYC(b_+3, b_+6);
-  rickyState9_hook(gb);
+  TAIL(rickyState9);
 }
 
 void rickyState9_hook(GB *gb) {
@@ -862,7 +862,7 @@ noWalls:
   CYC(b_+17, b_+18); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+18, b_+19); ret_effect(gb); return; }
   CYC(b_+18, b_+19);
-  rickyStopUntilLandedOnGround_hook(gb);
+  TAIL(rickyStopUntilLandedOnGround);
 }
 
 void rickyStopUntilLandedOnGround_hook(GB *gb) {
@@ -894,7 +894,7 @@ setState:
   CYC(b_+28, b_+30); E = 0x39;
   CYC(b_+30, b_+32); A = 0x10;
   CYC(b_+32, b_+33); mem_wr(gb, DE, A);
-  rickyCheckHazards2_hook(gb);
+  TAIL(rickyCheckHazards2);
 }
 
 void rickyCheckHazards2_hook(GB *gb) {
@@ -907,7 +907,7 @@ void rickyCheckHazards2_hook(GB *gb) {
     TAIL(companionSetAnimation);
   }
   CYC(b_+5, b_+8);
-  rickyFunc_70cc_hook(gb);
+  TAIL(rickyFunc_70cc);
 }
 
 void rickyFunc_70cc_hook(GB *gb) {
@@ -1014,7 +1014,7 @@ void rickySetJumpSpeedForCutsceneAndSetAngle_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_and(gb, 0x1c);
   CYC(b_+9, b_+11); E = 0x09;
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
-  rickySetJumpSpeedForCutscene_hook(gb);
+  TAIL(rickySetJumpSpeedForCutscene);
 }
 
 void rickySetJumpSpeedForCutscene_hook(GB *gb) {
@@ -1439,14 +1439,14 @@ void rickyBeginJumpOverHole_hook(GB *gb) {
   BASE(rickyBeginJumpOverHole);
   CYC(b_+0, b_+2); A = 0x01;
   CYC(b_+2, b_+5); W8(wLinkInAir) = A;
-  rickySetJumpSpeed_andcc91_hook(gb);
+  TAIL(rickySetJumpSpeed_andcc91);
 }
 
 void rickySetJumpSpeed_andcc91_hook(GB *gb) {
   BASE(rickySetJumpSpeed_andcc91);
   CYC(b_+0, b_+2); A = 0x01;
   CYC(b_+2, b_+5); W8(wDisableScreenTransitions) = A;
-  rickySetJumpSpeed_hook(gb);
+  TAIL(rickySetJumpSpeed);
 }
 
 void rickySetJumpSpeed_hook(GB *gb) {

@@ -118,14 +118,16 @@ class Tool:
             if t1 != t2 or len(o1) != len(o2): self.report.append(f'{name}: template differs at +{a1 - aa}'); ok = False; continue
             off = a1 - pbase
             for (k, v1), (_, v2) in zip(o1, o2):
-                if k == 'rom' and self.A.rom_sym(ab, v1) == self.S.rom_sym(sb, v2) and not self.A.rom_sym(ab, v1).startswith('$'): continue
+                ra, rs = self.A.rom_sym(ab, v1), self.S.rom_sym(sb, v2)
+                ra, rs = self.A.peer_sym(ra, rs), self.S.peer_sym(rs, ra)
+                if k == 'rom' and ra == rs and not ra.startswith('$'): continue
                 if k == 'ram' and self.A.ram_sym(v1) == self.S.ram_sym(v2) and not self.A.ram_sym(v1).startswith('$'): continue
                 if k == 'imm' and v1 == v2: continue
-                if k == 'ram' and v1 == v2 and v1 >= 0xff00: continue      # IO/HRAM register, same in both
+                if k == 'ram' and v1 == v2 and (v1 >= 0xff00 or v1 < 0x8000): continue      # IO/HRAM or MBC register, same in both
                 if not self.fix_site(name, funcs, off, k, v1, v2, t1, apply, quiet=self.auditing): ok = False
         return ok
 
-    def fix_site(self, name, funcs, off, kind, v1, v2, tmpl, apply, quiet=False):
+    def fix_site(self, name, funcs, off, kind, v1, v2, tmpl, apply, quiet=False, helpers=False):
         for f, s, e in funcs:
             self.cur_file = f
             lines = self.files[f]
@@ -140,6 +142,11 @@ class Tool:
                 for i in range(s, e + 1):
                     for m in re.finditer(r'\bCYCT?\(b_\+(\d+), b_\+(\d+)\)', lines[i].split('//')[0]):
                         if int(m.group(1)) < off < int(m.group(2)): anchor.append(i)
+            if not anchor and helpers:
+                # a helper that burns a run of instructions from its address argument (bank_push, obj helpers)
+                for i in range(s, e + 1):
+                    for m in re.finditer(r'\b\w+\(gb, b_\+(\d+)\b', lines[i].split('//')[0]):
+                        if int(m.group(1)) <= off <= int(m.group(1)) + 24: anchor.append(i)
             if not anchor: continue
             order = []
             for i0 in anchor:
@@ -161,7 +168,7 @@ class Tool:
                     if not cands:
                         cands = [m for m in re.finditer(r'(?:INTERACTION_BASE|ENEMY_BASE|PART_BASE|ITEM_BASE)? ?\+? ?OBJ_\w+(?: \+ \d+)?', code) if self.eval_expr(m.group(0), 0) == v1]
                     if not cands:
-                        cands = [m for m in re.finditer(r'\(uint8_t\)\(?[\w+ ]+\)?', code) if self.eval_expr(m.group(0).replace('(uint8_t)', ''), 0) is not None and (self.eval_expr(m.group(0).replace('(uint8_t)', ''), 0) & 0xff) == v1]
+                        cands = [m for m in re.finditer(r'\(uint8_t\)(?:\([^()]*\)|\w+)', code) if self.eval_expr(m.group(0).replace('(uint8_t)', ''), 0) is not None and (self.eval_expr(m.group(0).replace('(uint8_t)', ''), 0) & 0xff) == v1]
                         if len(cands) == 1 and (self.eval_expr(cands[0].group(0).replace('(uint8_t)', ''), 1) & 0xff) == v2: return True
                     if len(cands) != 1:
                         if i != order[-1]: continue
@@ -207,7 +214,7 @@ class Tool:
                 hits = [(st, en, ex) for st, en, ex in exprs if ex.strip() and not re.match(r'\s*gb\s*$', ex) and self.eval_expr(ex, 0, b0) == v1]
                 if not hits:
                     if i != order[-1]: continue
-                    if found_ok: return True
+                    if found_ok or v1 == v2: return True     # same value in both games and not spelled on these lines: burned inside a helper
                     self.report.append(f'{name}: +{off} {kind} 0x{v1:04x} -> 0x{v2:04x}: 0 candidates near line {anchor[0] + 1} of {f}: {lines[anchor[0]].strip()[:90]}')
                     return False
                 wrong = [(st, en, ex) for st, en, ex in hits if self.eval_expr(ex, 1, b1) != v2]
@@ -261,6 +268,8 @@ class Tool:
                 if apply: self.files[f][i] = new + self.files[f][i][len(code):]
                 self.changed[f] += 1
                 return True
+        if not helpers: return self.fix_site(name, funcs, off, kind, v1, v2, tmpl, apply, quiet, helpers=True)
+        if v1 == v2: return True     # the same value in both games, burned by a helper: nothing to change
         if not quiet: self.report.append(f'{name}: +{off} no C line burning that instruction')
         return False
 
@@ -293,6 +302,11 @@ def main():
     if apply:
         for f, lines in tool.files.items():
             if tool.changed[f]: open(f, 'w').write('\n'.join(lines))
+        # routines checked by hand (a shared helper already carries the GV, a TAIL_GV, ...)
+        if os.path.exists('src/hooks/seasons_ok_manual.txt'):
+            for l in open('src/hooks/seasons_ok_manual.txt'):
+                n = l.split('#')[0].strip()
+                if n and n not in ok_names: ok_names.append(n)
         with open('src/hooks/seasons_ok.txt', 'w') as f:
             for n in sorted(ok_names): f.write(n + '\n')
     for r in tool.report: print(r)

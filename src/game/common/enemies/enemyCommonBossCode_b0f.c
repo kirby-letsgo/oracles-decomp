@@ -18,7 +18,7 @@ void enemyBoss_beginBoss_common_b0f_hook(GB *gb) {
   CYC(b_+9, b_+10); A = B;
   CYC(b_+10, b_+13); W8(wActiveMusic) = A;
   CYC(b_+13, b_+16);
-  playSound_b00_hook(gb);
+  TAIL(playSound_b00);
 }
 
 void enemyBoss_dead_b0f_hook(GB *gb) {
@@ -72,7 +72,7 @@ alreadyPlayedDeathSound:
   CALL_C(b_+62, playSound_b00_hook, SYM(playSound_b00), b_+65);
 finish:
   CYC(b_+65, b_+68);
-  enemyDelete_hook(gb);
+  TAIL(enemyDelete);
 }
 
 void enemyBoss_spawnShadow_b0f_hook(GB *gb) {
@@ -112,7 +112,7 @@ skipScreenVarStore:
   } else {
     CALL_C_CC(b_+9, loadPaletteHeader_hook, SYM(loadPaletteHeader), SYM(enemyBoss_initializeRoomWithoutExtraGfx_b0f));
   }
-  enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook(gb);
+  TAIL(enemyBoss_initializeRoomWithoutExtraGfx_b0f);
 }
 
 void enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook(GB *gb) {

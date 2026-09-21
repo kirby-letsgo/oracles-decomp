@@ -156,7 +156,7 @@ void goronDance_initNextRound_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL((SYM(interactionCode48__initSubid06) + 6));
   CYC(b_+9, b_+11); E = 0x08;
   CALL_C(b_+11, interBankCall_hook, 0x008a, SYM(goronDance_clearDanceVariables));
-  goronDance_clearDanceVariables_hook(gb);
+  TAIL(goronDance_clearDanceVariables);
 }
 
 void goronDance_clearDanceVariables_hook(GB *gb) {
@@ -651,7 +651,7 @@ void goronSubid10__afterCall7854_hook(GB *gb) {
   BASE(goronSubid07);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+8, interactionRunScript_hook, SYM(interactionRunScript), SYM(goron_runScriptAndDeleteWhenFinished));
-  goron_runScriptAndDeleteWhenFinished_hook(gb);
+  TAIL(goron_runScriptAndDeleteWhenFinished);
 }
 
 void goron_runScriptAndDeleteWhenFinished_hook(GB *gb) {
@@ -1368,7 +1368,7 @@ void goron_checkEnoughTimePassed_hook(GB *gb) {
   CYC15(b_+3, b_+4); A = (uint8_t)~A;
   CYC15(b_+4, b_+6); alu_bit(gb, 0, A);
   CALL_C15(b_+6, writeFlagsTocddb_hook, SYM(writeFlagsTocddb), SYM(goron_clearRefillBit));
-  goron_clearRefillBit_hook(gb);
+  TAIL(goron_clearRefillBit);
 }
 
 void goron_clearRefillBit_hook(GB *gb) {

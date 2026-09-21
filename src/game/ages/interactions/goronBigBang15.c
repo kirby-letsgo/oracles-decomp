@@ -35,7 +35,7 @@ void goron_bigBang_initLinkPosition_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x00;
   CYC(b_+2, b_+5); SET_BC((SYM(group2ObjectDataTable) + 277));
-  goron_setLinkPositionAndDirection_hook(gb);
+  TAIL(goron_setLinkPositionAndDirection);
 }
 
 void goron_bigBang_spawnPrize_hook(GB *gb) {
@@ -262,7 +262,7 @@ void goron_bigBang_loadNormalRoomLayout_bottomHalf_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(goron_bigBang_normalRoomLayout));
   CYC(b_+3, b_+5); C = 0x41;
-  goron_bigBang_loadRoomLayout_hook(gb);
+  TAIL(goron_bigBang_loadRoomLayout);
 }
 
 void goron_bigBang_loadRoomLayout_hook(GB *gb) {

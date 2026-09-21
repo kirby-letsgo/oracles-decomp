@@ -529,7 +529,7 @@ void sidescrollPlatformFunc_5bfc_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_cp(gb, D);
   if (!(F & FZ)) { CYCT(b_+7, b_+8); ret_effect(gb); return; } // ret nz
   CYC(b_+7, b_+8);
-  sidescrollPlatform_updateLinkSubpixels_hook(gb); // falls through
+  TAIL(sidescrollPlatform_updateLinkSubpixels);// falls through
 }
 
 void sidescrollPlatform_updateLinkSubpixels_hook(GB *gb) {

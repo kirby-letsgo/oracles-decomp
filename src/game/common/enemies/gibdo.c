@@ -130,5 +130,5 @@ gotoState8:
   CYC(b_+122, b_+124); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+124, b_+126); A = 0x08;
   CYC(b_+126, b_+127); mem_wr(gb, DE, A);
-  CYC(b_+127, (SYM(enemyCode13) + 1)); goto animate; // jr
+  CYC(b_+127, b_+129); goto animate; // jr
 }

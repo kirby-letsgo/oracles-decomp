@@ -100,7 +100,7 @@ void updateTextbox_hook(GB *gb) {
   CYC(b_+30, b_+31);
   CYC(b_+31, b_+34); mem_wr(gb, wTextboxFlags, A);
   CYC(b_+34, b_+37);
-  stubThreadStart_hook(gb);
+  TAIL(stubThreadStart);
 }
 
 void updateTextbox__updateText_hook(GB *gb) {
@@ -187,7 +187,7 @@ void standardTextState0_hook(GB *gb) {
   CALL_C(b_+124, saveTilesUnderTextbox_hook, SYM(saveTilesUnderTextbox), b_+127);
   CALL_C(b_+127, initTextboxMapping_hook, SYM(initTextboxMapping), b_+130);
   CYC(b_+130, b_+133);
-  dmaTextboxMap_hook(gb);
+  TAIL(dmaTextboxMap);
 }
 
 void standardTextState1_hook(GB *gb) {
@@ -203,7 +203,7 @@ void standardTextState1_hook(GB *gb) {
   CYC(b_+144, b_+145); mem_wr(gb, HL, A);
   CALL_C(b_+145, drawLineOfText_hook, SYM(drawLineOfText), b_+148);
   CYC(b_+148, b_+151);
-  dmaTextGfxBuffer_hook(gb);
+  TAIL(dmaTextGfxBuffer);
 }
 
 void standardTextState2_hook(GB *gb) {
@@ -295,7 +295,7 @@ void standardTextState6_hook(GB *gb) {
   CYC(b_+246, b_+247); L = E;
   CYC(b_+247, b_+248); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+248, b_+251);
-  dmaTextboxMap_hook(gb);
+  TAIL(dmaTextboxMap);
 }
 
 void standardTextState7_hook(GB *gb) {
@@ -306,7 +306,7 @@ void standardTextState7_hook(GB *gb) {
   CYC(b_+253, b_+254); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CALL_C(b_+254, shiftTextboxMapUp_hook, SYM(shiftTextboxMapUp), b_+257);
   CYC(b_+257, b_+260);
-  subFirstRowOfTextMapBy20_hook(gb);
+  TAIL(subFirstRowOfTextMapBy20);
 }
 
 void standardTextState8_hook(GB *gb) {
@@ -321,7 +321,7 @@ void standardTextState8_hook(GB *gb) {
   CALL_C(b_+267, dmaTextboxMap_hook, SYM(dmaTextboxMap), b_+270);
   CYC(b_+270, b_+271); alu_xor(gb, A);
   CYC(b_+271, b_+274);
-  dmaTextGfxBuffer_hook(gb);
+  TAIL(dmaTextGfxBuffer);
 }
 
 void standardTextStateB_hook(GB *gb) {
@@ -340,7 +340,7 @@ void standardTextStateB_hook(GB *gb) {
   CYC(b_+289, b_+291); mem_wr(gb, HL, 0x02);
   CALL_C(b_+291, shiftTextboxMapUp_hook, SYM(shiftTextboxMapUp), b_+294);
   CYC(b_+294, b_+297);
-  clearTopRowOfTextMap_hook(gb);
+  TAIL(clearTopRowOfTextMap);
 }
 
 void standardTextStateE_hook(GB *gb) {
@@ -355,7 +355,7 @@ void standardTextStateE_hook(GB *gb) {
   CALL_C(b_+305, dmaTextboxMap_hook, SYM(dmaTextboxMap), b_+308);
   CYC(b_+308, b_+309); alu_xor(gb, A);
   CYC(b_+309, b_+312);
-  dmaTextGfxBuffer_hook(gb);
+  TAIL(dmaTextGfxBuffer);
 }
 
 void standardTextStateF_hook(GB *gb) {
@@ -377,7 +377,7 @@ void standardTextStateF_hook(GB *gb) {
   CYC(b_+325, b_+327); mem_wr(gb, HL, 0x00);
   CYC(b_+327, b_+328); L = E;
   CYC(b_+328, b_+330); mem_wr(gb, HL, 0x00);
-  CYC(b_+330, b_+332); A = GV(GV(0x49, 0x24), 0x24);
+  CYC(b_+330, b_+332); A = GV(0x49, 0x24);
   CYC(b_+332, b_+335); mem_wr(gb, wTextIndexL, A);
   CYC(b_+335, b_+337); A = 0x00;
   CYC(b_+337, b_+339); alu_add(gb, 0x04);
@@ -388,7 +388,7 @@ void standardTextStateF_hook(GB *gb) {
   CYC(b_+350, b_+352); A = 0x2a;
   CYC(b_+352, b_+354); C = 0x04;
   CYC(b_+354, b_+357);
-  giveTreasure_hook(gb);
+  TAIL(giveTreasure);
 }
 
 void standardTextStateF__label_3f_096_hook(GB *gb) {
@@ -415,7 +415,7 @@ void standardTextStateF__label_3f_096_hook(GB *gb) {
     CALL_C(b_+379, giveTreasure_hook, SYM(giveTreasure), b_+382);
   }
   CYC(b_+382, b_+385);
-  saveTilesUnderTextbox_hook(gb);
+  TAIL(saveTilesUnderTextbox);
 }
 
 void standardTextStateF__checkShouldExit_hook(GB *gb) {
@@ -467,7 +467,7 @@ void standardTextState10_hook(GB *gb) {
   CYC(b_+418, b_+419); alu_xor(gb, A);
   CYC(b_+419, b_+422); mem_wr(gb, wTextIsActive, A);
   CYC(b_+422, b_+425);
-  dmaTextboxMap_hook(gb);
+  TAIL(dmaTextboxMap);
 }
 
 void textOptionCode_hook(GB *gb) {
@@ -494,7 +494,7 @@ void textOptionCode__state01_hook(GB *gb) {
   CYC(b_+25, b_+26); L = E;
   CYC(b_+26, b_+27); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+27, b_+30);
-  updateSelectedTextPositionAndDmaTextboxMap_hook(gb);
+  TAIL(updateSelectedTextPositionAndDmaTextboxMap);
 }
 
 void textOptionCode__state02_hook(GB *gb) {
@@ -582,7 +582,7 @@ void textOptionCode__state04_hook(GB *gb) {
   CALL_C(b_+140, clearMemory_hook, SYM(clearMemory), b_+143);
   CALL_C(b_+143, drawLineOfText_hook, SYM(drawLineOfText), b_+146);
   CYC(b_+146, b_+149);
-  dmaTextGfxBuffer_hook(gb);
+  TAIL(dmaTextGfxBuffer);
 }
 
 void inventoryTextCode_hook(GB *gb) {
@@ -643,20 +643,20 @@ check_inventory_text_status:
     TAIL(inventoryTextCode__state00__end);
   }
   CYC(b_+55, b_+57);
-  inventoryTextCode__state00__stopText_hook(gb);
+  TAIL(inventoryTextCode__state00__stopText);
 }
 
 void inventoryTextCode__state00__stopText_hook(GB *gb) {
   BASE(inventoryTextCode);
   CYC(b_+57, b_+60); mem_wr(gb, wTextIsActive, A);
-  inventoryTextCode__state00__end_hook(gb);
+  TAIL(inventoryTextCode__state00__end);
 }
 
 void inventoryTextCode__state00__end_hook(GB *gb) {
   BASE(inventoryTextCode);
   CYC(b_+60, b_+62); A = 0x17;
   CYC(b_+62, b_+65);
-  loadUncompressedGfxHeader_hook(gb);
+  TAIL(loadUncompressedGfxHeader);
 }
 
 void inventoryTextCode__state01_hook(GB *gb) {
@@ -717,7 +717,7 @@ void inventoryTextCode__state02_hook(GB *gb) {
   CYC(b_+121, b_+123); L = 0xd5;
   CYC(b_+123, b_+124); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+124, b_+125); mem_wr(gb, HL, B);
-  inventoryTextCode__drawSpaceWithoutSavingTextAddress_hook(gb);
+  TAIL(inventoryTextCode__drawSpaceWithoutSavingTextAddress);
 }
 
 void inventoryTextCode__drawSpaceWithoutSavingTextAddress_hook(GB *gb) {
@@ -727,7 +727,7 @@ void inventoryTextCode__drawSpaceWithoutSavingTextAddress_hook(GB *gb) {
   CYC(b_+127, b_+130); SET_BC(w7TextGfxBuffer + 0x1e0);
   CALL_C(b_+130, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+133);
   CYC(b_+133, b_+135);
-  inventoryTextCode__dmaTextGfxBuffer_hook(gb);
+  TAIL(inventoryTextCode__dmaTextGfxBuffer);
 }
 
 void inventoryTextCode__state03_hook(GB *gb) {
@@ -751,20 +751,20 @@ void inventoryTextCode__state03_hook(GB *gb) {
   CYC(b_+151, b_+154); A = mem_rd(gb, wTextIndexH_backup);
   CYC(b_+154, b_+157); mem_wr(gb, wTextIndexH, A);
   CALL_C(b_+157, checkInitialTextCommands_hook, SYM(checkInitialTextCommands), b_+160);
-  inventoryTextCode__insertSpace_hook(gb);
+  TAIL(inventoryTextCode__insertSpace);
 }
 
 void inventoryTextCode__insertSpace_hook(GB *gb) {
   BASE(inventoryTextCode);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+160, shiftTextGfxBufferLeft_hook, SYM(shiftTextGfxBufferLeft), b_+163);
-  inventoryTextCode__drawSpace_hook(gb);
+  TAIL(inventoryTextCode__drawSpace);
 }
 
 void inventoryTextCode__drawSpace_hook(GB *gb) {
   BASE(inventoryTextCode);
   CYC(b_+163, b_+165); A = 0x20;
-  inventoryTextCode__drawCharacter_hook(gb);
+  TAIL(inventoryTextCode__drawCharacter);
 }
 
 void inventoryTextCode__drawCharacter_hook(GB *gb) {
@@ -772,7 +772,7 @@ void inventoryTextCode__drawCharacter_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+165, b_+168); SET_BC(w7TextGfxBuffer + 0x1e0);
   CALL_C(b_+168, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+171);
-  inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer_hook(gb);
+  TAIL(inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer);
 }
 
 void inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer_hook(GB *gb) {
@@ -781,14 +781,14 @@ void inventoryTextCode__saveTextAddressAndDmaTextGfxBuffer_hook(GB *gb) {
   CYC(b_+172, b_+175); mem_wr(gb, w7TextAddress, A);
   CYC(b_+175, b_+176); A = H;
   CYC(b_+176, b_+179); mem_wr(gb, w7TextAddress + 1, A);
-  inventoryTextCode__dmaTextGfxBuffer_hook(gb);
+  TAIL(inventoryTextCode__dmaTextGfxBuffer);
 }
 
 void inventoryTextCode__dmaTextGfxBuffer_hook(GB *gb) {
   BASE(inventoryTextCode);
   CYC(b_+179, b_+181); A = 0x17;
   CYC(b_+181, b_+184);
-  loadUncompressedGfxHeader_hook(gb);
+  TAIL(loadUncompressedGfxHeader);
 }
 
 void inventoryTextCode__state04_hook(GB *gb) {
@@ -890,7 +890,7 @@ void inventoryTextCode__state07_hook(GB *gb) {
   CYC(b_+272, b_+273); H = mem_rd(gb, HL);
   CYC(b_+273, b_+274); L = A;
   CYC(b_+274, b_+277);
-  inventoryTextCode__drawSpace_hook(gb);
+  TAIL(inventoryTextCode__drawSpace);
 }
 
 void initTextbox_hook(GB *gb) {
@@ -1418,7 +1418,7 @@ void clearTextGfxBuffer_hook(GB *gb) {
   CYC(b_+3, b_+6); SET_BC(0x0200);
   CYC(b_+6, b_+8); A = 0xff;
   CYC(b_+8, b_+11);
-  fillMemoryBc_hook(gb);
+  TAIL(fillMemoryBc);
 }
 
 void clearLineTextBuffer_hook(GB *gb) {
@@ -1428,7 +1428,7 @@ void clearLineTextBuffer_hook(GB *gb) {
   CYC(b_+4, b_+5); E = L;
   CYC(b_+5, b_+7); B = 0x10;
   CYC(b_+7, b_+10);
-  clearMemory_hook(gb);
+  TAIL(clearMemory);
 }
 
 void setLineTextBuffers_hook(GB *gb) {
@@ -2374,7 +2374,7 @@ void label_3f_158_hook(GB *gb) {
 void label_3f_159_hook(GB *gb) {
   BASE(label_3f_159);
   CYC(b_+0, b_+3); SET_HL(w7TextboxOptionPositions);
-  label_3f_160_hook(gb);
+  TAIL(label_3f_160);
 }
 
 void label_3f_160_hook(GB *gb) {
@@ -2402,7 +2402,7 @@ void readNextTextByte_hook(GB *gb) {
   CYC(b_+3, b_+4); H = mem_rd(gb, HL);
   CYC(b_+4, b_+5); L = A;
   CALL_C(b_+5, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), SYM(getExtraTextIndex));
-  getExtraTextIndex_hook(gb);
+  TAIL(getExtraTextIndex);
 }
 
 void getExtraTextIndex_hook(GB *gb) {
@@ -3084,7 +3084,7 @@ void readByteFromW7ActiveBankAndIncHl_hook(GB *gb) {
   BASE(readByteFromW7ActiveBankAndIncHl);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, readByteFromW7ActiveBank_hook, SYM(readByteFromW7ActiveBank), SYM(incHlAndUpdateBank));
-  incHlAndUpdateBank_hook(gb);
+  TAIL(incHlAndUpdateBank);
 }
 
 void incHlAndUpdateBank_hook(GB *gb) {
@@ -3144,14 +3144,14 @@ void textControlCodeC_5_hook(GB *gb) {
   BASE(textControlCodeC_5);
   CYC(b_+0, b_+3); SET_HL(w7d0c1);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
-  textControlCodeC_3_hook(gb);
+  TAIL(textControlCodeC_3);
 }
 
 void textControlCodeC_3_hook(GB *gb) {
   BASE(textControlCodeC_3);
   CYC(b_+0, b_+3); SET_HL(w7d0c1);
   CYC(b_+3, b_+5); mem_wr(gb, HL, mem_rd(gb, HL) | 0x02);
-  textControlCodeC_ret_hook(gb);
+  TAIL(textControlCodeC_ret);
 }
 
 void textControlCodeC_ret_hook(GB *gb) {
@@ -3167,7 +3167,7 @@ void textControlCodeC_6_hook(GB *gb) {
   CYC(b_+3, b_+6); mem_wr(gb, (wTextNumberSubstitution + 1), A);
   CYC(b_+6, b_+9); A = mem_rd(gb, wcbaa);
   CYC(b_+9, b_+12); mem_wr(gb, wTextNumberSubstitution, A);
-  textControlCodeC_1_hook(gb);
+  TAIL(textControlCodeC_1);
 }
 
 void textControlCodeC_1_hook(GB *gb) {

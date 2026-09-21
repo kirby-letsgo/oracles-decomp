@@ -155,7 +155,7 @@ void func_4043_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_cp(gb, 0x80);
   if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
   CYC(b_+5, b_+6);
-  sendPacketByte_hook(gb);
+  TAIL(sendPacketByte);
 }
 
 void sendPacketByte_hook(GB *gb) {
@@ -235,7 +235,7 @@ void func_4096_hook(GB *gb) {
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11);
-  prepareForNextPacket_hook(gb);
+  TAIL(prepareForNextPacket);
 }
 
 void disableSerialIfByteReceived_hook(GB *gb) {
@@ -243,7 +243,7 @@ void disableSerialIfByteReceived_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, waitForSerialByte_hook, SYM(waitForSerialByte), b_+3);
   CYC(b_+3, b_+6);
-  disableSerialPort_hook(gb);
+  TAIL(disableSerialPort);
 }
 
 void receivePacketByte_hook(GB *gb) {
@@ -515,7 +515,7 @@ byte_received:
   CYC(b_+33, b_+34); alu_xor(gb, A);
   CYC(b_+34, b_+36); H8(hReceivedSerialByte) = A;
   CYC(b_+36, b_+38); H8(hFFBD) = A;
-  setLinkTimerTo180_hook(gb);
+  TAIL(setLinkTimerTo180);
 }
 
 void setLinkTimerTo180_hook(GB *gb) {
@@ -618,7 +618,7 @@ void prepareForNextPacket_hook(GB *gb) {
   CYC(b_+0, b_+2); A = H8(hSerialLinkState);
   CYC(b_+2, b_+3); A = alu_inc8(gb, A);
   CYC(b_+3, b_+5); H8(hSerialLinkState) = A;
-  func_426e_hook(gb);
+  TAIL(func_426e);
 }
 
 void func_426e_hook(GB *gb) {
@@ -631,7 +631,7 @@ void func_426e_hook(GB *gb) {
   CYC(b_+12, b_+13); A = alu_inc8(gb, A);
   CYC(b_+13, b_+16); W8(w4WaitingForNextByte) = A;
   CYC(b_+16, b_+18);
-  setLinkTimerTo180_hook(gb);
+  TAIL(setLinkTimerTo180);
 }
 
 void waitForNextPacket_hook(GB *gb) {
@@ -650,7 +650,7 @@ void waitForNextPacket_hook(GB *gb) {
   CYC(b_+14, b_+15); A = alu_dec8(gb, A);
   CYC(b_+15, b_+17); H8(hSerialLinkState) = A;
   CYC(b_+17, b_+19);
-  func_426e_hook(gb);
+  TAIL(func_426e);
 }
 
 void func_4293_hook(GB *gb) {
@@ -663,7 +663,7 @@ void func_4293_hook(GB *gb) {
   CYC(b_+12, b_+14); B = 0x07;
   CALL_C(b_+14, copyMemoryReverse_hook, SYM(copyMemoryReverse), b_+17);
   CYC(b_+17, b_+20);
-  sendAckPacket_hook(gb);
+  TAIL(sendAckPacket);
 }
 
 void receiveLinkState0b_hook(GB *gb) {
@@ -805,7 +805,7 @@ void gameLinkState12_hook(GB *gb) {
   BASE(gameLinkState12);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, prepareForNextPacket_hook, SYM(prepareForNextPacket), SYM(func_4350));
-  func_4350_hook(gb);
+  TAIL(func_4350);
 }
 
 void func_4350_hook(GB *gb) {
@@ -956,7 +956,7 @@ void sendAckPacket_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(w4LinkRetryCounter) = A;
   CYC(b_+4, b_+7); SET_HL(ackPacket_bank16);
-  setPacketBuffer_hook(gb);
+  TAIL(setPacketBuffer);
 }
 
 void setPacketBuffer_hook(GB *gb) {
@@ -1182,13 +1182,13 @@ packet_complete:
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+18); SET_AF(pop_effect(gb));
   CYC(b_+18, b_+21);
-  disableSerialPort_hook(gb);
+  TAIL(disableSerialPort);
 }
 
 void compareFileHeader_hook(GB *gb) {
   BASE(compareFileHeader);
   CYC(b_+0, b_+3); SET_DE(w4RingFortuneStuff);
-  compareFileIDsAndNames_hook(gb);
+  TAIL(compareFileIDsAndNames);
 }
 
 void compareFileIDsAndNames_hook(GB *gb) {

@@ -706,7 +706,7 @@ substate0:
     CYCT(b_+13, b_+14); ret_effect(gb); return;
   }
   CYC(b_+13, b_+14);
-  setCounter1To120AndPlaySoundEffectAndIncSubstate_hook(gb);
+  TAIL(setCounter1To120AndPlaySoundEffectAndIncSubstate);
 }
 
 // Used in cutscenes where people get restored from stone?
@@ -1250,7 +1250,7 @@ void boyUpdateGravityAndHopWhenLanded_hook(GB *gb) {
     CYCT(b_+5, b_+6); ret_effect(gb); return;
   }
   CYC(b_+5, b_+6);
-  boyStartHop_hook(gb);
+  TAIL(boyStartHop);
 }
 
 void boyStartHop_hook(GB *gb) {

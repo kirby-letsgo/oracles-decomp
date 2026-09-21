@@ -34,7 +34,7 @@ def main():
             if n and verdict.get(n) == 'SAME_SHAPE': verdict[n] = 'IDENTICAL'
 
     # C call graph: function name -> callees, per file (static helpers are file-local)
-    callees, burns, local_calls = {}, {}, {}
+    callees, burns, local_calls, tails = {}, {}, {}, {}
     EXEC = re.compile(r'\b(?:CYCT?[0-9a-f]*|burn_rom|RET|RET_TAKEN|RETI|I|push_effect|BASE)\(([^;]*)')
     for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) == 'syms.c': continue
@@ -42,7 +42,7 @@ def main():
         for line in open(path, errors='replace'):
             m = FUNC.match(line)
             if m:
-                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); local_calls[cur] = set()
+                cur = (path, m.group(1)); callees[cur] = set(); burns[cur] = set(); local_calls[cur] = set(); tails[cur] = set()
                 line = line[m.end():]
             elif line.startswith('}'): cur = None; continue
             if cur is None: continue
@@ -53,6 +53,8 @@ def main():
             for c in CALL.findall(code):
                 if c.endswith('_hook') and c[:-5] in guarded: continue
                 callees[cur].add(c)
+            # a TAIL target need not be identical (the interpreter runs it) but must exist in Seasons
+            for lab in re.findall(r'\bTAIL\((\w+)\)', code): tails[cur].add(lab)
             # CALL_L runs the call target's C unconditionally: that target's body must match too
             for off, lab, loff in re.findall(r'\bCALL_L(?:_CC)?\((?:b_\+(\d+)|\(SYM\((\w+)\) \+ (\d+)\)), \w+,', code):
                 local_calls[cur].add((lab or None, int(off or loff)))
@@ -77,18 +79,36 @@ def main():
         return None
 
     seasons_names = set(rom_labels(seasons_sym))
-    unpairable = re.compile(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)')
-
-    def label_verdict(sid):
-        name = re.sub(r'_b[0-9a-f]{2}$', '', sid).replace('__', '@')
-        if unpairable.match(name) or name not in seasons_names: return 'AGES_ONLY'
-        return verdict.get(name.split('@')[0])
-
     from symfiles import pair_instances
     from routine_equiv import Game
     pairs = pair_instances(ages_rom, ages_sym, seasons_rom, seasons_sym)
     A, S = Game(ages_rom, ages_sym), Game(seasons_rom, seasons_sym)
     ages_labels = rom_labels(ages_sym)
+    unpairable = re.compile(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)')
+
+    local_cache = {}
+
+    def local_verdict(name):
+        """A @local that routine_equiv did not rate on its own (reached by `call`, so not part of
+        its parent's flow-followed body): compare its body directly."""
+        if name in local_cache: return local_cache[name]
+        v = 'IDENTICAL'
+        for a in ages_labels.get(name, []):
+            s_ = pairs.get((name,) + a)
+            if s_ is None: v = 'AGES_ONLY'; break
+            try:
+                if A.normalized(a[0], a[1])[0] != S.normalized(s_[0], s_[1])[0]: v = 'DIFFERENT'; break
+            except Exception: v = 'DIFFERENT'; break
+        local_cache[name] = v
+        return v
+
+    def label_verdict(sid):
+        name = re.sub(r'_b[0-9a-f]{2}$', '', sid).replace('__', '@')
+        if unpairable.match(name) or name not in seasons_names: return 'AGES_ONLY'
+        if name in verdict: return verdict[name]
+        if '@' in name and name in ages_labels: return local_verdict(name)
+        return verdict.get(name.split('@')[0])
+
 
     def local_call_ok(base, off):
         """The bodies at the call target of the `call` at base+off are identical in both games."""
@@ -110,6 +130,8 @@ def main():
         for lab in burns[key]:
             v = label_verdict(lab)
             if v is not None and v != 'IDENTICAL': ok = False
+        for lab in tails[key]:
+            if label_verdict(lab) == 'AGES_ONLY': ok = False
         base_labels = [l for l in burns[key] if l in ages_labels]
         for lab, off in local_calls[key]:
             base = lab or (base_labels[0] if len(base_labels) == 1 else None)

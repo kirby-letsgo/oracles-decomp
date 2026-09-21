@@ -112,7 +112,7 @@ void interactionCoded4__state1_hook(GB *gb) {
   CYC(b_+47, b_+48); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+48, b_+50); interactionCoded4__seagull_hook(gb); return; }
   CYC(b_+48, b_+50);
-  interactionCoded4__ship_hook(gb);
+  TAIL(interactionCoded4__ship);
 }
 
 void interactionCoded4_hook(GB *gb) {

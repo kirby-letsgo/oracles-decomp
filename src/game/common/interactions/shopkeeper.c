@@ -131,7 +131,7 @@ L_4124:
   CYC(b_+51, b_+54); SET_HL((SYM(interactionCode50__state0__substate0) + 5));
   if (!(F & FZ)) { CYCT(b_+54, b_+56); shopkeeperLoadScript_hook(gb); return; } CYC(b_+54, b_+56);
   CYC(b_+56, b_+59); SET_HL((SYM(interactionCode50__state0__substate0) + 8));
-  shopkeeperLoadScript_hook(gb);
+  TAIL(shopkeeperLoadScript);
 }
 
 void shopkeeperLoadScript_hook(GB *gb) {
@@ -198,7 +198,7 @@ L_4185:
   CYC(b_+67, b_+69); L = 0x44;
   CYC(b_+69, b_+70); mem_wr(gb, HL, C);
   CALL_C(b_+70, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), SYM(shopkeeperGotoState1));
-  shopkeeperGotoState1_hook(gb);
+  TAIL(shopkeeperGotoState1);
 }
 
 void shopkeeperGotoState1_hook(GB *gb) {
@@ -321,7 +321,7 @@ L_4246:
   CYC(b_+156, b_+158); E = 0x45;
   CYC(b_+158, b_+159); alu_xor(gb, A);
   CYC(b_+159, b_+160); mem_wr(gb, DE, A);
-  shopkeeperGetItemPrice_hook(gb);
+  TAIL(shopkeeperGetItemPrice);
 }
 
 void shopkeeperGetItemPrice_hook(GB *gb) {

@@ -223,7 +223,7 @@ void blueStalfosProjectile_subid1_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+4, b_+6); blueStalfosProjectile_subid1_uninitialized_hook(gb); return; } // jr z
   CYC(b_+4, b_+6);
-  blueStalfosProjectile_applySpeedAndDeleteIfOffScreen_hook(gb);
+  TAIL(blueStalfosProjectile_applySpeedAndDeleteIfOffScreen);
 }
 
 void blueStalfosProjectile_applySpeedAndDeleteIfOffScreen_hook(GB *gb) {
@@ -232,7 +232,7 @@ void blueStalfosProjectile_applySpeedAndDeleteIfOffScreen_hook(GB *gb) {
   CALL_C(b_+0, partCommon_checkOutOfBounds_hook, SYM(partCommon_checkOutOfBounds), b_+3);
   if (F & FZ) { CYCT(b_+3, b_+6); partDelete_hook(gb); return; } // jp z
   CYC(b_+3, b_+6);
-  blueStalfosProjectile_applySpeed_hook(gb);
+  TAIL(blueStalfosProjectile_applySpeed);
 }
 
 void blueStalfosProjectile_applySpeed_hook(GB *gb) {

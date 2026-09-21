@@ -23,6 +23,11 @@ pairs = pair_instances(sys.argv[3] if len(sys.argv) > 3 else "roms/Legend of Zel
                        sys.argv[4] if len(sys.argv) > 4 else "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", seasons_sym)
 for line in open('src/hooks/syms_used.txt'):
     sid, name, ba = line.split()
+    if ba == '-':      # a Seasons-only label (TAIL_GV targets): poison in Ages
+        s = seasons.get(name, [None])[0]
+        if s is None: missing.append(sid)
+        rows.append((sid, POISON, POISON if s is None else (s[0] << 16) | s[1]))
+        continue
     bank, addr = int(ba[:2], 16), int(ba[3:], 16)
     parent = name.split('@')[0]
     s = None if re.match(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)', parent) else pairs.get((name, bank, addr))

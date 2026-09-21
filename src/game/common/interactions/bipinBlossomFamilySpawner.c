@@ -105,7 +105,7 @@ void initializeChildOnGameStart_hook(GB *gb) {
   CYC(b_+8, b_+10); L = GV(0xe0, 0xda);
   CYC(b_+10, b_+11); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+11, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  decideInitialChildPersonality_hook(gb);
+  TAIL(decideInitialChildPersonality);
 }
 
 void childSetVar38ToNumEssencesObtained_hook(GB *gb) {

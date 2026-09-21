@@ -357,7 +357,7 @@ void realignUnappraisedRings_hook(GB *gb) {
     CYCT(b_+20, b_+22);
   }
   CYC(b_+22, b_+24);
-  getNumUnappraisedRings_hook(gb);
+  TAIL(getNumUnappraisedRings);
 }
 
 void realignUnappraisedRings__findNextFilledSlot_hook(GB *gb) {
@@ -669,7 +669,7 @@ void giveTreasure_body__mode6_hook(GB *gb) {
   BASE(giveTreasure_body);
   CYC(b_+182, b_+185); A = W8(wDungeonIndex);
   CYC(b_+185, b_+186); C = A;
-  giveTreasure_body__mode1_hook(gb);
+  TAIL(giveTreasure_body__mode1);
 }
 
 void giveTreasure_body__mode2_hook(GB *gb) {
@@ -698,7 +698,7 @@ void giveTreasure_body__mode4_hook(GB *gb) {
 void giveTreasure_body__mode3_hook(GB *gb) {
   BASE(giveTreasure_body);
   CYC(b_+196, b_+198); C = 0x01;
-  giveTreasure_body__mode4_hook(gb);
+  TAIL(giveTreasure_body__mode4);
 }
 
 void giveTreasure_body__mode7_hook(GB *gb) {

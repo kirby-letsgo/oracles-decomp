@@ -246,7 +246,7 @@ void itemMakeInteractionForBreakableTile_hook(GB *gb) {
   CYC(b_+8, b_+10); H8(hFF91) = A;
   CYC(b_+10, b_+12); L = 0x03;
   CYC(b_+12, b_+13); A = mem_rd(gb, HL);
-  makeInteractionForBreakableTile_hook(gb);
+  TAIL(makeInteractionForBreakableTile);
 }
 
 void makeInteractionForBreakableTile_hook(GB *gb) {

@@ -117,7 +117,7 @@ void interaction21_subid01_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDeleteAndRetIfItemFlagSet_hook, SYM(interactionDeleteAndRetIfItemFlagSet), b_+3);
   CYC(b_+3, b_+6); SET_HL(subid01_tileData_bank08);
-  verifyTilesAndDropSmallKey_hook(gb);
+  TAIL(verifyTilesAndDropSmallKey);
 }
 
 void verifyTilesAndDropSmallKey_hook(GB *gb) {
@@ -284,7 +284,7 @@ void interaction21_subid07_hook(GB *gb) {
     CYCT(b_+19, b_+21); TAIL(unsetSwitch);
   }
   CYC(b_+19, b_+21);
-  setSwitch_hook(gb);
+  TAIL(setSwitch);
 }
 
 void setSwitch_hook(GB *gb) {
@@ -593,7 +593,7 @@ void interaction21_subid11_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  spawnChestAndDeleteSelf_hook(gb);
+  TAIL(spawnChestAndDeleteSelf);
 }
 
 void spawnChestAndDeleteSelf_hook(GB *gb) {
@@ -737,7 +737,7 @@ state0:
 void setTileToStandardFloor_hook(GB *gb) {
   BASE(setTileToStandardFloor);
   CYC(b_+0, b_+2); A = 0xa0; // TILEINDEX_STANDARD_FLOOR
-  setTileWithPuff_hook(gb);
+  TAIL(setTileWithPuff);
 }
 
 // Falls through into createPuffAt.
@@ -745,7 +745,7 @@ void setTileWithPuff_hook(GB *gb) {
   BASE(setTileWithPuff);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, setTile_hook, SYM(setTile), SYM(createPuffAt));
-  createPuffAt_hook(gb);
+  TAIL(createPuffAt);
 }
 
 // @param c Position to create puff at

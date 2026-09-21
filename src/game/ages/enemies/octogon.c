@@ -590,7 +590,7 @@ void octogon_subid0AboveWater_stateB_hook(GB *gb) {
 }
 
 void octogon_subid0AboveWater_stateF_hook(GB *gb) {
-  octogon_subid0AboveWater_stateB_hook(gb);
+  TAIL(octogon_subid0AboveWater_stateB);
 }
 
 // Turning around?

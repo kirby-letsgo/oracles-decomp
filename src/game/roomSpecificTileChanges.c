@@ -143,7 +143,7 @@ void tileReplacement_group4Map1b_hook(GB *gb) {
   CYC(b_+11, b_+12); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+12, b_+13); L = alu_inc8(gb, L);
   CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  tileReplacement_group2Map7e_hook(gb);
+  TAIL(tileReplacement_group2Map7e);
 }
 
 void tileReplacement_group2Map7e_hook(GB *gb) {
@@ -1073,13 +1073,13 @@ void tileReplacement_group5Mapc2_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+9); SET_HL(wRoomLayout + 0x56);
   CYC(b_+9, b_+11); A = 0x6d;
-  set4Bytes_hook(gb);
+  TAIL(set4Bytes);
 }
 
 void set4Bytes_hook(GB *gb) {
   BASE(set4Bytes);
   CYC(b_+0, b_+1); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  set3Bytes_hook(gb);
+  TAIL(set3Bytes);
 }
 
 void set3Bytes_hook(GB *gb) {
@@ -1175,7 +1175,7 @@ void tileReplacement_group0Mape0_hook(GB *gb) {
     CYC(b_+7, b_+10);
   }
   CYC(b_+10, b_+12); C = 0x1b;
-  createInteraction90_hook(gb);
+  TAIL(createInteraction90);
 }
 
 void createInteraction90_hook(GB *gb) {
@@ -1229,7 +1229,7 @@ void tileReplacement_group0Mape2_hook(GB *gb) {
   }
   CYC(b_+10, b_+11);
   CYC(b_+11, b_+13); L = 0x54;
-  setTileToDoor_hook(gb);
+  TAIL(setTileToDoor);
 }
 
 void setTileToDoor_hook(GB *gb) {

@@ -126,7 +126,7 @@ void initializeFile_b07_hook(GB *gb) {
   CYC(b_+71, b_+74); SET_HL((SYM(enemyActiveCollisions) + 59));
   CYC(b_+74, b_+76); E = 0x04;
   CALL_C(b_+76, interBankCall_hook, 0x008a, SYM(saveFile_b07));
-  saveFile_b07_hook(gb);
+  TAIL(saveFile_b07);
 }
 
 void saveFile_b07_hook(GB *gb) {
@@ -153,7 +153,7 @@ void saveFile_b07_hook(GB *gb) {
   CYC(b_+38, b_+39); D = B;
   CALL_C(b_+39, copyFileFromHlToDe_hook, SYM(copyFileFromHlToDe), b_+42);
   CYC(b_+42, b_+44);
-  verifyFileCopies_hook(gb);
+  TAIL(verifyFileCopies);
 }
 
 void loadFile_b07_hook(GB *gb) {
@@ -184,7 +184,7 @@ void eraseFile_b07_hook(GB *gb) {
   CALL_C(b_+0, getFileAddress1_hook, SYM(getFileAddress1), b_+3);
   CALL_C(b_+3, eraseFile__clearFile_b07_hook, b_+9, b_+6);
   CALL_C(b_+6, getFileAddress2_hook, SYM(getFileAddress2), b_+9);
-  eraseFile__clearFile_b07_hook(gb);
+  TAIL(eraseFile__clearFile_b07);
 }
 
 void eraseFile__clearFile_b07_hook(GB *gb) {
@@ -204,7 +204,7 @@ void clearFileAtHl_hook(GB *gb) {
   BASE(clearFileAtHl);
   CYC(b_+0, b_+3); SET_BC(0x0550);
   CYC(b_+3, b_+6);
-  clearMemoryBc_hook(gb);
+  TAIL(clearMemoryBc);
 }
 
 static void verify_file_copies_both_valid(GB *gb) {

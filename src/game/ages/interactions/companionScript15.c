@@ -17,7 +17,7 @@ void companionScript_noticeLink_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+4, b_+6); companionScript_makeExclamationMark_hook(gb); return; }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+9); mem_wr(gb, w1Companion_var3f, A);
-  companionScript_makeExclamationMark_hook(gb);
+  TAIL(companionScript_makeExclamationMark);
 }
 
 void companionScript_makeExclamationMark_hook(GB *gb) {

@@ -240,7 +240,7 @@ void func_6b71_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0xff;
   CYC(b_+2, b_+5); mem_wr(gb, wTmpcfc0_genericCutscene_cfd5, A);
   CYC(b_+5, b_+6); alu_xor(gb, A);
-  func_6b77_hook(gb); // falls through
+  TAIL(func_6b77);// falls through
 }
 
 void func_6b77_hook(GB *gb) {
@@ -379,7 +379,7 @@ void func_6c17_hook(GB *gb) {
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+13); A = 0x5a; // SND_ERROR
   CALL_C(b_+13, playSound_b00_hook, SYM(playSound_b00), SYM(func_6c27));
-  func_6c27_hook(gb); // falls through
+  TAIL(func_6c27);// falls through
 }
 
 void func_6c27_hook(GB *gb) {

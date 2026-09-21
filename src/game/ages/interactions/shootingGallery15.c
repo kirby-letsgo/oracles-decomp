@@ -119,7 +119,7 @@ equipOnB:
   CYC(b_+20, b_+21); alu_xor(gb, A);
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
   CYC(b_+22, b_+24);
-  shootingGallery_changeEquips_hook(gb);
+  TAIL(shootingGallery_changeEquips);
 }
 
 void shootingGallery_equipBiggoronSword_hook(GB *gb) {
@@ -128,7 +128,7 @@ void shootingGallery_equipBiggoronSword_hook(GB *gb) {
   CYC(b_+3, b_+5); A = 0x0c;
   CYC(b_+5, b_+6); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+6, b_+7); mem_wr(gb, HL, A);
-  shootingGallery_changeEquips_hook(gb);
+  TAIL(shootingGallery_changeEquips);
 }
 
 void shootingGallery_changeEquips_hook(GB *gb) {
@@ -213,7 +213,7 @@ void shootingGallery_checkLinkHasRupees_hook(GB *gb) {
   BASE(shootingGallery_checkLinkHasRupees);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, cpRupeeValue_hook, SYM(cpRupeeValue), SYM(writeFlagsTocddb));
-  writeFlagsTocddb_hook(gb);
+  TAIL(writeFlagsTocddb);
 }
 
 void writeFlagsTocddb_hook(GB *gb) {
@@ -274,7 +274,7 @@ void shootingGallery_giveRandomRingToLink_hook(GB *gb) {
   CYC(b_+8, b_+9); shootingGallery_addAToHl_from_rst(gb, b_+9);
   CYC(b_+9, b_+10); A = mem_rd(gb, HL);
   CYC(b_+10, b_+12);
-  giveRingAToLink_hook(gb);
+  TAIL(giveRingAToLink);
 }
 
 void forceLinkDirection_hook(GB *gb) {
@@ -320,7 +320,7 @@ void setLinkToState08AndSetDirection_hook(GB *gb) {
   BASE(setLinkToState08AndSetDirection);
   CYC(b_+0, b_+3); SET_HL(w1Link_direction);
   CYC(b_+3, b_+4); mem_wr(gb, HL, A);
-  setLinkToState08_hook(gb);
+  TAIL(setLinkToState08);
 }
 
 void setLinkToState08_hook(GB *gb) {

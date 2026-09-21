@@ -399,7 +399,7 @@ void agesFunc_10_70f6__substate5_hook(GB *gb) {
   CALL_C(b_+255, incCbc2_hook, SYM(incCbc2), b_+258);
   CYC(b_+258, b_+260); A = 0xf0;
   CYC(b_+260, b_+263); mem_wr(gb, wTmpcbb3, A);
-  agesFunc_10_70f6__func_71fd_hook(gb);
+  TAIL(agesFunc_10_70f6__func_71fd);
 }
 
 void agesFunc_10_70f6__substate7_hook(GB *gb) {
@@ -417,7 +417,7 @@ void agesFunc_10_70f6__substate7_hook(GB *gb) {
   CALL_C(b_+359, incCbc2_hook, SYM(incCbc2), b_+362);
   CYC(b_+362, b_+364);
   CYC(b_+390, b_+393);
-  agesFunc_10_70f6__func_71fd_hook(gb);
+  TAIL(agesFunc_10_70f6__func_71fd);
 }
 
 void agesFunc_10_70f6__substate8_hook(GB *gb) {
@@ -450,7 +450,7 @@ void agesFunc_10_7298__substate1_hook(GB *gb) {
   }
   CYC(b_+127, b_+128);
   CALL_C(b_+128, incCbc2_hook, SYM(incCbc2), b_+131);
-  agesFunc_10_7298__func_731b_hook(gb);
+  TAIL(agesFunc_10_7298__func_731b);
 }
 
 void agesFunc_10_7298__substate2_hook(GB *gb) {
@@ -464,7 +464,7 @@ void agesFunc_10_7298__substate2_hook(GB *gb) {
   }
   CYC(b_+175, b_+176);
   CALL_C(b_+176, incCbc2_hook, SYM(incCbc2), b_+179);
-  agesFunc_10_7298__substate3_hook(gb);
+  TAIL(agesFunc_10_7298__substate3);
 }
 
 void agesFunc_10_7298__substate3_hook(GB *gb) {

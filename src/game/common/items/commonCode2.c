@@ -40,7 +40,7 @@ void tryBreakTileWithExpertsRing_hook(GB *gb) {
   CYC(b_+4, b_+5); C = A;
   CYC(b_+5, b_+7); A = 0x03;
   CYC(b_+7, b_+9);
-  tryBreakTileWithSword_hook(gb);
+  TAIL(tryBreakTileWithSword);
 }
 
 void tryBreakTileWithSword_calculateLevel_hook(GB *gb) {
@@ -54,7 +54,7 @@ void tryBreakTileWithSword_calculateLevel_hook(GB *gb) {
   }
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+10); A = 0x02;
-  tryBreakTileWithSword_hook(gb);
+  TAIL(tryBreakTileWithSword);
 }
 
 void tryBreakTileWithSword_hook(GB *gb) {

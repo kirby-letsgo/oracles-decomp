@@ -75,7 +75,7 @@ void scriptCmd_stopIfItemFlagSet_hook(GB *gb) {
   BASE(scriptCmd_stopIfItemFlagSet);
   CYC(b_+0, b_+2); B = 0x20;
   CYC(b_+2, b_+4);
-  scriptFunc_checkRoomFlag_hook(gb);
+  TAIL(scriptFunc_checkRoomFlag);
 }
 
 // 0c:4109
@@ -83,14 +83,14 @@ void scriptCmd_stopIfRoomFlag40Set_hook(GB *gb) {
   BASE(scriptCmd_stopIfRoomFlag40Set);
   CYC(b_+0, b_+2); B = 0x40;
   CYC(b_+2, b_+4);
-  scriptFunc_checkRoomFlag_hook(gb);
+  TAIL(scriptFunc_checkRoomFlag);
 }
 
 // 0c:410d
 void scriptCmd_stopIfRoomFlag80Set_hook(GB *gb) {
   BASE(scriptCmd_stopIfRoomFlag80Set);
   CYC(b_+0, b_+2); B = 0x80;
-  scriptFunc_checkRoomFlag_hook(gb);
+  TAIL(scriptFunc_checkRoomFlag);
 }
 
 // 0c:410f
@@ -170,7 +170,7 @@ void scriptCmd_disableInput_hook(GB *gb) {
   BASE(scriptCmd_disableInput);
   CYC(b_+0, b_+2); A = 0x81;
   CYC(b_+2, b_+5); W8(wDisabledObjects) = A;
-  scriptCmd_disableMenu_hook(gb);
+  TAIL(scriptCmd_disableMenu);
 }
 
 void scriptCmd_disableMenu_hook(GB *gb) {
@@ -181,7 +181,7 @@ void scriptCmd_disableMenu_hook(GB *gb) {
   CALL_C(b_+5, clearAllParentItems_hook, SYM(clearAllParentItems), b_+8);
   CALL_C(b_+8, dropLinkHeldItem_hook, SYM(dropLinkHeldItem), b_+11);
   CALL_C(b_+11, func_0c_4177_hook, SYM(func_0c_4177), SYM(scriptFunc_popHlAndInc));
-  scriptFunc_popHlAndInc_hook(gb);
+  TAIL(scriptFunc_popHlAndInc);
 }
 
 void scriptFunc_popHlAndInc_hook(GB *gb) {
@@ -196,7 +196,7 @@ void scriptCmd_enableInput_hook(GB *gb) {
   BASE(scriptCmd_enableInput);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); W8(wDisabledObjects) = A;
-  scriptCmd_enableMenu_hook(gb);
+  TAIL(scriptCmd_enableMenu);
 }
 
 void scriptCmd_enableMenu_hook(GB *gb) {
@@ -209,7 +209,7 @@ void scriptCmd_enableMenu_hook(GB *gb) {
 void scriptCmd_setLinkCantMoveTo91_hook(GB *gb) {
   BASE(scriptCmd_setLinkCantMoveTo91);
   CYC(b_+0, b_+2); A = 0x91;
-  scriptFunc_setLinkCantMove_hook(gb);
+  TAIL(scriptFunc_setLinkCantMove);
 }
 
 void scriptFunc_setLinkCantMove_hook(GB *gb) {
@@ -250,7 +250,7 @@ void scriptCmd_setState_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+4); E = 0x44;
-  scriptFunc_setState_hook(gb);
+  TAIL(scriptFunc_setState);
 }
 
 void scriptFunc_setState_hook(GB *gb) {
@@ -333,7 +333,7 @@ void scriptCmd_spawnInteraction_hook(GB *gb) {
   CYC(b_+9, b_+11);
   CYC(b_+11, b_+13); A = 0x4b;
   CALL_C(b_+13, scriptFunc_initializeObject_hook, SYM(scriptFunc_initializeObject), SYM(scriptFunc_restoreActiveObject));
-  scriptFunc_restoreActiveObject_hook(gb);
+  TAIL(scriptFunc_restoreActiveObject);
 }
 
 void scriptFunc_restoreActiveObject_hook(GB *gb) {
@@ -413,7 +413,7 @@ void scriptCmd_spawnEnemyHere_hook(GB *gb) {
   CYC(b_+21, b_+23); A = 0x8b;
   CALL_C(b_+23, scriptFunc_initializeObject_hook, SYM(scriptFunc_initializeObject), b_+26);
   CYC(b_+26, b_+28);
-  scriptFunc_restoreActiveObject_hook(gb);
+  TAIL(scriptFunc_restoreActiveObject);
 }
 
 // 0c:4210
@@ -721,7 +721,7 @@ void scriptCmd_setCounter1_hook(GB *gb) {
   CYC(b_+0, b_+1); SET_HL(pop_effect(gb));
   CYC(b_+1, b_+2); SET_HL(HL + 1);
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  scriptFunc_4310_hook(gb);
+  TAIL(scriptFunc_4310);
 }
 
 void scriptFunc_4310_hook(GB *gb) {

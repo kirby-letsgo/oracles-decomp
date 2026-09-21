@@ -24,7 +24,7 @@ void checkInitUnderwaterWaves_hook(GB *gb) {
   CYC(b_+13, b_+15); mem_wr(gb, hNextLcdInterruptBehaviour, A);
   CYC(b_+15, b_+17); A = 0x02;
   CALL_C(b_+17, initWaveScrollValues_hook, SYM(initWaveScrollValues), SYM(checkUpdateUnderwaterWaves));
-  checkUpdateUnderwaterWaves_hook(gb);
+  TAIL(checkUpdateUnderwaterWaves);
 }
 
 void checkUpdateUnderwaterWaves_hook(GB *gb) {

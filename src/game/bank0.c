@@ -1916,7 +1916,7 @@ void objectUpdateSpeedZ_sidescroll_hook(GB *gb) {
   BASE(objectUpdateSpeedZ_sidescroll);
   B = 0x06;
   CYC(b_+0, b_+2);
-  objectUpdateSpeedZ_sidescroll_givenYOffset_hook(gb);
+  TAIL(objectUpdateSpeedZ_sidescroll_givenYOffset);
 }
 
 void objectSetSpeedZ_hook(GB *gb) {
@@ -5786,7 +5786,7 @@ void initializeDungeonStuff_hook(GB *gb) {
   CYC(b_+4, b_+7); W8(wSwitchState) = A;
   CYC(b_+7, b_+10); W8(wSpinnerState) = A;
   CYC(b_+10, b_+13);
-  loadStaticObjects_hook(gb);
+  TAIL(loadStaticObjects);
 }
 
 void clearStaticObjects_hook(GB *gb) {
@@ -7853,7 +7853,7 @@ static void next_animation_frame(GB *gb, uint16_t o, uint8_t counter, uint8_t id
   } else {
     alu_or(gb, 0x40);
     CYC((SYM(_partNextAnimationFrame) + 45), (SYM(_partNextAnimationFrame) + 50)); mem_wr(gb, DE, A);
-    A = 0x11;
+    A = GV(0x11, 0x10);
     CYC((SYM(_partNextAnimationFrame) + 50), (SYM(_partNextAnimationFrame) + 54)); H8(hRomBank) = A;
     CYC((SYM(_partNextAnimationFrame) + 54), (SYM(_partNextAnimationFrame) + 57)); mem_wr(gb, MBC_ROM_BANK, A);
     CYC((SYM(_partNextAnimationFrame) + 57), (SYM(_partNextAnimationFrame) + 58));
@@ -8573,14 +8573,14 @@ void showText_hook(GB *gb) {
   BASE(showText);
   L = 0x00;
   CYC(b_+0, b_+2);
-  _label_00_203_hook(gb);
+  TAIL(_label_00_203);
 }
 
 void showTextNonExitable_hook(GB *gb) {
   BASE(showTextNonExitable);
   L = 0x02;
   CYCT(b_+0, b_+4);
-  _label_00_203_hook(gb);
+  TAIL(_label_00_203);
 }
 
 void showTextOnInventoryMenu_hook(GB *gb) {
@@ -8591,7 +8591,7 @@ void showTextOnInventoryMenu_hook(GB *gb) {
   L = 0x00;
   E = 0x02;
   CYCT(b_+8, b_+14);
-  _label_00_204_hook(gb);
+  TAIL(_label_00_204);
 }
 
 void clearAllItemsAndPutLinkOnGround_hook(GB *gb) {
@@ -9167,7 +9167,7 @@ void objectCreateFloatingSnore_hook(GB *gb) {
   A = 0x00;
   CYC((SYM(objectCreateFloatingSnore) + 2), (SYM(objectCreateFloatingSnore) + 6));
   CYC(b_+4, b_+6); H8(hFF8D) = A;
-  bank_push(gb, b_+6, 0x0b);
+  bank_push(gb, b_+6, GV(0x0b, 0x0a));
   CALL_ROM(b_+16, ROM_b0b_objectCreateFloatingImage);
   bank_pop(gb, b_+19);
   CYC(b_+25, b_+26);
@@ -9191,7 +9191,7 @@ void setGlobalFlag_hook(GB *gb) {
 }
 
 static void bank12_table_pointer(GB *gb, uint16_t a, uint16_t table) {
-  bank_push(gb, a, 0x12);
+  bank_push(gb, a, GV(0x12, 0x11));
   A = B;
   SET_HL(table);
   CYC(a + 10, a + 15);
@@ -11771,7 +11771,7 @@ void linkState07__substate0_hook(GB *gb) {
   CYC(b_+25, b_+28); W8(wLinkInAir) = A;
   CYC(b_+28, b_+30); A = 0x03;
   CYC(b_+30, b_+33);
-  specialObjectSetAnimation_hook(gb);
+  TAIL(specialObjectSetAnimation);
 }
 
 void linkState07__substate2_hook(GB *gb) {
@@ -11786,7 +11786,7 @@ void linkState07__substate2_hook(GB *gb) {
   CYC(b_+47, b_+48); mem_wr(gb, DE, A);
   CYC(b_+48, b_+50); A = 0x0a;
   CYC(b_+50, b_+53);
-  linkSetState_hook(gb);
+  TAIL(linkSetState);
 }
 
 void linkState07_hook(GB *gb) {
@@ -12824,7 +12824,7 @@ void restartThisThread_hook(GB *gb) {
   copy_initial_thread_state(gb, b_+17);
   set_thread_restart_address(gb, b_+23);
   CYCT(b_+29, b_+31);
-  _nextThread_hook(gb);
+  TAIL(_nextThread);
 }
 
 void stubThreadStart_hook(GB *gb) {
@@ -12835,7 +12835,7 @@ void stubThreadStart_hook(GB *gb) {
   CYC(b_+0, b_+5);
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x00);
   CYCT(b_+7, b_+9);
-  _nextThread_hook(gb);
+  TAIL(_nextThread);
 }
 
 void resumeThreadNextFrameAndSaveBank_hook(GB *gb) {
@@ -12863,7 +12863,7 @@ void resumeThreadNextFrame_hook(GB *gb) {
   BASE(resumeThreadNextFrame);
   A = 0x01;
   CYC(b_+0, b_+2);
-  resumeThreadInAFrames_hook(gb);
+  TAIL(resumeThreadInAFrames);
 }
 
 void resumeThreadInAFrames_hook(GB *gb) {
@@ -12889,7 +12889,7 @@ void resumeThreadInAFrames_hook(GB *gb) {
   CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+20, b_+22); A = mem_rd(gb, hFF93);
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
-  _nextThread_hook(gb);
+  TAIL(_nextThread);
 }
 
 void writeToSC_hook(GB *gb) {
@@ -12968,7 +12968,7 @@ void serialFunc_0c73_hook(GB *gb) {
   A = 0x81;
   CYC(b_+7, b_+9);
   CYCT(b_+9, b_+11);
-  writeToSC_hook(gb);
+  TAIL(writeToSC);
 }
 
 void disableSerialPort_hook(GB *gb) {
@@ -12978,7 +12978,7 @@ void disableSerialPort_hook(GB *gb) {
   CYC(b_+1, b_+3); H8(hSerialInterruptBehaviour) = A;
   CYC(b_+3, b_+5); mem_wr(gb, IO_SB, A);
   CYCT(b_+5, b_+7);
-  writeToSC_hook(gb);
+  TAIL(writeToSC);
 }
 
 void serialFunc_0c85_hook(GB *gb) {
@@ -13092,14 +13092,14 @@ void vblankVector_hook(GB *gb) {
   CYC(0x0042, 0x0043); push_effect(gb, DE);
   CYC(0x0043, 0x0044); push_effect(gb, HL);
   CYC(0x0044, 0x0047);
-  vblankInterrupt_hook(gb);
+  TAIL(vblankInterrupt);
 }
 
 void lcdVector_hook(GB *gb) {
   CYC(0x0048, 0x0049); push_effect(gb, AF);
   CYC(0x0049, 0x004a); push_effect(gb, HL);
   CYC(0x004a, 0x004d);
-  lcdInterrupt_hook(gb);
+  TAIL(lcdInterrupt);
 }
 
 void timerVector_hook(GB *gb) {
@@ -13110,13 +13110,13 @@ void timerVector_hook(GB *gb) {
   CYC(0x0053, 0x0054); push_effect(gb, DE);
   CYC(0x0054, 0x0055); push_effect(gb, HL);
   CYC(0x0055, 0x0058);
-  timerInterrupt_hook(gb);
+  TAIL(timerInterrupt);
 }
 
 void serialVector_hook(GB *gb) {
   CYC(0x0058, 0x0059); push_effect(gb, AF);
   CYC(0x0059, 0x005c);
-  serialInterrupt_hook(gb);
+  TAIL(serialInterrupt);
 }
 
 void vblankFunctionRet_hook(GB *gb);
@@ -13195,7 +13195,7 @@ void vblankRunBank4Function_hook(GB *gb) {
   CYC(b_+0, b_+2);
   CYC(b_+2, b_+5); mem_wr(gb, MBC_ROM_BANK, A);
   CYC(b_+5, b_+8);
-  vblankRunBank4Function_b04_hook(gb);
+  TAIL(vblankRunBank4Function_b04);
 }
 
 void vblankFunction0aa8_hook(GB *gb) {
@@ -13284,7 +13284,7 @@ void vblankDmaFunction_hook(GB *gb) {
   CYC(b_+22, b_+23); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+23, b_+25); mem_wr(gb, IO_HDMA5, A);
   CYC(b_+25, b_+28);
-  vblankFunctionRet_hook(gb);
+  TAIL(vblankFunctionRet);
 }
 
 void vblankInterrupt_hook(GB *gb) {
@@ -13385,7 +13385,7 @@ void lcdInterrupt_clearLYC_hook(GB *gb) {
   A = 0xc7;
   CYC(b_+0, b_+2); mem_wr(gb, IO_LYC, A);
   CYC(b_+2, b_+4);
-  _lcdInterruptEnd_hook(gb);
+  TAIL(_lcdInterruptEnd);
 }
 
 void lcdInterrupt_clearWXY_hook(GB *gb) {
@@ -13394,7 +13394,7 @@ void lcdInterrupt_clearWXY_hook(GB *gb) {
   CYC(b_+0, b_+2); mem_wr(gb, IO_WY, A);
   CYC(b_+2, b_+4); mem_wr(gb, IO_WX, A);
   CYC(b_+4, b_+6);
-  lcdInterrupt_clearLYC_hook(gb);
+  TAIL(lcdInterrupt_clearLYC);
 }
 
 void lcdInterrupt_setLcdcToA7_hook(GB *gb) {
@@ -13410,7 +13410,7 @@ void lcdInterrupt_setLcdcToA7_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); mem_wr(gb, IO_LCDC, A);
   CYCT(b_+9, b_+11);
-  lcdInterrupt_clearLYC_hook(gb);
+  TAIL(lcdInterrupt_clearLYC);
 }
 
 void lcdInterrupt_ringMenu_hook(GB *gb) {
@@ -13454,7 +13454,7 @@ void lcdInterrupt_ringMenu_hook(GB *gb) {
   CYC(b_+32, b_+34);
   CYC(b_+34, b_+36); mem_wr(gb, IO_SCY, A);
   CYCT(b_+36, b_+38);
-  lcdInterrupt_clearWXY_hook(gb);
+  TAIL(lcdInterrupt_clearWXY);
 }
 
 void lcdInterrupt_0bea_hook(GB *gb) {
@@ -13478,7 +13478,7 @@ void lcdInterrupt_0bea_hook(GB *gb) {
   CYC(b_+14, b_+15);
   CYC(b_+15, b_+17); mem_wr(gb, IO_SCX, A);
   CYCT(b_+17, b_+19);
-  lcdInterrupt_clearLYC_hook(gb);
+  TAIL(lcdInterrupt_clearLYC);
 }
 
 static void lcd_interrupt_not_status_bar(GB *gb) {
@@ -13575,7 +13575,7 @@ void lcdInterrupt_hook(GB *gb) {
   CYC(b_+74, b_+76);
   CYC(b_+76, b_+78); H8(hLcdInterruptCounter) = A;
   CYCT(b_+78, b_+80);
-  _lcdInterruptEnd_hook(gb);
+  TAIL(_lcdInterruptEnd);
 }
 
 void begin_hook(GB *gb) {
@@ -13606,7 +13606,7 @@ void begin_hook(GB *gb) {
   A = 0x0d;
   CYC(b_+21, b_+23);
   CYC(b_+23, b_+25); H8(hRng2) = A;
-  resetGame_hook(gb);
+  TAIL(resetGame);
 }
 
 void resetGame__afterSp016c_hook(GB *gb) {
@@ -13616,7 +13616,7 @@ void resetGame__afterSp016c_hook(GB *gb) {
   CYC(b_+5, b_+7); H8(hRomBank) = A;
   CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, A);
   CYCT(b_+10, b_+13);
-  init_hook(gb);
+  TAIL(init);
 }
 
 void resetGame_hook(GB *gb) {
@@ -13633,7 +13633,7 @@ void _nextThread__afterSp091a_hook(GB *gb) {
   CYC(b_+5, b_+7);
   CYC(b_+7, b_+9); mem_wr(gb, IO_SVBK, A);
   CYCT(b_+9, b_+11);
-  _mainLoop_nextThread_hook(gb);
+  TAIL(_mainLoop_nextThread);
 }
 
 void _nextThread_hook(GB *gb) {
@@ -13661,7 +13661,7 @@ void startGame__afterSp0925_hook(GB *gb) {
     CYC(b_+15, b_+17);
     break;
   }
-  _mainLoop_hook(gb);
+  TAIL(_mainLoop);
 }
 
 void startGame_hook(GB *gb) {
@@ -13708,7 +13708,7 @@ void _mainLoop_hook(GB *gb) {
   CYC(b_+31, b_+32);
   if (F & FZ) { CYCT(b_+32, b_+34); _initializeThread_hook(gb); return; }
   CYC(b_+32, b_+34);
-  _mainLoop_nextThread_hook(gb);
+  TAIL(_mainLoop_nextThread);
 }
 
 void _mainLoop_nextThread_hook(GB *gb) {
@@ -13784,7 +13784,7 @@ void _mainLoop_nextThread_hook(GB *gb) {
     break;
   }
   CYCT(b_+52, b_+54);
-  _mainLoop_hook(gb);
+  TAIL(_mainLoop);
 }
 
 void _countdownToRunThread__afterSp0998_hook(GB *gb) {

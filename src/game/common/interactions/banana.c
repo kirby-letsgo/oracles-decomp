@@ -97,7 +97,7 @@ void interactionCodec0__state1_hook(GB *gb) {
   CALL_C(b_+58, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+61);
   CYC(b_+61, b_+63); L = OBJ_DIRECTION;
   CYC(b_+63, b_+64); A = mem_rd(gb, HL);
-  interactionCodec0__updatePosition_hook(gb);
+  TAIL(interactionCodec0__updatePosition);
 }
 
 void interactionCodec0_hook(GB *gb) {

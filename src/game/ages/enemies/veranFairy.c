@@ -217,7 +217,7 @@ afterFire:
   CYC(b_+60, b_+62); mem_wr(gb, HL, 0x00);
   CYC(b_+62, b_+64); A = 0x05;
   CYC(b_+64, b_+67);
-  enemySetAnimation_hook(gb);
+  TAIL(enemySetAnimation);
 }
 
 void attack2_hook(GB *gb) {
@@ -255,7 +255,7 @@ afterFire:
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x00);
   CYC(b_+41, b_+43); A = 0x05;
   CYC(b_+43, b_+46);
-  enemySetAnimation_hook(gb);
+  TAIL(enemySetAnimation);
 }
 
 void veranFairy_66ed_hook(GB *gb) {
@@ -314,7 +314,7 @@ void veranFairy_animate_hook(GB *gb) {
   BASE(veranFairy_animate);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3);
-  enemyAnimate_hook(gb);
+  TAIL(enemyAnimate);
 }
 
 void veranFairy_state0_hook(GB *gb) {
@@ -332,7 +332,7 @@ void veranFairy_state0_hook(GB *gb) {
   CYC(b_+19, b_+21); A = 0x02;
   CALL_C(b_+21, enemySetAnimation_hook, SYM(enemySetAnimation), b_+24);
   CYC(b_+24, b_+27);
-  objectSetVisible82_hook(gb);
+  TAIL(objectSetVisible82);
 }
 
 void veranFairy_state1_hook(GB *gb) {
@@ -506,7 +506,7 @@ substateC:
   CYC(b_+228, b_+230); L = ENEMY_BASE + OBJ_COUNTER2;
   CYC(b_+230, b_+232); mem_wr(gb, HL, 0x78);
   CYC(b_+232, b_+235);
-  enemyBoss_beginBoss_b10_hook(gb);
+  TAIL(enemyBoss_beginBoss_b10);
 }
 
 void veranFairy_state2_hook(GB *gb) {
@@ -554,7 +554,7 @@ pickMovementPattern:
   CYC(b_+54, b_+55); E = alu_inc8(gb, E);
   CYC(b_+55, b_+56); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+56, b_+57); mem_wr(gb, DE, A);
-  veranFairy_saveMovementPatternPointer_hook(gb);
+  TAIL(veranFairy_saveMovementPatternPointer);
 }
 
 void veranFairy_state3_hook(GB *gb) {
@@ -613,7 +613,7 @@ nextTarget:
   CALL_C(b_+60, veranFairy_saveMovementPatternPointer_hook, SYM(veranFairy_saveMovementPatternPointer), b_+63);
 updateMovement:
   CALL_C(b_+63, ecom_moveTowardPosition_b10_hook, SYM(ecom_moveTowardPosition_b10), SYM(veranFairy_animate));
-  veranFairy_animate_hook(gb);
+  TAIL(veranFairy_animate);
 }
 
 void veranFairy_state4_hook(GB *gb) {
@@ -630,7 +630,7 @@ void veranFairy_state4_hook(GB *gb) {
   CYC(b_+6, b_+7); L = E;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x02);
   CYC(b_+9, b_+11);
-  veranFairy_animate_hook(gb);
+  TAIL(veranFairy_animate);
 }
 
 void veranFairy_state5_hook(GB *gb) {
@@ -711,7 +711,7 @@ triggerCutscene:
   CYC(b_+84, b_+86); A = 0x1f;
   CYC(b_+86, b_+89); mem_wr(gb, wCutsceneTrigger, A);
   CYC(b_+89, b_+92);
-  enemyDelete_hook(gb);
+  TAIL(enemyDelete);
 }
 
 void enemyCode06_hook(GB *gb) {

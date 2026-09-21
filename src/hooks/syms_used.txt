@@ -8200,6 +8200,7 @@ mapMenu_drawArrow mapMenu_drawArrow 02:664e
 mapMenu_drawArrow__sprite mapMenu_drawArrow@sprite 02:665c
 mapMenu_drawCursor mapMenu_drawCursor 02:6661
 mapMenu_drawCursor__sprite mapMenu_drawCursor@sprite 02:6669
+mapMenu_drawJewelLocations mapMenu_drawJewelLocations -
 mapMenu_drawSpriteAtRoomIndex mapMenu_drawSpriteAtRoomIndex 02:6672
 mapMenu_drawSprites mapMenu_drawSprites 02:64ae
 mapMenu_drawSprites__dungeon mapMenu_drawSprites@dungeon 02:64b5

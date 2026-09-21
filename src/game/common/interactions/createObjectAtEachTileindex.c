@@ -71,7 +71,7 @@ void interactionCodec7__createObject_hook(GB *gb) {
   CYC(b_+60, b_+62); A = alu_swap(gb, A);
   CYC(b_+62, b_+64); alu_add(gb, 0x08);
   CYC(b_+64, b_+65); mem_wr(gb, HL, A);
-  interactionCodec7__ret_hook(gb);
+  TAIL(interactionCodec7__ret);
 }
 
 void interactionCodec7_hook(GB *gb) {

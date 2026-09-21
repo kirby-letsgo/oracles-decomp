@@ -73,7 +73,7 @@ state0:
   CYC(b_+34, b_+37); CYC(b_+37, b_+39); A = 0x39;
   CALL_C(b_+39, playSound_b00_hook, SYM(playSound_b00), b_+42);
   CYC(b_+42, b_+45); SET_HL(SYM(interactionCoded8__scriptTable));
-  vire_setScript_hook(gb);
+  TAIL(vire_setScript);
 }
 
 void vire_setScript_hook(GB *gb) {
@@ -206,7 +206,7 @@ void vire_deleteAndReturnControl_hook(GB *gb) {
   BASE(vire_deleteAndReturnControl);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionDelete_hook, SYM(interactionDelete), SYM(vire_returnControl));
-  vire_returnControl_hook(gb);
+  TAIL(vire_returnControl);
 }
 
 void vire_returnControl_hook(GB *gb) {

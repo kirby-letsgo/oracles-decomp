@@ -56,7 +56,7 @@ void bombUpgradeFairy_decreaseLinkHealth_hook(GB *gb) {
   if (F & FC) { RET_TAKEN(b_+6); return; }
   CYC(b_+6, b_+7);
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x04);
-  bombUpgradeFairy_linkCollapsed_hook(gb);
+  TAIL(bombUpgradeFairy_linkCollapsed);
 }
 
 void bombUpgradeFairy_linkCollapsed_hook(GB *gb) {

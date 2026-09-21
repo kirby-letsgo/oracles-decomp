@@ -296,7 +296,7 @@ subid3_state0:
   CALL_C(b_+351, objectGetAngleTowardEnemyTarget_hook, SYM(objectGetAngleTowardEnemyTarget), b_+354);
   CYC(b_+354, b_+356); E = 0xc9; // Part.angle
   CYC(b_+356, b_+357); mem_wr(gb, DE, A);
-  func_6e2f_hook(gb); // falls through
+  TAIL(func_6e2f);// falls through
 }
 
 void func_6e2f_hook(GB *gb) {

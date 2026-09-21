@@ -106,7 +106,7 @@ state1:
   CYC(b_+97, b_+99); alu_cp(gb, 0xfd);  // cp $fd
   if ((F & FC)) { RET_TAKEN(b_+99); return; } CYC(b_+99, b_+100);  // ret c
   CYC(b_+100, b_+102); L = 0x15;  // ld l,<w1Link.speedZ+1
-  CYC(b_+102, b_+105); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
+  CYC(b_+102, b_+104); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if (!(F & FZ)) { RET_TAKEN(b_+104); return; } CYC(b_+104, b_+105);  // ret nz
 mountedRaft:
   CYC(b_+105, b_+106); A = D;  // ld a,d

@@ -70,7 +70,7 @@ loadScript:
   CYC(b_+25, b_+26); H = mem_rd(gb, HL);
   CYC(b_+26, b_+27); L = A;
   CYC(b_+27, b_+29);
-  movingPlatform_setScript_hook(gb);
+  TAIL(movingPlatform_setScript);
 }
 
 void movingPlatform_runScript_hook(GB *gb) {

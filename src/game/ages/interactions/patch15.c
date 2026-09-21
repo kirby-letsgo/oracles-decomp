@@ -36,7 +36,7 @@ void patch_restoreControlAndStairs_hook(GB *gb) {
   CYC(b_+1, b_+4); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+4, b_+7); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+7, b_+9); A = 0x44;
-  patch_setStairTile_hook(gb);
+  TAIL(patch_setStairTile);
 }
 
 void patch_setStairTile_hook(GB *gb) {

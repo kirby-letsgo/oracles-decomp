@@ -982,7 +982,7 @@ substate3:
   CALL_C(b_+64, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+67);
   CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_VAR3E;
   CYC(b_+69, b_+70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  ralphRunScript_hook(gb);
+  TAIL(ralphRunScript);
 }
 
 void ralphRunScript_hook(GB *gb) {
@@ -1066,7 +1066,7 @@ void ralphSubid07Substate1_hook(GB *gb) {
   CALL_C(b_+3, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+6);
   CYC(b_+6, b_+9); SET_BC(0xfe40); // -$1c0
   CALL_C(b_+9, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), SYM(ralphSubid07Substate2));
-  ralphSubid07Substate2_hook(gb);
+  TAIL(ralphSubid07Substate2);
 }
 
 void ralphSubid07Substate2_hook(GB *gb) {
@@ -1384,7 +1384,7 @@ void ralphSubid0e_hook(GB *gb) {
   CYC(b_+21, b_+23);
   CYC(b_+23, b_+24); mem_wr(gb, HL, A);
   CALL_C(b_+24, interactionSetAnimation_hook, SYM(interactionSetAnimation), SYM(ralphRunScriptAndDeleteWhenOver));
-  ralphRunScriptAndDeleteWhenOver_hook(gb);
+  TAIL(ralphRunScriptAndDeleteWhenOver);
 }
 
 void ralphRunScriptAndDeleteWhenOver_hook(GB *gb) {

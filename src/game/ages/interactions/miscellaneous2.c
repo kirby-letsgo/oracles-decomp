@@ -56,7 +56,7 @@ void interactiondc_subid00_hook(GB *gb) {
   CALL_C(b_+17, createTreasure_hook, SYM(createTreasure), b_+20);
   CALL_C(b_+20, objectCopyPosition_hook, SYM(objectCopyPosition), b_+23);
   CYC(b_+23, b_+26);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid01_hook(GB *gb) {
@@ -79,7 +79,7 @@ void interactiondc_subid01_hook(GB *gb) {
   CALL_C(b_+17, interactionSetScript_hook, SYM(interactionSetScript), b_+20);
   CALL_C(b_+20, interactionSetAlwaysUpdateBit_hook, SYM(interactionSetAlwaysUpdateBit), b_+23);
   CYC(b_+23, b_+26);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid02_hook(GB *gb) {
@@ -165,7 +165,7 @@ substate1:
   CYC(b_+119, b_+121); A = 0x1a;
   CYC(b_+121, b_+124); mem_wr(gb, wCutsceneTrigger, A);
   CYC(b_+124, b_+127);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid3And4_state1_hook(GB *gb) {
@@ -186,7 +186,7 @@ void interactiondc_subid3And4_state1_hook(GB *gb) {
   CYC(b_+20, b_+22); A = 0x4d;
   CALL_C(b_+22, playSound_b00_hook, SYM(playSound_b00), b_+25);
   CYC(b_+25, b_+28);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid03_hook(GB *gb) {
@@ -209,7 +209,7 @@ void interactiondc_subid03_hook(GB *gb) {
   CYC(b_+15, b_+17); A = 0x02;
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+21);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid04_hook(GB *gb) {
@@ -232,7 +232,7 @@ void interactiondc_subid04_hook(GB *gb) {
   CYC(b_+15, b_+17); A = 0x04;
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+21);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid05_setRandomShakeDuration_hook(GB *gb) {
@@ -256,7 +256,7 @@ void interactiondc_subid05_shakeScreen_hook(GB *gb) {
   if (F & FC) { RET_TAKEN(b_+95); return; }
   CYC(b_+95, b_+96);
   CYC(b_+96, b_+99);
-  interactionDecCounter1_hook(gb);
+  TAIL(interactionDecCounter1);
 }
 
 void interactiondc_subid05_hook(GB *gb) {
@@ -337,7 +337,7 @@ void interactiondc_subid06_hook(GB *gb) {
   CALL_C(b_+10, objectCreateInteraction_hook, SYM(objectCreateInteraction), b_+13);
 delete_:
   CYC(b_+13, b_+16);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid07_hook(GB *gb) {
@@ -354,7 +354,7 @@ void interactiondc_subid07_hook(GB *gb) {
   CALL_C(b_+11, createTreasure_hook, SYM(createTreasure), b_+14);
   CALL_C(b_+14, objectCopyPosition_hook, SYM(objectCopyPosition), b_+17);
   CYC(b_+17, b_+20);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid08_hook(GB *gb) {
@@ -402,7 +402,7 @@ state0:
   CYC(b_+46, b_+48); E = INTERACTION_BASE + OBJ_VAR03;
   CYC(b_+48, b_+49); mem_wr(gb, DE, A);
   CYC(b_+49, b_+52);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid09_replaceTileList_hook(GB *gb) {
@@ -544,7 +544,7 @@ state1:
     CYC(b_+36, b_+39);
   }
   CYC(b_+39, b_+42);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid0A_hook(GB *gb) {
@@ -581,7 +581,7 @@ state0:
   }
   CYC(b_+38, b_+41);
   CYC(b_+41, b_+44);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid0B_hook(GB *gb) {
@@ -652,7 +652,7 @@ state3:
   CYC(b_+93, b_+96);
   CYC(b_+96, b_+98); A = 0x48;
   CYC(b_+98, b_+101);
-  breakCrackedFloor_hook(gb);
+  TAIL(breakCrackedFloor);
 }
 
 void interactiondc_subid0C_hook(GB *gb) {
@@ -706,7 +706,7 @@ state0:
   }
   CYC(b_+60, b_+63);
   CYC(b_+63, b_+66);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid0E_spawnPuff_hook(GB *gb) {
@@ -718,7 +718,7 @@ void interactiondc_subid0E_spawnPuff_hook(GB *gb) {
   CYC(b_+94, b_+96); mem_wr(gb, HL, 0x05);
   CYC(b_+96, b_+98); L = INTERACTION_BASE + OBJ_YH;
   CYC(b_+98, b_+101);
-  setShortPosition_paramC_hook(gb);
+  TAIL(setShortPosition_paramC);
 }
 
 void interactiondc_subid0E_hook(GB *gb) {
@@ -794,7 +794,7 @@ state2:
   CYC(b_+116, b_+119); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+119, b_+122); mem_wr(gb, wMenuDisabled, A);
   CYC(b_+122, b_+125);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid0F_hook(GB *gb) {
@@ -840,7 +840,7 @@ state0:
   CYC(b_+44, b_+46); A = 0x08;
   CALL_C(b_+46, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+49);
   CYC(b_+49, b_+52);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid10_hook(GB *gb) {
@@ -897,7 +897,7 @@ warpDest:
   CYC(b_+62, b_+64); A = 0x6e;
   CALL_C(b_+64, playSound_b00_hook, SYM(playSound_b00), b_+67);
   CYC(b_+67, b_+70);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid11_hook(GB *gb) {
@@ -910,7 +910,7 @@ void interactiondc_subid11_hook(GB *gb) {
   CYC(b_+6, b_+9); SET_HL(wDungeonBossKeys);
   CYC(b_+9, b_+11); A = 0x0c;
   CYC(b_+11, b_+14);
-  setFlag_hook(gb);
+  TAIL(setFlag);
 }
 
 void interactiondc_subid12_hook(GB *gb) {
@@ -942,7 +942,7 @@ void interactiondc_subid12_hook(GB *gb) {
   CYC(b_+36, b_+38); A = 0x4d;
   CALL_C(b_+38, playSound_b00_hook, SYM(playSound_b00), b_+41);
   CYC(b_+41, b_+44);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid13_hook(GB *gb) {
@@ -960,7 +960,7 @@ void interactiondc_subid13_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+17, b_+18); mem_wr(gb, HL, A);
   CYC(b_+18, b_+21);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid14_hook(GB *gb) {
@@ -977,7 +977,7 @@ void interactiondc_subid14_hook(GB *gb) {
   CALL_C(b_+9, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+12);
 delete_:
   CYC(b_+12, b_+15);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid15And16_setChestContents_hook(GB *gb) {
@@ -991,7 +991,7 @@ void interactiondc_subid15And16_setChestContents_hook(GB *gb) {
   CYC(b_+8, b_+9); A = mem_rd(gb, HL);
   CYC(b_+9, b_+12); mem_wr(gb, (wChestContentsOverride + 1), A);
   CYC(b_+12, b_+15);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactiondc_subid15And16_state0_hook(GB *gb) {
@@ -1005,7 +1005,7 @@ void interactiondc_subid15And16_state0_hook(GB *gb) {
   }
   CYC(b_+5, b_+8);
   CYC(b_+8, b_+11);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void interactiondc_subid15_hook(GB *gb) {
@@ -1025,7 +1025,7 @@ void interactiondc_subid15_hook(GB *gb) {
   }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+13); A = alu_dec8(gb, A);
-  interactiondc_subid15And16_setChestContents_hook(gb);
+  TAIL(interactiondc_subid15And16_setChestContents);
 }
 
 void interactiondc_subid16_hook(GB *gb) {
@@ -1046,7 +1046,7 @@ void interactiondc_subid16_hook(GB *gb) {
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+13); A = alu_inc8(gb, A);
   CYC(b_+13, b_+15);
-  interactiondc_subid15And16_setChestContents_hook(gb);
+  TAIL(interactiondc_subid15And16_setChestContents);
 }
 
 void interactiondc_subid17_hook(GB *gb) {

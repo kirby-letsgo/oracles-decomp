@@ -34,7 +34,7 @@ void initializeAnimations_hook(GB *gb) {
   CALL_L(b_+17, initializeAnimations__locFunc_hook, b_+20);
   CYC(b_+20, b_+23); SET_HL(wAnimationState);
   CYC(b_+23, b_+25); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
-  initializeAnimations__locFunc_hook(gb);
+  TAIL(initializeAnimations__locFunc);
 }
 
 void updateAnimations_hook(GB *gb) {
@@ -52,7 +52,7 @@ void updateAnimations_hook(GB *gb) {
   CYC(b_+15, b_+16);
   CALL_C(b_+16, updateAnimationQueue_hook, SYM(updateAnimationQueue), b_+19);
   CYC(b_+19, b_+21);
-  updateAnimationData_hook(gb);
+  TAIL(updateAnimationData);
 }
 
 static void add_a_to_hl(GB *gb, uint16_t address) {
@@ -117,7 +117,7 @@ void loadAnimationGfxIndex_hook(GB *gb) {
   CYC(b_+20, b_+21); B = mem_rd(gb, HL);
   CYC(b_+21, b_+22); SET_HL(pop_effect(gb));
   CYC(b_+22, b_+25);
-  queueDmaTransfer_hook(gb);
+  TAIL(queueDmaTransfer);
 }
 
 void updateAnimationDataPointer_hook(GB *gb) {

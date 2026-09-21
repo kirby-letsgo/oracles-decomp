@@ -46,7 +46,7 @@ void loadAttributesAndGraphicsAndIncState_hook(GB *gb) {
   CALL_C(b_+0, itemIncState_hook, SYM(itemIncState), b_+3);
   CYC(b_+3, b_+5); L = 0x00;
   CYC(b_+5, b_+7); mem_wr(gb, HL, 0x03);
-  itemLoadAttributesAndGraphics_hook(gb);
+  TAIL(itemLoadAttributesAndGraphics);
 }
 
 void itemLoadAttributesAndGraphics_hook(GB *gb) {
@@ -136,7 +136,7 @@ void itemSetAnimation_hook(GB *gb) {
   CYC(b_+12, b_+13); H = mem_rd(gb, HL);
   CYC(b_+13, b_+14); L = A;
   CYC(b_+14, b_+15); alu_add_hl(gb, BC);
-  itemNextAnimationFrame_hook(gb);
+  TAIL(itemNextAnimationFrame);
 }
 
 void itemNextAnimationFrame_hook(GB *gb) {

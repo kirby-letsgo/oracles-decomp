@@ -82,7 +82,7 @@ void interactionCoded3__afterCall4cd0_hook(GB *gb) {
   CYC(b_+41, b_+42); A = B;
   CALL_C(b_+42, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+45);
   CYC(b_+45, b_+46); SET_AF(pop_effect(gb));
-  interactionCoded3__initializePositionAndCounter1_hook(gb);
+  TAIL(interactionCoded3__initializePositionAndCounter1);
 }
 
 void interactionCoded3__state0_hook(GB *gb) {

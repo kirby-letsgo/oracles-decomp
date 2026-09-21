@@ -58,7 +58,7 @@ void parentItemCode_rodOfSeasons_hook(GB *gb) {
   CALL_C(b_+3, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+6);
   if (!(F & FZ)) { CYCT(b_+6, b_+9); clearParentItem_hook(gb); return; }
   CYC(b_+6, b_+9);
-  parentItemCode_foolsOre_hook(gb);
+  TAIL(parentItemCode_foolsOre);
 }
 
 void parentItemCode_punch_hook(GB *gb) {

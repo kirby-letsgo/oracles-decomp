@@ -332,7 +332,7 @@ check_item:
     CYCT(b_+43, b_+44); ret_effect(gb); return;
   }
   CYC(b_+43, b_+44);
-  initializeParentItem_hook(gb);
+  TAIL(initializeParentItem);
 }
 
 void checkUseItems_b06_hook(GB *gb) {

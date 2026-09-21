@@ -621,7 +621,7 @@ void channelCmdff_hook(GB *gb) {
   CYC(b_+12, b_+13); alu_add_hl(gb, DE);
   CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
   CYC(b_+14, b_+15); mem_wr(gb, HL, A);
-  silencePlayedSound_hook(gb);
+  TAIL(silencePlayedSound);
 }
 
 // Ensures no sound is audible on the current channel by setting the volume

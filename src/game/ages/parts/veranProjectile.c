@@ -38,7 +38,7 @@ void partCode37_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+7, b_+10); veranProjectile_subid1_hook(gb); return; } // jp nz
   CYC(b_+7, b_+10);
-  veranProjectile_subid0_hook(gb);
+  TAIL(veranProjectile_subid0);
 }
 
 // The "core" projectile spawner

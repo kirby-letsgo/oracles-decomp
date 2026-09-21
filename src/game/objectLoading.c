@@ -167,21 +167,21 @@ void parseObjectData_hook(GB *gb) {
   CYC(b_+21, b_+24); SET_HL((SYM(group5Mapd3EnemyObjectData) + 6));
   CYC(b_+24, b_+26); E = 0x15;
   CALL_C(b_+26, interBankCall_hook, 0x008a, SYM(parseGivenObjectData_b12));
-  parseGivenObjectData_b12_hook(gb);
+  TAIL(parseGivenObjectData_b12);
 }
 
 void func_55f8_hook(GB *gb) {
   BASE(func_55f8);
   CYC(b_+0, b_+2);
-  parseGivenObjectData_b12_hook(gb);
+  TAIL(parseGivenObjectData_b12);
 }
 
 void parseGivenObjectData_hl_hook(GB *gb) {
   BASE(parseGivenObjectData_hl);
   CYC(b_+0, b_+1); E = L;
   CYC(b_+1, b_+2); D = H;
-  CYC(b_+2, (SYM(objectDataOpcodeSizes) + 1));
-  parseGivenObjectData_b12_hook(gb);
+  CYC(b_+2, b_+4);
+  TAIL(parseGivenObjectData_b12);
 }
 
 void skipToOpEnd_2byte_hook(GB *gb) {
@@ -246,7 +246,7 @@ void skipPointer_hook(GB *gb) {
   BASE(skipPointer);
   CYC(b_+0, b_+2); SET_DE(DE + 2);
   CYC(b_+2, b_+5);
-  parseGivenObjectData_b12_hook(gb);
+  TAIL(parseGivenObjectData_b12);
 }
 
 void parsePointer_hook(GB *gb) {
@@ -258,7 +258,7 @@ void parsePointer_hook(GB *gb) {
   CYC(b_+6, b_+7); D = mem_rd(gb, HL);
   CYC(b_+7, b_+8); E = A;
   CYC(b_+8, b_+11);
-  parseGivenObjectData_b12_hook(gb);
+  TAIL(parseGivenObjectData_b12);
 }
 
 void continueObjectLoopIfOpDone_hook(GB *gb) {
@@ -269,7 +269,7 @@ void continueObjectLoopIfOpDone_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); SET_BC(pop_effect(gb));
   CYC(b_+5, b_+8);
-  parseGivenObjectData_b12_hook(gb);
+  TAIL(parseGivenObjectData_b12);
 }
 
 void objectDataOp1_hook(GB *gb) {
@@ -307,7 +307,7 @@ void objectDataOp3_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+3, b_+5); skipPointer_hook(gb); return; }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7);
-  parsePointer_hook(gb);
+  TAIL(parsePointer);
 }
 
 void objectDataOp4_hook(GB *gb) {
@@ -321,7 +321,7 @@ void objectDataOp4_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+10, b_+12); skipPointer_hook(gb); return; }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+14);
-  parsePointer_hook(gb);
+  TAIL(parsePointer);
 }
 
 void objectDataOp5_hook(GB *gb) {
@@ -335,7 +335,7 @@ void objectDataOp5_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+10, b_+12); skipPointer_hook(gb); return; }
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+14);
-  parsePointer_hook(gb);
+  TAIL(parsePointer);
 }
 
 void objectDataOp8_hook(GB *gb) {

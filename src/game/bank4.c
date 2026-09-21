@@ -271,7 +271,7 @@ void label_04_032_hook(GB *gb) {
   CYC(b_+5, b_+6); H = mem_rd(gb, HL);
   CYC(b_+6, b_+7); L = A;
   CYC(b_+7, b_+10); A = W8(wWarpDestRoom);
-  label_04_033_hook(gb);
+  TAIL(label_04_033);
 }
 
 void applyWarpDest_b04_hook(GB *gb) {
@@ -284,7 +284,7 @@ void applyWarpDest_b04_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+7);
-  label_04_032_hook(gb);
+  TAIL(label_04_032);
 }
 
 void findWarpSourceAndDest_hook(GB *gb) {

@@ -8204,6 +8204,7 @@ enum {
   S_mapMenu_drawArrow__sprite,
   S_mapMenu_drawCursor,
   S_mapMenu_drawCursor__sprite,
+  S_mapMenu_drawJewelLocations,
   S_mapMenu_drawSpriteAtRoomIndex,
   S_mapMenu_drawSprites,
   S_mapMenu_drawSprites__dungeon,

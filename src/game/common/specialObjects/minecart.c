@@ -192,7 +192,7 @@ minecart_stopped:
   CYC(b_+198, b_+200); B = 0x16;
   CALL_C(b_+200, objectCreateInteractionWithSubid00_hook, SYM(objectCreateInteractionWithSubid00), b_+203);
   CYC(b_+203, b_+206);
-  objectDelete_useActiveObjectType_hook(gb);
+  TAIL(objectDelete_useActiveObjectType);
 }
 
 static void minecart_check_door(GB *gb, uint16_t sp0_) {

@@ -13,7 +13,7 @@ void setLinkAnimation_hook(GB *gb);
 void turnToFaceSomething_hook(GB *gb) {
   BASE(turnToFaceSomething);
   CYC(b_+0, b_+2); A = 0x0f;
-  turnToFaceSomethingAtInterval_hook(gb);
+  TAIL(turnToFaceSomethingAtInterval);
 }
 
 void turnToFaceSomethingAtInterval_hook(GB *gb) {

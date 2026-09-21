@@ -499,7 +499,7 @@ void collisionEffect12_hook(GB *gb) {
   BASE(collisionEffect12);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), SYM(collisionEffect0c));
-  collisionEffect0c_hook(gb);
+  TAIL(collisionEffect0c);
 }
 
 void collisionEffect0c_hook(GB *gb) {
@@ -512,7 +512,7 @@ void collisionEffect13_hook(GB *gb) {
   BASE(collisionEffect13);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), SYM(collisionEffect0d));
-  collisionEffect0d_hook(gb);
+  TAIL(collisionEffect0d);
 }
 
 void collisionEffect0d_hook(GB *gb) {
@@ -525,13 +525,13 @@ void collisionEffect14_hook(GB *gb) {
   BASE(collisionEffect14);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), SYM(collisionEffect0e));
-  collisionEffect0e_hook(gb);
+  TAIL(collisionEffect0e);
 }
 
 void collisionEffect0e_hook(GB *gb) {
   BASE(collisionEffect0e);
   CYC(b_+0, b_+2); E = 0x18;
-  label_07_028_hook(gb);
+  TAIL(label_07_028);
 }
 
 void label_07_028_hook(GB *gb) {
@@ -570,7 +570,7 @@ void collisionEffect18_hook(GB *gb) {
   BASE(collisionEffect18);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), SYM(collisionEffect0f));
-  collisionEffect0f_hook(gb);
+  TAIL(collisionEffect0f);
 }
 
 void collisionEffect0f_hook(GB *gb) {
@@ -583,7 +583,7 @@ void collisionEffect19_hook(GB *gb) {
   BASE(collisionEffect19);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), SYM(collisionEffect10));
-  collisionEffect10_hook(gb);
+  TAIL(collisionEffect10);
 }
 
 void collisionEffect10_hook(GB *gb) {
@@ -620,7 +620,7 @@ void collisionEffect1a_hook(GB *gb) {
   BASE(collisionEffect1a);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, createClinkInteraction_hook, SYM(createClinkInteraction), SYM(collisionEffect11));
-  collisionEffect11_hook(gb);
+  TAIL(collisionEffect11);
 }
 
 void collisionEffect11_hook(GB *gb) {
@@ -680,7 +680,7 @@ void collisionEffect20_hook(GB *gb) {
 void collisionEffect22_hook(GB *gb) {
   BASE(collisionEffect22);
   CYC(b_+0, b_+3); SET_HL(0x1c24);
-  applyDamageToBothObjects_hook(gb);
+  TAIL(applyDamageToBothObjects);
 }
 
 void collisionEffect26_hook(GB *gb) {
@@ -725,7 +725,7 @@ void collisionEffect3a_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
   CYC(b_+4, b_+5);
-  collisionEffect3d_hook(gb);
+  TAIL(collisionEffect3d);
 }
 
 void collisionEffect3d_hook(GB *gb) {
@@ -864,7 +864,7 @@ void collisionEffect32_hook(GB *gb) {
 void collisionEffect33_hook(GB *gb) {
   BASE(collisionEffect33);
   CYC(b_+0, b_+3); SET_HL(0x384c);
-  label_07_033_hook(gb);
+  TAIL(label_07_033);
 }
 
 void label_07_033_hook(GB *gb) {
@@ -894,7 +894,7 @@ void collisionEffect35_hook(GB *gb) {
 
   CYC(b_+0, b_+3); SET_HL(0x1c1c);
   CALL_C(b_+3, applyDamageToBothObjects_hook, SYM(applyDamageToBothObjects), SYM(killEnemyOrPart));
-  killEnemyOrPart_hook(gb);
+  TAIL(killEnemyOrPart);
 }
 
 void killEnemyOrPart_hook(GB *gb) {
@@ -973,7 +973,7 @@ void collisionEffect0b_hook(GB *gb) {
 void collisionEffect21_hook(GB *gb) {
   BASE(collisionEffect21);
   CYC(b_+0, b_+2); E = 0x30;
-  label_07_027_hook(gb);
+  TAIL(label_07_027);
 }
 
 void collisionEffect2e_hook(GB *gb) {
@@ -1385,7 +1385,7 @@ void func_07_47b7_hook(GB *gb) {
 void applyDamageToLink_paramE_hook(GB *gb) {
   BASE(applyDamageToLink_paramE);
   CYC(b_+0, b_+1); A = E;
-  applyDamageToLink_hook(gb);
+  TAIL(applyDamageToLink);
 }
 
 void applyDamageToLink_hook(GB *gb) {

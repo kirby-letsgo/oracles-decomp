@@ -659,7 +659,7 @@ gotoState2:
   CYC(b_+26, b_+28); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   CALL_C(b_+28, objectSetVisible83_hook, SYM(objectSetVisible83), b_+31);
   CALL_C(b_+31, veranFinal_spiderForm_resetCollisionData_hook, SYM(veranFinal_spiderForm_resetCollisionData), b_+34);
-  CYC(b_+34, (SYM(veranFinal_spiderForm_state4) + 1)); TAIL(veranFinal_spiderForm_initState2);  // jr veranFinal_spiderForm_initState2
+  CYC(b_+34, b_+36); TAIL(veranFinal_spiderForm_initState2);  // jr veranFinal_spiderForm_initState2
 }
 
 void veranFinal_spiderForm_state4_hook(GB *gb) {
@@ -698,7 +698,7 @@ substate0:
   CYC(b_+28, b_+30); alu_and(gb, 0x18);  // and $18
   CYC(b_+30, b_+32); alu_add(gb, 0x04);  // add $04
   CYC(b_+32, b_+33); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+33, (SYM(veranFinal_spiderForm_jumpAttack) + 1)); TAIL(veranFinal_spiderForm_animate);  // jr veranFinal_spiderForm_animate
+  CYC(b_+33, b_+35); TAIL(veranFinal_spiderForm_animate);  // jr veranFinal_spiderForm_animate
 }
 
 void veranFinal_spiderForm_jumpAttack_hook(GB *gb) {
@@ -875,7 +875,7 @@ void veranFinal_spiderForm_webAttack_substate2_hook(GB *gb) {
   CALL_C(b_+13, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+16);
   CYC(b_+16, b_+17); L = alu_inc8(gb, L);  // inc l
   CYC(b_+17, b_+19); mem_wr(gb, HL, 90);  // ld (hl),90
-  CYC(b_+19, (SYM(veranFinal_spiderForm_webAttack_substate3) + 1)); TAIL(veranFinal_spiderForm_resetCollisionData);  // jr veranFinal_spiderForm_resetCollisionData
+  CYC(b_+19, b_+21); TAIL(veranFinal_spiderForm_resetCollisionData);  // jr veranFinal_spiderForm_resetCollisionData
 }
 
 void veranFinal_spiderForm_webAttack_substate3_hook(GB *gb) {
@@ -965,7 +965,7 @@ void veranFinal_spiderForm_webAttack_substate6_hook(GB *gb) {
   CYC(b_+18, b_+20); B = 0x14;  // ld b,$14
   CALL_C(b_+20, veranFinal_spiderForm_webAttack_updateLinkPosition_hook, SYM(veranFinal_spiderForm_webAttack_updateLinkPosition), b_+23);
   CYC(b_+23, b_+26); SET_BC(0xf618);  // ld bc,-10,$18
-  CYC(b_+26, (SYM(veranFinal_spiderForm_webAttack_substate7) + 1)); TAIL(veranFinal_spiderForm_webAttack_applyDamageToLink);  // jr veranFinal_spiderForm_webAttack_applyDamageToLink
+  CYC(b_+26, b_+28); TAIL(veranFinal_spiderForm_webAttack_applyDamageToLink);  // jr veranFinal_spiderForm_webAttack_applyDamageToLink
 }
 
 void veranFinal_spiderForm_webAttack_substate7_hook(GB *gb) {
@@ -1299,7 +1299,7 @@ void label_10_173_hook(GB *gb) {
   CYC(b_+8, b_+11); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 setState02:
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
-  CYC(b_+12, (SYM(veranFinal_beeForm_stateB) + 1)); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
+  CYC(b_+12, b_+14); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_beeForm_stateB_hook(GB *gb) {
@@ -1330,7 +1330,7 @@ chooseQuadrant:
   CYC(b_+35, b_+36); E = alu_inc8(gb, E);  // inc e
   CYC(b_+36, b_+37); A = mem_rd(gb, HL);  // ld a,(hl)
   CYC(b_+37, b_+38); mem_wr(gb, DE, A);  // ld (de),a
-  CYC(b_+38, (SYM(veranFinal_beeForm_screenCornerEntrances) + 1)); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
+  CYC(b_+38, b_+40); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 }
 
 void veranFinal_transformToBeeOrSpider_hook(GB *gb) {

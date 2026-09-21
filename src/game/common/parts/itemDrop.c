@@ -93,7 +93,7 @@ void partCode01_hook(GB *gb) {
 
   // @normalStatus
   CYC(b_+12, b_+15); push_effect(gb, b_+15);
-  partCode01__checkCollidedWithLink_hook(gb);
+  TAIL(partCode01__checkCollidedWithLink);
 }
 
 void partCode01__afterCollisionCheck_hook(GB *gb) {
@@ -294,7 +294,7 @@ void partCode01__checkCollidedWithLink_hook(GB *gb) {
   if (!(F & FC)) { RET_TAKEN(b_+257); partCode01__afterCollisionCheck_hook(gb); return; } // ret nc
   CYC(b_+257, b_+258);
   CYC(b_+258, b_+259); SET_HL(pop_effect(gb)); // pop hl (discard return address)
-  partCode01__linkCollectedItem_hook(gb);
+  TAIL(partCode01__linkCollectedItem);
 }
 
 void partCode01__linkCollectedItem_hook(GB *gb) {

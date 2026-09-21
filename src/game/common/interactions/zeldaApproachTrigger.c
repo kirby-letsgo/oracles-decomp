@@ -74,7 +74,7 @@ void interactionCodeda__state1_hook(GB *gb) {
     CYC(b_+69, b_+70); alu_or(gb, A);
     if (F & FZ) { CYCT(b_+70, b_+72); goto next_interaction; }
     CYC(b_+70, b_+72); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+72, b_+73); alu_cp(gb, GV(GV(0xa9, 0xb0), 0xb0));
+    CYC(b_+72, b_+73); alu_cp(gb, GV(0xa9, 0xb0));
     if (!(F & FZ)) { CYCT(b_+75, b_+77); goto next_interaction; }
     CYC(b_+75, b_+77);
     CYC(b_+77, b_+79); L = 0x5a;

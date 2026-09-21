@@ -78,5 +78,5 @@ state8:
 // 0e:60bb, alias of enemyCode4d (ENEMY_HARMLESS_HARDHAT_BEETLE, ages only): identical bytes at
 // the identical address.
 void enemyCode5f_hook(GB *gb) {
-  enemyCode4d_hook(gb);
+  TAIL(enemyCode4d);
 }

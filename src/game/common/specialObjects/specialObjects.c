@@ -216,7 +216,7 @@ clear:
   CYC(b_+117, b_+120); SET_HL(wGrabbableObjectBuffer);
   CYC(b_+120, b_+122); B = 0x10;
   CYC(b_+122, b_+125);
-  clearMemory_hook(gb);
+  TAIL(clearMemory);
 }
 
 void func_410d_hook(GB *gb) {
@@ -367,7 +367,7 @@ raft_position:
 copy_raft_position:
   CALL_C(b_+228, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+231);
   CYC(b_+231, b_+234);
-  objectSetVisiblec3_hook(gb);
+  TAIL(objectSetVisiblec3);
 }
 
 void linkApplyDamage_b5_hook(GB *gb) {

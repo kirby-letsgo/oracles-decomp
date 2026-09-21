@@ -99,7 +99,7 @@ state0:
 choose:
   CYC(b_+42, b_+43); alu_add(gb, B);
   CALL_C(b_+43, impaNpc_determineTextAndPositionInHouse_hook, SYM(impaNpc_determineTextAndPositionInHouse), SYM(impaNpc_setScriptAndInitialize));
-  impaNpc_setScriptAndInitialize_hook(gb);
+  TAIL(impaNpc_setScriptAndInitialize);
 }
 
 void impaNpc_setScriptAndInitialize_hook(GB *gb) {
@@ -182,7 +182,7 @@ void impaNpc_subid01_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+19, b_+21); impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb); return; }
   CYC(b_+19, b_+21);
   CYC(b_+21, b_+23); A = 0x2e;
-  impaNpc_setTextIndexAndLoadGenericNpcScript_hook(gb);
+  TAIL(impaNpc_setTextIndexAndLoadGenericNpcScript);
 }
 
 void impaNpc_setTextIndexAndLoadGenericNpcScript_hook(GB *gb) {

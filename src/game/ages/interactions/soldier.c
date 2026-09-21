@@ -112,7 +112,7 @@ void soldierSubid0c_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+3, b_+5); label_09_092_hook(gb); return; }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, soldierInitGraphicsAndLoadScript_hook, SYM(soldierInitGraphicsAndLoadScript), SYM(label_09_092));
-  label_09_092_hook(gb);
+  TAIL(label_09_092);
 }
 
 void soldierSubid02_hook(GB *gb) {
@@ -126,7 +126,7 @@ void soldierSubid02_hook(GB *gb) {
   CYC(b_+8, b_+11);
   CALL_C(b_+11, soldierInitGraphicsAndLoadScript_hook, SYM(soldierInitGraphicsAndLoadScript), b_+14);
   CALL_C(b_+14, objectSetVisible82_hook, SYM(objectSetVisible82), SYM(label_09_093));
-  label_09_093_hook(gb);
+  TAIL(label_09_093);
 }
 
 void soldierSubid03_hook(GB *gb) {
@@ -459,7 +459,7 @@ void label_09_090_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+1, b_+4); interactionDelete_hook(gb); return; }
   CYC(b_+1, b_+4);
-  soldierSubid0c_hook(gb);
+  TAIL(soldierSubid0c);
 }
 
 void label_09_092_hook(GB *gb) {
@@ -487,7 +487,7 @@ void label_09_093_hook(GB *gb) {
   CALL_C(b_+21, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+24);
   if (F & FZ) { CYCT(b_+24, b_+25); ret_effect(gb); return; }
   CYC(b_+24, b_+25);
-  label_09_094_hook(gb);
+  TAIL(label_09_094);
 }
 
 void label_09_094_hook(GB *gb) {

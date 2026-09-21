@@ -1,0 +1,16 @@
+# SAME_SHAPE routines checked by hand: the C already carries the per-game value
+# (tools/gameconst.py cannot see it because a shared helper burns the instruction).
+_interactionNextAnimationFrame   # OAM table via SYM(interactionOamDataTable), bank GV in next_animation_frame
+_enemyNextAnimationFrame         # same helper
+_partNextAnimationFrame          # same helper
+enemyDie_uncounted               # enemy_die_common carries GV(0x4f, 0x4c)
+enemyDie_uncounted_withoutItemDrop
+enemyDie_withoutItemDrop
+fileSelectDrawLinkInOtherGame    # B = GV(0x00, 0x04), body shared with fileSelectDrawLink
+gameLink_getFile1                # game_link_get_file_body carries the GVs
+gameLink_getFile2
+partCheckCollisions              # collision_check_object (enemyCheckCollisions) carries the GVs; both callees are one address in Seasons
+mapMenu_drawSprites              # TAIL_GV(mapMenu_drawTimePortal, mapMenu_drawJewelLocations)
+getEntryFromObjectTable1         # bank12_table_pointer carries GV(0x12, 0x11)
+loadGfxHeader                    # SYM(gfxHeaderTable) is uncmpGfxHeader36's address in Seasons
+objectCreateFloatingSnore        # bank_push GV(0x0b, 0x0a)

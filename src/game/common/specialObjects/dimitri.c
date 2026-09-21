@@ -527,7 +527,7 @@ void dimitriState2Substate3_hook(GB *gb) {
 
 state1:
   CYC(b_+27, b_+28); alu_xor(gb, A);
-  dimitriFunc_756d_hook(gb);
+  TAIL(dimitriFunc_756d);
 }
 
 void dimitriFunc_756d_hook(GB *gb) {
@@ -676,7 +676,7 @@ set_water_status:
     TAIL(companionUpdateDirectionAndSetAnimation);
   }
   CYC((SYM(dimitriUpdateMovement__setWaterStatus) + 7), (SYM(dimitriUpdateMovement__setWaterStatus) + 10));
-  dimitriState9_hook(gb);
+  TAIL(dimitriState9);
 }
 
 void dimitriUpdateMovement_hook(GB *gb) {
@@ -750,7 +750,7 @@ set_water_status:
     TAIL(companionUpdateDirectionAndSetAnimation);
   }
   CYC(b_+72, b_+75);
-  dimitriState9_hook(gb);
+  TAIL(dimitriState9);
 }
 
 void dimitriState9_hook(GB *gb) {
@@ -818,7 +818,7 @@ substate1:
 
 substate2:
   CALL_C(b_+29, dimitriCheckAddToGrabbableObjectBuffer_hook, SYM(dimitriCheckAddToGrabbableObjectBuffer), SYM(dimitriGotoState1IfLinkFarAway));
-  dimitriGotoState1IfLinkFarAway_hook(gb);
+  TAIL(dimitriGotoState1IfLinkFarAway);
 }
 
 void dimitriGotoState1IfLinkFarAway_hook(GB *gb) {
@@ -828,7 +828,7 @@ void dimitriGotoState1IfLinkFarAway_hook(GB *gb) {
   CALL_C(b_+2, objectCheckLinkWithinDistance_hook, SYM(objectCheckLinkWithinDistance), b_+5);
   if (F & FC) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
   CYC(b_+5, b_+6);
-  dimitriGotoState1_hook(gb);
+  TAIL(dimitriGotoState1);
 }
 
 void dimitriGotoState1_hook(GB *gb) {
@@ -1015,7 +1015,7 @@ state5:
   CYC(b_+21, b_+23); E = 0x04;
   CYC(b_+23, b_+25); A = 0x05;
   CYC(b_+25, b_+26); mem_wr(gb, DE, A);
-  dimitriLandOnGroundAndGotoState5_hook(gb);
+  TAIL(dimitriLandOnGroundAndGotoState5);
 }
 
 void dimitriLandOnGroundAndGotoState5_hook(GB *gb) {

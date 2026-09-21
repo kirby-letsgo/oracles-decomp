@@ -234,7 +234,7 @@ doneBouncing:
   CYC(b_+24, b_+25); H = D;
   CYC(b_+25, b_+27); L = 0xc4; // Part.state
   CYC(b_+27, b_+28); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  kingMoblinBomb_state4_hook(gb);
+  TAIL(kingMoblinBomb_state4);
 }
 
 void kingMoblinBomb_state4_hook(GB *gb) {
@@ -300,7 +300,7 @@ void kingMoblinBomb_state7_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); L = E; // Part.state
   CYC(b_+5, b_+6); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  kingMoblinBomb_state8_hook(gb);
+  TAIL(kingMoblinBomb_state8);
 }
 
 void kingMoblinBomb_state8_hook(GB *gb) {

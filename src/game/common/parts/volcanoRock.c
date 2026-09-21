@@ -250,7 +250,7 @@ void volcanoRock_subid2_hook(GB *gb) {
 substate0:
   CYC(b_+12, b_+14); A = 0x01;
   CYC(b_+14, b_+15); mem_wr(gb, DE, A);
-  volcanoRock_setRandomPosition_hook(gb); // falls through
+  TAIL(volcanoRock_setRandomPosition);// falls through
 }
 
 void volcanoRock_setRandomPosition_hook(GB *gb) {

@@ -39,7 +39,7 @@ void partCommon_getTileCollisionInFront_hook(GB *gb) {
   BASE(partCommon_getTileCollisionInFront);
   CYC(b_+0, b_+2); E = 0xc9; // Part.angle
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  partCommon_getTileCollisionAtAngle_hook(gb); // falls through
+  TAIL(partCommon_getTileCollisionAtAngle);// falls through
 }
 
 void partCommon_getTileCollisionAtAngle_hook(GB *gb) {

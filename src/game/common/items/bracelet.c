@@ -177,7 +177,7 @@ destroy:
   CYC(b_+159, b_+161); E = 0x06;
   CALL_C(b_+161, interBankCall_hook, 0x008a, b_+164);
   CYC(b_+164, b_+167);
-  itemDelete_hook(gb);
+  TAIL(itemDelete);
 }
 
 void braceletCheckBreakable_hook(GB *gb) {

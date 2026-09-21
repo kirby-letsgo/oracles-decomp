@@ -259,7 +259,7 @@ void roomTileChangesAfterLoad00_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+6);
-  drawCollapsedWingDungeon_hook(gb);
+  TAIL(drawCollapsedWingDungeon);
 }
 
 void drawCollapsedWingDungeon_hook(GB *gb) {
@@ -296,7 +296,7 @@ void roomTileChangesAfterLoad03_hook(GB *gb) {
     return;
   }
   CYC(b_+5, b_+6);
-  roomTileChangesAfterLoad01_hook(gb);
+  TAIL(roomTileChangesAfterLoad01);
 }
 
 void roomTileChangesAfterLoad01_hook(GB *gb) {
@@ -440,7 +440,7 @@ void copyRectangleFromTmpGfxBuffer_paramBc_hook(GB *gb) {
   BASE(copyRectangleFromTmpGfxBuffer_paramBc);
   CYC(b_+0, b_+1); L = C;
   CYC(b_+1, b_+2); H = B;
-  copyRectangleFromTmpGfxBuffer_hook(gb);
+  TAIL(copyRectangleFromTmpGfxBuffer);
 }
 
 // 02:7d6e

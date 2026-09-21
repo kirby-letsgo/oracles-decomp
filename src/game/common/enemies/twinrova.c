@@ -660,7 +660,7 @@ substate6:
   CYC(b_+248, b_+250); L = 0xb2;  // ld l,Enemy.var32
   CYC(b_+250, b_+252); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 0)));  // res 0,(hl)
   CYC(b_+252, b_+254); A = 0x01;  // ld a,$01
-  CYC(b_+254, b_+258); mem_wr(gb, wLoadedObjectGfxEnd, A);  // ld (wLoadedTreeGfxIndex),a
+  CYC(b_+254, b_+257); mem_wr(gb, wLoadedObjectGfxEnd, A);  // ld (wLoadedTreeGfxIndex),a
   RET(b_+257); return;  // ret
 substate7:
   CYC(b_+258, b_+259); H = D;  // ld h,d

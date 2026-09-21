@@ -92,7 +92,7 @@ void linkCutscene_oscillateZ_hook(GB *gb) {
 void linkCutscene_oscillateZ_1_hook(GB *gb) {
   BASE(linkCutscene_oscillateZ_1);
   CYC(b_+0, b_+3); SET_HL(SYM(linkCutscene_zOscillation1));
-  linkCutscene_oscillateZ_hook(gb);
+  TAIL(linkCutscene_oscillateZ);
 }
 
 void linkCutscene_oscillateZ_2_hook(GB *gb) {
@@ -144,7 +144,7 @@ void linkCutscene0_substate6_hook(GB *gb) {
   }
   CYC(b_+19, b_+22);
   CYC(b_+22, b_+25);
-  objectSetVisible_hook(gb);
+  TAIL(objectSetVisible);
 }
 
 void linkCutscene0_hook(GB *gb) {
@@ -288,7 +288,7 @@ substate5:
     TAIL(linkCutscene_oscillateZ_1);
   }
   CYC(b_+167, b_+169);
-  linkCutscene_createGlowingOrb_hook(gb);
+  TAIL(linkCutscene_createGlowingOrb);
 }
 
 void linkCutscene_cpyTo48_hook(GB *gb) {
@@ -315,7 +315,7 @@ void linkCutscene_initOam_setVisible_incState_hook(GB *gb) {
   CALL_C(b_+5, interBankCall_hook, 0x008a, b_+8);
   CALL_C(b_+8, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+11);
   CYC(b_+11, b_+14);
-  itemIncState_hook(gb);
+  TAIL(itemIncState);
 }
 
 void linkCutscene_updateAngleOnPath_hook(GB *gb) {
@@ -428,7 +428,7 @@ void linkCutsceneFunc_73e8_hook(GB *gb) {
   CYC(b_+24, b_+25);
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
   CYC(b_+26, b_+29);
-  specialObjectSetAnimation_hook(gb);
+  TAIL(specialObjectSetAnimation);
 }
 
 static void link_cutscene_set_direction_and_animation(GB *gb, uint16_t sp0_) {
@@ -597,7 +597,7 @@ substate8:
   CYC(b_+190, b_+192); A = 0x03;
   CALL_C(b_+192, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+195);
   CYC(b_+195, b_+198);
-  itemIncSubstate_hook(gb);
+  TAIL(itemIncSubstate);
 }
 
 void linkCutscene4_hook(GB *gb) {
@@ -710,7 +710,7 @@ substate5:
   CYC(b_+125, b_+126); mem_wr(gb, DE, A);
   CYC(b_+126, b_+127); alu_xor(gb, A);
   CYC(b_+127, b_+130);
-  setLinkIDOverride_hook(gb);
+  TAIL(setLinkIDOverride);
 }
 
 void linkCutscene1_hook(GB *gb) {
@@ -818,7 +818,7 @@ substate3:
   CYC(b_+125, b_+127); A = 0x50;
   CALL_C(b_+127, playSound_b00_hook, SYM(playSound_b00), b_+130);
   CYC(b_+130, b_+133);
-  itemIncSubstate_hook(gb);
+  TAIL(itemIncSubstate);
 }
 
 void linkCutscene2_hook(GB *gb) {
@@ -998,7 +998,7 @@ goto_state7:
   CYC(b_+152, b_+154); mem_wr(gb, HL, 0x3c);
   CYC(b_+154, b_+155); alu_xor(gb, A);
   CYC(b_+155, b_+158);
-  specialObjectSetAnimation_hook(gb);
+  TAIL(specialObjectSetAnimation);
 }
 
 void linkCutscene5_hook(GB *gb) {
@@ -1034,7 +1034,7 @@ state1:
   }
   CYC(b_+34, b_+36); A = 0x00;
   CYC(b_+36, b_+39);
-  setLinkIDOverride_hook(gb);
+  TAIL(setLinkIDOverride);
 }
 
 void linkCutscene6_hook(GB *gb) {
@@ -1515,7 +1515,7 @@ substate3:
   }
   CYC(b_+144, b_+147);
   CYC(b_+147, b_+150);
-  objectSetVisible_hook(gb);
+  TAIL(objectSetVisible);
 }
 
 void linkCutsceneC_hook(GB *gb) {
@@ -1539,7 +1539,7 @@ state0:
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x01);
   CYC(b_+23, b_+25); A = 0x06;
   CYC(b_+25, b_+28);
-  specialObjectSetAnimation_hook(gb);
+  TAIL(specialObjectSetAnimation);
 }
 
 void specialObjectCode_linkInCutscene_b06_hook(GB *gb) {

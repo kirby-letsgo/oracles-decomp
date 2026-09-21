@@ -358,7 +358,7 @@ void introSpriteRunSubid07_hook(GB *gb) {
   CYC(b_+12, b_+14); alu_and(gb, 1);
   CYC(b_+14, b_+15); alu_xor(gb, B);
   if (F & FZ) CALL_C_CC(b_+15, objectSetInvisible_hook, SYM(objectSetInvisible), SYM(introSpriteRunTriforceGlowSubid)); else CYC(b_+15, b_+18);
-  introSpriteRunTriforceGlowSubid_hook(gb);
+  TAIL(introSpriteRunTriforceGlowSubid);
 }
 
 void introSpriteRunTriforceGlowSubid_hook(GB *gb) {

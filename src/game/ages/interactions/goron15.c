@@ -40,7 +40,7 @@ void goron_setLinkPositionAndDirection_hook(GB *gb) {
   CYC(b_+6, b_+7); mem_wr(gb, HL, B);
   CYC(b_+7, b_+9); L = 0x0d;
   CYC(b_+9, b_+10); mem_wr(gb, HL, C);
-  goron_putLinkInState08_hook(gb);
+  TAIL(goron_putLinkInState08);
 }
 
 void goron_putLinkInState08_hook(GB *gb) {

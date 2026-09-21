@@ -52,6 +52,12 @@ def guard_file(path, syms, apply):
             out.append(f'{indent}TAIL({callee});' + (sep + comment if sep else ''))
             changed += 1; skip = True
             continue
+        m3 = re.match(r'^(\s*)((?:CYCT?\([^;]*\); )?)(\w+)_hook\(gb\);\s*$', code)
+        if m3 and i + 1 < len(lines) and lines[i + 1] == '}' and m3.group(3) in syms and func_start is not None and not lines[func_start].startswith('static '):
+            indent, pre, callee = m3.groups()
+            out.append(f'{indent}{pre}TAIL({callee});' + (sep + comment if sep else ''))
+            changed += 1
+            continue
         m = PLAIN.match(code)
         if m and m.group(3) in syms and not re.search(r'hook_enabled_at', code) and func_start is not None:
             indent, pre, callee, rest = m.groups()

@@ -565,7 +565,7 @@ void tokayThiefSubstate0_hook(GB *gb) {
   else CYCT(b_+32, b_+34);
   CYC(b_+40, b_+42); L = 0x46;
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x5a);
-  tokayInitHeldItem_hook(gb);
+  TAIL(tokayInitHeldItem);
 }
 
 void tokayInitHeldItem_hook(GB *gb) {
@@ -579,7 +579,7 @@ void tokayInitHeldItem_hook(GB *gb) {
   CALL_C(b_+9, addAToBc_hook, 0x006d, b_+12);
   CYC(b_+12, b_+13); A = mem_rd(gb, BC);
   CYC(b_+13, b_+14); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  tokayInitAccessory_hook(gb);
+  TAIL(tokayInitAccessory);
 }
 
 void tokayInitAccessory_hook(GB *gb) {
@@ -645,7 +645,7 @@ void tokayThiefSubstate2_hook(GB *gb) {
   CYC(b_+9, b_+11); mem_wr(gb, HL, 6);
   CYC(b_+11, b_+13); L = 0x50;
   CYC(b_+13, b_+15); mem_wr(gb, HL, 0x64);
-  tokayThief_jump_hook(gb);
+  TAIL(tokayThief_jump);
 }
 
 void tokayThief_jump_hook(GB *gb) {
@@ -772,7 +772,7 @@ void wildTokayParticipantSubstate0_hook(GB *gb) {
   BASE(wildTokayParticipantSubstate0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, wildTokayParticipant_checkGrabMeat_hook, SYM(wildTokayParticipant_checkGrabMeat), SYM(wildTokayParticipantSubstate2));
-  wildTokayParticipantSubstate2_hook(gb);
+  TAIL(wildTokayParticipantSubstate2);
 }
 
 void wildTokayParticipantSubstate2_hook(GB *gb) {
@@ -841,7 +841,7 @@ void wildTokayParticipant_checkGrabMeat_hook(GB *gb) {
   CYC(b_+60, b_+61); SET_DE(pop_effect(gb));
   CYC(b_+61, b_+63); A = 0x6c;
   CALL_C(b_+63, playSound_b00_hook, SYM(playSound_b00), SYM(tokayInitMeatAccessory));
-  tokayInitMeatAccessory_hook(gb);
+  TAIL(tokayInitMeatAccessory);
 }
 
 void tokayInitMeatAccessory_hook(GB *gb) {
@@ -919,7 +919,7 @@ void tokayRunSubid0f_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScrollMode);
   CYC(b_+3, b_+5); alu_and(gb, 0x0e);
   if (!(F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; } CYC(b_+5, b_+6);
-  tokayRunSubid10_hook(gb);
+  TAIL(tokayRunSubid10);
 }
 
 void tokayRunSubid10_hook(GB *gb) {

@@ -11,7 +11,7 @@ void twinrova_writePositionWithXOffsetTocfd5_hook(GB *gb);
 void objectWritePositionTocfd5_hook(GB *gb) {
   BASE(objectWritePositionTocfd5);
   CYC(b_+0, b_+1); alu_xor(gb, A);
-  twinrova_writePositionWithXOffsetTocfd5_hook(gb);
+  TAIL(twinrova_writePositionWithXOffsetTocfd5);
 }
 
 void twinrova_writePositionWithXOffsetTocfd5_hook(GB *gb) {

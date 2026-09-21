@@ -126,5 +126,5 @@ take_position_with_offset:
 
 delete:
   CYC(b_+85, b_+88);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }

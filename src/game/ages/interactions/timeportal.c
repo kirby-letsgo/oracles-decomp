@@ -43,7 +43,7 @@ void timeportal_updatePalette_hook(GB *gb) {
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
 animate:
   CYC(b_+14, b_+17);
-  interactionAnimate_hook(gb);
+  TAIL(interactionAnimate);
 }
 
 void interactionBeginTimewarp_hook(GB *gb) {
@@ -68,7 +68,7 @@ void interactionBeginTimewarp_hook(GB *gb) {
   CYC(b_+40, b_+43); mem_wr(gb, wCutsceneTrigger, A);
   CALL_C(b_+43, restartSound_hook, SYM(restartSound), b_+46);
   CYC(b_+46, b_+49);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }
 
 void interactionCodede_hook(GB *gb) {
@@ -152,5 +152,5 @@ state2:
   CYC(b_+96, b_+97);
   CYC(b_+97, b_+99); A = 0xff;
   CYC(b_+99, b_+102); mem_wr(gb, wPortalGroup, A);
-  interactionBeginTimewarp_hook(gb);
+  TAIL(interactionBeginTimewarp);
 }

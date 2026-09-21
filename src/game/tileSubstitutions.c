@@ -97,7 +97,7 @@ void replaceBreakableTileOverPortal_hook(GB *gb) {
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+15); L = alu_inc8(gb, L);
   CYC(b_+15, b_+16); C = mem_rd(gb, HL);
-  removeBreakableTileForTimeWarp_hook(gb);
+  TAIL(removeBreakableTileForTimeWarp);
 }
 
 void removeBreakableTileForTimeWarp_hook(GB *gb) {
@@ -245,7 +245,7 @@ void applyStandardTileSubstitutions_hook(GB *gb) {
     return;
   }
   CYC(b_+50, b_+51);
-  applyStandardTileSubstitutions__locFunc_hook(gb);
+  TAIL(applyStandardTileSubstitutions__locFunc);
 }
 
 void applyStandardTileSubstitutions__locFunc_hook(GB *gb) {

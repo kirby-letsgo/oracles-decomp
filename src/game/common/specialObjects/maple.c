@@ -397,7 +397,7 @@ variation_mask_ready:
   CYC(b_+134, b_+135); E = alu_inc8(gb, E);
   CYC(b_+135, b_+136); A = H;
   CYC(b_+136, b_+137); mem_wr(gb, DE, A);
-  mapleDecideNextAngle_hook(gb);
+  TAIL(mapleDecideNextAngle);
 }
 
 void mapleDecideNextAngle_hook(GB *gb) {
@@ -772,7 +772,7 @@ void mapleUpdateAngle_hook(GB *gb) {
   CYC(b_+14, b_+16); H8(hFF8B) = A;
   CYC(b_+16, b_+17); A = mem_rd(gb, DE);
   CALL_C(b_+17, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(mapleDecideAnimation));
-  mapleDecideAnimation_hook(gb);
+  TAIL(mapleDecideAnimation);
 }
 
 void mapleDecideAnimation_hook(GB *gb) {
@@ -1330,7 +1330,7 @@ substate2:
     CYCT(b_+125, b_+126); ret_effect(gb); return;
   }
   CYC(b_+125, b_+126);
-  mapleEndEncounter_hook(gb);
+  TAIL(mapleEndEncounter);
 }
 
 void mapleEndEncounter_hook(GB *gb) {
@@ -1342,7 +1342,7 @@ void mapleEndEncounter_hook(GB *gb) {
   CYC(b_+7, b_+10); W8(wMenuDisabled) = A;
   CYC(b_+10, b_+13); W8(wDisableScreenTransitions) = A;
   CALL_C(b_+13, mapleIncrementMeetingCounter_hook, SYM(mapleIncrementMeetingCounter), SYM(mapleDeleteSelf));
-  mapleDeleteSelf_hook(gb);
+  TAIL(mapleDeleteSelf);
 }
 
 void mapleDeleteSelf_hook(GB *gb) {
@@ -1433,7 +1433,7 @@ substate1:
   CALL_C(b_+74, itemIncState_hook, SYM(itemIncState), b_+77);
   CYC(b_+77, b_+79); L = 0x10;
   CYC(b_+79, b_+81); mem_wr(gb, HL, 0x78);
-  mapleStateC_hook(gb);
+  TAIL(mapleStateC);
 }
 
 void mapleStateC_hook(GB *gb) {

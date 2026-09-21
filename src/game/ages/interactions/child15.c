@@ -36,7 +36,7 @@ void child_setStage8ResponseToSelectedTextOption_hook(GB *gb) {
   BASE(child_setStage8ResponseToSelectedTextOption);
   CYC(b_+0, b_+3); SET_HL(wSelectedTextOption);
   CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
-  child_setStage8Response_hook(gb);
+  TAIL(child_setStage8Response);
 }
 
 void child_setStage8Response_hook(GB *gb) {

@@ -159,6 +159,6 @@ void loadStaticObjects_body_hook(GB *gb) {
     CYC(b_+29, b_+30); E = alu_inc8(gb, E);
     CYC(b_+30, b_+31); E = alu_inc8(gb, E);
     CYC(b_+31, b_+32); E = alu_inc8(gb, E);
-    CYC(b_+32, (SYM(staticDungeonObjects) + 1));
+    CYC(b_+32, b_+34);
   }
 }

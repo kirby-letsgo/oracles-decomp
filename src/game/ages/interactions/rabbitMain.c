@@ -368,7 +368,7 @@ void rabbitJump_hook(GB *gb) {
   CALL_C(b_+2, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+5);
   CYC(b_+5, b_+8); SET_BC(0xff20);
   CYC(b_+8, b_+11);
-  objectSetSpeedZ_hook(gb);
+  TAIL(objectSetSpeedZ);
 }
 
 void rabbitSubid4Substate2_hook(GB *gb) {
@@ -390,7 +390,7 @@ void rabbitSubid4Substate2_hook(GB *gb) {
   CALL_C(b_+22, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+25);
   CYC(b_+25, b_+27); A = 0x09;
   CYC(b_+27, b_+30);
-  interactionSetAnimation_hook(gb);
+  TAIL(interactionSetAnimation);
 }
 
 static void rabbit_subid5_substate3(GB *gb, uint16_t sp0_) {
@@ -482,7 +482,7 @@ void rabbitSubid7_hook(GB *gb) {
   }
   CYC(b_+3, b_+6);
   CYC(b_+6, b_+9);
-  npcFaceLinkAndAnimate_hook(gb);
+  TAIL(npcFaceLinkAndAnimate);
 }
 
 void rabbitSubid2SetRandomSpawnDelay_hook(GB *gb) {
@@ -560,7 +560,7 @@ void rabbitSubid2_hook(GB *gb) {
   CYC(b_+35, b_+36); C = A;
   CALL_ROM(b_+36, SYM(spawnRabbitWithSubid1));
   CYC(b_+39, b_+42);
-  rabbitSubid2SetRandomSpawnDelay_hook(gb);
+  TAIL(rabbitSubid2SetRandomSpawnDelay);
 }
 
 static void rabbit_subid5_substate0(GB *gb, uint16_t sp0_) {

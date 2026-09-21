@@ -165,7 +165,7 @@ void mooshState1_hook(GB *gb) {
     TAIL(companionTryToMount);
   }
   CYC(b_+11, b_+14);
-  mooshCheckHazards_hook(gb);
+  TAIL(mooshCheckHazards);
 }
 
 void mooshCheckHazards_hook(GB *gb) {
@@ -258,7 +258,7 @@ void mooshTryToBreakTileFromMovingAndCheckHazards_hook(GB *gb) {
     TAIL(companionUpdateDirectionAndAnimate);
   }
   CYC(b_+8, b_+11);
-  mooshSetVar37ForHazard_hook(gb);
+  TAIL(mooshSetVar37ForHazard);
 }
 
 void mooshSetVar37ForHazard_hook(GB *gb) {
@@ -357,7 +357,7 @@ void mooshPressedAButton_hook(GB *gb) {
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
   CYC(b_+8, b_+10); A = 0x53;
   CALL_C(b_+10, playSound_b00_hook, SYM(playSound_b00), SYM(mooshState2));
-  mooshState2_hook(gb);
+  TAIL(mooshState2);
 }
 
 void mooshState2_hook(GB *gb) {

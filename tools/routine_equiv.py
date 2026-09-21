@@ -53,8 +53,8 @@ class Game:
         """label+offset for a ROM address, resolved in the bank the code would land in (for bank 0
         code, the bank the routine last switched to when known, else the one bank with a label)."""
         tb = 0 if t < 0x4000 else bank
+        if t >= 0x4000 and hint is not None and hint != tb and (hint, t) in self.by_addr: return self.by_addr[(hint, t)]
         if tb == 0 and t >= 0x4000:
-            if hint is not None and (hint, t) in self.by_addr: return self.by_addr[(hint, t)]
             hits = [b for b in self.sorted_by_bank if b != 0 and (b, t) in self.by_addr]
             return self.by_addr[(hits[0], t)] if len(hits) == 1 else f'${t:04x}'
         addrs = self.sorted_by_bank.get(tb, [])
@@ -63,6 +63,14 @@ class Game:
         base = addrs[i]
         n = self.by_addr[(tb, base)]
         return n if base == t else f'{n}+{t - base}'
+
+    def peer_sym(self, sym, peer):
+        """An unresolved `$xxxx` (a bank-0 reference several banks could satisfy) counts as the
+        other game's label when this game has that label at that address in some bank."""
+        m = re.match(r'^\$([0-9a-f]{4})$', sym)
+        if not m or not re.match(r'^[A-Za-z_]\w*$', peer): return sym
+        t = int(m.group(1), 16)
+        return peer if any((b, t) in self.by_addr and self.by_addr[(b, t)] == peer for b in self.sorted_by_bank if b != 0) else sym
 
     def ram_sym(self, t):
         i = bisect.bisect_right(self.ram_sorted, t) - 1
@@ -176,7 +184,10 @@ class Game:
         for i, (a, ln, kind, tmpl, ops) in enumerate(insns):
             if tmpl == 'ld a,%s' and ops and ops[0][0] == 'imm': last_imm = ops[0][1]
             elif tmpl in ('ld (%s),a', 'ldh (%s),a') and ops and ops[0][1] in (0x2222, 0xff97): hint = last_imm
-            elif tmpl == 'ld e,%s' and ops and ops[0][0] == 'imm' and any(x[2] == 'call' and x[4] and x[4][0][1] == ibc for x in insns[i + 1:i + 4]): hint = ops[0][1]
+            h = hint if start < 0x4000 else None
+            for j in range(i, min(i + 4, len(insns))):     # ld hl,x / ld e,bank / call interBankCall, in any order
+                xj = insns[j]
+                if xj[3] == 'ld e,%s' and xj[4] and xj[4][0][0] == 'imm' and any(x[2] == 'call' and x[4] and x[4][0][1] == ibc for x in insns[j + 1:j + 4]): h = xj[4][0][1]; break
             syms = []
             for k, v in ops:
                 if k == 'imm': syms.append(f'${v:02x}')
@@ -184,10 +195,29 @@ class Game:
                 elif k == 'ram' and 0x0000 <= v < 0x8000 and not (0x0150 <= v < 0x4000 and tmpl.startswith('ld a,(')): syms.append(f'${v:04x}')   # MBC register writes
                 elif v in addrs or (k != 'any' and lo <= v < lo + 0x200 and any(x <= v < x + l for x, l, *_ in insns)):
                     syms.append(f'@{v - start:+d}')
-                else: syms.append(self.rom_sym(bank, v, hint))
+                else: syms.append(self.rom_sym(bank, v, h))
             out.append((a - start, tmpl % tuple(syms) if syms else tmpl))
             shape.append((a - start, tmpl))
         return out, shape
+
+
+def reconcile(an, sn, ages, seasons):
+    """Resolve `$xxxx` operands on either side through the other side's label (Game.peer_sym)."""
+    out_a, out_s = [], []
+    for (oa, ta), (os_, ts) in zip(an, sn):
+        if ta != ts:
+            wa, ws = ta.split(' '), ts.split(' ')
+            if len(wa) == len(ws):
+                for i in range(len(wa)):
+                    if wa[i] == ws[i]: continue
+                    xa, xs = wa[i].split(','), ws[i].split(',')
+                    if len(xa) == len(xs):
+                        xa = [ages.peer_sym(x, y) for x, y in zip(xa, xs)]
+                        xs = [seasons.peer_sym(y, x) for x, y in zip(xa, xs)]
+                        wa[i], ws[i] = ','.join(xa), ','.join(xs)
+                ta, ts = ' '.join(wa), ' '.join(ws)
+        out_a.append((oa, ta)); out_s.append((os_, ts))
+    return out_a, out_s
 
 
 def main():
@@ -232,6 +262,7 @@ def main():
             best = None
             for (sb, sa) in s_insts:
                 sn, ssh = seasons.normalized(sb, sa)
+                if an != sn and ash == ssh: an, sn = reconcile(an, sn, ages, seasons)
                 if an == sn: best = ('IDENTICAL', f'{sb:02x}:{sa:04x}'); break
                 if ash == ssh:
                     diffs = sum(1 for x, y in zip(an, sn) if x != y)

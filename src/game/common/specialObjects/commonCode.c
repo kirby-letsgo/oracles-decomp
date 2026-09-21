@@ -129,7 +129,7 @@ void dealSpikeDamageToLink_hook(GB *gb) {
   CYC(b_+44, b_+46); A = 0x5f;
   CALL_C(b_+46, playSound_b00_hook, SYM(playSound_b00), b_+49);
   CYC(b_+49, b_+51);
-  linkApplyDamage_b5_hook(gb);
+  TAIL(linkApplyDamage_b5);
 }
 
 void updateLinkDamageTaken_hook(GB *gb) {
@@ -138,7 +138,7 @@ void updateLinkDamageTaken_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(GV((SYM(companionDismount) + 56), 0x4647));
   CYC(b_+3, b_+5); E = 0x06;
   CALL_C(b_+5, interBankCall_hook, 0x008a, SYM(linkApplyDamage_b5));
-  linkApplyDamage_b5_hook(gb);
+  TAIL(linkApplyDamage_b5);
 }
 
 void updateLinkInvincibilityCounter_hook(GB *gb) {
@@ -519,7 +519,7 @@ current:
 void linkAdjustAngleInSidescrollingArea_hook(GB *gb) {
   BASE(linkAdjustAngleInSidescrollingArea);
   CYC(b_+0, b_+2); L = 0x09;
-  linkAdjustGivenAngleInSidescrollingArea_hook(gb);
+  TAIL(linkAdjustGivenAngleInSidescrollingArea);
 }
 
 void linkAdjustGivenAngleInSidescrollingArea_hook(GB *gb) {
@@ -549,7 +549,7 @@ void companionPreventLinkFromPassing_noExtraChecks_hook(GB *gb) {
   BASE(companionPreventLinkFromPassing_noExtraChecks);
   CYC(b_+0, b_+3); SET_HL(w1Link);
   CYC(b_+3, b_+6);
-  preventObjectHFromPassingObjectD_hook(gb);
+  TAIL(preventObjectHFromPassingObjectD);
 }
 
 void companionUpdateMovement_hook(GB *gb) {
@@ -565,7 +565,7 @@ void companionUpdateMovement_hook(GB *gb) {
     CYCT(b_+11, b_+12); ret_effect(gb); return;
   }
   CYC(b_+11, b_+12);
-  companionTryToBreakTileFromMoving_hook(gb);
+  TAIL(companionTryToBreakTileFromMoving);
 }
 
 void companionTryToBreakTileFromMoving_hook(GB *gb) {
@@ -579,7 +579,7 @@ void companionTryToBreakTileFromMoving_hook(GB *gb) {
   CYC(b_+9, b_+10); C = mem_rd(gb, HL);
   CYC(b_+10, b_+12); A = 0x13;
   CYC(b_+12, b_+15);
-  tryToBreakTile_hook(gb);
+  TAIL(tryToBreakTile);
 }
 
 void companionCalculateAdjacentWallsBitset_hook(GB *gb) {
@@ -686,7 +686,7 @@ set_collision:
 
 check_collision:
   CYC(b_+48, b_+51);
-  checkCollisionPosition_disallowSmallBridges_hook(gb);
+  TAIL(checkCollisionPosition_disallowSmallBridges);
 }
 
 void specialObjectGetRelativeTileWithDirectionTable_hook(GB *gb) {
@@ -694,7 +694,7 @@ void specialObjectGetRelativeTileWithDirectionTable_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x08;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); common_code_add_double_index(gb, SYM(specialObjectGetRelativeTileFromHl));
-  specialObjectGetRelativeTileFromHl_hook(gb);
+  TAIL(specialObjectGetRelativeTileFromHl);
 }
 
 void specialObjectGetRelativeTileFromHl_hook(GB *gb) {
@@ -746,7 +746,7 @@ void specialObjectCheckMovingTowardWall_hook(GB *gb) {
     CYCT(b_+6, b_+7); ret_effect(gb); return;
   }
   CYC(b_+6, b_+7);
-  specialObjectCheckFacingWall_hook(gb);
+  TAIL(specialObjectCheckFacingWall);
 }
 
 void specialObjectCheckFacingWall_hook(GB *gb) {
@@ -868,7 +868,7 @@ void companionUpdateDirectionAndAnimate_hook(GB *gb) {
     CYCT(b_+21, b_+24); TAIL(specialObjectAnimate);
   }
   CYC(b_+21, b_+24);
-  companionUpdateDirectionAndSetAnimation_hook(gb);
+  TAIL(companionUpdateDirectionAndSetAnimation);
 }
 
 void companionUpdateDirectionAndSetAnimation_hook(GB *gb) {
@@ -880,7 +880,7 @@ void companionUpdateDirectionAndSetAnimation_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_and(gb, 0x03);
   CYC(b_+8, b_+9); E = alu_dec8(gb, E);
   CYC(b_+9, b_+10); mem_wr(gb, DE, A);
-  companionSetAnimation_hook(gb);
+  TAIL(companionSetAnimation);
 }
 
 void companionSetAnimation_hook(GB *gb) {
@@ -892,7 +892,7 @@ void companionSetAnimation_hook(GB *gb) {
   CYC(b_+5, b_+7); L = 0x38;
   CYC(b_+7, b_+8); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+8, b_+11);
-  specialObjectSetAnimation_hook(gb);
+  TAIL(specialObjectSetAnimation);
 }
 
 void companionTryToMount_hook(GB *gb) {
@@ -956,7 +956,7 @@ try_mounting:
   CYC(b_+50, b_+52); A = 0x03;
   CYC(b_+52, b_+53); mem_wr(gb, DE, A);
   CYC(b_+53, b_+55); A = 0xff;
-  setLinkMountingSpeed_hook(gb);
+  TAIL(setLinkMountingSpeed);
 }
 
 void setLinkMountingSpeed_hook(GB *gb) {
@@ -986,7 +986,7 @@ void companionCheckHazards_hook(GB *gb) {
     CYCT(b_+4, b_+5); ret_effect(gb); return;
   }
   CYC(b_+4, b_+5);
-  companionGotoHazardHandlingState_hook(gb);
+  TAIL(companionGotoHazardHandlingState);
 }
 
 void companionGotoHazardHandlingState_hook(GB *gb) {
@@ -1046,7 +1046,7 @@ void companionDismountAndSavePosition_hook(GB *gb) {
 
 normal_dismount:
   CYC(b_+34, b_+36);
-  saveLinkLocalRespawnAndCompanionPosition_hook(gb);
+  TAIL(saveLinkLocalRespawnAndCompanionPosition);
 }
 
 void companionDismount_hook(GB *gb) {
@@ -1092,7 +1092,7 @@ void companionDismount_hook(GB *gb) {
   CYC(b_+67, b_+70); W8(wForceCompanionDismount) = A;
   CYC(b_+70, b_+73); W8(wDisableScreenTransitions) = A;
   CYC(b_+73, b_+76);
-  setCameraFocusedObjectToLink_hook(gb);
+  TAIL(setCameraFocusedObjectToLink);
 }
 
 void saveLinkLocalRespawnAndCompanionPosition_hook(GB *gb) {
@@ -1382,7 +1382,7 @@ void companionFinalizeMounting_hook(GB *gb) {
   CALL_C(b_+50, setCameraFocusedObjectToLink_hook, SYM(setCameraFocusedObjectToLink), b_+53);
   CYC(b_+53, b_+55); A = 0x09;
   CYC(b_+55, b_+58);
-  setLinkID_hook(gb);
+  TAIL(setLinkID);
 }
 
 void companionFunc_47d8_hook(GB *gb) {
@@ -1572,7 +1572,7 @@ void companionRetIfInactive_hook(GB *gb) {
     return;
   }
   CYC(b_+9, b_+11);
-  companionRetIfInactiveWithoutStateCheck_hook(gb);
+  TAIL(companionRetIfInactiveWithoutStateCheck);
 }
 
 void companionRetIfInactiveWithoutStateCheck_hook(GB *gb) {
@@ -1851,7 +1851,7 @@ void companionInitializeOnEnteringScreen_hook(GB *gb) {
   CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+10, b_+12); L = 0x07;
   CYC(b_+12, b_+15);
-  objectSetVisiblec1_hook(gb);
+  TAIL(objectSetVisiblec1);
 }
 
 void companionRetIfNotFinishedWalkingIn_hook(GB *gb) {
@@ -1909,5 +1909,5 @@ void specialObjectTryToBreakTile_source05_hook(GB *gb) {
   CYC(b_+8, b_+9); B = A;
   CYC(b_+9, b_+11); A = 0x05;
   CYC(b_+11, b_+14);
-  tryToBreakTile_hook(gb);
+  TAIL(tryToBreakTile);
 }

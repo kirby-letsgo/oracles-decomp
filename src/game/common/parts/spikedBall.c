@@ -119,7 +119,7 @@ void spikedBall_head_state0_hook(GB *gb) {
   CYC(b_+3, b_+5); L = 0xe4; // Part.collisionType
   CYC(b_+5, b_+7); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));
   CALL_C(b_+7, objectSetVisible81_hook, SYM(objectSetVisible81), SYM(spikedBall_head_state1));
-  spikedBall_head_state1_hook(gb); // falls through
+  TAIL(spikedBall_head_state1);// falls through
 }
 
 void spikedBall_head_state1_hook(GB *gb) {
@@ -139,7 +139,7 @@ void spikedBall_head_state2_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_add(gb, 0x02);
   CYC(b_+5, b_+7); alu_and(gb, 0x1f);
   CYC(b_+7, b_+8); mem_wr(gb, DE, A);
-  spikedBall_head_setDefaultDistanceAway_hook(gb); // falls through
+  TAIL(spikedBall_head_setDefaultDistanceAway);// falls through
 }
 
 void spikedBall_head_setDefaultDistanceAway_hook(GB *gb) {
@@ -147,7 +147,7 @@ void spikedBall_head_setDefaultDistanceAway_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0xf0; // Part.var30
   CYC(b_+2, b_+4); A = 0x0a;
   CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  spikedBall_updatePosition_hook(gb); // falls through
+  TAIL(spikedBall_updatePosition);// falls through
 }
 
 void spikedBall_updatePosition_hook(GB *gb) {

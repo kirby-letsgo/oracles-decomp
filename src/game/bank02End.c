@@ -176,7 +176,7 @@ void fake_copyRectangleFromVramTilesToAddress_paramBc_hook(GB *gb) {
   BASE(fake_copyRectangleFromVramTilesToAddress_paramBc);
   CYC(b_+0, b_+1); L = C;
   CYC(b_+1, b_+2); H = B;
-  fake_copyRectangleFromVramTilesToAddress_hook(gb);
+  TAIL(fake_copyRectangleFromVramTilesToAddress);
 }
 
 void fake_copyRectangleFromVramTilesToAddress_hook(GB *gb) {

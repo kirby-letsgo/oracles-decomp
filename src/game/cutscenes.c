@@ -23,7 +23,7 @@ void cutscene06_hook(GB *gb) {
 void cutscene07_hook(GB *gb) {
   BASE(cutscene07);
   CYC(b_+0, b_+2); C = 0x01;
-  func_5d5d_hook(gb);
+  TAIL(func_5d5d);
 }
 
 void func_5d5d_hook(GB *gb) {
@@ -45,7 +45,7 @@ void cutscene08_hook(GB *gb) {
   BASE(cutscene08);
   CYC(b_+0, b_+2); C = 0x02;
   CYC(b_+2, b_+4);
-  func_5d5d_hook(gb);
+  TAIL(func_5d5d);
 }
 
 void cutscene0c_hook(GB *gb) {
@@ -54,7 +54,7 @@ void cutscene0c_hook(GB *gb) {
   CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
   CYC(b_+3, b_+5); C = 0x03;
   CYC(b_+5, b_+7);
-  func_5d5d_hook(gb);
+  TAIL(func_5d5d);
 }
 
 void cutscene09_hook(GB *gb) {
@@ -85,7 +85,7 @@ void cutscene_endgameTail_hook(GB *gb) {
   }
   CYC(b_+19, b_+20);
   CYC(b_+20, b_+23);
-  applyWarpTransition2_hook(gb);
+  TAIL(applyWarpTransition2);
 }
 
 void cutscene0f_hook(GB *gb) {
@@ -94,14 +94,14 @@ void cutscene0f_hook(GB *gb) {
   CALL_C(b_+0, refreshLoadedTreeGfx_hook, SYM(refreshLoadedTreeGfx), b_+3);
   CYC(b_+3, b_+5); E = 0x02;
   CYC(b_+5, b_+8);
-  endgameCutsceneHandler_hook(gb);
+  TAIL(endgameCutsceneHandler);
 }
 
 void cutscene0a_hook(GB *gb) {
   BASE(cutscene0a);
   CYC(b_+0, b_+2); E = 0x01;
   CYC(b_+2, b_+5);
-  endgameCutsceneHandler_hook(gb);
+  TAIL(endgameCutsceneHandler);
 }
 
 void cutscene20_hook(GB *gb) {
@@ -153,14 +153,14 @@ void cutscene21_hook(GB *gb) {
   CYC(b_+4, b_+7);
   CYC(b_+7, b_+9); C = 0x07;
   CYC(b_+9, b_+11);
-  func_5d5d_hook(gb);
+  TAIL(func_5d5d);
 }
 
 void cutscene10_hook(GB *gb) {
   BASE(cutscene10);
   CYC(b_+0, b_+2); C = 0x04;
   CYC(b_+2, b_+4);
-  func_5d5d_hook(gb);
+  TAIL(func_5d5d);
 }
 
 void cutscene11_hook(GB *gb) {
@@ -168,7 +168,7 @@ void cutscene11_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, func_3ed0_hook, GV(SYM(func_3ed0), 0x335a), b_+3);
   CYC(b_+3, b_+6);
-  func_5d41_hook(gb);
+  TAIL(func_5d41);
 }
 
 void cutscene12_hook(GB *gb) {
@@ -183,5 +183,5 @@ void cutscene12_hook(GB *gb) {
   CYC(b_+4, b_+7);
   CALL_C(b_+7, func_3ee4_hook, SYM(func_3ee4), b_+10);
   CYC(b_+10, b_+13);
-  func_5d41_hook(gb);
+  TAIL(func_5d41);
 }

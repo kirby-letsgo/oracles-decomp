@@ -87,7 +87,7 @@ void tokayShopItem_giveBraceletToLink_hook(GB *gb) {
 void tokayShopItem_giveFeatherToLink_hook(GB *gb) {
   BASE(tokayShopItem_giveFeatherToLink);
   CYC(b_+0, b_+2); C = 0x02;
-  tokayShopItem_createTreasureAtLink_hook(gb);
+  TAIL(tokayShopItem_createTreasureAtLink);
 }
 
 void tokayShopItem_createTreasureAtLink_hook(GB *gb) {

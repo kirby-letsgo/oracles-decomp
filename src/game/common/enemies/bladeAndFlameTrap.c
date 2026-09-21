@@ -579,7 +579,7 @@ void bladeTrap_incAngle_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(SYM(bladeTrap_incAngle), (SYM(bladeTrap_incAngle) + 1)); A = mem_rd(gb, DE);
   CYC((SYM(bladeTrap_incAngle) + 1), (SYM(bladeTrap_incAngle) + 2)); A = alu_inc8(gb, A);
-  CYC((SYM(bladeTrap_incAngle) + 2), b_+2); goto andAndStore; // jr
+  CYC((SYM(bladeTrap_incAngle) + 2), (SYM(bladeTrap_incAngle) + 4)); goto andAndStore; // jr
 
 andAndStore:
   CYC(b_+2, b_+4); alu_and(gb, 0x1f);

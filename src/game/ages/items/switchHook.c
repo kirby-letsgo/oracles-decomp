@@ -137,7 +137,7 @@ void itemCode0aPost_hook(GB *gb) {
   }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+14);
-  func_5902_hook(gb);
+  TAIL(func_5902);
 }
 
 void itemCode0b_hook(GB *gb) {
@@ -155,7 +155,7 @@ void itemCode0b_hook(GB *gb) {
   CYC(b_+15, b_+16); alu_xor(gb, A);
   CALL_C(b_+16, itemSetAnimation_hook, SYM(itemSetAnimation), b_+19);
   CYC(b_+19, b_+22);
-  objectSetVisible83_hook(gb);
+  TAIL(objectSetVisible83);
 }
 
 static void switch_hook_start_retracting(GB *gb) {
@@ -340,7 +340,7 @@ state2:
   CYC(b_+238, b_+240); L = 0x2f;
   CYC(b_+240, b_+242); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
   CYC(b_+242, b_+245);
-  objectSetInvisible_hook(gb);
+  TAIL(objectSetInvisible);
 }
 
 void func_5902_hook(GB *gb) {
@@ -364,7 +364,7 @@ void func_5902_hook(GB *gb) {
   CYC(b_+15, b_+18); W8(wDisableLinkCollisionsAndMenu) = A;
   CYC(b_+18, b_+21); W8(wSwitchHookState) = A;
   CYC(b_+21, b_+24);
-  itemDelete_hook(gb);
+  TAIL(itemDelete);
 }
 
 void checkRelatedObject2States_hook(GB *gb) {
@@ -402,7 +402,7 @@ void updateSwitchHookSound_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0xa7;
   CYC(b_+8, b_+11);
-  playSound_b00_hook(gb);
+  TAIL(playSound_b00);
 }
 
 void checkCanPlaceDiamondOnTile_hook(GB *gb) {
@@ -687,7 +687,7 @@ delete:
   CYC(b_+369, b_+372); W8(wSwitchHookState) = A;
   CYC(b_+372, b_+375); W8(wDisableLinkCollisionsAndMenu) = A;
   CYC(b_+375, b_+378);
-  itemDelete_hook(gb);
+  TAIL(itemDelete);
 }
 
 void itemCode09_hook(GB *gb) {

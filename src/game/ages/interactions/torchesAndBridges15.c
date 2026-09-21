@@ -117,7 +117,7 @@ void moonlitGrotto_enableControlAfterBreakingCrystal_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+4, b_+7); mem_wr(gb, wMenuDisabled, A);
-  label_15_031_hook(gb);
+  TAIL(label_15_031);
 }
 
 void label_15_031_hook(GB *gb) {

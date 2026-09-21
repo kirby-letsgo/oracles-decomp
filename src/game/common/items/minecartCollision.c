@@ -32,5 +32,5 @@ void itemCode1dPost_hook(GB *gb) {
   }
   CYC(b_+6, b_+9);
   CYC(b_+9, b_+12);
-  itemDelete_hook(gb);
+  TAIL(itemDelete);
 }

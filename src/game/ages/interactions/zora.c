@@ -83,7 +83,7 @@ void zora_commonInitWithScript_hook(GB *gb) {
   BASE(zora_commonInitWithScript);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionSetScript_hook, SYM(interactionSetScript), SYM(zora_commonInit));
-  zora_commonInit_hook(gb);
+  TAIL(zora_commonInit);
 }
 
 void zora_getWorldState_hook(GB *gb) {
@@ -493,7 +493,7 @@ state0:
 
 initialize:
   CYC(b_+43, b_+46); SET_HL((SYM(interactionCodeb6__state6) + 40));
-  zora_commonInitWithScript_hook(gb);
+  TAIL(zora_commonInitWithScript);
 }
 
 void zora_subid00_hook(GB *gb) {

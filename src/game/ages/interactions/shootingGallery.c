@@ -524,7 +524,7 @@ biggoronGallery:
   CYC(b_+43, b_+46); SET_HL(shootingGallery_targetTiles_biggoron_bank08);
   CYC(b_+46, b_+47); shootingGallery_addDoubleIndex(gb, b_+47);
   CYC(b_+47, b_+50); SET_BC(shootingGallery_targetPositions_biggoron_bank08);
-  shootingGallery_setTiles_hook(gb);
+  TAIL(shootingGallery_setTiles);
 }
 
 // Replace the 10 tiles at positions BC with the tile indices at HL, or with

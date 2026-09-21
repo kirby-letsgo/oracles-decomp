@@ -76,7 +76,7 @@ void specialObjectGetTileInFront_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+6); SET_HL(SYM(nextTileOffsets));
   CYC(b_+6, b_+7); add_double_index_to_hl_from_rst(gb, SYM(specialObjectGetTileAtOffset));
-  specialObjectGetTileAtOffset_hook(gb);
+  TAIL(specialObjectGetTileAtOffset);
 }
 
 void specialObjectGetTileAtOffset_hook(GB *gb) {
@@ -376,7 +376,7 @@ void checkFacingBottomOfTileAndPressedA_hook(GB *gb) {
     CYCT(b_+5, b_+7); facing_bottom_abort(gb); return;
   }
   CYC(b_+5, b_+7);
-  checkFacingBottomOfTile_hook(gb);
+  TAIL(checkFacingBottomOfTile);
 }
 
 void nextToChestTile_hook(GB *gb) {

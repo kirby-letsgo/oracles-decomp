@@ -225,7 +225,7 @@ update_speed_and_animation:
   if (!(F & FZ)) CALL_C_CC(b_+219, playSound_b00_hook, SYM(playSound_b00), b_+222);
   else CYC(b_+219, b_+222);
   CYC(b_+222, b_+225);
-  itemAnimate_hook(gb);
+  TAIL(itemAnimate);
 }
 
 void itemCheckWithinRangeOfLink_hook(GB *gb) {

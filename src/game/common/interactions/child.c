@@ -372,7 +372,7 @@ void childUpdateAnimationAndSolidity_hook(GB *gb) {
   BASE(childUpdateAnimationAndSolidity);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, interactionAnimate_hook, SYM(interactionAnimate), SYM(childUpdateSolidityAndVisibility));
-  childUpdateSolidityAndVisibility_hook(gb);
+  TAIL(childUpdateSolidityAndVisibility);
 }
 
 // var39: 0 = solid, 1 = "light" solidity (pushes Link away), 2 = no solidity.
@@ -447,7 +447,7 @@ void childUpdateHyperactiveMovement_hook(GB *gb) {
   CYC(b_+32, b_+33); A = mem_rd(gb, BC);
   CYC(b_+33, b_+35); L = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+35, b_+36); mem_wr(gb, HL, A);
-  childFlipAnimation_hook(gb);
+  TAIL(childFlipAnimation);
 }
 
 // Toggles bit 0 of var3a and sets animation var37 + var3a. Expects H = D.

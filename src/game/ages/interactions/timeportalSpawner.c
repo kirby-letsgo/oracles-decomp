@@ -158,7 +158,7 @@ state2:
   CYC(b_+158, b_+160); A = 0x8d;
   CALL_C(b_+160, playSound_b00_hook, SYM(playSound_b00), b_+163);
   CYC(b_+163, b_+166);
-  interactionIncState_hook(gb);
+  TAIL(interactionIncState);
 }
 
 void markSpotDiscovered_hook(GB *gb) {

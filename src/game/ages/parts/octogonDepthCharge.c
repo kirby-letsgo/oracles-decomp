@@ -59,7 +59,7 @@ normalStatus:
   CYC(b_+13, b_+15); E = 0xc4; // Part.state
   if (F & FZ) { CYCT(b_+15, b_+17); octogonDepthCharge_subid0_hook(gb); return; } // jr z
   CYC(b_+15, b_+17);
-  octogonDepthCharge_subid1_hook(gb);
+  TAIL(octogonDepthCharge_subid1);
 }
 
 // Small (split) projectile

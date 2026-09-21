@@ -152,7 +152,7 @@ void load_animation_frame_hook(GB *gb) {
   CYC(b_+62, b_+64); D = 0x86;
 queue:
   CYC(b_+64, b_+67);
-  queueDmaTransfer_hook(gb);
+  TAIL(queueDmaTransfer);
 }
 
 void loadLinkAndCompanionAnimationFrame_body_hook(GB *gb) {
@@ -253,7 +253,7 @@ void specialObjectSetAnimationWithLinkData_hook(GB *gb) {
   CYC(b_+5, b_+7); B = 0;
   CYC(b_+7, b_+10); A = mem_rd(gb, w1Link_id);
   CYC(b_+10, b_+12);
-  label_06_032_hook(gb);
+  TAIL(label_06_032);
 }
 
 void specialObjectLoadAnimationFrameToBuffer_hook(GB *gb) {
@@ -273,7 +273,7 @@ void specialObjectLoadAnimationFrameToBuffer_hook(GB *gb) {
   CYC(b_+16, b_+17); L = A;
   CYC(b_+17, b_+20); SET_DE(w1WeaponItem_counter1);
   CYC(b_+20, b_+23);
-  copy256BytesFromBank_hook(gb);
+  TAIL(copy256BytesFromBank);
 }
 
 void specialObjectNextAnimationFrame_hook(GB *gb) {
@@ -318,7 +318,7 @@ void specialObjectSetAnimation_data_hook(GB *gb) {
   CYC(b_+5, b_+6); H = mem_rd(gb, HL);
   CYC(b_+6, b_+7); L = A;
   CYC(b_+7, b_+8); alu_add_hl(gb, BC);
-  specialObjectNextAnimationFrame_hook(gb);
+  TAIL(specialObjectNextAnimationFrame);
 }
 
 void label_06_032_hook(GB *gb) {
@@ -341,7 +341,7 @@ void specialObjectAnimate_optimized_hook(GB *gb) {
   CYC(b_+4, b_+5);
   CYC(b_+5, b_+7); L = 0x22;
   CYC(b_+7, b_+9);
-  specialObjectNextAnimationFrame_hook(gb);
+  TAIL(specialObjectNextAnimationFrame);
 }
 
 void fake_specialObjectLoadAnimationFrameToBuffer_hook(GB *gb) {

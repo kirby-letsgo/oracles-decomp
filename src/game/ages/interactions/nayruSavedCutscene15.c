@@ -66,7 +66,7 @@ void nayruSavedCutscene_loadAngleAndAnimationPreset_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); SET_HL(SYM(nayruSavedCutscene_angleAndAnimationPresets));
   CYC(b_+3, b_+4); nayruSavedCutscene_addDoubleIndexToHl_from_rst(gb, SYM(nayruSavedCutscene_setAngleAndAnimationAtAddress));
-  nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(gb);
+  TAIL(nayruSavedCutscene_setAngleAndAnimationAtAddress);
 }
 
 void nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(GB *gb) {
@@ -75,7 +75,7 @@ void nayruSavedCutscene_setAngleAndAnimationAtAddress_hook(GB *gb) {
   CYC(b_+0, b_+2); E = 0x49;
   CYC(b_+2, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+3, b_+4); mem_wr(gb, DE, A);
-  nayruSavedCutscene_setAnimationAtAddress_hook(gb);
+  TAIL(nayruSavedCutscene_setAnimationAtAddress);
 }
 
 void nayruSavedCutscene_setAnimationAtAddress_hook(GB *gb) {

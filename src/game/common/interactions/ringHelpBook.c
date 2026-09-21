@@ -66,7 +66,7 @@ setScript:
   TAIL(objectAddToAButtonSensitiveObjectList);
 state1:
   CYC(b_+74, b_+77);
-  interactionRunScript_hook(gb);
+  TAIL(interactionRunScript);
 }
 
 void interactionCodee5_hook(GB *gb) {
@@ -87,5 +87,5 @@ doneTextFlagSetup:
   CYC(b_+16, b_+19); push_effect(gb, b_+19);
   interactionCodee5__runState_hook(gb);
   CYC(b_+19, b_+22);
-  objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 }

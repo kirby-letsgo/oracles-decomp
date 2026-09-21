@@ -139,7 +139,7 @@ void specialObjectCode_rickyCutscene_hook(GB *gb) {
   CYC(b_+15, b_+17); mem_wr(gb, HL, 0x50);
   CYC(b_+17, b_+19); L = 0x09;
   CYC(b_+19, b_+21); mem_wr(gb, HL, 0x08);
-  rickyCutsceneJump_hook(gb);
+  TAIL(rickyCutsceneJump);
 }
 
 void rickyCutscene_state1_hook(GB *gb) {

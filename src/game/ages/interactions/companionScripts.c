@@ -99,7 +99,7 @@ void companionScript_restrictHigherX_hook(GB *gb) {
   if (F & FC) { RET_TAKEN(b_+3); return; } // ret c
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); A = alu_inc8(gb, A);
-  CYC(b_+5, (SYM(companionScript_restrictHigherY) + 7)); companionScripts_restrictTail(gb); return; // jr
+  CYC(b_+5, b_+7); companionScripts_restrictTail(gb); return; // jr
 }
 
 void companionScript_restrictLowerX_hook(GB *gb) {
@@ -108,7 +108,7 @@ void companionScript_restrictLowerX_hook(GB *gb) {
   CALL_C(b_+0, companionScript_cpXToCompanion_hook, SYM(companionScript_cpXToCompanion), b_+3);
   if (!(F & FC)) { RET_TAKEN(b_+3); return; } // ret nc
   CYC(b_+3, b_+4);
-  CYC(b_+4, (SYM(companionScript_restrictHigherY) + 7)); companionScripts_restrictTail(gb); return; // jr
+  CYC(b_+4, b_+6); companionScripts_restrictTail(gb); return; // jr
 }
 
 void companionScript_restrictLowerY_hook(GB *gb) {
@@ -117,7 +117,7 @@ void companionScript_restrictLowerY_hook(GB *gb) {
   CALL_C(b_+0, companionScript_cpYToCompanion_hook, SYM(companionScript_cpYToCompanion), b_+3);
   if (!(F & FC)) { RET_TAKEN(b_+3); return; } // ret nc
   CYC(b_+3, b_+4);
-  CYC(b_+4, (SYM(companionScript_restrictHigherY) + 7)); companionScripts_restrictTail(gb); return; // jr
+  CYC(b_+4, b_+6); companionScripts_restrictTail(gb); return; // jr
 }
 
 void companionScript_restrictHigherY_hook(GB *gb) {

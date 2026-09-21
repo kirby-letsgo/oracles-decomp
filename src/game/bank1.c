@@ -249,7 +249,7 @@ void func_5d41_hook(GB *gb) {
   }
   CYC(b_+7, b_+10);
   CYC(b_+10, b_+13);
-  updateAllObjects_hook(gb);
+  TAIL(updateAllObjects);
 }
 
 void cutscene16_hook(GB *gb) {
@@ -286,7 +286,7 @@ void triggerFadeoutTransition_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x05;
   CYC(b_+2, b_+5); mem_wr(gb, (wThreadStateBuffer + 15), A);
   CYC(b_+5, b_+8);
-  fadeoutToWhite_hook(gb);
+  TAIL(fadeoutToWhite);
 }
 
 void applyWarpTransition2_hook(GB *gb) {
@@ -327,7 +327,7 @@ void applyWarpTransition2_hook(GB *gb) {
   CYC(b_+39, b_+42);
   CYC(b_+42, b_+44); A = 0x04;
   CYC(b_+44, b_+47);
-  fadeoutToWhiteWithDelay_hook(gb);
+  TAIL(fadeoutToWhiteWithDelay);
 }
 
 void setCutsceneIndexIfCutsceneTriggerSet_hook(GB *gb) {
@@ -678,7 +678,7 @@ void func_60cd_hook(GB *gb) {
   }
   CYC(b_+25, b_+26);
   CYC(b_+26, b_+28);
-  initiateScreenEdgeWarp_hook(gb);
+  TAIL(initiateScreenEdgeWarp);
 }
 
 void checkWarpsTopDown_hook(GB *gb) {
@@ -697,7 +697,7 @@ void checkWarpsTopDown_hook(GB *gb) {
   }
   CYC(b_+7, b_+8);
   CYC(b_+8, b_+10);
-  initiateScreenEdgeWarp_hook(gb);
+  TAIL(initiateScreenEdgeWarp);
 }
 
 void checkWarpsSidescrolling_hook(GB *gb) {
@@ -713,7 +713,7 @@ void checkWarpsSidescrolling_hook(GB *gb) {
   CYC(b_+7, b_+9); alu_or(gb, 0x30);
   CYC(b_+9, b_+12); W8(wWarpTransition) = A;
   CYC(b_+12, b_+14);
-  initiateWarp_hook(gb);
+  TAIL(initiateWarp);
 }
 
 void initiateScreenEdgeWarp_hook(GB *gb) {
@@ -721,7 +721,7 @@ void initiateScreenEdgeWarp_hook(GB *gb) {
   CYC(b_+0, b_+3); A = W8(wWarpTransition);
   CYC(b_+3, b_+5); alu_or(gb, 0x10);
   CYC(b_+5, b_+8); W8(wWarpTransition) = A;
-  initiateWarp_hook(gb);
+  TAIL(initiateWarp);
 }
 
 void initiateWarp_hook(GB *gb) {
@@ -733,7 +733,7 @@ void initiateWarp_hook(GB *gb) {
   CYC(b_+10, b_+12); A = 0x0a;
   CYC(b_+12, b_+15); W8(wLinkForceState) = A;
   CYC(b_+15, b_+17);
-  warpInitiated_hook(gb);
+  TAIL(warpInitiated);
 }
 
 static void checkLinkCloseEnoughToWarpTileCenter_func(GB *gb) {
@@ -1471,7 +1471,7 @@ void paletteFadeHandler09_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  paletteFadeHandler01_hook(gb);
+  TAIL(paletteFadeHandler01);
 }
 
 void paletteFadeHandler01_hook(GB *gb) {
@@ -1490,7 +1490,7 @@ void paletteFadeHandler01_hook(GB *gb) {
   CYC(b_+14, b_+17);
   CYC(b_+17, b_+20); mem_wr(gb, (wThreadStateBuffer + 31), A);
   CYC(b_+20, b_+21); C = A;
-  updateFadingPalettes_hook(gb);
+  TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler00_hook(GB *gb) {
@@ -1507,7 +1507,7 @@ void paletteFadeHandler0a_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  paletteFadeHandler02_hook(gb);
+  TAIL(paletteFadeHandler02);
 }
 
 void paletteFadeHandler02_hook(GB *gb) {
@@ -1526,7 +1526,7 @@ void paletteFadeHandler02_hook(GB *gb) {
   CYC(b_+14, b_+17); mem_wr(gb, (wThreadStateBuffer + 31), A);
   CYC(b_+17, b_+18); C = A;
   CYC(b_+18, b_+20);
-  updateFadingPalettes_hook(gb);
+  TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler0b_hook(GB *gb) {
@@ -1538,7 +1538,7 @@ void paletteFadeHandler0b_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  paletteFadeHandler03_hook(gb);
+  TAIL(paletteFadeHandler03);
 }
 
 void paletteFadeHandler03_hook(GB *gb) {
@@ -1558,7 +1558,7 @@ void paletteFadeHandler03_hook(GB *gb) {
   CYC(b_+15, b_+18); mem_wr(gb, (wThreadStateBuffer + 31), A);
   CYC(b_+18, b_+19); C = A;
   CYC(b_+19, b_+21);
-  updateFadingPalettes_hook(gb);
+  TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler0c_hook(GB *gb) {
@@ -1570,7 +1570,7 @@ void paletteFadeHandler0c_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  paletteFadeHandler04_hook(gb);
+  TAIL(paletteFadeHandler04);
 }
 
 void paletteFadeHandler04_hook(GB *gb) {
@@ -1589,7 +1589,7 @@ void paletteFadeHandler04_hook(GB *gb) {
   CYC(b_+13, b_+16); mem_wr(gb, (wThreadStateBuffer + 31), A);
   CYC(b_+16, b_+17); C = A;
   CYC(b_+17, b_+20);
-  updateFadingPalettes_hook(gb);
+  TAIL(updateFadingPalettes);
 }
 
 void paletteThread_setFadeOffsetAndStop_hook(GB *gb) {
@@ -1597,7 +1597,7 @@ void paletteThread_setFadeOffsetAndStop_hook(GB *gb) {
   CYC(b_+0, b_+1); A = B;
   CYC(b_+1, b_+3); alu_sub(gb, 0x1f);
   CYC(b_+3, b_+6); mem_wr(gb, (wThreadStateBuffer + 31), A);
-  paletteThread_stop_hook(gb);
+  TAIL(paletteThread_stop);
 }
 
 void paletteThread_stop_hook(GB *gb) {
@@ -1625,7 +1625,7 @@ void paletteFadeHandler0d_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  paletteFadeHandler05_hook(gb);
+  TAIL(paletteFadeHandler05);
 }
 
 void paletteFadeHandler05_hook(GB *gb) {
@@ -1664,7 +1664,7 @@ void paletteFadeHandler0e_hook(GB *gb) {
     return;
   }
   CYC(b_+3, b_+4);
-  paletteFadeHandler06_hook(gb);
+  TAIL(paletteFadeHandler06);
 }
 
 void paletteFadeHandler06_hook(GB *gb) {
@@ -2041,7 +2041,7 @@ void addFunctionsToVBlankQueue_hook(GB *gb) {
   CALL_C(b_+5, addFunctionsToVBlankQueue__locFunc_hook, b_+12, b_+8);
   CYC(b_+8, b_+10); C = 0x00;
   CYC(b_+10, b_+12); E = 0x40;
-  addFunctionsToVBlankQueue__locFunc_hook(gb);
+  TAIL(addFunctionsToVBlankQueue__locFunc);
 }
 
 void addFunctionsToVBlankQueue__locFunc_hook(GB *gb) {
@@ -2208,7 +2208,7 @@ void updateTilesetPalette_hook(GB *gb) {
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+12); mem_wr(gb, wLoadedTilesetPalette, A);
   CYC(b_+12, b_+15);
-  loadPaletteHeader_hook(gb);
+  TAIL(loadPaletteHeader);
 }
 
 void cpLinkState0e_hook(GB *gb) {
@@ -2401,7 +2401,7 @@ void applyPaletteFadeTransitionData_hook(GB *gb) {
   CYC(b_+38, b_+40); A = 0xff;
   CYC(b_+40, b_+43); mem_wr(gb, wLoadedTilesetPalette, A);
   CYC(b_+43, b_+46);
-  startFadeBetweenTwoPalettes_hook(gb);
+  TAIL(startFadeBetweenTwoPalettes);
 }
 
 void checkSymmetryCityPaletteTransition_hook(GB *gb) {
@@ -2434,7 +2434,7 @@ void checkSymmetryCityPaletteTransition_hook(GB *gb) {
   CYC(b_+28, b_+30); alu_cp(gb, 0x24);
   if (F & FZ) { CYCT(b_+30, b_+32); checkSymmetryCityPaletteTransition__notOk_hook(gb); return; }
   CYC(b_+30, b_+32);
-  checkSymmetryCityPaletteTransition__ok_hook(gb);
+  TAIL(checkSymmetryCityPaletteTransition__ok);
 }
 
 void checkSymmetryCityPaletteTransition__ok_hook(GB *gb) {
@@ -2456,7 +2456,7 @@ void makeActiveObjectFollowLink_b01_hook(GB *gb) {
   CYC(b_+5, b_+6); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+6, b_+8); A = mem_rd(gb, hActiveObject);
   CYC(b_+8, b_+9); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  resetFollowingLinkPath_hook(gb);
+  TAIL(resetFollowingLinkPath);
 }
 
 void resetFollowingLinkPath_hook(GB *gb) {
@@ -2629,7 +2629,7 @@ void setObjectsEnabledTo2_hook(GB *gb) {
   CYC(b_+12, b_+15); SET_HL(w1Link);
   CYC(b_+15, b_+17); C = 0xd2;
   CYC(b_+17, b_+19);
-  setObjectsEnabledTo2_hlpr_hook(gb);
+  TAIL(setObjectsEnabledTo2_hlpr);
 }
 
 void setItemsEnabledTo2_hook(GB *gb) {
@@ -2637,7 +2637,7 @@ void setItemsEnabledTo2_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(w1WeaponItem);
   CYC(b_+3, b_+5); C = 0xe0;
   CYC(b_+5, b_+7);
-  setObjectsEnabledTo2_hlpr_hook(gb);
+  TAIL(setObjectsEnabledTo2_hlpr);
 }
 
 void setInteractionsEnabledTo2_hook(GB *gb) {
@@ -2645,7 +2645,7 @@ void setInteractionsEnabledTo2_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(w1ReservedInteraction0);
   CYC(b_+3, b_+5); C = 0xe0;
   CYC(b_+5, b_+7);
-  setObjectsEnabledTo2_hlpr_hook(gb);
+  TAIL(setObjectsEnabledTo2_hlpr);
 }
 
 void setEnemiesEnabledTo2_hook(GB *gb) {
@@ -2653,14 +2653,14 @@ void setEnemiesEnabledTo2_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL((w1ReservedInteraction0_var3f + 1));
   CYC(b_+3, b_+5); C = 0xe0;
   CYC(b_+5, b_+7);
-  setObjectsEnabledTo2_hlpr_hook(gb);
+  TAIL(setObjectsEnabledTo2_hlpr);
 }
 
 void setPartsEnabledTo2_hook(GB *gb) {
   BASE(setPartsEnabledTo2);
   CYC(b_+0, b_+3); SET_HL(w7TextDisplayState);
   CYC(b_+3, b_+5); C = 0xe0;
-  setObjectsEnabledTo2_hlpr_hook(gb);
+  TAIL(setObjectsEnabledTo2_hlpr);
 }
 
 void setObjectsEnabledTo2_hlpr_hook(GB *gb) {
@@ -2710,7 +2710,7 @@ void screenTransitionState0_hook(GB *gb) {
   CALL_C(b_+4, checkDarkenRoom_hook, SYM(checkDarkenRoom), b_+7);
   CYC(b_+7, b_+9); A = 0x01;
   CYC(b_+9, b_+12); mem_wr(gb, wScreenTransitionState, A);
-  initializeRoomBoundaryAndLoadAnimations_hook(gb);
+  TAIL(initializeRoomBoundaryAndLoadAnimations);
 }
 
 void initializeRoomBoundaryAndLoadAnimations_hook(GB *gb) {
@@ -3063,7 +3063,7 @@ void screenTransitionState2__checkCanTransitionOverWater_hook(GB *gb) {
   CALL_C(b_+245, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+248);
   if (F & FC) { CYCT(b_+248, b_+249); ret_effect(gb); return; }
   CYC(b_+248, b_+249);
-  screenTransitionState2__fail_hook(gb);
+  TAIL(screenTransitionState2__fail);
 }
 
 void screenTransitionState2__fail_hook(GB *gb) {
@@ -3111,7 +3111,7 @@ void update_camera_position_body_hook(GB *gb) {
   if (F & FC) { CYCT(b_+59, b_+61); updateCameraPosition__updateComponent_hook(gb); return; }
   CYC(b_+59, b_+61);
   CYC(b_+61, b_+63); A = 0x50;
-  updateCameraPosition__updateComponent_hook(gb);
+  TAIL(updateCameraPosition__updateComponent);
 }
 
 void updateCameraPosition_hook(GB *gb) { gb->hook_pc = SYM(updateCameraPosition); update_camera_position_body_hook(gb); }
@@ -3267,7 +3267,7 @@ void checkDarkenRoomAndClearPaletteFadeState_hook(GB *gb) {
   BASE(checkDarkenRoomAndClearPaletteFadeState);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, wPaletteThread_parameter, A);
-  checkDarkenRoom_hook(gb);
+  TAIL(checkDarkenRoom);
 }
 
 void checkDarkenRoom_hook(GB *gb) {
@@ -3445,7 +3445,7 @@ void finishScrollingTransition_hook(GB *gb) {
   CYC(b_+15, b_+16); alu_add(gb, E);
   CYC(b_+16, b_+19); SET_DE(GV(SYM(label_01_037__positionOffsets), 0x4454));
   CALL_C(b_+19, addAToDe_hook, 0x0068, SYM(label_01_037));
-  label_01_037_hook(gb);
+  TAIL(label_01_037);
 }
 
 void label_01_037_hook(GB *gb) {
@@ -3637,7 +3637,7 @@ void screenTransitionState5Substate2__state4_hook(GB *gb) {
   CYC(b_+102, b_+105); mem_wr(gb, wLoadedTilesetUniqueGfx, A);
   CYC(b_+105, b_+106); alu_xor(gb, A);
   CYC(b_+106, b_+109); mem_wr(gb, wTilesetUniqueGfx, A);
-  screenTransitionState5Substate2__state5_hook(gb);
+  TAIL(screenTransitionState5Substate2__state5);
 }
 
 void screenTransitionState5Substate2__state5_hook(GB *gb) {
@@ -3680,7 +3680,7 @@ void screenTransitionState5Substate2__drawNextRow_hook(GB *gb) {
   CALL_C(b_+162, func_46ca_hook, SYM(func_46ca), b_+165);
   CYC(b_+165, b_+168); A = mem_rd(gb, wScreenScrollVramRow);
   CALL_C(b_+168, addFunctionsToVBlankQueue_hook, SYM(addFunctionsToVBlankQueue), SYM(incrementScreenScrollRowVars));
-  incrementScreenScrollRowVars_hook(gb);
+  TAIL(incrementScreenScrollRowVars);
 }
 
 void screenTransitionState5Substate1_hook(GB *gb) {
@@ -3768,7 +3768,7 @@ void screenTransitionState5Substate1__state4_hook(GB *gb) {
   CYC(b_+102, b_+105); mem_wr(gb, wLoadedTilesetUniqueGfx, A);
   CYC(b_+105, b_+106); alu_xor(gb, A);
   CYC(b_+106, b_+109); mem_wr(gb, wTilesetUniqueGfx, A);
-  screenTransitionState5Substate1__state5_hook(gb);
+  TAIL(screenTransitionState5Substate1__state5);
 }
 
 void screenTransitionState5Substate1__state5_hook(GB *gb) {
@@ -3874,7 +3874,7 @@ void clearPartsWithEnabled2_hook(GB *gb) {
   BASE(clearPartsWithEnabled2);
   CYC(b_+0, b_+3); SET_HL(PART_SLOTS);
   CYC(b_+3, b_+5); C = 0xe0;
-  clearObjectsWithEnabled2_hlpr_hook(gb);
+  TAIL(clearObjectsWithEnabled2_hlpr);
 }
 
 void clearObjectsWithEnabled2_hlpr_hook(GB *gb) {
@@ -4059,7 +4059,7 @@ void cutscene17__state0_hook(GB *gb) {
     } else {
       CYC(b_+29, b_+31);
       CYC(b_+31, b_+32); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+32, b_+34); alu_cp(gb, GV(GV(0xad, 0x44), 0x44));
+      CYC(b_+32, b_+34); alu_cp(gb, GV(0xad, 0x44));
       if (F & FZ) {
         CYCT(b_+34, b_+36);
         break;
@@ -4139,7 +4139,7 @@ void cutscene17__state2_hook(GB *gb) {
   CYC(b_+136, b_+139); mem_wr(gb, wGenericCutscene_cbb3, A);
   CYC(b_+139, b_+141); A = 0x03;
   CYC(b_+141, b_+144); mem_wr(gb, wCutsceneState, A);
-  cutscene17__state3_hook(gb);
+  TAIL(cutscene17__state3);
 }
 
 void cutscene17__state3_hook(GB *gb) {
@@ -4669,7 +4669,7 @@ void updateFadingPalettes_hook(GB *gb) {
   CYC(b_+19, b_+21); H8(hBgPaletteSources) = A;
   CYC(b_+21, b_+22); A = mem_rd(gb, HL);
   CYC(b_+22, b_+24); H8(hSprPaletteSources) = A;
-  paletteFadeHandler00_hook(gb);
+  TAIL(paletteFadeHandler00);
 }
 
 void checkLockBG7Color3ToBlack_hook(GB *gb) {
@@ -4688,7 +4688,7 @@ void checkLockBG7Color3ToBlack__thing1_hook(GB *gb) {
   CYC(b_+8, b_+9); alu_xor(gb, A);
   CYC(b_+9, b_+12); mem_wr(gb, w2FadingBgPalettes + 0x3e, A);
   CYC(b_+12, b_+15); mem_wr(gb, w2FadingBgPalettes + 0x3f, A);
-  checkLockBG7Color3ToBlack__thing0_hook(gb);
+  TAIL(checkLockBG7Color3ToBlack__thing0);
 }
 
 void checkLockBG7Color3ToBlack__thing0_hook(GB *gb) {
@@ -4915,7 +4915,7 @@ void loadingRoom_hook(GB *gb) {
   CYC(b_+9, b_+11); A = 0xff;
   CYC(b_+11, b_+14); W8(wActiveMusic) = A;
   CALL_C(b_+14, applyWarpDest_hook, SYM(applyWarpDest), SYM(func_5a60));
-  func_5a60_hook(gb);
+  TAIL(func_5a60);
 }
 
 void standardGameState_hook(GB *gb) {

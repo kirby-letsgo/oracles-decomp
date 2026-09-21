@@ -193,7 +193,7 @@ stopped_bouncing:
   CYC(b_+137, b_+139); L = 0x2f;
   CYC(b_+139, b_+141); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 6)));
   CYC(b_+141, b_+144);
-  bombUpdateAnimation_hook(gb);
+  TAIL(bombUpdateAnimation);
 }
 
 void bombUpdateThrowingVerticallyAndCheckDelete_hook(GB *gb) {
@@ -291,7 +291,7 @@ void itemUpdateExplosion_hook(GB *gb) {
   if (F & FZ) CALL_C_CC(b_+34, explosionTryToBreakNextTile_hook, SYM(explosionTryToBreakNextTile), b_+37);
   else CYC(b_+34, b_+37);
   CYC(b_+37, b_+40);
-  itemAnimate_hook(gb);
+  TAIL(itemAnimate);
 }
 
 void bombUpdateExplosion_hook(GB *gb) {
@@ -306,7 +306,7 @@ void bombUpdateExplosion_hook(GB *gb) {
   }
   CYC(b_+6, b_+8);
   CYC(b_+8, b_+10);
-  itemUpdateExplosion_hook(gb);
+  TAIL(itemUpdateExplosion);
 }
 
 void bombUpdateAnimation_hook(GB *gb) {
@@ -320,7 +320,7 @@ void bombUpdateAnimation_hook(GB *gb) {
     CYCT(b_+7, b_+8); ret_effect(gb); return;
   }
   CYC(b_+7, b_+8);
-  itemInitializeBombExplosion_hook(gb);
+  TAIL(itemInitializeBombExplosion);
 }
 
 void itemInitializeBombExplosion_hook(GB *gb) {
@@ -385,7 +385,7 @@ void bombInitializeIfNeeded_hook(GB *gb) {
   CALL_C(b_+8, decNumBombs_hook, SYM(decNumBombs), b_+11);
   CALL_C(b_+11, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+14);
   CALL_C(b_+14, itemMergeZPositionIfSidescrollingArea_hook, SYM(itemMergeZPositionIfSidescrollingArea), SYM(bombResetAnimationAndSetVisiblec1));
-  bombResetAnimationAndSetVisiblec1_hook(gb);
+  TAIL(bombResetAnimationAndSetVisiblec1);
 }
 
 void bombResetAnimationAndSetVisiblec1_hook(GB *gb) {
@@ -394,7 +394,7 @@ void bombResetAnimationAndSetVisiblec1_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CALL_C(b_+1, itemSetAnimation_hook, SYM(itemSetAnimation), b_+4);
   CYC(b_+4, b_+7);
-  objectSetVisiblec1_hook(gb);
+  TAIL(objectSetVisiblec1);
 }
 
 void explosionCheckAndApplyLinkCollision_hook(GB *gb) {
@@ -460,7 +460,7 @@ void explosionCheckAndApplyLinkCollision_hook(GB *gb) {
   CYC(b_+65, b_+66); L = alu_dec8(gb, L);
   CYC(b_+66, b_+68); mem_wr(gb, HL, 0x01);
   CYC(b_+68, b_+71);
-  linkApplyDamage_b00_hook(gb);
+  TAIL(linkApplyDamage_b00);
 }
 
 void explosionTryToBreakNextTile_hook(GB *gb) {
@@ -536,7 +536,7 @@ calculate_position:
   CYC(b_+62, b_+63);
   CYC(b_+63, b_+65); A = 0x04;
   CYC(b_+65, b_+68);
-  tryToBreakTile_hook(gb);
+  TAIL(tryToBreakTile);
 }
 
 void bombUpdateThrowingLaterally_hook(GB *gb) {
@@ -557,5 +557,5 @@ void bombUpdateThrowingLaterally_hook(GB *gb) {
   if (F & FZ) CALL_C_CC(b_+15, itemBeginThrow_hook, SYM(itemBeginThrow), b_+18);
   else CYC(b_+15, b_+18);
   CYC(b_+18, b_+21);
-  itemUpdateThrowingLaterally_hook(gb);
+  TAIL(itemUpdateThrowingLaterally);
 }

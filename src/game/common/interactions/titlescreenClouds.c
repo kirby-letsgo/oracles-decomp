@@ -103,7 +103,7 @@ void interactionCoded2__substate1_hook(GB *gb) {
   CYC(b_+81, b_+83); alu_cp(gb, 0x88);
   if (F & FZ) { CYCT(b_+83, b_+84); ret_effect(gb); return; }
   CYC(b_+83, b_+84);
-  introObject_applySpeed_hook(gb);
+  TAIL(introObject_applySpeed);
 }
 
 void interactionCoded2__substate0_hook(GB *gb) {
@@ -115,7 +115,7 @@ void interactionCoded2__substate0_hook(GB *gb) {
   CYC(b_+71, b_+72);
   CALL_C(b_+72, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+75);
   CALL_C(b_+75, objectSetVisible82_hook, SYM(objectSetVisible82), b_+78);
-  interactionCoded2__substate1_hook(gb);
+  TAIL(interactionCoded2__substate1);
 }
 
 void interactionCoded2__state1_hook(GB *gb) {
@@ -132,7 +132,7 @@ void interactionCoded2__state1_hook(GB *gb) {
   CALL_C(b_+61, checkInteractionSubstate_hook, SYM(checkInteractionSubstate), b_+64);
   if (!(F & FZ)) { CYCT(b_+64, b_+66); interactionCoded2__substate1_hook(gb); return; }
   CYC(b_+64, b_+66);
-  interactionCoded2__substate0_hook(gb);
+  TAIL(interactionCoded2__substate0);
 }
 
 void interactionCoded2_hook(GB *gb) {

@@ -720,7 +720,7 @@ substateF:
   CYC(b_+500, b_+501);
   CALL_C(b_+501, interactionIncSubstate_hook, SYM(interactionIncSubstate), SYM(impaLoadCollapsedGraphic));
   // Falls through into impaLoadCollapsedGraphic.
-  impaLoadCollapsedGraphic_hook(gb);
+  TAIL(impaLoadCollapsedGraphic);
 }
 
 // Changes impa's "oamTileIndexBase" to reference her "collapsed" graphic, which is not in
@@ -731,7 +731,7 @@ void impaLoadCollapsedGraphic_hook(GB *gb) {
   CYC(b_+2, b_+4); mem_wr(gb, HL, 0x0a);
   CYC(b_+4, b_+6); L = INTERACTION_BASE + OBJ_OAM_TILE_INDEX_BASE;
   CYC(b_+6, b_+8); mem_wr(gb, HL, 0x60);
-  impaRet_hook(gb);
+  TAIL(impaRet);
 }
 
 void impaRet_hook(GB *gb) {
@@ -895,7 +895,7 @@ void impaSubid2Substate4_hook(GB *gb) {
   CALL_C(b_+5, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+8);
   CYC(b_+8, b_+10); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);
-  impaSetVisibleAndJump_hook(gb);
+  TAIL(impaSetVisibleAndJump);
 }
 
 void impaSetVisibleAndJump_hook(GB *gb) {

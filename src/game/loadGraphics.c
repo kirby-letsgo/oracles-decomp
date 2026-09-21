@@ -395,7 +395,7 @@ static void insert_index_into_loaded_object_gfx_tree(GB *gb, uint16_t sp0_) {
 
 static void insert_index_into_loaded_object_gfx_object(GB *gb, uint16_t sp0_) {
   BASE(insertIndexIntoLoadedObjectGfx);
-  CYC(b_+43, b_+45); alu_sub(gb, GV(GV(0x08, 0x07), 0x07));
+  CYC(b_+43, b_+45); alu_sub(gb, GV(0x08, 0x07));
   CYC(b_+45, b_+47); alu_or(gb, 0x80);
   CYC(b_+47, b_+48); B = A;
   CYC(b_+48, b_+51); SET_HL(SYM(objectGfxHeaderTable));
@@ -547,7 +547,7 @@ void enemyGetObjectGfxIndex_hook(GB *gb) {
   BASE(enemyGetObjectGfxIndex);
   CYC(b_+0, b_+2); E = 0x81;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  getObjectGfxIndexForEnemy_hook(gb);
+  TAIL(getObjectGfxIndexForEnemy);
 }
 
 void getObjectGfxIndexForEnemy_hook(GB *gb) {
@@ -636,7 +636,7 @@ void reloadObjectGfx_b3f_hook(GB *gb) {
   } else {
     CYC(b_+11, b_+14);
   }
-  agesFunc_3f_4133_hook(gb);
+  TAIL(agesFunc_3f_4133);
 }
 
 void agesFunc_3f_4133__afterCall4143_hook(GB *gb) {
@@ -1139,7 +1139,7 @@ void interactionGetData_hook(GB *gb) {
   CYC(b_+1, b_+3); L = 0x41;
   CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+4, b_+5); E = mem_rd(gb, HL);
-  getDataForInteraction_hook(gb);
+  TAIL(getDataForInteraction);
 }
 
 void getDataForInteraction_hook(GB *gb) {

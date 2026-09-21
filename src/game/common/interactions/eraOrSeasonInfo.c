@@ -89,5 +89,5 @@ state3:
   if (!(F & FZ)) { RET_TAKEN(b_+79); return; }
   CYC(b_+79, b_+80);
   CYC(b_+80, b_+83);
-  interactionDelete_hook(gb);
+  TAIL(interactionDelete);
 }

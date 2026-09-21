@@ -76,7 +76,7 @@ void makuTree_func_70a2_hook(GB *gb) {
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x7f;
   CYC(b_+3, b_+4); alu_add(gb, mem_rd(gb, HL));
-  makuTree_checkLinkedAndUpdateMapText_hook(gb);
+  TAIL(makuTree_checkLinkedAndUpdateMapText);
 }
 
 void makuTree_checkLinkedAndUpdateMapText_hook(GB *gb) {

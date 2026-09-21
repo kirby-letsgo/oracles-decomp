@@ -77,7 +77,7 @@ void interactionCodee2__centerOnTileAndGetDirectionToFace_hook(GB *gb) {
   BASE(interactionCodee2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+90, objectCenterOnTile_hook, SYM(objectCenterOnTile), b_+93);
-  interactionCodee2__getDirectionToFace_hook(gb);
+  TAIL(interactionCodee2__getDirectionToFace);
 }
 
 void interactionCodee2__spawnChild_hook(GB *gb) {

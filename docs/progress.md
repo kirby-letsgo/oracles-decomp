@@ -448,6 +448,29 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21: Seasons hooks 3,002 to 3,212 and the SAME_SHAPE list closed (313 of 315 resolved;
+  `cutscene11` calls routines that only Seasons names, `func_39_400c` is garbage code).
+  `routine_equiv` resolves a bank-0 routine's cross-bank references through the bank it switched
+  to (`ld a,N` + `hRomBank`/`$2222`, `ld e,N` + `interBankCall`), and an unresolved `$xxxx` on one
+  side matches the other side's label when this game has that label at the address
+  (`peer_sym`): 3,113 to 3,180 IDENTICAL. `gameconst` finds constants burned by helpers
+  (`bank_push(gb, b_+N, bank)`, shared bodies), takes a same-valued constant on faith, and merges
+  `src/hooks/seasons_ok_manual.txt` (hand-checked routines whose GV lives in a shared helper).
+  `TAIL_GV(ages, seasons)` for a `jp` whose target differs per game (`mapMenu_drawSprites`);
+  a Seasons-only label goes into `syms_used.txt` with `-` for the Ages address. Selector rules
+  added after the verify caught them: a `@local` reached only by `call` is compared on its own
+  (`loadRoomLayout@loadLayoutData` differs, so `loadRoomLayout` is out); a `TAIL` target must
+  exist in Seasons (`showText` tail-calls `_label_00_203`, unpairable, so it is out).
+  `guard_tailcalls` now guards a trailing `x_hook(gb);` before `}` (1,019 more sites). Latent
+  Ages bugs fixed on the way: a conditional `ret` burned twice (four `ecom_updateAnimationFromAngle`
+  copies, raft, timewarp, twinrova, credits; `tools/audit_burns.py`), and 14 range ends spelled
+  from a label that only follows the range in Ages (`tools/audit_cyc.py --fix`, e.g.
+  `parseGivenObjectData_hl` burning into `objectDataOpcodeSizes`), four `GV(GV(..))` leftovers.
+  `tools/verify_trace.py` turns a BURNLOG/PCTRACE/VERIFYLOG run into the first differing
+  instruction of a cycle mismatch. Gates: Ages ctest 8/8, whole movie, verify 30k; Seasons demo
+  and playthrough, `VERIFY_ALL` on the playthrough 0 failures apart from the lcdInterrupt skew;
+  lint 0.
+
 - 2026-09-21 (early): Seasons hooks 2,406 to 2,863. `tools/guard_tailcalls.py` turned 4,082
   direct tail calls (`x_hook(gb); return;` for a `jp`, and the `jt_ ==` jump-table branches that
   have an interpreter fallback) into `TAIL(x)` / `hook_enabled_at` guards, so a routine can be

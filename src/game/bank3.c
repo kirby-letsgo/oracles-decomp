@@ -138,7 +138,7 @@ void init_hook(GB *gb) {
   CYC(b_+105, b_+107); E = 0x02;
   CALL_C(b_+107, interBankCall_hook, 0x008a, b_+110);
   CYC(b_+110, b_+113);
-  startGame_hook(gb);
+  TAIL(startGame);
 }
 
 void unpackSecret__fail_hook(GB *gb) {
@@ -267,13 +267,13 @@ void generateSecret__determineXorCipher_hook(GB *gb) {
   CYC(b_+78, b_+79); alu_rlca(gb);
   CYC(b_+79, b_+80); alu_rlca(gb);
   CYC(b_+80, b_+81); alu_xor(gb, B);
-  generateSecret__ret_hook(gb);
+  TAIL(generateSecret__ret);
 }
 
 void encodeSecretData_paramC_hook(GB *gb) {
   BASE(encodeSecretData_paramC);
   CYC(b_+0, b_+1); A = C;
-  encodeSecretData_hook(gb);
+  TAIL(encodeSecretData);
 }
 
 void encodeSecretData_hook(GB *gb) {
@@ -393,7 +393,7 @@ void unpackSecret__unpackSecretData_hook(GB *gb) {
   CYC(b_+56, b_+58); A = 0x04;
   CALL_C(b_+58, unpackSecret__unpack_hook, b_+62, b_+61);
   CYC(b_+61, b_+62); A = C;
-  unpackSecret__unpack_hook(gb);
+  TAIL(unpackSecret__unpack);
 }
 
 void unpackSecret__unpack_hook(GB *gb) {
@@ -406,7 +406,7 @@ void unpackSecret__unpack_hook(GB *gb) {
   CYC(b_+68, b_+69); L = A;
   CYC(b_+69, b_+70); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+70, b_+71); B = A;
-  unpackSecret__unpack__nextEntry_hook(gb);
+  TAIL(unpackSecret__unpack__nextEntry);
 }
 
 void unpackSecret__unpack__nextEntry_hook(GB *gb) {
@@ -470,7 +470,7 @@ void unpackSecret__readBits_hook(GB *gb) {
       break;
     }
   }
-  unpackSecret__readBits__end_hook(gb);
+  TAIL(unpackSecret__readBits__end);
 }
 
 void unpackSecret__readBits__end_hook(GB *gb) {
@@ -520,11 +520,11 @@ void loadUnpackedSecretData__type0_hook(GB *gb) {
   CYC(b_+39, b_+40); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+40, b_+43); A = mem_rd(gb, wTmpcec0 + 3);
   CYC(b_+43, b_+44); mem_wr(gb, HL, A);
-  loadUnpackedSecretData__type3_hook(gb);
+  TAIL(loadUnpackedSecretData__type3);
 }
 
 void loadUnpackedSecretData__type1_hook(GB *gb) {
-  loadUnpackedSecretData__type0_hook(gb);
+  TAIL(loadUnpackedSecretData__type0);
 }
 
 void loadUnpackedSecretData__type3_hook(GB *gb) {

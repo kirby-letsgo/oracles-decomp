@@ -222,7 +222,7 @@ void shopItemState5_hook(GB *gb) {
   CYC(b_+3, b_+4); alu_xor(gb, A);
   CYC(b_+4, b_+7); mem_wr(gb, wDisabledObjects, A);
   CYC(b_+7, b_+10); mem_wr(gb, wMenuDisabled, A);
-  shopItemPopStackAndDeleteSelf_hook(gb);
+  TAIL(shopItemPopStackAndDeleteSelf);
 }
 
 void shopItemPopStackAndDeleteSelf_hook(GB *gb) {
@@ -253,7 +253,7 @@ L_43a3:
 L_43b0:
   CALL_C(b_+21, shopItemCheckGrabbed_hook, SYM(shopItemCheckGrabbed), b_+24);
   if (!(F & FZ)) { CYCT(b_+24, b_+25); ret_effect(gb); return; } CYC(b_+24, b_+25);
-  shopItemState4_hook(gb);
+  TAIL(shopItemState4);
 }
 
 void shopItemState3_hook(GB *gb) {

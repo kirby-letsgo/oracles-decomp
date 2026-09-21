@@ -32,5 +32,5 @@ void itemCode0fPost_hook(GB *gb) {
   }
   CYC(b_+26, b_+27);
   CYC(b_+27, b_+30);
-  itemSetAnimation_hook(gb);
+  TAIL(itemSetAnimation);
 }

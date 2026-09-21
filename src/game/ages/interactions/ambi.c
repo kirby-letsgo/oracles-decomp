@@ -267,7 +267,7 @@ substate1:
   CALL_C(b_+58, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+61);
   CYC(b_+61, b_+63); L = 0x7e;
   CYC(b_+63, b_+64); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  ambi_ret_hook(gb);
+  TAIL(ambi_ret);
 }
 
 void ambi_ret_hook(GB *gb) {

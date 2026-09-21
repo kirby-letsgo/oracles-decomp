@@ -183,7 +183,7 @@ set_animation:
 void itemCreateChildIfDoesntExistAlready_hook(GB *gb) {
   BASE(itemCreateChildIfDoesntExistAlready);
   CYC(b_+0, b_+2); E = 0x01;
-  itemCreateChildAndDeleteOnFailure_hook(gb);
+  TAIL(itemCreateChildAndDeleteOnFailure);
 }
 
 void itemCreateChildAndDeleteOnFailure_hook(GB *gb) {
@@ -203,7 +203,7 @@ void itemCreateChild_hook(GB *gb) {
   CYC(b_+2, b_+3); H = D;
   CYC(b_+3, b_+5); L = 0x01;
   CYC(b_+5, b_+6); B = mem_rd(gb, HL);
-  itemCreateChildWithID_hook(gb);
+  TAIL(itemCreateChildWithID);
 }
 
 void itemCreateChildWithID_hook(GB *gb) {
@@ -420,7 +420,7 @@ void parentItemCheckButtonPressed_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); H = D;
   CYC(b_+1, b_+3); L = 0x03;
-  andHlWithGameKeysPressed_hook(gb);
+  TAIL(andHlWithGameKeysPressed);
 }
 
 void andHlWithGameKeysPressed_hook(GB *gb) {

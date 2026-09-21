@@ -104,7 +104,7 @@ void forestFairy_subid00State0_hook(GB *gb) {
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x50);
   CYC(b_+10, b_+12); L = 0x7a;
   CYC(b_+12, b_+14); mem_wr(gb, HL, 0x5a);
-  forestFairy_loadMovementPreset_hook(gb);
+  TAIL(forestFairy_loadMovementPreset);
 }
 
 void forestFairy_loadMovementPreset_hook(GB *gb) {
@@ -229,7 +229,7 @@ decrement:
   CYC(b_+85, b_+86); mem_wr(gb, HL, A);
   CALL_C(b_+86, objectGetRelativeAngleWithTempVars_hook, SYM(objectGetRelativeAngleWithTempVars), b_+89);
   CALL_C(b_+89, objectNudgeAngleTowards_hook, SYM(objectNudgeAngleTowards), SYM(forestFairy_updateMovement));
-  forestFairy_updateMovement_hook(gb);
+  TAIL(forestFairy_updateMovement);
 }
 
 void forestFairy_updateMovement_hook(GB *gb) {
@@ -241,7 +241,7 @@ void forestFairy_updateMovement_hook(GB *gb) {
   CYC(b_+8, b_+10); A = 0x83;
   if (F & FZ) CALL_C_CC(b_+10, playSound_b00_hook, SYM(playSound_b00), SYM(forestFairy_animate));
   else CYC(b_+10, b_+13);
-  forestFairy_animate_hook(gb);
+  TAIL(forestFairy_animate);
 }
 
 void forestFairy_animate_hook(GB *gb) {
@@ -498,7 +498,7 @@ state_zero:
   if (F & FZ) CYC(b_+80, b_+82);
   else { CYCT(b_+80, b_+82); CYC(b_+82, b_+84); A = 1; }
   CALL_C(b_+84, interactionSetAnimation_hook, SYM(interactionSetAnimation), SYM(forestFairy_initCollisionRadiusAndSetZAndIncState));
-  forestFairy_initCollisionRadiusAndSetZAndIncState_hook(gb);
+  TAIL(forestFairy_initCollisionRadiusAndSetZAndIncState);
 }
 
 void forestFairy_initNpcFromData_hook(GB *gb) {
@@ -562,7 +562,7 @@ void forestFairy_subid05_hook(GB *gb) {
   CYC(b_+32, b_+34); alu_sub(gb, 5);
   CYC(b_+34, b_+37); SET_HL(SYM(forestFairy_subid5To7NpcData));
   CYC(b_+37, b_+38); forest_fairy_add_double_index(gb, SYM(forestFairy_initNpcFromData));
-  forestFairy_initNpcFromData_hook(gb);
+  TAIL(forestFairy_initNpcFromData);
 }
 
 void forestFairy_subid08_hook(GB *gb) {
@@ -623,7 +623,7 @@ void forestFairy_subid0c_hook(GB *gb) {
   BASE(forestFairy_subid0c);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), SYM(forestFairy_standardUpdate_2));
-  forestFairy_standardUpdate_2_hook(gb);
+  TAIL(forestFairy_standardUpdate_2);
 }
 
 void forestFairy_standardUpdate_2_hook(GB *gb) {

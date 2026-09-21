@@ -150,5 +150,5 @@ loop:
   CYC(b_+17, b_+19); alu_cp(gb, 0xe0);
   if (F & FC) { CYCT(b_+19, b_+21); goto loop; }
   CYC(b_+19, b_+21);
-  itemCodeNilPost_hook(gb);
+  TAIL(itemCodeNilPost);
 }

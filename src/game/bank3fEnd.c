@@ -66,7 +66,7 @@ void func_7ca7_hook(GB *gb) {
   CYC(b_+129, b_+132); A = W8(wActiveMusic);
   CALL_C(b_+132, playSound_b00_hook, SYM(playSound_b00), b_+135);
   CYC(b_+135, b_+138);
-  tuniNut_gotoState4_hook(gb);
+  TAIL(tuniNut_gotoState4);
 }
 
 void func_7caf_hook(GB *gb) {

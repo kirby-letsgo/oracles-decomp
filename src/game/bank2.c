@@ -1304,7 +1304,7 @@ void mapGetRoomIndexWithoutUnusedColumns_hook(GB *gb) {
 void mapMenu_checkCursorRoomVisited_hook(GB *gb) {
   BASE(mapMenu_checkCursorRoomVisited);
   CYC(b_+0, b_+3); A = W8(wMapMenu_cursorIndex);
-  mapMenu_checkRoomVisited_hook(gb);
+  TAIL(mapMenu_checkRoomVisited);
 }
 
 void mapMenu_checkRoomVisited_hook(GB *gb) {
@@ -1376,7 +1376,7 @@ void mapMenu_drawWarpSites_hook(GB *gb) {
   CYC(b_+20, b_+21); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+21, b_+22); mem_wr(gb, HL, A);
   CYC(b_+22, b_+24); C = 0;
-  mapMenu_drawWarpSites__drawWarpDest_hook(gb);
+  TAIL(mapMenu_drawWarpSites__drawWarpDest);
 }
 
 void mapMenu_drawWarpSites__drawWarpDest_hook(GB *gb) {
@@ -1396,7 +1396,7 @@ void mapMenu_drawWarpSites__drawWarpDest_hook(GB *gb) {
   CYC(b_+38, b_+39); A = C;
   CYC(b_+39, b_+42); SET_HL(wTmpcec0);
   CALL_C(b_+42, mapMenu_drawSpriteAtRoomIndex_hook, SYM(mapMenu_drawSpriteAtRoomIndex), b_+45);
-  mapMenu_drawWarpSites__nextTree_hook(gb);
+  TAIL(mapMenu_drawWarpSites__nextTree);
 }
 
 void mapMenu_drawWarpSites__nextTree_hook(GB *gb) {
@@ -1452,7 +1452,7 @@ void getWarpTreeData_hook(GB *gb) {
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+21); A = 3;
   CYC(b_+21, b_+22); push_effect(gb, b_+22); add_a_to_hl(gb);
-  getWarpTreeData__ret_hook(gb);
+  TAIL(getWarpTreeData__ret);
 }
 
 void getWarpTreeData__ret_hook(GB *gb) {
@@ -1496,14 +1496,14 @@ void mapMenu_clearUnvisitedTiles_hook(GB *gb) {
   CYC(b_+4, b_+7); SET_DE(0x0e0e);
   CYC(b_+7, b_+10); SET_HL(w1ReservedInteraction0_var03);
   CYC(b_+10, b_+12); B = 0;
-  mapMenu_clearUnvisitedTiles__rowLoop_hook(gb);
+  TAIL(mapMenu_clearUnvisitedTiles__rowLoop);
 }
 
 void mapMenu_clearUnvisitedTiles__rowLoop_hook(GB *gb) {
   BASE(mapMenu_clearUnvisitedTiles);
   CYC(b_+12, b_+14); C = 0;
   CYC(b_+14, b_+15); push_effect(gb, DE);
-  mapMenu_clearUnvisitedTiles__columnLoop_hook(gb);
+  TAIL(mapMenu_clearUnvisitedTiles__columnLoop);
 }
 
 void mapMenu_clearUnvisitedTiles__columnLoop_hook(GB *gb) {
@@ -1519,7 +1519,7 @@ void mapMenu_clearUnvisitedTiles__columnLoop_hook(GB *gb) {
   CYC(b_+26, b_+28); H = (uint8_t)(H | (1 << 2));
   CYC(b_+28, b_+30); mem_wr(gb, HL, 0x0a);
   CYC(b_+30, b_+32); H = (uint8_t)(H & ~(1 << 2));
-  mapMenu_clearUnvisitedTiles__nextTile_hook(gb);
+  TAIL(mapMenu_clearUnvisitedTiles__nextTile);
 }
 
 void mapMenu_clearUnvisitedTiles__nextTile_hook(GB *gb) {
@@ -1596,7 +1596,7 @@ void dungeonMap_drawFloorList_hook(GB *gb) {
   CYC(b_+18, b_+21); A = W8(wDungeonNumFloors);
   CYC(b_+21, b_+22); A = alu_dec8(gb, A);
   CYC(b_+22, b_+23); C = A;
-  dungeonMap_drawFloorList__loop_hook(gb);
+  TAIL(dungeonMap_drawFloorList__loop);
 }
 
 void dungeonMap_drawFloorList__loop_hook(GB *gb) {
@@ -1638,7 +1638,7 @@ void dungeonMap_drawFloorList__loop_hook(GB *gb) {
   CYC(b_+73, b_+75); A = 0xab;
   CALL_C(b_+75, drawTileABtoDE_hook, SYM(drawTileABtoDE), b_+78);
   CYC(b_+78, b_+80); A = 0x1a;
-  dungeonMap_drawFloorList__nextFloor_hook(gb);
+  TAIL(dungeonMap_drawFloorList__nextFloor);
 }
 
 void dungeonMap_drawFloorList__nextFloor_hook(GB *gb) {
@@ -1679,13 +1679,13 @@ void dungeonMap_updateScroll_hook(GB *gb) {
   CYC(b_+13, b_+16); SET_DE(w1Link_y);
   CYC(b_+16, b_+18); A = 0x12;
   CYC(b_+18, b_+20); mem_wr(gb, hFF8D, A);
-  dungeonMap_updateScroll__nextRow_hook(gb);
+  TAIL(dungeonMap_updateScroll__nextRow);
 }
 
 void dungeonMap_updateScroll__nextRow_hook(GB *gb) {
   BASE(dungeonMap_updateScroll);
   CYC(b_+20, b_+22); C = 0x08;
-  dungeonMap_updateScroll__nextColumn_hook(gb);
+  TAIL(dungeonMap_updateScroll__nextColumn);
 }
 
 void dungeonMap_updateScroll__nextColumn_hook(GB *gb) {
@@ -1745,7 +1745,7 @@ void dungeonMap_updateScroll__nextColumn_hook(GB *gb) {
   CYC(b_+68, b_+70);
   CYC(b_+70, b_+71); SET_AF(pop_effect(gb));
   CYC(b_+71, b_+73); hram_wr(gb, 0x70, A);
-  dungeonMap_getTileForRoom_hook(gb);
+  TAIL(dungeonMap_getTileForRoom);
 }
 
 void dungeonMap_getTileForRoom_hook(GB *gb) {
@@ -1800,7 +1800,7 @@ void dungeonMap_getTileForRoom_hook(GB *gb) {
     TAIL(dungeonMap_getTileForRoom__ret);
   }
   CYC(b_+41, b_+43);
-  dungeonMap_getTileForRoom__hidden_hook(gb);
+  TAIL(dungeonMap_getTileForRoom__hidden);
 }
 
 void dungeonMap_getTileForRoom__hidden_hook(GB *gb) {
@@ -1822,7 +1822,7 @@ void dungeonMap_getTileForRoom__visited_hook(GB *gb) {
   CYC(b_+62, b_+63); alu_or(gb, E);
   CYC(b_+63, b_+65); alu_and(gb, 0x0f);
   CYC(b_+65, b_+67); alu_add(gb, 0xb0);
-  dungeonMap_getTileForRoom__ret_hook(gb);
+  TAIL(dungeonMap_getTileForRoom__ret);
 }
 
 void dungeonMap_getTileForRoom__ret_hook(GB *gb) {
@@ -2596,7 +2596,7 @@ void dungeonMap_scrollingState1_hook(GB *gb) {
   CYC(b_+24, b_+25); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+25, b_+26); mem_wr(gb, HL, A);
   CALL_C(b_+26, dungeonMap_updateScroll_hook, SYM(dungeonMap_updateScroll), SYM(mapMenu_copyTilemapToVram));
-  mapMenu_copyTilemapToVram_hook(gb);
+  TAIL(mapMenu_copyTilemapToVram);
 }
 
 void mapMenu_copyTilemapToVram_hook(GB *gb) {
@@ -2636,7 +2636,7 @@ overworld:
     TAIL(mapMenu_drawWarpSites);
   }
   CYC(b_+38, b_+41);
-  CYC(b_+41, b_+44); mapMenu_drawTimePortal_hook(gb);
+  CYC(b_+41, b_+44); TAIL_GV(mapMenu_drawTimePortal, mapMenu_drawJewelLocations);
 }
 
 void mapMenu_performTileSubstitutions_hook(GB *gb) {
@@ -2722,7 +2722,7 @@ void runGaleSeedMenu_hook(GB *gb) {
   CALL_C(b_+0, clearOam_hook, SYM(clearOam), b_+3);
   CALL_C(b_+3, runGaleSeedMenu__runState_hook, b_+9, b_+6);
   CYC(b_+6, b_+9);
-  mapMenu_drawSprites_hook(gb);
+  TAIL(mapMenu_drawSprites);
 }
 
 void galeSeedMenu_state0_hook(GB *gb) {
@@ -2734,7 +2734,7 @@ void galeSeedMenu_state0_hook(GB *gb) {
   CYC(b_+8, b_+10); A = 0x01;
   CYC(b_+10, b_+13); W8(wMapMenu_drawWarpDestinations) = A;
   CYC(b_+13, b_+16);
-  galeSeedMenu_addOffsetToWarpIndex_hook(gb);
+  TAIL(galeSeedMenu_addOffsetToWarpIndex);
 }
 
 void galeSeedMenu_state1_hook(GB *gb) {
@@ -2778,7 +2778,7 @@ set_state:
   CYC(b_+56, b_+59); W8(wMenuActiveState) = A;
   CYC(b_+59, b_+61); B = 0x03;
   CYC(b_+61, b_+64);
-  showText_hook(gb);
+  TAIL(showText);
 }
 
 void galeSeedMenu_state2_hook(GB *gb) {
@@ -2809,7 +2809,7 @@ void galeSeedMenu_state2_hook(GB *gb) {
   CYC(b_+44, b_+46); A = 0x03;
   CALL_C(b_+46, setMusicVolume_hook, SYM(setMusicVolume), b_+49);
   CYC(b_+49, b_+52);
-  fadeoutToWhite_hook(gb);
+  TAIL(fadeoutToWhite);
 }
 
 void galeSeedMenu_gotoState1_hook(GB *gb) {
@@ -2833,7 +2833,7 @@ void galeSeedMenu_state3_hook(GB *gb) {
   CYC(b_+9, b_+11); A = 0xff;
   CYC(b_+11, b_+14); W8(wWarpTransition2) = A;
   CYC(b_+14, b_+17);
-  closeMenu_hook(gb);
+  TAIL(closeMenu);
 }
 
 void galeSeedMenu_addOffsetToWarpIndex_hook(GB *gb) {
@@ -2961,7 +2961,7 @@ common:
   CALL_C(b_+153, fastFadeinFromWhite_hook, SYM(fastFadeinFromWhite), b_+156);
   CYC(b_+156, b_+158); A = 0x07;
   CYC(b_+158, b_+161);
-  loadGfxRegisterStateIndex_hook(gb);
+  TAIL(loadGfxRegisterStateIndex);
 }
 
 void loadMinimapDisplayRoom_hook(GB *gb) {
@@ -3050,7 +3050,7 @@ void mapMenu_state1_hook(GB *gb) {
   if (F & FZ) CALL_C_CC(b_+4, mapMenu_state1__checkInput_hook, b_+10, b_+7);
   else CYC(b_+4, b_+7);
   CYC(b_+7, b_+10);
-  mapMenu_drawSprites_hook(gb);
+  TAIL(mapMenu_drawSprites);
 }
 
 void mapMenu_state1__checkInput_hook(GB *gb) {
@@ -3145,7 +3145,7 @@ show_room_text:
   CYC(b_+117, b_+120); SET_HL(wSubmenuState);
   CYC(b_+120, b_+121); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+121, b_+124);
-  showText_hook(gb);
+  TAIL(showText);
 }
 
 void mapGetRoomTextOrReturn_hook(GB *gb) {
@@ -3171,7 +3171,7 @@ void mapGetRoomTextOrReturn_hook(GB *gb) {
   CYC(b_+18, b_+21); W8(wTextboxPosition) = A;
   CYC(b_+21, b_+23); A = 0x09;
   CYC(b_+23, b_+26); W8(wTextboxFlags) = A;
-  mapGetRoomText_hook(gb);
+  TAIL(mapGetRoomText);
 }
 
 void mapGetRoomText_hook(GB *gb) {
@@ -3307,7 +3307,7 @@ void mapGetRoomText__checkDungeonEntered_hook(GB *gb) {
 void getFileDisplayVariableAddress_hook(GB *gb) {
   BASE(getFileDisplayVariableAddress);
   CYC(b_+0, b_+1); E = A;
-  getFileDisplayVariableAddress_paramE_hook(gb);
+  TAIL(getFileDisplayVariableAddress_paramE);
 }
 
 void getFileDisplayVariableAddress_paramE_hook(GB *gb) {
@@ -3571,13 +3571,13 @@ check_short_secret:
   CYC(b_+100, b_+101); alu_sub(gb, B);
   if (F & FZ) { CYCT(b_+101, b_+103); runSecretEntryMenu__setTextInputResult_hook(gb); return; }
   CYC(b_+101, b_+103);
-  runSecretEntryMenu__invalidSecret_hook(gb);
+  TAIL(runSecretEntryMenu__invalidSecret);
 }
 
 void runSecretEntryMenu__invalidSecret_hook(GB *gb) {
   BASE(runSecretEntryMenu);
   CYC(b_+103, b_+105); A = 0x01;
-  runSecretEntryMenu__setTextInputResult_hook(gb);
+  TAIL(runSecretEntryMenu__setTextInputResult);
 }
 
 void runSecretEntryMenu__setTextInputResult_hook(GB *gb) {
@@ -3780,7 +3780,7 @@ set_input_mode:
   CYC(b_+28, b_+31); W8(wFileSelect_textInputMaxCursorPos) = A;
   CYC(b_+31, b_+32); A = C;
   CYC(b_+32, b_+35); W8(wFileSelect_textInputMode) = A;
-  label_02_038_hook(gb);
+  TAIL(label_02_038);
 }
 
 void label_02_038_hook(GB *gb) {
@@ -3813,7 +3813,7 @@ void label_02_038_hook(GB *gb) {
   CYC(b_+48, b_+50); A = 0x08;
   CALL_C(b_+50, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+53);
   CYC(b_+53, b_+55);
-  label_02_038__end_hook(gb);
+  TAIL(label_02_038__end);
 }
 
 void label_02_038__secretEntry_hook(GB *gb) {
@@ -3831,7 +3831,7 @@ void label_02_038__secretEntry_hook(GB *gb) {
   CYC(b_+73, b_+75); A = 0xaa;
   CALL_C(b_+75, loadGfxHeader_hook, SYM(loadGfxHeader), b_+78);
   CALL_C(b_+78, func_02_461c_hook, SYM(func_02_461c), b_+81);
-  label_02_038__end_hook(gb);
+  TAIL(label_02_038__end);
 }
 
 void label_02_038__end_hook(GB *gb) {
@@ -3906,7 +3906,7 @@ void runTextInput__aButton_hook(GB *gb) {
   CYC(b_+94, b_+97); SET_HL(0x0061);
   CYC(b_+97, b_+98); push_effect(gb, b_+98); add_a_to_hl(gb);
   CYC(b_+98, b_+99); C = mem_rd(gb, HL);
-  runTextInput__gotCharacter_hook(gb);
+  TAIL(runTextInput__gotCharacter);
 }
 
 void runTextInput__gotCharacter_hook(GB *gb) {
@@ -3914,7 +3914,7 @@ void runTextInput__gotCharacter_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+99, textInput_getOutputAddress_hook, SYM(textInput_getOutputAddress), b_+102);
   CYC(b_+102, b_+103); mem_wr(gb, HL, C);
-  runTextInput__selectionRight_hook(gb);
+  TAIL(runTextInput__selectionRight);
 }
 
 void runTextInput__selectionRight_hook(GB *gb) {
@@ -3926,7 +3926,7 @@ void runTextInput__selectionRight_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+111, b_+113); runTextInput__updateEntryCursor_hook(gb); return; }
   CYC(b_+111, b_+113);
   CYC(b_+113, b_+114); mem_wr(gb, HL, A);
-  runTextInput__updateEntryCursor_hook(gb);
+  TAIL(runTextInput__updateEntryCursor);
 }
 
 void runTextInput__updateEntryCursor_hook(GB *gb) {
@@ -3941,7 +3941,7 @@ void runTextInput__lowerOptions_hook(GB *gb) {
   CYC(b_+121, b_+124); A = W8(wFileSelect_cursorPos2);
   if (F & FC) { CYCT(b_+124, b_+126); runTextInput__secretTable_hook(gb); return; }
   CYC(b_+124, b_+126);
-  runTextInput__nameTable_hook(gb);
+  TAIL(runTextInput__nameTable);
 }
 
 void runTextInput__nameTable_hook(GB *gb) {
@@ -3972,7 +3972,7 @@ void runTextInput__bButton_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+142, textInput_getOutputAddress_hook, SYM(textInput_getOutputAddress), b_+145);
   CYC(b_+145, b_+147); mem_wr(gb, HL, 0x20);
-  runTextInput__selectionLeft_hook(gb);
+  TAIL(runTextInput__selectionLeft);
 }
 
 void runTextInput__selectionLeft_hook(GB *gb) {
@@ -4021,7 +4021,7 @@ void runTextInput__rightButton_hook(GB *gb) {
 void runTextInput__leftButton_hook(GB *gb) {
   BASE(runTextInput);
   CYC(b_+190, b_+192); C = 0xff;
-  runTextInput__leftOrRight_hook(gb);
+  TAIL(runTextInput__leftOrRight);
 }
 
 void runTextInput__leftOrRight_hook(GB *gb) {
@@ -4081,7 +4081,7 @@ void runTextInput__upButton_hook(GB *gb) {
 void runTextInput__downButton_hook(GB *gb) {
   BASE(runTextInput);
   CYC(b_+244, b_+246); C = 0x10;
-  runTextInput__upOrDown_hook(gb);
+  TAIL(runTextInput__upOrDown);
 }
 
 void runTextInput__upOrDown_hook(GB *gb) {
@@ -4300,7 +4300,7 @@ void textInput_mapUpperXToLowerX_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+7, b_+9); textInput_mapUpperXToLowerX__label_hook(gb); return; }
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+12); SET_HL(b_+51);
-  textInput_mapUpperXToLowerX__label_hook(gb);
+  TAIL(textInput_mapUpperXToLowerX__label);
 }
 
 void textInput_mapUpperXToLowerX__label_hook(GB *gb) {
@@ -4370,7 +4370,7 @@ void loadFileDisplayVariables_hook(GB *gb) {
   BASE(loadFileDisplayVariables);
   CYC(b_+0, b_+2); A = 0x02;
   CYC(b_+2, b_+4); mem_wr(gb, hActiveFileSlot, A);
-  loadFileDisplayVariables__nextFile_hook(gb);
+  TAIL(loadFileDisplayVariables__nextFile);
 }
 
 void loadFileDisplayVariables__nextFile_hook(GB *gb) {
@@ -4437,7 +4437,7 @@ void textInput_updateEntryCursor_hook(GB *gb) {
 void textInput_getOutputAddress_hook(GB *gb) {
   BASE(textInput_getOutputAddress);
   CYC(b_+0, b_+3); A = mem_rd(gb, wFileSelect_textInputCursorPos);
-  textInput_getOutputAddressOffset_hook(gb);
+  TAIL(textInput_getOutputAddressOffset);
 }
 
 void textInput_getOutputAddressOffset_hook(GB *gb) {
@@ -4695,7 +4695,7 @@ next_table_entry:
   CYC(b_+34, b_+35); alu_add(gb, B);
   CYC(b_+35, b_+36); C = A;
   CYC(b_+36, b_+37); alu_scf(gb);
-  func_02_494a__end_hook(gb);
+  TAIL(func_02_494a__end);
 }
 
 void func_02_494a__end_hook(GB *gb) {
@@ -4805,7 +4805,7 @@ subtract_rupee:
 play_rupee_sound:
   CYC(b_+70, b_+72); A = 0x61;
   CALL_C(b_+72, playSound_b00_hook, SYM(playSound_b00), b_+75);
-  updateStatusBar_body__updateRupeeDisplay_hook(gb);
+  TAIL(updateStatusBar_body__updateRupeeDisplay);
 }
 
 void updateStatusBar_body__updateRupeeDisplay_hook(GB *gb) {
@@ -4857,7 +4857,7 @@ decrement_hearts:
 mark_heart_refresh:
   CYC(b_+142, b_+145); SET_HL(wStatusBarNeedsRefresh);
   CYC(b_+145, b_+147); mem_wr(gb, HL, mem_rd(gb, HL) | 0x04);
-  updateStatusBar_body__updateHeartDisplay_hook(gb);
+  TAIL(updateStatusBar_body__updateHeartDisplay);
 }
 
 void updateStatusBar_body__updateHeartDisplay_hook(GB *gb) {
@@ -4996,7 +4996,7 @@ void loadEquippedItemGfx_hook(GB *gb) {
   CYC(b_+31, b_+33); E = (uint8_t)(w4ItemIconGfx + 0x40);
   if (F & FC) CALL_C_CC(b_+33, loadItemIconGfx_hook, SYM(loadItemIconGfx), SYM(func_02_52f6));
   else CYC(b_+33, b_+36);
-  func_02_52f6_hook(gb);
+  TAIL(func_02_52f6);
 }
 
 void func_02_52f6_hook(GB *gb) {
@@ -5017,7 +5017,7 @@ void func_02_52f6_hook(GB *gb) {
   CYC(b_+26, b_+28); alu_bit(gb, 7, A);
   if (!(F & FZ)) { CYCT(b_+28, b_+29); ret_effect(gb); return; }
   CYC(b_+28, b_+29);
-  func_02_52f6__func1_hook(gb);
+  TAIL(func_02_52f6__func1);
 }
 
 void func_02_52f6__func1_hook(GB *gb) {
@@ -5027,7 +5027,7 @@ void func_02_52f6__func1_hook(GB *gb) {
   if (!(F & FZ)) CALL_C_CC(b_+30, func_02_52f6__func2_hook, b_+34, b_+33);
   else CYC(b_+30, b_+33);
   CYC(b_+33, b_+34); L = alu_dec8(gb, L);
-  func_02_52f6__func2_hook(gb);
+  TAIL(func_02_52f6__func2);
 }
 
 void func_02_52f6__func2_hook(GB *gb) {
@@ -5128,7 +5128,7 @@ void drawItemTilesOnStatusBar_hook(GB *gb) {
   CYC(b_+54, b_+57); A = W8(wBItemTreasure);
   CYC(b_+57, b_+58); B = A;
   CYC(b_+58, b_+61); A = W8(wBItemDisplayMode);
-  drawItemTilesOnStatusBar__drawItem_hook(gb);
+  TAIL(drawItemTilesOnStatusBar__drawItem);
 }
 
 void drawItemTilesOnStatusBar__drawItem_hook(GB *gb) {
@@ -5143,7 +5143,7 @@ void drawItemTilesOnStatusBar__drawItem_hook(GB *gb) {
   CYC(b_+68, b_+69); B = A;
   CYC(b_+69, b_+70); A = C;
   CYC(b_+70, b_+72); C = 0x80;
-  drawTreasureExtraTiles_hook(gb);
+  TAIL(drawTreasureExtraTiles);
 }
 
 void drawTreasureExtraTiles_hook(GB *gb) {
@@ -5302,7 +5302,7 @@ void inGameDrawHeartDisplay_hook(GB *gb) {
   CYC(b_+6, b_+9); A = W8(wDisplayedHearts);
   CYC(b_+9, b_+10); C = A;
   CYC(b_+10, b_+13); A = W8(wLinkMaxHealth);
-  drawHeartDisplay_hook(gb);
+  TAIL(drawHeartDisplay);
 }
 
 void drawHeartDisplay_hook(GB *gb) {
@@ -5355,7 +5355,7 @@ void drawHeartDisplay_hook(GB *gb) {
   if (F & FZ) CYCT(b_+61, b_+63);
   else { CYC(b_+61, b_+63); CYC(b_+63, b_+64); alu_xor(gb, A); }
   CYC(b_+64, b_+65); B = A;
-  drawHeartDisplay__drawHeartDisplayRow_hook(gb);
+  TAIL(drawHeartDisplay__drawHeartDisplayRow);
 }
 
 void drawHeartDisplay__drawHeartDisplayRow_hook(GB *gb) {
@@ -5364,7 +5364,7 @@ void drawHeartDisplay__drawHeartDisplayRow_hook(GB *gb) {
   CYC(b_+66, b_+67); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+67, b_+69); drawHeartDisplay__partiallyFilledHeart_hook(gb); return; }
   CYC(b_+67, b_+69);
-  drawHeartDisplay__filledHearts_hook(gb);
+  TAIL(drawHeartDisplay__filledHearts);
 }
 
 void drawHeartDisplay__filledHearts_hook(GB *gb) {
@@ -5375,7 +5375,7 @@ void drawHeartDisplay__filledHearts_hook(GB *gb) {
     CYC(b_+72, b_+73); C = alu_dec8(gb, C);
     if (!(F & FZ)) CYCT(b_+73, b_+75); else CYC(b_+73, b_+75);
   } while (!(F & FZ));
-  drawHeartDisplay__partiallyFilledHeart_hook(gb);
+  TAIL(drawHeartDisplay__partiallyFilledHeart);
 }
 
 void drawHeartDisplay__partiallyFilledHeart_hook(GB *gb) {
@@ -5392,7 +5392,7 @@ void drawHeartDisplay__partiallyFilledHeart_hook(GB *gb) {
   CYC(b_+85, b_+86); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+86, b_+88); D = 0;
   CYC(b_+88, b_+89); B = alu_dec8(gb, B);
-  drawHeartDisplay__unfilledHearts_hook(gb);
+  TAIL(drawHeartDisplay__unfilledHearts);
 }
 
 void drawHeartDisplay__unfilledHearts_hook(GB *gb) {
@@ -5407,7 +5407,7 @@ void drawHeartDisplay__unfilledHearts_hook(GB *gb) {
     CYC(b_+96, b_+97); B = alu_dec8(gb, B);
     if (!(F & FZ)) CYCT(b_+97, b_+99); else CYC(b_+97, b_+99);
   } while (!(F & FZ));
-  drawHeartDisplay__fillBlankSpace_hook(gb);
+  TAIL(drawHeartDisplay__fillBlankSpace);
 }
 
 void drawHeartDisplay__fillBlankSpace_hook(GB *gb) {
@@ -5434,7 +5434,7 @@ void loadItemIconGfx_hook(GB *gb) {
   CALL_C(b_+4, loadItemIconGfx__func_hook, b_+9, b_+7);
   CYC(b_+7, b_+8); SET_BC(pop_effect(gb));
   CYC(b_+8, b_+9); A = C;
-  loadItemIconGfx__func_hook(gb);
+  TAIL(loadItemIconGfx__func);
 }
 
 void loadItemIconGfx__func_hook(GB *gb) {
@@ -5535,7 +5535,7 @@ void showItemText1_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(w4SubscreenTextIndices);
   CYC(b_+3, b_+4); push_effect(gb, b_+4); add_a_to_hl(gb);
   CYC(b_+4, b_+5); A = mem_rd(gb, HL);
-  showItemText2_hook(gb);
+  TAIL(showItemText2);
 }
 
 void showItemText2_hook(GB *gb) {
@@ -5731,7 +5731,7 @@ void inventoryMenuState1__aOrB_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+101, b_+103); inventoryMenuState1__finalizeEquip_hook(gb); return; }
   CYC(b_+101, b_+103);
   CYC(b_+103, b_+105); C = 0xe0;
-  inventoryMenuState1__hasSubmenu_hook(gb);
+  TAIL(inventoryMenuState1__hasSubmenu);
 }
 
 void inventoryMenuState1__hasSubmenu_hook(GB *gb) {
@@ -5745,7 +5745,7 @@ void inventoryMenuState1__hasSubmenu_hook(GB *gb) {
   CYC(b_+117, b_+119); A = 0x02;
   if (!(F & FC)) { CYCT(b_+119, b_+122); inventoryMenuState1__func_02_5606_hook(gb); return; }
   CYC(b_+119, b_+122);
-  inventoryMenuState1__finalizeEquip_hook(gb);
+  TAIL(inventoryMenuState1__finalizeEquip);
 }
 
 void inventoryMenuState1__finalizeEquip_hook(GB *gb) {
@@ -5779,7 +5779,7 @@ void inventoryMenuState1__equipItem_hook(GB *gb) {
   CYC(b_+164, b_+165); alu_cp(gb, B);
   if (!(F & FZ)) { CYCT(b_+165, b_+167); inventoryMenuState1__equipItem__swapItems_hook(gb); return; }
   CYC(b_+165, b_+167);
-  inventoryMenuState1__equipItem__unequipBiggoron_hook(gb);
+  TAIL(inventoryMenuState1__equipItem__unequipBiggoron);
 }
 
 void inventoryMenuState1__equipItem__unequipBiggoron_hook(GB *gb) {
@@ -5792,7 +5792,7 @@ void inventoryMenuState1__equipItem__unequipBiggoron_hook(GB *gb) {
   CYC(b_+173, b_+174); L = C;
   CYC(b_+174, b_+175); A = B;
   CYC(b_+175, b_+176); mem_wr(gb, DE, A);
-  inventoryMenuState1__equipItem__swapItems_hook(gb);
+  TAIL(inventoryMenuState1__equipItem__swapItems);
 }
 
 void inventoryMenuState1__equipItem__swapItems_hook(GB *gb) {
@@ -6246,7 +6246,7 @@ void ringMenu_unappraisedRings_state4__not100th_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+50, b_+53); ringMenu_state1_restart_hook(gb); return; }
   CYC(b_+50, b_+53);
   CYC(b_+53, b_+55); B = 0x02;
-  ringMenu_unappraisedRings_gotoState5_hook(gb);
+  TAIL(ringMenu_unappraisedRings_gotoState5);
 }
 
 void ringMenu_unappraisedRings_gotoState5_hook(GB *gb) {
@@ -6380,7 +6380,7 @@ void secretListMenu_state1_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+30, b_+32); secretListMenu_state1__end_hook(gb); return; }
   CYC(b_+30, b_+32);
   CYC(b_+32, b_+34); A = 0x01;
-  secretListMenu_state1__upOrDown_hook(gb);
+  TAIL(secretListMenu_state1__upOrDown);
 }
 
 void secretListMenu_state1__upOrDown_hook(GB *gb) {
@@ -6397,7 +6397,7 @@ void secretListMenu_state1__upOrDown_hook(GB *gb) {
   CYC(b_+44, b_+46); alu_cp(gb, 0x03);
   if (F & FC) { CYCT(b_+46, b_+48); secretListMenu_state1__playSound_hook(gb); return; }
   CYC(b_+46, b_+48);
-  secretListMenu_state1__scrollDown_hook(gb);
+  TAIL(secretListMenu_state1__scrollDown);
 }
 
 void secretListMenu_state1__scrollDown_hook(GB *gb) {
@@ -6412,7 +6412,7 @@ void secretListMenu_state1__scrollDown_hook(GB *gb) {
   CYC(b_+64, b_+67); W8(wSecretListMenu_scrollSpeed) = A;
   CYC(b_+67, b_+69); L = (uint8_t)wSecretListMenu_state;
   CYC(b_+69, b_+70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  secretListMenu_state1__playSound_hook(gb);
+  TAIL(secretListMenu_state1__playSound);
 }
 
 void secretListMenu_state1__scrollUp_hook(GB *gb) {
@@ -6425,7 +6425,7 @@ void secretListMenu_state1__scrollUp_hook(GB *gb) {
   CYC(b_+64, b_+67); W8(wSecretListMenu_scrollSpeed) = A;
   CYC(b_+67, b_+69); L = (uint8_t)wSecretListMenu_state;
   CYC(b_+69, b_+70); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  secretListMenu_state1__playSound_hook(gb);
+  TAIL(secretListMenu_state1__playSound);
 }
 
 void secretListMenu_state1__playSound_hook(GB *gb) {
@@ -6433,7 +6433,7 @@ void secretListMenu_state1__playSound_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+70, b_+72); A = 0x84;
   CALL_C(b_+72, playSound_b00_hook, SYM(playSound_b00), b_+75);
-  secretListMenu_state1__end_hook(gb);
+  TAIL(secretListMenu_state1__end);
 }
 
 void secretListMenu_state1__end_hook(GB *gb) {
@@ -6513,7 +6513,7 @@ restart:
   CYC(b_+56, b_+59); SET_DE(w7d800);
   CYC(b_+59, b_+61); B = 0x18;
   CALL_C(b_+61, copyTextCharactersFromHl_hook, SYM(copyTextCharactersFromHl), b_+64);
-  secretListMenu_printSecret__end_hook(gb);
+  TAIL(secretListMenu_printSecret__end);
 }
 
 void secretListMenu_printSecret__end_hook(GB *gb) {
@@ -6562,7 +6562,7 @@ void secretListMenu_loadAllSecretNames_hook(GB *gb) {
   CYC(b_+1, b_+3); hram_wr(gb, R_VBK, A);
   CYC(b_+3, b_+6); SET_DE(0x8a00);
   CYC(b_+6, b_+8); B = 0;
-  secretListMenu_loadAllSecretNames__nextSecret_hook(gb);
+  TAIL(secretListMenu_loadAllSecretNames__nextSecret);
 }
 
 void secretListMenu_loadAllSecretNames__nextSecret_hook(GB *gb) {
@@ -6676,7 +6676,7 @@ display_ring_text:
   CYC(b_+24, b_+27); W8(wRingMenu_selectedRing) = A;
   CALL_C(b_+27, ringMenu_updateDisplayedRingNumberWithGivenComparator_hook, SYM(ringMenu_updateDisplayedRingNumberWithGivenComparator), b_+30);
   CALL_C(b_+30, ringMenu_updateRingText_hook, SYM(ringMenu_updateRingText), b_+33);
-  ringMenu_ringList_substate0__checkInput_hook(gb);
+  TAIL(ringMenu_ringList_substate0__checkInput);
 }
 
 void ringMenu_ringList_substate0__checkInput_hook(GB *gb) {
@@ -6688,7 +6688,7 @@ void ringMenu_ringList_substate0__checkInput_hook(GB *gb) {
   CYC(b_+40, b_+42); alu_bit(gb, 0, A);
   if (F & FZ) { CYCT(b_+42, b_+45); ringMenu_checkRingBoxCursorMoved_hook(gb); return; }
   CYC(b_+42, b_+45);
-  ringMenu_ringList_substate0__aPressed_hook(gb);
+  TAIL(ringMenu_ringList_substate0__aPressed);
 }
 
 void ringMenu_ringList_substate0__aPressed_hook(GB *gb) {
@@ -6738,7 +6738,7 @@ void ringMenu_ringList_substate1_hook(GB *gb) {
   CALL_C(b_+23, ringMenu_updateDisplayedRingNumber_hook, SYM(ringMenu_updateDisplayedRingNumber), b_+26);
   CALL_C(b_+26, ringMenu_drawSprites_hook, SYM(ringMenu_drawSprites), b_+29);
   CALL_C(b_+29, ringMenu_retIfCounterNotFinished_hook, SYM(ringMenu_retIfCounterNotFinished), SYM(ringMenu_updateRingText));
-  ringMenu_updateRingText_hook(gb);
+  TAIL(ringMenu_updateRingText);
 }
 
 void ringMenu_updateRingText_hook(GB *gb) {
@@ -6777,7 +6777,7 @@ description:
   CYC(b_+49, b_+51);
   CYC(b_+51, b_+52); A = C;
   CYC(b_+52, b_+54); alu_add(gb, 0x80);
-  ringMenu_updateRingText__printDescription_hook(gb);
+  TAIL(ringMenu_updateRingText__printDescription);
 }
 
 void ringMenu_updateRingText__printDescription_hook(GB *gb) {
@@ -6824,7 +6824,7 @@ write_ring:
   CYC(b_+35, b_+38); SET_HL(wRingBoxContents);
   CYC(b_+38, b_+39); push_effect(gb, b_+39); add_a_to_hl(gb);
   CYC(b_+39, b_+40); mem_wr(gb, HL, C);
-  ringMenu_moveCursorToRingBox_hook(gb);
+  TAIL(ringMenu_moveCursorToRingBox);
 }
 
 void ringMenu_moveCursorToRingBox_hook(GB *gb) {
@@ -6847,7 +6847,7 @@ void ringMenu_checkRingIsInBox_hook(GB *gb) {
   CYC(b_+0, b_+1); push_effect(gb, BC);
   CYC(b_+1, b_+4); SET_HL(wRingBoxContents + 4);
   CYC(b_+4, b_+6); B = 0x05;
-  ringMenu_checkRingIsInBox__nextRing_hook(gb);
+  TAIL(ringMenu_checkRingIsInBox__nextRing);
 }
 
 void ringMenu_checkRingIsInBox__nextRing_hook(GB *gb) {
@@ -6884,7 +6884,7 @@ void ringMenu_initiateScrollRight_hook(GB *gb) {
   CYC(b_+9, b_+12); W8(wRingMenu_ringListCursorIndex) = A;
   CYC(b_+12, b_+15); A = W8(wRingMenu_page);
   CYC(b_+15, b_+16); A = alu_inc8(gb, A);
-  ringMenu_initiateScroll_hook(gb);
+  TAIL(ringMenu_initiateScroll);
 }
 
 void ringMenu_initiateScroll_hook(GB *gb) {
@@ -6901,7 +6901,7 @@ void ringMenu_initiateScroll_hook(GB *gb) {
 set_page:
   CYC(b_+11, b_+14); W8(wRingMenu_page) = A;
   CYC(b_+14, b_+16); A = 0x02;
-  ringMenu_setState_hook(gb);
+  TAIL(ringMenu_setState);
 }
 
 void ringMenu_setState_hook(GB *gb) {
@@ -6972,7 +6972,7 @@ void ringMenu_state2__substate1_hook(GB *gb) {
   CYC(b_+77, b_+79); alu_bit(gb, 7, A);
   if (F & FZ) { CYCT(b_+79, b_+81); ringMenu_state2__scrollRight_hook(gb); return; }
   CYC(b_+79, b_+81);
-  ringMenu_state2__scrollLeft_hook(gb);
+  TAIL(ringMenu_state2__scrollLeft);
 }
 
 void ringMenu_state2__scrollLeft_hook(GB *gb) {
@@ -7013,7 +7013,7 @@ store_right:
   CYC(b_+111, b_+114); A = W8(wGfxRegs2_LCDC);
   CYC(b_+114, b_+116); alu_xor(gb, 0x48);
   CYC(b_+116, b_+119); W8(wGfxRegs2_LCDC) = A;
-  ringMenu_state2__doneScrolling_hook(gb);
+  TAIL(ringMenu_state2__doneScrolling);
 }
 
 void ringMenu_state2__doneScrolling_hook(GB *gb) {
@@ -7060,7 +7060,7 @@ void ringMenu_checkRingListCursorMoved_hook(GB *gb) {
   CYC(b_+44, b_+45); A = alu_dec8(gb, A);
 initiate_scroll:
   CALL_C(b_+45, ringMenu_initiateScroll_hook, SYM(ringMenu_initiateScroll), b_+48);
-  ringMenu_checkRingListCursorMoved__playSound_hook(gb);
+  TAIL(ringMenu_checkRingListCursorMoved__playSound);
 }
 
 void ringMenu_checkRingListCursorMoved__playSound_hook(GB *gb) {
@@ -7167,7 +7167,7 @@ draw_cursor:
 void ringMenu_drawSpritesForRingsInBox_hook(GB *gb) {
   BASE(ringMenu_drawSpritesForRingsInBox);
   CYC(b_+0, b_+2); A = 0x05;
-  ringMenu_drawSpritesForRingsInBox__loop_hook(gb);
+  TAIL(ringMenu_drawSpritesForRingsInBox__loop);
 }
 
 void ringMenu_drawSpritesForRingsInBox__loop_hook(GB *gb) {
@@ -7264,7 +7264,7 @@ void ringMenu_drawUnappraisedRings_hook(GB *gb) {
   CYC(b_+8, b_+10); A = alu_swap(gb, A);
   CYC(b_+10, b_+13); SET_HL(wUnappraisedRings);
   CYC(b_+13, b_+14); push_effect(gb, b_+14); add_a_to_hl(gb);
-  ringMenu_drawUnappraisedRings__nextRing_hook(gb);
+  TAIL(ringMenu_drawUnappraisedRings__nextRing);
 }
 
 void ringMenu_drawUnappraisedRings__nextRing_hook(GB *gb) {
@@ -7290,7 +7290,7 @@ void ringMenu_drawRingList_hook(GB *gb) {
   CYC(b_+5, b_+8); A = W8(wRingMenu_page);
   CYC(b_+8, b_+10); A = alu_swap(gb, A);
   CYC(b_+10, b_+11); C = A;
-  ringMenu_drawRingList__nextRing_hook(gb);
+  TAIL(ringMenu_drawRingList__nextRing);
 }
 
 void ringMenu_drawRingList__nextRing_hook(GB *gb) {
@@ -7327,7 +7327,7 @@ void ringMenu_drawRingBoxContents_hook(GB *gb) {
   BASE(ringMenu_drawRingBoxContents);
   CYC(b_+0, b_+3); SET_HL(wRingBoxContents);
   CYC(b_+3, b_+5); B = 0x11;
-  ringMenu_drawRingBoxContents__nextRing_hook(gb);
+  TAIL(ringMenu_drawRingBoxContents__nextRing);
 }
 
 void ringMenu_drawRingBoxContents__nextRing_hook(GB *gb) {
@@ -7427,7 +7427,7 @@ void getRingTiles_hook(GB *gb) {
   CYC(b_+44, b_+45); push_effect(gb, b_+45); add_a_to_hl(gb);
   CALL_C(b_+45, getRingTiles__drawTile_hook, b_+49, b_+48);
   CYC(b_+48, b_+49); L = alu_inc8(gb, L);
-  getRingTiles__drawTile_hook(gb);
+  TAIL(getRingTiles__drawTile);
 }
 
 void getRingTiles__drawTile_hook(GB *gb) {
@@ -7446,7 +7446,7 @@ void getRingTiles__drawTile_hook(GB *gb) {
 void ringMenu_updateDisplayedRingNumber_hook(GB *gb) {
   BASE(ringMenu_updateDisplayedRingNumber);
   CYC(b_+0, b_+3); A = W8(wRingMenu_ringListCursorIndex);
-  ringMenu_updateDisplayedRingNumberWithGivenComparator_hook(gb);
+  TAIL(ringMenu_updateDisplayedRingNumberWithGivenComparator);
 }
 
 void ringMenu_updateDisplayedRingNumberWithGivenComparator_hook(GB *gb) {
@@ -7465,14 +7465,14 @@ void ringMenu_updateDisplayedRingNumberWithGivenComparator_hook(GB *gb) {
   CYC(b_+15, b_+17); A |= 0x10;
   CYC(b_+17, b_+19); C |= 0x10;
   CYC(b_+19, b_+21);
-  ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(gb);
+  TAIL(ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber);
 }
 
 void ringMenu_updateDisplayedRingNumberWithGivenComparator__noRing_hook(GB *gb) {
   BASE(ringMenu_updateDisplayedRingNumberWithGivenComparator);
   CYC(b_+21, b_+23); A = 0xe8;
   CYC(b_+23, b_+24); C = A;
-  ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(gb);
+  TAIL(ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber);
 }
 
 void ringMenu_updateDisplayedRingNumberWithGivenComparator__drawNumber_hook(GB *gb) {
@@ -7551,7 +7551,7 @@ void saveQuitMenu_state0_hook(GB *gb) {
   CALL_C(b_+21, saveQuitMenu_checkIsGameOver_hook, SYM(saveQuitMenu_checkIsGameOver), b_+24);
   if (F & FZ) { CYCT(b_+24, b_+26); saveQuitMenu_state0__notGameOver_hook(gb); return; }
   CYC(b_+24, b_+26);
-  saveQuitMenu_state0__gameOver_hook(gb);
+  TAIL(saveQuitMenu_state0__gameOver);
 }
 
 void saveQuitMenu_state0__gameOver_hook(GB *gb) {
@@ -7742,7 +7742,7 @@ void runGameLinkMenu_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wFileSelect_cbb6);
   CYC(b_+3, b_+4); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CALL_C(b_+4, fileSelect_redrawDecorationsAndSetWramBank4_hook, SYM(fileSelect_redrawDecorationsAndSetWramBank4), SYM(fileSelectMode7));
-  fileSelectMode7_hook(gb);
+  TAIL(fileSelectMode7);
 }
 
 void fileSelectMode7_hook(GB *gb) {
@@ -7898,7 +7898,7 @@ void fileSelectMode7__state3_hook(GB *gb) {
   CYC(b_+230, b_+232); alu_bit(gb, 1, A);
   if (F & FZ) { CYCT(b_+232, b_+233); ret_effect(gb); return; }
   CYC(b_+232, b_+233);
-  fileSelectMode7__moveCursorToQuit_hook(gb);
+  TAIL(fileSelectMode7__moveCursorToQuit);
 }
 
 void fileSelectMode7__moveCursorToQuit_hook(GB *gb) {
@@ -8011,7 +8011,7 @@ void fileSelectMode7__state5_hook(GB *gb) {
   CYC(b_+390, b_+391); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+391, b_+392); ret_effect(gb); return; }
   CYC(b_+391, b_+392);
-  fileSelectMode7__cancelLink_hook(gb);
+  TAIL(fileSelectMode7__cancelLink);
 }
 
 void fileSelectMode7__cancelLink_hook(GB *gb) {
@@ -8043,7 +8043,7 @@ void fileSelectMode7__state6_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+427, b_+428); ret_effect(gb); return; }
   CYC(b_+427, b_+428);
   CYC(b_+428, b_+430);
-  fileSelectMode7__cancelLink_hook(gb);
+  TAIL(fileSelectMode7__cancelLink);
 }
 
 void runFakeReset_hook(GB *gb) {
@@ -8169,7 +8169,7 @@ void fileSelectMode1__state2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+120, fileSelectMode1__textSpeedMenu_checkInput_hook, b_+125, b_+123);
   CYC(b_+123, b_+125);
-  fileSelectMode1__textSpeedMenu_addCursorToOam_hook(gb);
+  TAIL(fileSelectMode1__textSpeedMenu_addCursorToOam);
 }
 
 void fileSelectMode1__textSpeedMenu_checkInput_hook(GB *gb) {
@@ -8527,7 +8527,7 @@ store_width:
   CYC(b_+80, b_+81); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+81, b_+84); SET_HL(wSubmenuState);
   CYC(b_+84, b_+85); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  inventoryMenuState2__subState1_hook(gb);
+  TAIL(inventoryMenuState2__subState1);
 }
 
 void inventoryMenuState2__subState1_hook(GB *gb) {
@@ -8670,7 +8670,7 @@ set_submenu:
   CYC(b_+40, b_+41); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+41, b_+43); A = 0x54;
   CALL_C(b_+43, playSound_b00_hook, SYM(playSound_b00), b_+46);
-  inventoryMenuState3__subState1_hook(gb);
+  TAIL(inventoryMenuState3__subState1);
 }
 
 void inventoryMenuState3__subState1_hook(GB *gb) {
@@ -8689,7 +8689,7 @@ store:
   CYC(b_+67, b_+69); alu_cp(gb, 0x98);
   if (F & FC) { CYCT(b_+69, b_+70); ret_effect(gb); return; }
   CYC(b_+69, b_+70);
-  inventoryMenuState3__subState2_hook(gb);
+  TAIL(inventoryMenuState3__subState2);
 }
 
 void inventoryMenuState3__subState2_hook(GB *gb) {
@@ -8996,7 +8996,7 @@ void func_02_5a35_hook(GB *gb) {
 selected:
   CYC(b_+11, b_+12); B = D;
   CYC(b_+12, b_+14); D = 0;
-  func_02_5a35__next_hook(gb);
+  TAIL(func_02_5a35__next);
 }
 
 void func_02_5a35__next_hook(GB *gb) {
@@ -9060,13 +9060,13 @@ void func_02_5a35__next_hook(GB *gb) {
   CYC(b_+88, b_+90); alu_and(gb, 0x0f);
   CYC(b_+90, b_+92); alu_add(gb, 0x20);
   CYC(b_+92, b_+93); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  func_02_5a35__seedOnlyCodeDone_hook(gb);
+  TAIL(func_02_5a35__seedOnlyCodeDone);
 }
 
 void func_02_5a35__seedOnlyCodeDone_hook(GB *gb) {
   BASE(func_02_5a35);
   CYC(b_+93, b_+94); D = alu_inc8(gb, D);
-  func_02_5a35__dontHaveSubItem_hook(gb);
+  TAIL(func_02_5a35__dontHaveSubItem);
 }
 
 void func_02_5a35__dontHaveSubItem_hook(GB *gb) {
@@ -9216,7 +9216,7 @@ void inventorySubscreen0_drawStoredItems_hook(GB *gb) {
 void inventorySubscreen1_drawTreasures_hook(GB *gb) {
   BASE(inventorySubscreen1_drawTreasures);
   CYC(b_+0, b_+3); SET_HL(SYM(subscreen1TreasureData));
-  inventorySubscreen1_drawTreasures__drawTreasure_hook(gb);
+  TAIL(inventorySubscreen1_drawTreasures__drawTreasure);
 }
 
 void inventorySubscreen1_drawTreasures__drawTreasure_hook(GB *gb) {
@@ -9251,7 +9251,7 @@ void inventorySubscreen1_drawTreasures__drawTreasure_hook(GB *gb) {
   CALL_C(b_+36, addAToDe_hook, 0x0068, b_+39);
   CYC(b_+39, b_+40); A = C;
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);
-  inventorySubscreen1_drawTreasures__nextTreasure_hook(gb);
+  TAIL(inventorySubscreen1_drawTreasures__nextTreasure);
 }
 
 void inventorySubscreen1_drawTreasures__nextTreasure_hook(GB *gb) {
@@ -9259,7 +9259,7 @@ void inventorySubscreen1_drawTreasures__nextTreasure_hook(GB *gb) {
   CYC(b_+41, b_+42); SET_HL(HL + 1);
   CYC(b_+42, b_+43); SET_HL(HL + 1);
   CYC(b_+43, b_+45);
-  inventorySubscreen1_drawTreasures__drawTreasure_hook(gb);
+  TAIL(inventorySubscreen1_drawTreasures__drawTreasure);
 }
 
 void inventorySubscreen1_drawTreasures__undrawRingBox_hook(GB *gb) {
@@ -9280,7 +9280,7 @@ void inventorySubscreen1_drawTreasures__undrawRingBox_hook(GB *gb) {
   CYC(b_+60, b_+61); L = A;
   CYC(b_+61, b_+63); H = (uint8_t)((w4TileMap + 0x100) >> 8);
   CALL_C(b_+63, fillRectangleInTileMapWithMenuBlock_hook, SYM(fillRectangleInTileMapWithMenuBlock), b_+66);
-  inventorySubscreen1_drawTreasures__drawRings_hook(gb);
+  TAIL(inventorySubscreen1_drawTreasures__drawRings);
 }
 
 void inventorySubscreen1_drawTreasures__drawRings_hook(GB *gb) {
@@ -9290,7 +9290,7 @@ void inventorySubscreen1_drawTreasures__drawRings_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+69, b_+70); ret_effect(gb); return; }
   CYC(b_+69, b_+70);
   CYC(b_+70, b_+71); B = A;
-  inventorySubscreen1_drawTreasures__drawRing_hook(gb);
+  TAIL(inventorySubscreen1_drawTreasures__drawRing);
 }
 
 void inventorySubscreen1_drawTreasures__drawRing_hook(GB *gb) {
@@ -9322,7 +9322,7 @@ void inventorySubscreen1_drawTreasures__drawRing_hook(GB *gb) {
   CYC(b_+100, b_+101); A = C;
   CALL_C(b_+101, getRingTiles_hook, SYM(getRingTiles), b_+104);
   CYC(b_+104, b_+105); SET_BC(pop_effect(gb));
-  inventorySubscreen1_drawTreasures__nextRing_hook(gb);
+  TAIL(inventorySubscreen1_drawTreasures__nextRing);
 }
 
 void inventorySubscreen1_drawTreasures__nextRing_hook(GB *gb) {
@@ -9365,7 +9365,7 @@ void inventorySubscreen2_drawTreasures_hook(GB *gb) {
   CYC(b_+6, b_+8); B = 0x0b;
   CALL_C(b_+8, copyMemory_hook, SYM(copyMemory), b_+11);
   CYC(b_+11, b_+13); B = 0x08;
-  inventorySubscreen2_drawTreasures__drawEssence_hook(gb);
+  TAIL(inventorySubscreen2_drawTreasures__drawEssence);
 }
 
 void inventorySubscreen2_drawTreasures__drawEssence_hook(GB *gb) {
@@ -9395,7 +9395,7 @@ void inventorySubscreen2_drawTreasures__drawEssence_hook(GB *gb) {
   CYC(b_+43, b_+46); SET_HL(w4SubscreenTextIndices - 1);
   CYC(b_+46, b_+47); push_effect(gb, b_+47); add_a_to_hl(gb);
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0);
-  inventorySubscreen2_drawTreasures__nextEssence_hook(gb);
+  TAIL(inventorySubscreen2_drawTreasures__nextEssence);
 }
 
 void inventorySubscreen2_drawTreasures__nextEssence_hook(GB *gb) {
@@ -9421,7 +9421,7 @@ void inventorySubscreen2_drawTreasures__nextEssence_hook(GB *gb) {
   CYC(b_+65, b_+67); alu_add(gb, 0x10);
   CYC(b_+67, b_+70); mem_wr(gb, w4TileMap + 0x14f, A);
   CYC(b_+70, b_+73); SET_HL(SYM(itemSubmenu2HeartPieceDisplayData));
-  inventorySubscreen2_drawTreasures__nextQuarterHeart_hook(gb);
+  TAIL(inventorySubscreen2_drawTreasures__nextQuarterHeart);
 }
 
 void inventorySubscreen2_drawTreasures__nextQuarterHeart_hook(GB *gb) {
@@ -9437,7 +9437,7 @@ void inventorySubscreen2_drawTreasures__nextQuarterHeart_hook(GB *gb) {
     CYC(b_+85, b_+86); C = alu_dec8(gb, C);
     if (!(F & FZ)) CYCT(b_+86, b_+88); else CYC(b_+86, b_+88);
   } while (!(F & FZ));
-  inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece_hook(gb);
+  TAIL(inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece);
 }
 
 void inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece_hook(GB *gb) {
@@ -9477,7 +9477,7 @@ void getRingBoxCapacity_hook(GB *gb) {
 void fillRectangleInTileMapWithMenuBlock_hook(GB *gb) {
   BASE(fillRectangleInTileMapWithMenuBlock);
   CYC(b_+0, b_+3); SET_DE(0xe701);
-  fillRectangleInTilemap_hook(gb);
+  TAIL(fillRectangleInTilemap);
 }
 
 void fillRectangleInTilemap_hook(GB *gb) {
@@ -9605,7 +9605,7 @@ void inventoryMenuDrawSprites_hook(GB *gb) {
     TAIL(inventoryMenuDrawSprites__menuScrolling);
   }
   CYC(b_+17, b_+19);
-  inventoryMenuDrawSprites__drawIfOnSubscreen1_hook(gb);
+  TAIL(inventoryMenuDrawSprites__drawIfOnSubscreen1);
 }
 
 void inventoryMenuDrawSprites__drawIfOnSubscreen1_hook(GB *gb) {
@@ -9615,7 +9615,7 @@ void inventoryMenuDrawSprites__drawIfOnSubscreen1_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+23, b_+24); ret_effect(gb); return; }
   CYC(b_+23, b_+24);
   CYC(b_+24, b_+26);
-  inventoryMenuDrawSprites__drawSprite_hook(gb);
+  TAIL(inventoryMenuDrawSprites__drawSprite);
 }
 
 void inventoryMenuDrawSprites__menuScrolling_hook(GB *gb) {
@@ -9643,14 +9643,14 @@ void inventoryMenuDrawSprites__menuScrolling_hook(GB *gb) {
     CYC(b_+43, b_+45); alu_sub(gb, 0x07);
     CYC(b_+45, b_+47);
   }
-  inventoryMenuDrawSprites__drawSpriteWithXOffset_hook(gb);
+  TAIL(inventoryMenuDrawSprites__drawSpriteWithXOffset);
 }
 
 void inventoryMenuDrawSprites__drawSpriteWithXOffset_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
   CYC(b_+52, b_+53); alu_add(gb, C);
   CYC(b_+53, b_+54); C = A;
-  inventoryMenuDrawSprites__drawSprite_hook(gb);
+  TAIL(inventoryMenuDrawSprites__drawSprite);
 }
 
 void inventoryMenuDrawSprites__drawSprite_hook(GB *gb) {
@@ -9726,14 +9726,14 @@ scrolling:
     CYC(b_+67, b_+69); alu_sub(gb, 0x07);
     CYC(b_+69, b_+71);
   }
-  inventoryMenuDrawHarpSprites__drawSpriteWithXOffset_hook(gb);
+  TAIL(inventoryMenuDrawHarpSprites__drawSpriteWithXOffset);
 }
 
 void inventoryMenuDrawHarpSprites__drawSpriteWithXOffset_hook(GB *gb) {
   BASE(inventoryMenuDrawHarpSprites);
   CYC(b_+76, b_+77); alu_add(gb, C);
   CYC(b_+77, b_+78); C = A;
-  inventoryMenuDrawHarpSprites__drawSprite_hook(gb);
+  TAIL(inventoryMenuDrawHarpSprites__drawSprite);
 }
 
 void inventoryMenuDrawHarpSprites__drawSprite_hook(GB *gb) {
@@ -9776,7 +9776,7 @@ void setFileSelectMode_hook(GB *gb) {
 void setFileSelectModeTo1_hook(GB *gb) {
   BASE(setFileSelectModeTo1);
   CYC(b_+0, b_+2); A = 0x01;
-  setFileSelectMode_hook(gb);
+  TAIL(setFileSelectMode);
 }
 
 void loadGfxRegisterState5AndIncFileSelectMode2_hook(GB *gb) {
@@ -9784,7 +9784,7 @@ void loadGfxRegisterState5AndIncFileSelectMode2_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x05;
   CALL_C(b_+2, loadGfxRegisterStateIndex_hook, SYM(loadGfxRegisterStateIndex), SYM(incFileSelectMode2));
-  incFileSelectMode2_hook(gb);
+  TAIL(incFileSelectMode2);
 }
 
 void incFileSelectMode2_hook(GB *gb) {
@@ -9807,7 +9807,7 @@ void decFileSelectMode2IfBPressed_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_and(gb, 0x02);
   if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
   CYC(b_+5, b_+6);
-  decFileSelectMode2_hook(gb);
+  TAIL(decFileSelectMode2);
 }
 
 void createBlankSpritesForItemSubmenu_hook(GB *gb) {
@@ -10166,7 +10166,7 @@ void menuStateFadeIntoMenu__openMenu_hook(GB *gb) {
   else CYC(b_+43, b_+46);
   CYC(b_+46, b_+48); A = 2;
   CALL_C(b_+48, setMusicVolume_hook, SYM(setMusicVolume), SYM(saveGraphicsOnEnterMenu_body));
-  saveGraphicsOnEnterMenu_body_hook(gb);
+  TAIL(saveGraphicsOnEnterMenu_body);
 }
 
 void saveGraphicsOnEnterMenu_body_hook(GB *gb) {
@@ -10226,14 +10226,14 @@ void copyTextCharactersFromSecretTextTable_hook(GB *gb) {
   CYC(b_+4, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+5, b_+6); H = mem_rd(gb, HL);
   CYC(b_+6, b_+7); L = A;
-  copyTextCharactersFromHlUntilNull_hook(gb);
+  TAIL(copyTextCharactersFromHlUntilNull);
 }
 
 void copyTextCharactersFromHlUntilNull_hook(GB *gb) {
   BASE(copyTextCharactersFromHlUntilNull);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); B |= 0x80;
-  copyTextCharactersFromHl_hook(gb);
+  TAIL(copyTextCharactersFromHl);
 }
 
 void copyTextCharactersFromHl_hook(GB *gb) {
@@ -10303,7 +10303,7 @@ void fileSelectMode0_hook(GB *gb) {
   CYC(b_+21, b_+22); alu_xor(gb, A);
   CYC(b_+22, b_+25); W8(wLastSecretInputLength) = A;
   CALL_C(b_+25, setFileSelectModeTo1_hook, SYM(setFileSelectModeTo1), SYM(fileSelectMode1));
-  fileSelectMode1_hook(gb);
+  TAIL(fileSelectMode1);
 }
 
 void fileSelectMode1_hook(GB *gb) {
@@ -10488,7 +10488,7 @@ void textInput_waitForInput_hook(GB *gb) {
   CYC(b_+13, b_+14);
   CYC(b_+14, b_+16); A = 0x01;
   CYC(b_+16, b_+19); W8(wFileSelect_mode2) = A;
-  func_02_461c_hook(gb);
+  TAIL(func_02_461c);
 }
 
 void checkDisplayDmgModeScreen_hook(GB *gb) {
@@ -10510,7 +10510,7 @@ void checkDisplayDmgModeScreen_hook(GB *gb) {
   CYC(b_+18, b_+21); SET_DE(wGfxRegsFinal);
   CYC(b_+21, b_+23); B = 0x06;
   CALL_C(b_+23, copyMemory_hook, SYM(copyMemory), b_+26);
-  checkDisplayDmgModeScreen__vblankLoop_hook(gb);
+  TAIL(checkDisplayDmgModeScreen__vblankLoop);
 }
 
 void checkDisplayDmgModeScreen__vblankLoop_hook(GB *gb) {

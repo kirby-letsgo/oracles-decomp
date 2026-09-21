@@ -96,7 +96,7 @@ void updateSwingableItemAnimation_hook(GB *gb) {
   CYC(b_+25, b_+26); push_effect(gb, HL);
   CALL_C(b_+26, tryBreakTileWithSword_calculateLevel_hook, SYM(tryBreakTileWithSword_calculateLevel), b_+29);
   CYC(b_+29, b_+30); SET_HL(pop_effect(gb));
-  label_07_227_hook(gb);
+  TAIL(label_07_227);
 }
 
 void updateBiggoronSwordAnimation_hook(GB *gb) {
@@ -143,7 +143,7 @@ void updateBiggoronSwordAnimation_hook(GB *gb) {
   CYC(b_+43, b_+45); E = 0x30;
   CYC(b_+45, b_+46); mem_wr(gb, DE, A);
   CYC(b_+46, b_+49);
-  itemSetAnimation_hook(gb);
+  TAIL(itemSetAnimation);
 }
 
 void itemCode08Post_hook(GB *gb) {
@@ -165,7 +165,7 @@ void itemCode08Post_hook(GB *gb) {
   CYC(b_+21, b_+23); E = 0x30;
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
   CYC(b_+24, b_+27);
-  itemSetAnimation_hook(gb);
+  TAIL(itemSetAnimation);
 }
 
 void itemCode13Post_hook(GB *gb) {
@@ -183,7 +183,7 @@ void itemCode13Post_hook(GB *gb) {
   CYC(b_+15, b_+17); E = 0x30;
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
   CYC(b_+18, b_+21);
-  itemSetAnimation_hook(gb);
+  TAIL(itemSetAnimation);
 }
 
 void itemCode1ePost_hook(GB *gb) {
@@ -206,7 +206,7 @@ void itemCode1ePost_hook(GB *gb) {
   CYC(b_+19, b_+20); mem_wr(gb, DE, A);
   CYC(b_+20, b_+23); SET_HL(SYM(swordArcData));
   CYC(b_+23, b_+25);
-  itemSetPositionInSwordArc_hook(gb);
+  TAIL(itemSetPositionInSwordArc);
 }
 
 void itemCode00Post_hook(GB *gb) {
@@ -215,7 +215,7 @@ void itemCode00Post_hook(GB *gb) {
   CYC(b_+3, b_+5); alu_add(gb, 0x18);
   CYC(b_+5, b_+8); SET_HL(SYM(swordArcData));
   CYC(b_+8, b_+10);
-  itemSetPositionInSwordArc_hook(gb);
+  TAIL(itemSetPositionInSwordArc);
 }
 
 void itemCode0cPost_hook(GB *gb) {
@@ -233,7 +233,7 @@ void itemCode0cPost_hook(GB *gb) {
   CYC(b_+12, b_+15); SET_HL(SYM(biggoronSwordArcData));
   CALL_C(b_+15, itemSetPositionInSwordArc_hook, SYM(itemSetPositionInSwordArc), b_+18);
   CYC(b_+18, b_+21);
-  itemCalculateSwordDamage_hook(gb);
+  TAIL(itemCalculateSwordDamage);
 }
 
 void itemCode04Post_hook(GB *gb) {
@@ -251,14 +251,14 @@ void itemCode04Post_hook(GB *gb) {
   CYC(b_+12, b_+15); SET_HL(SYM(swordArcData));
   CALL_C(b_+15, itemSetPositionInSwordArc_hook, SYM(itemSetPositionInSwordArc), b_+18);
   CYC(b_+18, b_+21);
-  itemCalculateSwordDamage_hook(gb);
+  TAIL(itemCalculateSwordDamage);
 }
 
 void itemSetPositionInSwordArc_hook(GB *gb) {
   BASE(itemSetPositionInSwordArc);
   CYC(b_+0, b_+1); alu_add(gb, A);
   CYC(b_+1, b_+2); post_update_add_double_index(gb, SYM(itemInitializeFromLinkPosition));
-  itemInitializeFromLinkPosition_hook(gb);
+  TAIL(itemInitializeFromLinkPosition);
 }
 
 void itemInitializeFromLinkPosition_hook(GB *gb) {
