@@ -710,7 +710,7 @@ L_46ce:
   CALL(0x46d3, objectGetPosition_hook, 0x2048, 0x46d6);  // call $2048
   CALL(0x46d6, s_checkCollisionForCompanion, 0x4471, 0x46d9);  // call $4471
   if ((F & FC)) { I(0x46d9, 3); goto L_46e0; } I(0x46d9, 2);  // jr c,$46e0
-  CALL(0x46db, s_objectCheckIsOnHazard, 0x21cb, 0x46de);  // call $21cb
+  CALL(0x46db, objectCheckIsOnHazard_hook, 0x21cb, 0x46de);  // call $21cb
   if (!(F & FC)) { I(0x46de, 3); goto L_46f2; } I(0x46de, 2);  // jr nc,$46f2
 L_46e0:
   I(0x46e0, 1); H = D;  // ld h,d
@@ -1149,7 +1149,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1216,7 +1216,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1283,7 +1283,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1344,7 +1344,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1387,7 +1387,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1429,7 +1429,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1466,7 +1466,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1499,7 +1499,7 @@ L_745d:
   I(0x745d, 2); A = 0x00;  // ld a,$00
   I(0x745f, 4); mem_wr(gb, 0xdc10, A);  // ld ($dc10),a
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -1529,7 +1529,7 @@ L_7468:
 void s_dimitriState2Substate2__checkOnHazard(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_7462:
-  CALL(0x7462, s_objectCheckIsOnHazard, 0x21cb, 0x7465);  // call $21cb
+  CALL(0x7462, objectCheckIsOnHazard_hook, 0x21cb, 0x7465);  // call $21cb
   I(0x7465, 2); alu_cp(gb, 0x01);  // cp $01
   if (!(F & FZ)) { RET_TAKEN(0x7467); return; } I(0x7467, 2);  // ret nz
 L_7468:
@@ -4654,7 +4654,7 @@ L_523c:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x5250: goto L_5250; case 0x5259: goto L_5259; case 0x525e: goto L_525e; case 0x525f: goto L_525f; case 0x5262: goto L_5262; default: HANDOFF(HL); }
 L_5250:
-  CALL(0x5250, s_darkenRoomLightly, 0x31d0, 0x5253);  // call $31d0
+  CALL(0x5250, darkenRoomLightly_hook, 0x31d0, 0x5253);  // call $31d0
   I(0x5253, 2); A = 0x06;  // ld a,$06
   I(0x5255, 4); mem_wr(gb, 0xc4ad, A);  // ld ($c4ad),a
   RET(0x5258); return;  // ret
@@ -4684,7 +4684,7 @@ L_5262:
 void s_linkState05__animParameter1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5250:
-  CALL(0x5250, s_darkenRoomLightly, 0x31d0, 0x5253);  // call $31d0
+  CALL(0x5250, darkenRoomLightly_hook, 0x31d0, 0x5253);  // call $31d0
   I(0x5253, 2); A = 0x06;  // ld a,$06
   I(0x5255, 4); mem_wr(gb, 0xc4ad, A);  // ld ($c4ad),a
   RET(0x5258); return;  // ret

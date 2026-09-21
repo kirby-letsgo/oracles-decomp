@@ -8084,6 +8084,7 @@ enum {
   S_loadStoneNpcPalette,
   S_loadTileset,
   S_loadTilesetAndRoomLayout,
+  S_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains,
   S_loadTilesetAnimation,
   S_loadTilesetData,
   S_loadTilesetData_body,

@@ -220,7 +220,7 @@ def main():
                     j += 1
                 if ages_only_depth: out.append(line); continue
                 keep, line = line[:j], line[j:]
-            if re.search(r'!game_seasons\s*&&', code):     # an Ages-only condition on one line
+            if re.search(r'!game_seasons\s*&&', code) or re.search(r'if \(!game_seasons\)\s*[^{\s]', code):     # an Ages-only condition on one line
                 out.append(keep + re.sub(r'\bb_\+OE?\((\d+)\)', r'b_+\1', line)); continue
             # the else branch of `if (game_seasons) { ... } else {` is Ages-only too
             if seasons_depth:

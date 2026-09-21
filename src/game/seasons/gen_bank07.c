@@ -303,18 +303,6 @@ L_514d:
   I(0x5157, 4); if (hook_is(gb, 0x5220, bombchuSetAnimationFromAngle_hook)) { bombchuSetAnimationFromAngle_hook(gb); return; } HANDOFF(0x5220);  // jp $5220
 }
 
-// 07:6109
-void s_braceletCheckBreakable(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6109, 2); E = 0x02;  // ld e,$02
-  I(0x610b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x610c, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x610d); return; } I(0x610d, 2);  // ret z
-  I(0x610e, 2); alu_cp(gb, 0xd7);  // cp $d7
-  I(0x6110, 1); alu_scf(gb);  // scf
-  RET(0x6111); return;  // ret
-}
-
 // 07:612d
 void s_braceletCheckDeleteSelfWhileThrowing__deleteSelfAndRetFromCaller(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3151,10 +3139,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3185,7 +3173,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3253,10 +3241,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3287,7 +3275,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3353,10 +3341,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3387,7 +3375,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3428,10 +3416,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3462,7 +3450,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3516,10 +3504,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3550,7 +3538,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3596,10 +3584,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3630,7 +3618,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3658,10 +3646,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3692,7 +3680,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3713,10 +3701,10 @@ L_60ae:
   I(0x60b9, 1); C = A;  // ld c,a
   CALL(0x60ba, s_itemUpdateThrowingVertically, 0x4a8d, 0x60bd);  // call $4a8d
   if (!(F & FC)) { I(0x60bd, 3); goto L_60cf; } I(0x60bd, 2);  // jr nc,$60cf
-  CALL(0x60bf, s_braceletCheckBreakable, 0x6109, 0x60c2);  // call $6109
+  CALL(0x60bf, braceletCheckBreakable_hook, 0x6109, 0x60c2);  // call $6109
   if (!(F & FZ)) { I(0x60c2, 3); goto L_60ed; } I(0x60c2, 2);  // jr nz,$60ed
   if (!(F & FC)) { I(0x60c4, 3); goto L_60ca; } I(0x60c4, 2);  // jr nc,$60ca
-  CALL(0x60c6, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60c9);  // call $21e0
+  CALL(0x60c6, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60c9);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60c9); return; } I(0x60c9, 2);  // ret c
 L_60ca:
   CALL(0x60ca, itemBounce_hook, 0x6220, 0x60cd);  // call $6220
@@ -3747,7 +3735,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3798,7 +3786,7 @@ L_60f4:
   CALL(0x60f4, objectCreatePuff_hook, 0x24ad, 0x60f7);  // call $24ad
   I(0x60f7, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -3819,7 +3807,7 @@ L_60f4:
 void s_itemCode16__state3__destroyWithAnimation(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_60fa:
-  CALL(0x60fa, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x60fd);  // call $21e0
+  CALL(0x60fa, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x60fd);  // call $21e0
   if ((F & FC)) { RET_TAKEN(0x60fd); return; } I(0x60fd, 2);  // ret c
   I(0x60fe, 3); SET_HL(0x47bb);  // ld hl,$47bb
   I(0x6101, 2); E = 0x06;  // ld e,$06
@@ -4719,7 +4707,7 @@ L_57d7:
   I(0x57ed, 2); A = mem_rd(gb, DE);  // ld a,(de)
   CALL(0x57ee, s_itemCode29__checkBallShouldBeDroppedOffCliffOrLeavingRoom, 0x58c3, 0x57f1);  // call $58c3
 L_57f1:
-  CALL(0x57f1, s_objectCheckIsOnHazard, 0x21cb, 0x57f4);  // call $21cb
+  CALL(0x57f1, objectCheckIsOnHazard_hook, 0x21cb, 0x57f4);  // call $21cb
   if ((F & FC)) { I(0x57f4, 4); goto L_57f8; } I(0x57f4, 3);  // jp c,$57f8
   RET(0x57f7); return;  // ret
 L_57f8:
@@ -4970,7 +4958,7 @@ L_57d7:
   I(0x57ed, 2); A = mem_rd(gb, DE);  // ld a,(de)
   CALL(0x57ee, s_itemCode29__checkBallShouldBeDroppedOffCliffOrLeavingRoom, 0x58c3, 0x57f1);  // call $58c3
 L_57f1:
-  CALL(0x57f1, s_objectCheckIsOnHazard, 0x21cb, 0x57f4);  // call $21cb
+  CALL(0x57f1, objectCheckIsOnHazard_hook, 0x21cb, 0x57f4);  // call $21cb
   if ((F & FC)) { I(0x57f4, 4); goto L_57f8; } I(0x57f4, 3);  // jp c,$57f8
   RET(0x57f7); return;  // ret
 L_57f8:
@@ -5910,7 +5898,7 @@ L_5a5c:
 void s_itemCode29__savePositionInStaticObjects(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5a28:
-  CALL(0x5a28, s_objectCheckIsOnHazard, 0x21cb, 0x5a2b);  // call $21cb
+  CALL(0x5a28, objectCheckIsOnHazard_hook, 0x21cb, 0x5a2b);  // call $21cb
   if ((F & FC)) { RET_TAKEN(0x5a2b); return; } I(0x5a2b, 2);  // ret c
   I(0x5a2c, 2); E = 0x0b;  // ld e,$0b
   I(0x5a2e, 2); A = mem_rd(gb, DE);  // ld a,(de)
@@ -6123,7 +6111,7 @@ L_61ed:
   if (!(F & FZ)) { I(0x61fd, 3); goto L_61ed; } I(0x61fd, 2);  // jr nz,$61ed
   I(0x61ff, 3); goto L_620b;  // jr $620b
 L_6201:
-  CALL(0x6201, s_braceletCheckBreakable, 0x6109, 0x6204);  // call $6109
+  CALL(0x6201, braceletCheckBreakable_hook, 0x6109, 0x6204);  // call $6109
   if (!(F & FZ)) { I(0x6204, 3); goto L_621e; } I(0x6204, 2);  // jr nz,$621e
   I(0x6206, 2); E = 0x09;  // ld e,$09
   I(0x6208, 2); A = 0xff;  // ld a,$ff
@@ -6150,7 +6138,7 @@ L_621e:
 void s_itemUpdateThrowingLaterally__collision(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6201:
-  CALL(0x6201, s_braceletCheckBreakable, 0x6109, 0x6204);  // call $6109
+  CALL(0x6201, braceletCheckBreakable_hook, 0x6109, 0x6204);  // call $6109
   if (!(F & FZ)) { I(0x6204, 3); goto L_621e; } I(0x6204, 2);  // jr nz,$621e
   I(0x6206, 2); E = 0x09;  // ld e,$09
   I(0x6208, 2); A = 0xff;  // ld a,$ff
@@ -6445,7 +6433,7 @@ L_4b02:
   I(0x4b09, 3); alu_bit(gb, 7, mem_rd(gb, HL));  // bit 7,(hl)
   if (!(F & FZ)) { I(0x4b0b, 3); goto L_4b11; } I(0x4b0b, 2);  // jr nz,$4b11
 L_4b0d:
-  CALL(0x4b0d, s_objectCheckIsOverHazard, 0x21d4, 0x4b10);  // call $21d4
+  CALL(0x4b0d, objectCheckIsOverHazard_hook, 0x21d4, 0x4b10);  // call $21d4
   I(0x4b10, 1); H = D;  // ld h,d
 L_4b11:
   I(0x4b11, 1); B = A;  // ld b,a
@@ -6469,7 +6457,7 @@ L_4b23:
 void s_itemUpdateThrowingVertically__checkHoleOrWater__sidescrolling(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4b0d:
-  CALL(0x4b0d, s_objectCheckIsOverHazard, 0x21d4, 0x4b10);  // call $21d4
+  CALL(0x4b0d, objectCheckIsOverHazard_hook, 0x21d4, 0x4b10);  // call $21d4
   I(0x4b10, 1); H = D;  // ld h,d
   I(0x4b11, 1); B = A;  // ld b,a
   I(0x4b12, 2); L = 0x3b;  // ld l,$3b

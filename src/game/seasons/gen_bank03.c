@@ -1805,10 +1805,10 @@ L_6c19:
   I(0x6c27, 2); E = 0x01;  // ld e,$01
   CALL(0x6c29, interBankCall_hook, 0x008a, 0x6c2c);  // call $008a
 L_6c2c:
-  CALL(0x6c2c, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x6c2f);  // call $32dc
+  CALL(0x6c2c, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x6c2f);  // call $32dc
   CALL(0x6c2f, loadTilesetData_hook, 0x381a, 0x6c32);  // call $381a
 L_6c32:
-  CALL(0x6c32, s_loadTilesetAndRoomLayout, 0x3836, 0x6c35);  // call $3836
+  CALL(0x6c32, loadTilesetAndRoomLayout_hook, 0x3836, 0x6c35);  // call $3836
 L_6c35:
   CALL(0x6c35, s_generateVramTilesWithRoomChanges, 0x3a06, 0x6c38);  // call $3a06
   I(0x6c38, 2); A = 0x08;  // ld a,$08
@@ -1871,10 +1871,10 @@ L_6c19:
   I(0x6c27, 2); E = 0x01;  // ld e,$01
   CALL(0x6c29, interBankCall_hook, 0x008a, 0x6c2c);  // call $008a
 L_6c2c:
-  CALL(0x6c2c, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x6c2f);  // call $32dc
+  CALL(0x6c2c, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x6c2f);  // call $32dc
   CALL(0x6c2f, loadTilesetData_hook, 0x381a, 0x6c32);  // call $381a
 L_6c32:
-  CALL(0x6c32, s_loadTilesetAndRoomLayout, 0x3836, 0x6c35);  // call $3836
+  CALL(0x6c32, loadTilesetAndRoomLayout_hook, 0x3836, 0x6c35);  // call $3836
 L_6c35:
   CALL(0x6c35, s_generateVramTilesWithRoomChanges, 0x3a06, 0x6c38);  // call $3a06
   I(0x6c38, 2); A = 0x08;  // ld a,$08
@@ -1923,10 +1923,10 @@ L_6c19:
   I(0x6c27, 2); E = 0x01;  // ld e,$01
   CALL(0x6c29, interBankCall_hook, 0x008a, 0x6c2c);  // call $008a
 L_6c2c:
-  CALL(0x6c2c, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x6c2f);  // call $32dc
+  CALL(0x6c2c, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x6c2f);  // call $32dc
   CALL(0x6c2f, loadTilesetData_hook, 0x381a, 0x6c32);  // call $381a
 L_6c32:
-  CALL(0x6c32, s_loadTilesetAndRoomLayout, 0x3836, 0x6c35);  // call $3836
+  CALL(0x6c32, loadTilesetAndRoomLayout_hook, 0x3836, 0x6c35);  // call $3836
 L_6c35:
   CALL(0x6c35, s_generateVramTilesWithRoomChanges, 0x3a06, 0x6c38);  // call $3a06
   I(0x6c38, 2); A = 0x08;  // ld a,$08
@@ -1965,10 +1965,10 @@ L_6c19:
   I(0x6c27, 2); E = 0x01;  // ld e,$01
   CALL(0x6c29, interBankCall_hook, 0x008a, 0x6c2c);  // call $008a
 L_6c2c:
-  CALL(0x6c2c, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x6c2f);  // call $32dc
+  CALL(0x6c2c, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x6c2f);  // call $32dc
   CALL(0x6c2f, loadTilesetData_hook, 0x381a, 0x6c32);  // call $381a
 L_6c32:
-  CALL(0x6c32, s_loadTilesetAndRoomLayout, 0x3836, 0x6c35);  // call $3836
+  CALL(0x6c32, loadTilesetAndRoomLayout_hook, 0x3836, 0x6c35);  // call $3836
 L_6c35:
   CALL(0x6c35, s_generateVramTilesWithRoomChanges, 0x3a06, 0x6c38);  // call $3a06
   I(0x6c38, 2); A = 0x08;  // ld a,$08
@@ -1998,10 +1998,10 @@ L_6c4f:
 void s_cutsceneHandler_0b_stage1__afterCall6c2c(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6c2c:
-  CALL(0x6c2c, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x6c2f);  // call $32dc
+  CALL(0x6c2c, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x6c2f);  // call $32dc
   CALL(0x6c2f, loadTilesetData_hook, 0x381a, 0x6c32);  // call $381a
 L_6c32:
-  CALL(0x6c32, s_loadTilesetAndRoomLayout, 0x3836, 0x6c35);  // call $3836
+  CALL(0x6c32, loadTilesetAndRoomLayout_hook, 0x3836, 0x6c35);  // call $3836
 L_6c35:
   CALL(0x6c35, s_generateVramTilesWithRoomChanges, 0x3a06, 0x6c38);  // call $3a06
   I(0x6c38, 2); A = 0x08;  // ld a,$08
@@ -2031,7 +2031,7 @@ L_6c4f:
 void s_cutsceneHandler_0b_stage1__afterCall6c32(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6c32:
-  CALL(0x6c32, s_loadTilesetAndRoomLayout, 0x3836, 0x6c35);  // call $3836
+  CALL(0x6c32, loadTilesetAndRoomLayout_hook, 0x3836, 0x6c35);  // call $3836
 L_6c35:
   CALL(0x6c35, s_generateVramTilesWithRoomChanges, 0x3a06, 0x6c38);  // call $3a06
   I(0x6c38, 2); A = 0x08;  // ld a,$08
@@ -3160,7 +3160,7 @@ L_691f:
   I(0x6920, 4); mem_wr(gb, 0xcc49, A);  // ld ($cc49),a
   I(0x6923, 1); A = C;  // ld a,c
   I(0x6924, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  CALL(0x6927, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x692a);  // call $32dc
+  CALL(0x6927, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x692a);  // call $32dc
   CALL(0x692a, loadTilesetData_hook, 0x381a, 0x692d);  // call $381a
   CALL(0x692d, s_loadTilesetGraphics, 0x3737, 0x6930);  // call $3737
   I(0x6930, 4); s_func_131f(gb); return;  // jp $12dd
@@ -9857,7 +9857,7 @@ void s_seasonsFunc_03_5d12(GB *gb) {
 void s_seasonsFunc_03_63eb(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x63eb, initializeVramMaps_hook, 0x04a9, 0x63ee);  // call $04a9
-  CALL(0x63ee, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x63f1);  // call $32dc
+  CALL(0x63ee, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x63f1);  // call $32dc
   CALL(0x63f1, loadTilesetData_hook, 0x381a, 0x63f4);  // call $381a
 L_63f4:
   CALL(0x63f4, s_loadTilesetGraphics, 0x3737, 0x63f7);  // call $3737
@@ -10404,7 +10404,7 @@ void s_seasonsFunc_03_6de4(GB *gb) {
   I(0x6de5, 4); mem_wr(gb, 0xcc49, A);  // ld ($cc49),a
   I(0x6de8, 1); A = C;  // ld a,c
   I(0x6de9, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  CALL(0x6dec, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x6def);  // call $32dc
+  CALL(0x6dec, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x6def);  // call $32dc
   CALL(0x6def, loadTilesetData_hook, 0x381a, 0x6df2);  // call $381a
 L_6df2:
   CALL(0x6df2, s_loadTilesetGraphics, 0x3737, 0x6df5);  // call $3737

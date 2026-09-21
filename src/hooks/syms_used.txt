@@ -8080,6 +8080,7 @@ loadStatusBarMap loadStatusBarMap 02:54df
 loadStoneNpcPalette loadStoneNpcPalette 08:7de5
 loadTileset loadTileset 00:0799
 loadTilesetAndRoomLayout loadTilesetAndRoomLayout 00:38a5
+loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains loadTilesetAndRoomLayout@adjustLoadingRoomForTempleRemains -
 loadTilesetAnimation loadTilesetAnimation 00:1374
 loadTilesetData loadTilesetData 00:3889
 loadTilesetData_body loadTilesetData_body 04:6d7a

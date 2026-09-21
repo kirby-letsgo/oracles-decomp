@@ -5817,7 +5817,7 @@ L_42e2:
 void s_parentItemCode_biggoronSword(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL(0x4a4b, clearParentItemIfCantUseSword_hook, 0x53f0, 0x4a4e);  // call $53f0
-  s_parentItemCode_foolsOre(gb); return;  // fallthrough
+  if (hook_is(gb, 0x4a4e, parentItemCode_foolsOre_hook)) { parentItemCode_foolsOre_hook(gb); return; } HANDOFF(0x4a4e);  // fallthrough
 }
 
 // 06:4ea7
@@ -7588,31 +7588,6 @@ L_4d0e:
   I(0x4d15, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7);  // jp $49e7
 }
 
-// 06:4a4e
-void s_parentItemCode_foolsOre(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a4e, 2); E = 0x04;  // ld e,$04
-  I(0x4a50, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4a51, 0x4a52);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4a5d: goto L_4a5d; case 0x4a97: goto L_4a97; default: HANDOFF(HL); }
-L_4a5d:
-  I(0x4a5d, 2); E = 0x00;  // ld e,$00
-  I(0x4a5f, 2); A = 0xff;  // ld a,$ff
-  I(0x4a61, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x4a62, updateLinkDirectionFromAngle_hook, 0x2aab, 0x4a65);  // call $2aab
-  CALL(0x4a65, s_parentItemLoadAnimationAndIncState, 0x52e2, 0x4a68);  // call $52e2
-  I(0x4a68, 4); if (hook_is(gb, 0x532f, itemCreateChild_hook)) { itemCreateChild_hook(gb); return; } HANDOFF(0x532f);  // jp $532f
-L_4a97:
-  I(0x4a97, 2); E = 0x21;  // ld e,$21
-  I(0x4a99, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4a9a, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { I(0x4a9b, 4); if (hook_is(gb, 0x4414, specialObjectAnimate_optimized_hook)) { specialObjectAnimate_optimized_hook(gb); return; } HANDOFF(0x4414); } I(0x4a9b, 3);  // jp nc,$4414
-  I(0x4a9e, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7);  // jp $49e7
-}
-
 // 06:4a56
 void s_parentItemCode_foolsOre__rod_state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7976,45 +7951,6 @@ void s_parentItemCode_magnetGloves__ret(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_52a5:
   RET(0x52a5); return;  // ret
-}
-
-// 06:4a6b
-void s_parentItemCode_punch(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4a6b, 2); E = 0x04;  // ld e,$04
-  I(0x4a6d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4a6e, 0x4a6f);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4a73: goto L_4a73; case 0x4a97: goto L_4a97; default: HANDOFF(HL); }
-L_4a73:
-  I(0x4a73, 2); E = 0x00;  // ld e,$00
-  I(0x4a75, 2); A = 0xff;  // ld a,$ff
-  I(0x4a77, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x4a78, updateLinkDirectionFromAngle_hook, 0x2aab, 0x4a7b);  // call $2aab
-  CALL(0x4a7b, s_parentItemLoadAnimationAndIncState, 0x52e2, 0x4a7e);  // call $52e2
-  CALL(0x4a7e, itemCreateChild_hook, 0x532f, 0x4a81);  // call $532f
-  I(0x4a81, 4); A = mem_rd(gb, 0xc6c5);  // ld a,($c6c5)
-  I(0x4a84, 2); alu_cp(gb, 0x0b);  // cp $0b
-  if (!(F & FZ)) { RET_TAKEN(0x4a86); return; } I(0x4a86, 2);  // ret nz
-L_4a87:
-  I(0x4a87, 2); L = 0x02;  // ld l,$02
-  I(0x4a89, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x4a8a, 2); C = 0x34;  // ld c,$34
-  I(0x4a8c, 4); A = mem_rd(gb, 0xcc48);  // ld a,($cc48)
-  I(0x4a8f, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { I(0x4a90, 3); goto L_4a93; } I(0x4a90, 2);  // jr nc,$4a93
-  I(0x4a92, 1); C = alu_inc8(gb, C);  // inc c
-L_4a93:
-  I(0x4a93, 1); A = C;  // ld a,c
-  I(0x4a94, 4); if (hook_is(gb, 0x4408, specialObjectSetAnimationWithLinkData_hook)) { specialObjectSetAnimationWithLinkData_hook(gb); return; } HANDOFF(0x4408);  // jp $4408
-L_4a97:
-  I(0x4a97, 2); E = 0x21;  // ld e,$21
-  I(0x4a99, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4a9a, 1); alu_rlca(gb);  // rlca
-  if (!(F & FC)) { I(0x4a9b, 4); if (hook_is(gb, 0x4414, specialObjectAnimate_optimized_hook)) { specialObjectAnimate_optimized_hook(gb); return; } HANDOFF(0x4414); } I(0x4a9b, 3);  // jp nc,$4414
-  I(0x4a9e, 4); if (hook_is(gb, 0x49e7, clearParentItem_hook)) { clearParentItem_hook(gb); return; } HANDOFF(0x49e7);  // jp $49e7
 }
 
 // 06:4a73

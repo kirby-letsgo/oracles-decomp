@@ -448,6 +448,18 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-21: DIFFERENT batch 3, 46 routines in `ofs_routines.txt`: decideItemDrop_body,
+  inventoryMenuState3 (subStates 0/2 in `seasons_ok_manual.txt`: an equal-valued literal and a
+  TAIL to a local at a per-game distance), parentItemCode_foolsOre and parentItemCode_punch
+  (Ages-only underwater/companion branches, Seasons-only `ret nz`), interactionCode0f
+  (`fallDownHole_checkUpdateHoleEvent` Ages-only, helper `AGES_ONLY()`), loadTilesetAndRoomLayout
+  (Seasons-only `adjustLoadingRoomForTempleRemains` call), loadScreenMusicAndSetRoomPack and
+  loadScreenMusic (Seasons `or a` room-pack test), braceletCheckBreakable, objectCheckIsOverHazard,
+  _darkenRoomHelper and _setDarkeningVariables (Seasons stores the fade offset first and sets
+  speed 1 itself). `ofsmap.py` leaves a one-line `if (!game_seasons) ...` alone. Shared Seasons
+  hooks 3,586 -> 3,598, table 10,948. Gates: ctest 10/10, whole movie, Ages verify 30k 0 failures,
+  Seasons playthrough `OFS_TRAP=1 VERIFY_ALL=1` 0 failures, native both, lint 0.
+
 - 2026-09-23: merged Fable's step 5 (the app, `8c93de0`) and its codemap follow-up (`2203b75`):
   the codemap conflict resolved to main's Seasons-mode version (it already read both lists),
   generated files regenerated. Gates: ctest 10/10, whole movie, Ages verify 30k, Seasons

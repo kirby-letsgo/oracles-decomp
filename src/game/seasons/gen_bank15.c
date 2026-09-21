@@ -5811,7 +5811,7 @@ L_7097:
   I(0x70cd, 2); A = 0x07;  // ld a,$07
   CALL(0x70cf, giveTreasure_hook, 0x16eb, 0x70d2);  // call $16eb
 L_70d2:
-  I(0x70d2, 4); s_darkenRoom(gb); return;  // jp $31d4
+  I(0x70d2, 4); if (hook_is(gb, 0x31d4, darkenRoom_hook)) { darkenRoom_hook(gb); return; } HANDOFF(0x31d4);  // jp $31d4
 L_70d5:
   CALL(0x70d5, retIfTextIsActive_hook, 0x1832, 0x70d8);  // call $1832
   CALL(0x70d8, interactionIncSubstate_hook, 0x23a0, 0x70db);  // call $23a0
@@ -6021,7 +6021,7 @@ L_7097:
   I(0x70cd, 2); A = 0x07;  // ld a,$07
   CALL(0x70cf, giveTreasure_hook, 0x16eb, 0x70d2);  // call $16eb
 L_70d2:
-  I(0x70d2, 4); s_darkenRoom(gb); return;  // jp $31d4
+  I(0x70d2, 4); if (hook_is(gb, 0x31d4, darkenRoom_hook)) { darkenRoom_hook(gb); return; } HANDOFF(0x31d4);  // jp $31d4
 L_70d5:
   CALL(0x70d5, retIfTextIsActive_hook, 0x1832, 0x70d8);  // call $1832
   CALL(0x70d8, interactionIncSubstate_hook, 0x23a0, 0x70db);  // call $23a0
@@ -6168,14 +6168,14 @@ L_7097:
   I(0x70cd, 2); A = 0x07;  // ld a,$07
   CALL(0x70cf, giveTreasure_hook, 0x16eb, 0x70d2);  // call $16eb
 L_70d2:
-  I(0x70d2, 4); s_darkenRoom(gb); return;  // jp $31d4
+  I(0x70d2, 4); if (hook_is(gb, 0x31d4, darkenRoom_hook)) { darkenRoom_hook(gb); return; } HANDOFF(0x31d4);  // jp $31d4
 }
 
 // 15:70d2
 void s_interactionCodee6_state1__afterCall70d2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_70d2:
-  I(0x70d2, 4); s_darkenRoom(gb); return;  // jp $31d4
+  I(0x70d2, 4); if (hook_is(gb, 0x31d4, darkenRoom_hook)) { darkenRoom_hook(gb); return; } HANDOFF(0x31d4);  // jp $31d4
 }
 
 // 15:70d5
@@ -9283,7 +9283,7 @@ void s_seasonsFunc_15_62d9(GB *gb) {
 // 15:632f
 void s_seasonsFunc_15_632f(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x632f, s_darkenRoom, 0x31d4, 0x6332);  // call $31d4
+  CALL(0x632f, darkenRoom_hook, 0x31d4, 0x6332);  // call $31d4
   I(0x6332, 3); goto L_6337;  // jr $6337
 L_6337:
   I(0x6337, 1); alu_xor(gb, A);  // xor a

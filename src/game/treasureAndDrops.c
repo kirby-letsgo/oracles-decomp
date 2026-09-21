@@ -551,56 +551,56 @@ void loadTreasureDisplayData__getTableIndices_b3f_hook(GB *gb) {
 void decideItemDrop_body_hook(GB *gb) {
   BASE(decideItemDrop_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); A = C;
-  CYC(b_+1, b_+2); alu_or(gb, A);
-  CYC(b_+2, b_+4); A |= 0x80;
+  CYC(b_+O(0), b_+OE(1)); A = C;
+  CYC(b_+O(1), b_+OE(2)); alu_or(gb, A);
+  CYC(b_+O(2), b_+OE(4)); A |= 0x80;
   if (!(F & FZ)) {
-    CYCT(b_+4, b_+6);
+    CYCT(b_+O(4), b_+OE(6));
   } else {
-    CYC(b_+4, b_+6);
-    CYC(b_+6, b_+8); A = H8(hActiveObjectType);
-    CYC(b_+8, b_+10); alu_add(gb, 0x02);
-    CYC(b_+10, b_+11); E = A;
-    CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+    CYC(b_+O(4), b_+OE(6));
+    CYC(b_+O(6), b_+OE(8)); A = H8(hActiveObjectType);
+    CYC(b_+O(8), b_+OE(10)); alu_add(gb, 0x02);
+    CYC(b_+O(10), b_+OE(11)); E = A;
+    CYC(b_+O(11), b_+OE(12)); A = mem_rd(gb, DE);
   }
-  CYC(b_+12, b_+15); SET_HL(SYM(itemDropTables));
-  CYC(b_+15, b_+16); treasure_add_index_to_hl_from_rst(gb, b_+16);
-  CYC(b_+16, b_+17); A = mem_rd(gb, HL);
-  CYC(b_+17, b_+18); C = A;
-  CYC(b_+18, b_+20); alu_cp(gb, 0xff);
+  CYC(b_+O(12), b_+OE(15)); SET_HL(SYM(itemDropTables));
+  CYC(b_+O(15), b_+OE(16)); treasure_add_index_to_hl_from_rst(gb, b_+OE(16));
+  CYC(b_+O(16), b_+OE(17)); A = mem_rd(gb, HL);
+  CYC(b_+O(17), b_+OE(18)); C = A;
+  CYC(b_+O(18), b_+OE(20)); alu_cp(gb, 0xff);
   if (F & FZ) {
-    CYCT(b_+20, b_+22);
+    CYCT(b_+O(20), b_+OE(22));
     goto unavailable;
   }
-  CYC(b_+20, b_+22);
-  CYC(b_+22, b_+24); A = alu_swap(gb, A);
-  CYC(b_+24, b_+25); alu_rrca(gb);
-  CYC(b_+25, b_+27); alu_and(gb, 0x07);
-  CYC(b_+27, b_+30); SET_HL(SYM(itemDropProbabilityTable));
-  CYC(b_+30, b_+31); treasure_add_double_index_to_hl_from_rst(gb, b_+31);
-  CYC(b_+31, b_+32); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+32, b_+33); H = mem_rd(gb, HL);
-  CYC(b_+33, b_+34); L = A;
-  CALL_C(b_+34, getRandomNumber_hook, SYM(getRandomNumber), b_+37);
-  CYC(b_+37, b_+39); alu_and(gb, 0x3f);
-  CALL_C(b_+39, checkFlag_hook, SYM(checkFlag), b_+42);
+  CYC(b_+O(20), b_+OE(22));
+  CYC(b_+O(22), b_+OE(24)); A = alu_swap(gb, A);
+  CYC(b_+O(24), b_+OE(25)); alu_rrca(gb);
+  CYC(b_+O(25), b_+OE(27)); alu_and(gb, 0x07);
+  CYC(b_+O(27), b_+OE(30)); SET_HL(SYM(itemDropProbabilityTable));
+  CYC(b_+O(30), b_+OE(31)); treasure_add_double_index_to_hl_from_rst(gb, b_+OE(31));
+  CYC(b_+O(31), b_+OE(32)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(32), b_+OE(33)); H = mem_rd(gb, HL);
+  CYC(b_+O(33), b_+OE(34)); L = A;
+  CALL_C(b_+O(34), getRandomNumber_hook, SYM(getRandomNumber), b_+OE(37));
+  CYC(b_+O(37), b_+OE(39)); alu_and(gb, 0x3f);
+  CALL_C(b_+O(39), checkFlag_hook, SYM(checkFlag), b_+OE(42));
   if (F & FZ) {
-    CYCT(b_+42, b_+44);
+    CYCT(b_+O(42), b_+OE(44));
     goto unavailable;
   }
-  CYC(b_+42, b_+44);
-  CYC(b_+44, b_+45); A = C;
-  CYC(b_+45, b_+47); alu_and(gb, 0x1f);
-  CYC(b_+47, b_+50); SET_HL(SYM(itemDropSetTable));
-  CYC(b_+50, b_+51); treasure_add_double_index_to_hl_from_rst(gb, b_+51);
-  CYC(b_+51, b_+52); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+52, b_+53); H = mem_rd(gb, HL);
-  CYC(b_+53, b_+54); L = A;
-  CALL_C(b_+54, getRandomNumber_hook, SYM(getRandomNumber), b_+57);
-  CYC(b_+57, b_+59); alu_and(gb, 0x1f);
-  CYC(b_+59, b_+60); treasure_add_index_to_hl_from_rst(gb, b_+60);
-  CYC(b_+60, b_+61); A = mem_rd(gb, HL);
-  CYC(b_+61, b_+62); C = A;
+  CYC(b_+O(42), b_+OE(44));
+  CYC(b_+O(44), b_+OE(45)); A = C;
+  CYC(b_+O(45), b_+OE(47)); alu_and(gb, 0x1f);
+  CYC(b_+O(47), b_+OE(50)); SET_HL(SYM(itemDropSetTable));
+  CYC(b_+O(50), b_+OE(51)); treasure_add_double_index_to_hl_from_rst(gb, b_+OE(51));
+  CYC(b_+O(51), b_+OE(52)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(52), b_+OE(53)); H = mem_rd(gb, HL);
+  CYC(b_+O(53), b_+OE(54)); L = A;
+  CALL_C(b_+O(54), getRandomNumber_hook, SYM(getRandomNumber), b_+OE(57));
+  CYC(b_+O(57), b_+OE(59)); alu_and(gb, 0x1f);
+  CYC(b_+O(59), b_+OE(60)); treasure_add_index_to_hl_from_rst(gb, b_+OE(60));
+  CYC(b_+O(60), b_+OE(61)); A = mem_rd(gb, HL);
+  CYC(b_+O(61), b_+OE(62)); C = A;
   TAIL(checkItemDropAvailable_body);
 
 unavailable:

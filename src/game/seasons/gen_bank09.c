@@ -3232,7 +3232,7 @@ L_4a75:
   I(0x4a8b, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x4a8d, 2); L = 0x44;  // ld l,$44
   I(0x4a8f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x4a90, s_darkenRoom, 0x31d4, 0x4a93);  // call $31d4
+  CALL(0x4a90, darkenRoom_hook, 0x31d4, 0x4a93);  // call $31d4
   I(0x4a93, 2); A = 0x77;  // ld a,$77
   CALL(0x4a95, playSound_b00_hook, 0x0c74, 0x4a98);  // call $0c74
   I(0x4a98, 2); A = 0xfc;  // ld a,$fc
@@ -3489,7 +3489,7 @@ L_4a75:
   I(0x4a8b, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x4a8d, 2); L = 0x44;  // ld l,$44
   I(0x4a8f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x4a90, s_darkenRoom, 0x31d4, 0x4a93);  // call $31d4
+  CALL(0x4a90, darkenRoom_hook, 0x31d4, 0x4a93);  // call $31d4
   I(0x4a93, 2); A = 0x77;  // ld a,$77
   CALL(0x4a95, playSound_b00_hook, 0x0c74, 0x4a98);  // call $0c74
   I(0x4a98, 2); A = 0xfc;  // ld a,$fc
@@ -3513,7 +3513,7 @@ L_4a75:
   I(0x4a8b, 3); mem_wr(gb, HL, 0x14);  // ld (hl),$14
   I(0x4a8d, 2); L = 0x44;  // ld l,$44
   I(0x4a8f, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CALL(0x4a90, s_darkenRoom, 0x31d4, 0x4a93);  // call $31d4
+  CALL(0x4a90, darkenRoom_hook, 0x31d4, 0x4a93);  // call $31d4
   I(0x4a93, 2); A = 0x77;  // ld a,$77
   CALL(0x4a95, playSound_b00_hook, 0x0c74, 0x4a98);  // call $0c74
   I(0x4a98, 2); A = 0xfc;  // ld a,$fc
@@ -5528,7 +5528,7 @@ L_40a1:
   I(0x40a9, 2); C = 0x10;  // ld c,$10
   CALL(0x40ab, objectUpdateSpeedZ_paramC_hook, 0x1f04, 0x40ae);  // call $1f04
   if (!(F & FZ)) { RET_TAKEN(0x40ae); return; } I(0x40ae, 2);  // ret nz
-  CALL(0x40af, s_objectCheckIsOnHazard, 0x21cb, 0x40b2);  // call $21cb
+  CALL(0x40af, objectCheckIsOnHazard_hook, 0x21cb, 0x40b2);  // call $21cb
   if (!(F & FC)) { I(0x40b2, 3); goto L_40ba; } I(0x40b2, 2);  // jr nc,$40ba
   I(0x40b4, 1); A = alu_dec8(gb, A);  // dec a
   if ((F & FZ)) { I(0x40b5, 3); goto L_40f4; } I(0x40b5, 2);  // jr z,$40f4
@@ -5707,7 +5707,7 @@ L_41e8:
   CALL(0x41f0, objectUpdateSpeedZAndBounce_hook, 0x232b, 0x41f3);  // call $232b
   if (!(F & FZ)) { RET_TAKEN(0x41f3); return; } I(0x41f3, 2);  // ret nz
   PUSH(0x41f4, AF);  // push af
-  CALL(0x41f5, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x41f8);  // call $21e0
+  CALL(0x41f5, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x41f8);  // call $21e0
   SET_BC(POP(0x41f8));  // pop bc
   if ((F & FC)) { I(0x41f9, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9); } I(0x41f9, 3);  // jp c,$3ad9
   I(0x41fc, 2); A = 0x77;  // ld a,$77
@@ -5828,7 +5828,7 @@ L_40a1:
   I(0x40a9, 2); C = 0x10;  // ld c,$10
   CALL(0x40ab, objectUpdateSpeedZ_paramC_hook, 0x1f04, 0x40ae);  // call $1f04
   if (!(F & FZ)) { RET_TAKEN(0x40ae); return; } I(0x40ae, 2);  // ret nz
-  CALL(0x40af, s_objectCheckIsOnHazard, 0x21cb, 0x40b2);  // call $21cb
+  CALL(0x40af, objectCheckIsOnHazard_hook, 0x21cb, 0x40b2);  // call $21cb
   if (!(F & FC)) { I(0x40b2, 3); goto L_40ba; } I(0x40b2, 2);  // jr nc,$40ba
   I(0x40b4, 1); A = alu_dec8(gb, A);  // dec a
   if ((F & FZ)) { I(0x40b5, 3); goto L_40f4; } I(0x40b5, 2);  // jr z,$40f4
@@ -5928,7 +5928,7 @@ L_40a1:
   I(0x40a9, 2); C = 0x10;  // ld c,$10
   CALL(0x40ab, objectUpdateSpeedZ_paramC_hook, 0x1f04, 0x40ae);  // call $1f04
   if (!(F & FZ)) { RET_TAKEN(0x40ae); return; } I(0x40ae, 2);  // ret nz
-  CALL(0x40af, s_objectCheckIsOnHazard, 0x21cb, 0x40b2);  // call $21cb
+  CALL(0x40af, objectCheckIsOnHazard_hook, 0x21cb, 0x40b2);  // call $21cb
   if (!(F & FC)) { I(0x40b2, 3); goto L_40ba; } I(0x40b2, 2);  // jr nc,$40ba
   I(0x40b4, 1); A = alu_dec8(gb, A);  // dec a
   if ((F & FZ)) { I(0x40b5, 3); goto L_40f4; } I(0x40b5, 2);  // jr z,$40f4
@@ -6330,7 +6330,7 @@ L_41e8:
   CALL(0x41f0, objectUpdateSpeedZAndBounce_hook, 0x232b, 0x41f3);  // call $232b
   if (!(F & FZ)) { RET_TAKEN(0x41f3); return; } I(0x41f3, 2);  // ret nz
   PUSH(0x41f4, AF);  // push af
-  CALL(0x41f5, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x41f8);  // call $21e0
+  CALL(0x41f5, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x41f8);  // call $21e0
   SET_BC(POP(0x41f8));  // pop bc
   if ((F & FC)) { I(0x41f9, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9); } I(0x41f9, 3);  // jp c,$3ad9
   I(0x41fc, 2); A = 0x77;  // ld a,$77
@@ -6401,7 +6401,7 @@ L_41e8:
   CALL(0x41f0, objectUpdateSpeedZAndBounce_hook, 0x232b, 0x41f3);  // call $232b
   if (!(F & FZ)) { RET_TAKEN(0x41f3); return; } I(0x41f3, 2);  // ret nz
   PUSH(0x41f4, AF);  // push af
-  CALL(0x41f5, s_objectReplaceWithAnimationIfOnHazard, 0x21e0, 0x41f8);  // call $21e0
+  CALL(0x41f5, objectReplaceWithAnimationIfOnHazard_hook, 0x21e0, 0x41f8);  // call $21e0
   SET_BC(POP(0x41f8));  // pop bc
   if ((F & FC)) { I(0x41f9, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9); } I(0x41f9, 3);  // jp c,$3ad9
   I(0x41fc, 2); A = 0x77;  // ld a,$77
@@ -8952,7 +8952,7 @@ L_581e:
 L_5830:
   CALL(0x5830, objectAddToGrabbableObjectBuffer_hook, 0x2b75, 0x5833);  // call $2b75
 L_5833:
-  CALL(0x5833, s_objectCheckIsOnHazard, 0x21cb, 0x5836);  // call $21cb
+  CALL(0x5833, objectCheckIsOnHazard_hook, 0x21cb, 0x5836);  // call $21cb
   if (!(F & FC)) { RET_TAKEN(0x5836); return; } I(0x5836, 2);  // ret nc
   I(0x5837, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { I(0x5839, 3); goto L_5842; } I(0x5839, 2);  // jr nz,$5842
@@ -9082,7 +9082,7 @@ L_581e:
 L_5830:
   CALL(0x5830, objectAddToGrabbableObjectBuffer_hook, 0x2b75, 0x5833);  // call $2b75
 L_5833:
-  CALL(0x5833, s_objectCheckIsOnHazard, 0x21cb, 0x5836);  // call $21cb
+  CALL(0x5833, objectCheckIsOnHazard_hook, 0x21cb, 0x5836);  // call $21cb
   if (!(F & FC)) { RET_TAKEN(0x5836); return; } I(0x5836, 2);  // ret nc
   I(0x5837, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { I(0x5839, 3); goto L_5842; } I(0x5839, 2);  // jr nz,$5842
@@ -9106,7 +9106,7 @@ L_5842:
 void s_interactionCode68__func_5833(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5833:
-  CALL(0x5833, s_objectCheckIsOnHazard, 0x21cb, 0x5836);  // call $21cb
+  CALL(0x5833, objectCheckIsOnHazard_hook, 0x21cb, 0x5836);  // call $21cb
   if (!(F & FC)) { RET_TAKEN(0x5836); return; } I(0x5836, 2);  // ret nc
   I(0x5837, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { I(0x5839, 3); goto L_5842; } I(0x5839, 2);  // jr nz,$5842
@@ -9131,7 +9131,7 @@ void s_interactionCode68__state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_585a;
 L_5833:
-  CALL(0x5833, s_objectCheckIsOnHazard, 0x21cb, 0x5836);  // call $21cb
+  CALL(0x5833, objectCheckIsOnHazard_hook, 0x21cb, 0x5836);  // call $21cb
   if (!(F & FC)) { RET_TAKEN(0x5836); return; } I(0x5836, 2);  // ret nc
   I(0x5837, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { I(0x5839, 3); goto L_5842; } I(0x5839, 2);  // jr nz,$5842
@@ -9214,7 +9214,7 @@ void s_interactionCode68__state2__substate2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_5871;
 L_5833:
-  CALL(0x5833, s_objectCheckIsOnHazard, 0x21cb, 0x5836);  // call $21cb
+  CALL(0x5833, objectCheckIsOnHazard_hook, 0x21cb, 0x5836);  // call $21cb
   if (!(F & FC)) { RET_TAKEN(0x5836); return; } I(0x5836, 2);  // ret nc
   I(0x5837, 2); alu_bit(gb, 6, A);  // bit 6,a
   if (!(F & FZ)) { I(0x5839, 3); goto L_5842; } I(0x5839, 2);  // jr nz,$5842

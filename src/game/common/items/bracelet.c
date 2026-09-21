@@ -182,13 +182,14 @@ destroy:
 
 void braceletCheckBreakable_hook(GB *gb) {
   BASE(braceletCheckBreakable);
-  CYC(b_+0, b_+2); E = 0x02;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
-  CYC(b_+4, b_+5);
-  CYC(b_+5, b_+6); alu_scf(gb);
-  CYC(b_+6, b_+7); ret_effect(gb);
+  CYC(b_+O(0), b_+OE(2)); E = 0x02;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(4), b_+OE(5)); ret_effect(gb); return; }
+  CYC(b_+O(4), b_+OE(5));
+  if (game_seasons) { CYC(b_+S(5), b_+S(7)); alu_cp(gb, 0xd7); }   // flags only; a leftover compare
+  CYC(b_+O(5), b_+OE(6)); alu_scf(gb);
+  CYC(b_+O(6), b_+OE(7)); ret_effect(gb);
 }
 
 void braceletCheckDeleteSelfWhileThrowing_hook(GB *gb) {

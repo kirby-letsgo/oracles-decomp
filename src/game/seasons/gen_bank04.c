@@ -936,14 +936,14 @@ void s_label_04_033(GB *gb) {
 // 04:4659
 void s_label_04_035(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4659, s_loadScreenMusicAndSetRoomPack, 0x32dc, 0x465c);  // call $32dc
+  CALL(0x4659, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x465c);  // call $32dc
   I(0x465c, 4); s_checkRoomPackAfterWarp(gb); return;  // jp $3ab2
 }
 
 // 04:465f
 void s_label_04_036(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x465f, 4); s_loadScreenMusicAndSetRoomPack(gb); return;  // jp $32dc
+  I(0x465f, 4); if (hook_is(gb, 0x32dc, loadScreenMusicAndSetRoomPack_hook)) { loadScreenMusicAndSetRoomPack_hook(gb); return; } HANDOFF(0x32dc);  // jp $32dc
 }
 
 // 04:6778

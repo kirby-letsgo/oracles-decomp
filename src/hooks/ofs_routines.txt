@@ -1,17 +1,22 @@
+_darkenRoomHelper
 _drawObjectTerrainEffects
+_setDarkeningVariables
 applyRoomSpecificTileChanges
 applyRoomSpecificTileChangesAfterGfxLoad
+braceletCheckBreakable
 calculateAdjacentWallsBitset
 checkItemUsed 7=13
 checkLinkJumpingOffCliff
 checkTileWarps
 checkUseItems_b06
 cutscene01
+decideItemDrop_body
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject
 endgameCutsceneHandler_body
 enemyCode79
 functionCaller_b02
+interactionCode0f
 interactionCode60
 interactionCode6b
 interactionCode6c
@@ -20,10 +25,17 @@ interactionCodedc
 interactionCodee0
 introCinematic_inTemple
 introCinematic_ridingHorse
+inventoryMenuState3
 linkApplyTileTypes 233=227 234=228
 linkState01 149=148
+loadScreenMusic
+loadScreenMusicAndSetRoomPack
+loadTilesetAndRoomLayout
 loadTilesetLayout
+objectCheckIsOverHazard
 paletteFadeHandler
+parentItemCode_foolsOre
+parentItemCode_punch
 parseGivenObjectData_b12
 rickyStateA
 screenTransitionState2

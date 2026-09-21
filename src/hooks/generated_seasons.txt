@@ -340,6 +340,10 @@
 00:216e objectReplaceWithID_hook -
 00:219e objectDelete_useActiveObjectType_hook -
 00:21a1 objectDelete_de_hook -
+00:21b4 checkLinkIsOverHazard_hook -
+00:21cb objectCheckIsOnHazard_hook -
+00:21d4 objectCheckIsOverHazard_hook -
+00:21e0 objectReplaceWithAnimationIfOnHazard_hook -
 00:21ee objectReplaceWithFallingDownHoleInteraction_hook -
 00:21f3 objectReplaceWithSplash_hook -
 00:21fd objectCopyPosition_hook -
@@ -522,12 +526,18 @@
 00:31a9 fadeinFromBlackWithDelay_hook -
 00:31b5 fastFadeinFromBlack_hook -
 00:31be fadeinFromBlack_hook -
+00:31d0 darkenRoomLightly_hook -
+00:31d4 darkenRoom_hook -
+00:31d6 _darkenRoomHelper_hook -
+00:31de _setDarkeningVariables_hook -
 00:3204 fastFadeinFromWhiteToRoom_hook -
 00:3212 fadeinFromWhiteToRoom_hook -
 00:3217 startFadeBetweenTwoPalettes_hook -
 00:3222 setPaletteThreadDelay_hook -
 00:322b paletteFadeThreadStart_hook -
 00:3248 mainThreadStart_hook -
+00:328a loadScreenMusic_hook -
+00:32dc loadScreenMusicAndSetRoomPack_hook -
 00:32f1 dismountCompanionAndSetRememberedPositionToScreenCenter_hook -
 00:3382 updateAllObjects_hook -
 00:3420 updateSpecialObjectsAndInteractions_hook -
@@ -548,6 +558,7 @@
 00:37b9 loadTilesetUniqueGfx_hook -
 00:37d4 loadUniqueGfxHeaderEntry_hook -
 00:381a loadTilesetData_hook -
+00:3836 loadTilesetAndRoomLayout_hook -
 00:3894 loadRoomLayout_hook -
 00:3a4a setHlToTileMappingDataPlusATimes8_hook -
 00:3a52 setTile_hook -
@@ -935,6 +946,10 @@
 02:5596 func_02_55b2__subScreen0_hook -
 02:55a3 func_02_55b2__subScreen1_hook -
 02:55ab func_02_55b2__subScreen2_hook -
+02:57d3 inventoryMenuState3_hook -
+02:57dd inventoryMenuState3__subState0_hook -
+02:5801 inventoryMenuState3__subState1_hook -
+02:5819 inventoryMenuState3__subState2_hook -
 02:582f getDirectionButtonOffsetFromHl_hook -
 02:583f inventorySubscreen0CheckDirectionButtons_hook -
 02:5856 inventorySubmenu1CheckDirectionButtons_hook -
@@ -1617,6 +1632,8 @@
 06:4994 parentItemUpdate_hook -
 06:49e7 clearParentItem_hook -
 06:49f5 clearParentItemH_hook -
+06:4a4e parentItemCode_foolsOre_hook -
+06:4a6b parentItemCode_punch_hook -
 06:4db4 clearSelfIfNoSeeds_hook -
 06:4dc7 parentItemGenericState1_hook -
 06:4dd1 parentItemCode_shovel_hook -
@@ -1828,6 +1845,7 @@
 07:5f1c tryBreakTileWithSword_hook -
 07:5fb7 itemCalculateSwordDamage_hook -
 07:6010 itemMimicBgTile_hook -
+07:6109 braceletCheckBreakable_hook -
 07:6112 braceletCheckDeleteSelfWhileThrowing_hook -
 07:613a bombUpdateThrowingLaterally_hook -
 07:614f itemBeginThrow_hook -
@@ -1835,6 +1853,7 @@
 07:6220 itemBounce_hook -
 07:62a2 itemCode1a_hook -
 08:4000 interactionCode00_hook -
+08:40a0 interactionCode0f_hook -
 08:4110 interactionCode10_hook -
 08:427e interactionCode13_hook -
 08:443b interactionCode16_hook -
@@ -3473,6 +3492,7 @@
 3f:46bc addTreasureToInventory_hook -
 3f:46e2 addTreasureToInventory__addToInventory_hook -
 3f:46fe loadTreasureDisplayData_b3f_hook -
+3f:4757 decideItemDrop_body_hook -
 3f:4b05 checkIncreaseGashaMaturityForGettingTreasure_hook -
 3f:4b26 initTextbox_hook -
 3f:4b4e updateTextbox_hook -

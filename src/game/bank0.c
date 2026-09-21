@@ -2616,11 +2616,11 @@ void findTileInRoom_hook(GB *gb) {
 static void object_check_is_over_hazard(GB *gb) {
   BASE(objectCheckIsOverHazard);
   SET_BC(0x0500);
-  CYC(b_+0, b_+6);
+  CYC(b_+O(0), b_+OE(6));
   object_get_relative_tile(gb);
-  CYC(b_+6, b_+9); W8(wObjectTileIndex) = A;
+  if (!game_seasons) { CYC(b_+6, b_+9); W8(wObjectTileIndex) = A; }
   SET_HL(hazardCollisionTable);
-  CYC(b_+9, b_+15);
+  CYC(b_+O(9), b_+OE(15));
   lookup_collision_table(gb);
 }
 
@@ -6257,19 +6257,27 @@ void fadeinFromBlackWithDelay_hook(GB *gb) {
 
 static void set_darkening_variables(GB *gb) {
   BASE(_setDarkeningVariables);
-  CYC(b_+0, b_+3); W8(wPaletteThread_speed) = A;
-  CYC(b_+3, b_+6); A = W8(wPaletteThread_parameter);
-  CYC(b_+6, b_+9); mem_wr(gb, wPaletteFadeOffset, A);
-  A = B;
-  CYC(b_+9, b_+13); W8(wPaletteThread_parameter) = A;
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(3)); mem_wr(gb, wPaletteFadeOffset, A);
+    A = B;
+    CYC(b_+S(3), b_+S(7)); W8(wPaletteThread_parameter) = A;
+    A = 0x01;
+    CYC(b_+S(7), b_+S(12)); W8(wPaletteThread_speed) = A;
+  } else {
+    CYC(b_+0, b_+3); W8(wPaletteThread_speed) = A;
+    CYC(b_+3, b_+6); A = W8(wPaletteThread_parameter);
+    CYC(b_+6, b_+9); mem_wr(gb, wPaletteFadeOffset, A);
+    A = B;
+    CYC(b_+9, b_+13); W8(wPaletteThread_parameter) = A;
+  }
   A = 0xfc;
   SET_HL(wDirtyFadeBgPalettes);
-  CYC(b_+13, b_+19); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(13), b_+OE(19)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(19), b_+OE(21)); mem_wr(gb, HL, 0x00);
   L = alu_inc8(gb, L);
-  CYC(b_+21, b_+23); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+23, b_+25); mem_wr(gb, HL, 0x00);
-  CYC(b_+25, b_+26);
+  CYC(b_+O(21), b_+OE(23)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(23), b_+OE(25)); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(25), b_+OE(26));
 }
 
 void _setDarkeningVariables_hook(GB *gb) {
@@ -6280,9 +6288,13 @@ void _setDarkeningVariables_hook(GB *gb) {
 static void darken_room_helper(GB *gb) {
   BASE(_darkenRoomHelper);
   A = 0x05;
-  CYC(b_+0, b_+5); W8(wPaletteThread_mode) = A;
-  A = 0x01;
-  CYC(b_+5, b_+7);
+  CYC(b_+O(0), b_+OE(5)); W8(wPaletteThread_mode) = A;
+  if (!game_seasons) {
+    A = 0x01;
+    CYC(b_+5, b_+7);
+  } else {
+    CYC(b_+S(5), b_+S(8)); A = W8(wPaletteThread_parameter);
+  }
   set_darkening_variables(gb);
 }
 
@@ -6663,34 +6675,48 @@ static void generate_vram_tiles_with_room_changes(GB *gb, uint16_t sp0_);
 
 static void load_screen_music(GB *gb) {
   BASE(loadScreenMusic);
-  bank_push(gb, b_+0, 0x04);
-  CYC(b_+10, b_+13); A = W8(wActiveGroup);
+  bank_push(gb, b_+O(0), 0x04);
+  CYC(b_+O(10), b_+OE(13)); A = W8(wActiveGroup);
   SET_HL(musicAssignmentGroupTable_bank04);
-  CYC(b_+13, b_+17);
+  CYC(b_+O(13), b_+OE(17));
   add_double_index_to_hl(gb);
-  CYC(b_+17, b_+18); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+18, b_+19); H = mem_rd(gb, HL);
+  CYC(b_+O(17), b_+OE(18)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(18), b_+OE(19)); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+19, b_+23); A = W8(wActiveRoom);
-  CYC(b_+23, b_+24);
+  CYC(b_+O(19), b_+OE(23)); A = W8(wActiveRoom);
+  CYC(b_+O(23), b_+OE(24));
   add_a_to_hl(gb);
-  CYC(b_+24, b_+25); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+25, b_+28); W8(wActiveMusic2) = A;
-  CYC(b_+28, b_+31); A = W8(wActiveGroup);
-  alu_cp(gb, 0x02);
-  if (!(F & FC)) CYCT(b_+31, b_+35);
-  else {
-    CYC(b_+31, b_+35);
-    B = A;
-    CYC(b_+35, b_+39); A = W8(wActiveRoom);
-    C = A;
-    SET_HL(roomPackData_bank04);
-    alu_add_hl(gb, BC);
-    CYC(b_+39, b_+45); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+45, b_+48); W8(wLoadingRoomPack) = A;
+  CYC(b_+O(24), b_+OE(25)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(25), b_+OE(28)); W8(wActiveMusic2) = A;
+  CYC(b_+O(28), b_+OE(31)); A = W8(wActiveGroup);
+  if (game_seasons) {
+    alu_or(gb, A);
+    if (!(F & FZ)) CYCT(b_+S(31), b_+S(34));
+    else {
+      CYC(b_+S(31), b_+S(34));
+      CYC(b_+S(34), b_+S(37)); A = W8(wActiveRoom);
+      SET_HL(roomPackData_bank04);
+      CYC(b_+S(37), b_+S(41));
+      add_a_to_hl(gb);
+      CYC(b_+S(41), b_+S(42)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(42), b_+S(45)); W8(wLoadingRoomPack) = A;
+    }
+  } else {
+    alu_cp(gb, 0x02);
+    if (!(F & FC)) CYCT(b_+31, b_+35);
+    else {
+      CYC(b_+31, b_+35);
+      B = A;
+      CYC(b_+35, b_+39); A = W8(wActiveRoom);
+      C = A;
+      SET_HL(roomPackData_bank04);
+      alu_add_hl(gb, BC);
+      CYC(b_+39, b_+45); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+45, b_+48); W8(wLoadingRoomPack) = A;
+    }
   }
-  bank_pop(gb, b_+48);
-  CYC(b_+54, b_+55);
+  bank_pop(gb, b_+O(48));
+  CYC(b_+O(54), b_+OE(55));
 }
 
 void loadScreenMusic_hook(GB *gb) {
@@ -6709,17 +6735,17 @@ void applyWarpDest_hook(GB *gb) {
 
 static void load_screen_music_and_set_room_pack(GB *gb) {
   BASE(loadScreenMusicAndSetRoomPack);
-  CYC(b_+0, b_+3);
+  CYC(b_+O(0), b_+OE(3));
   load_screen_music(gb);
-  CYC(b_+3, b_+6); A = W8(wActiveRoom);
-  CYC(b_+6, b_+9); W8(wLoadingRoom) = A;
-  CYC(b_+9, b_+12); A = W8(wActiveGroup);
+  CYC(b_+O(3), b_+OE(6)); A = W8(wActiveRoom);
+  CYC(b_+O(6), b_+OE(9)); W8(wLoadingRoom) = A;
+  CYC(b_+O(9), b_+OE(12)); A = W8(wActiveGroup);
   alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+12, b_+14); return; }
-  CYC(b_+12, b_+17); A = W8(wLoadingRoomPack);
-  alu_and(gb, 0x7f);
-  CYC(b_+17, b_+22); W8(wRoomPack) = A;
-  CYC(b_+22, b_+23);
+  if (!(F & FZ)) { CYCT(b_+O(12), b_+OE(14)); return; }
+  CYC(b_+O(12), b_+OE(17)); A = W8(wLoadingRoomPack);
+  if (!game_seasons) alu_and(gb, 0x7f);      // bit 7 marks the past in Ages
+  CYC(b_+O(17), b_+OE(22)); W8(wRoomPack) = A;
+  CYC(b_+O(22), b_+OE(23));
 }
 
 void loadScreenMusicAndSetRoomPack_hook(GB *gb) {
@@ -10067,31 +10093,32 @@ void loadTilesetData_hook(GB *gb) {
 
 void loadTilesetAndRoomLayout_hook(GB *gb) {
   BASE(loadTilesetAndRoomLayout);
-  CYC(b_+0, b_+2); A = H8(hRomBank);
-  CYC(b_+2, b_+3); push_effect(gb, AF);
-  CYC(b_+3, b_+6); A = W8(wLoadedTilesetLayout);
+  CYC(b_+O(0), b_+OE(2)); A = H8(hRomBank);
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, AF);
+  CYC(b_+O(3), b_+OE(6)); A = W8(wLoadedTilesetLayout);
   B = A;
-  CYC(b_+6, b_+10); A = W8(wTilesetLayout);
+  CYC(b_+O(6), b_+OE(10)); A = W8(wTilesetLayout);
   alu_cp(gb, B);
-  CYC(b_+10, b_+14); W8(wLoadedTilesetLayout) = A;
-  if (!(F & FZ)) CALL_ROM_CC(b_+14, ROM_loadTilesetLayout);
-  else CYC(b_+14, b_+17);
-  CALL_ROM(b_+17, ROM_loadRoomLayout);
-  switch_bank(gb, b_+20, 0x04);
-  CALL_ROM(b_+27, ROM_b04_applyAllTileSubstitutions);
+  CYC(b_+O(10), b_+OE(14)); W8(wLoadedTilesetLayout) = A;
+  if (!(F & FZ)) CALL_ROM_CC(b_+O(14), ROM_loadTilesetLayout);
+  else CYC(b_+O(14), b_+OE(17));
+  if (game_seasons) CALL_ROM(b_+S(17), SYM(loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains));
+  CALL_ROM(b_+O(17), ROM_loadRoomLayout);
+  switch_bank(gb, b_+O(20), 0x04);
+  CALL_ROM(b_+O(27), ROM_b04_applyAllTileSubstitutions);
   A = 0x03;
-  CYC(b_+30, b_+34); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(30), b_+OE(34)); mem_wr(gb, IO_SVBK, A);
   SET_HL(w3RoomLayoutBuffer);
   SET_DE(wRoomLayout);
   B = 0xc0;
-  CYC(b_+34, b_+42);
-  CALL_ROM(b_+42, ROM_copyMemoryReverse);
+  CYC(b_+O(34), b_+OE(42));
+  CALL_ROM(b_+O(42), ROM_copyMemoryReverse);
   alu_xor(gb, A);
-  CYC(b_+45, b_+48); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+48, b_+49); SET_AF(pop_effect(gb));
-  CYC(b_+49, b_+51); H8(hRomBank) = A;
-  CYC(b_+51, b_+54); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+54, b_+55);
+  CYC(b_+O(45), b_+OE(48)); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(48), b_+OE(49)); SET_AF(pop_effect(gb));
+  CYC(b_+O(49), b_+OE(51)); H8(hRomBank) = A;
+  CYC(b_+O(51), b_+OE(54)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(54), b_+OE(55));
   ret_effect(gb);
 }
 

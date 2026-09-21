@@ -501,7 +501,6 @@
 15:63f5 s_zeldaKidnapped_spawnInteraction -
 15:5aac s_zelda_checkIfLinkFullyHealed -
 15:5ac8 s_zelda_createExclamationMark -
-00:31d6 s__darkenRoomHelper -
 00:0ee0 s__drawObjectTerrainEffects__inAir L
 00:0f01 s__drawObjectTerrainEffects__onGround L
 00:0f30 s__drawObjectTerrainEffects__walkingInPuddle L
@@ -510,7 +509,6 @@
 00:0f4e s__drawObjectTerrainEffects__end L
 00:1016 s__getObjectPositionOnScreen_duringScreenTransition__dontDraw L
 00:31db s__label_331c -
-00:31de s__setDarkeningVariables -
 00:2e7f s__updateEnemiesIfStateIsZero__next L
 00:3b02 s__updateInteractionsIfStateIsZero__next L
 00:30de s_addRoomToEnemiesKilledList_b00 -
@@ -532,7 +530,6 @@
 00:3e07 s_checkIfHoronVillageNPCShouldBeSeen -
 00:1d16 s_checkLinkCollisionsEnabled__noCarry L
 00:1cde s_checkLinkID0AndControlNormal -
-00:21b4 s_checkLinkIsOverHazard -
 00:3ab2 s_checkRoomPackAfterWarp -
 00:1986 s_clearAllItemsAndPutLinkOnGround -
 00:198a s_clearAllItemsAndPutLinkOnGround__afterCall198a L
@@ -545,8 +542,6 @@
 00:358a s_clearParts -
 00:1734 s_cpOreChunkValue -
 00:3d30 s_createSokraSnore -
-00:31d4 s_darkenRoom -
-00:31d0 s_darkenRoomLightly -
 00:0d95 s_drawAllSpritesUnconditionally__loop L
 00:0e3b s_drawAllSpritesUnconditionally__drawObject L
 00:0e6f s_drawAllSpritesUnconditionally__nextSprite L
@@ -633,11 +628,6 @@
 00:39c0 s_loadRoomLayout__checkDeNextLayoutRow L
 00:39cb s_loadRoomLayout__decompressLayoutHelper L
 00:39df s_loadRoomLayout__loadLayoutData L
-00:328a s_loadScreenMusic -
-00:32dc s_loadScreenMusicAndSetRoomPack -
-00:3836 s_loadTilesetAndRoomLayout -
-00:384d s_loadTilesetAndRoomLayout__afterCall384d L
-00:3857 s_loadTilesetAndRoomLayout__afterCall3857 L
 00:3870 s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains L
 00:3737 s_loadTilesetGraphics -
 00:36dc s_loadTilesetLayout__helper L
@@ -651,12 +641,9 @@
 00:1af7 s_objectAddToAButtonSensitiveObjectList__next L
 00:1b02 s_objectAddToAButtonSensitiveObjectList__foundBlankEntry L
 00:1fd3 s_objectApplyComponentSpeed__addSpeedComponent L
-00:21cb s_objectCheckIsOnHazard -
-00:21d4 s_objectCheckIsOverHazard -
 00:146f s_objectGetRelativePositionOfTile__checkTileAtOffset L
 00:2644 s_objectPreventLinkFromPassing__end L
 00:1b1b s_objectRemoveFromAButtonSensitiveObjectList__next L
-00:21e0 s_objectReplaceWithAnimationIfOnHazard -
 00:21f5 s_objectReplaceWithSplash__create L
 00:21f8 s_objectReplaceWithSplash__delete L
 00:22a9 s_objectSetPriorityRelativeToLink_withTerrainEffects__getPriority L
@@ -1599,7 +1586,6 @@
 3f:4494 s_checkTreasureObtained_body__isUpgrade L
 3f:449e s_checkTreasureObtained_body__dontHaveItem L
 3f:539c s_clearTopRowOfTextMap__func L
-3f:4757 s_decideItemDrop_body -
 3f:5263 s_displayNextTextCharacter__endLine L
 3f:5279 s_displayNextTextCharacter__readSubsequentLineBuffers L
 3f:52a4 s_displayNextTextCharacter__playSound L
@@ -3614,7 +3600,6 @@
 06:5190 s_parentItemCode_feather__deleteParent L
 06:5193 s_parentItemCode_feather__state1 L
 06:4c83 s_parentItemCode_flute -
-06:4a4e s_parentItemCode_foolsOre -
 06:4a56 s_parentItemCode_foolsOre__rod_state0 L
 06:4a5d s_parentItemCode_foolsOre__state0 L
 06:51cd s_parentItemCode_magnetGloves -
@@ -3627,7 +3612,6 @@
 06:528b s_parentItemCode_magnetGloves__checkNextTile L
 06:5297 s_parentItemCode_magnetGloves__foundTile L
 06:52a5 s_parentItemCode_magnetGloves__ret L
-06:4a6b s_parentItemCode_punch -
 06:4a73 s_parentItemCode_punch__state0 L
 06:4a87 s_parentItemCode_punch__expertsRing L
 06:4a93 s_parentItemCode_punch__setAnimation L
@@ -4218,9 +4202,7 @@
 08:64e7 s_interac65_state1__slackerMovement L
 08:6500 s_interac65_state1__singerMovement L
 08:6516 s_interac65_state1__runScriptAndUpdateAnimation L
-08:40a0 s_interactionCode0f -
 08:40aa s_interactionCode0f__interac0f_state0 L
-08:40ad s_interactionCode0f__afterCall40ad L
 08:40bf s_interactionCode0f__dust L
 08:40c5 s_interactionCode0f__fallDownHole L
 08:40d0 s_interactionCode0f__interac0f_state1 L
@@ -5033,7 +5015,6 @@
 07:5266 s_bombchuUpdateAngle_sidescrolling__setAngle L
 07:5122 s_bombchuUpdateSpeed__updateSpeed L
 07:514d s_bombchuUpdateSpeed__impassableTile L
-07:6109 s_braceletCheckBreakable -
 07:612d s_braceletCheckDeleteSelfWhileThrowing__deleteSelfAndRetFromCaller L
 07:6131 s_braceletCheckDeleteSelfWhileThrowing__throwingTile L
 07:41df s_checkEnemyAndPartCollisions__nextEnemy L
@@ -6058,11 +6039,6 @@
 02:5763 s_inventoryMenuState2__subState2 L
 02:5790 s_inventoryMenuState2__buttonPressed L
 02:57a6 s_inventoryMenuState2__func_02_57f3 L
-02:57d3 s_inventoryMenuState3 -
-02:57dd s_inventoryMenuState3__subState0 L
-02:57f3 s_inventoryMenuState3__afterCall57f3 L
-02:5801 s_inventoryMenuState3__subState1 L
-02:5819 s_inventoryMenuState3__subState2 L
 02:5940 s_inventorySubmenu1_drawCursor -
 02:58b4 s_inventorySubmenu2CheckDirectionButtons -
 02:58cc s_inventorySubmenu2CheckDirectionButtons__leftOrRight L

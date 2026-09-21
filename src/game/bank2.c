@@ -8674,12 +8674,12 @@ rectangle:
 void inventoryMenuState3_hook(GB *gb) {
   BASE(inventoryMenuState3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = W8(wSubmenuState);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wSubmenuState);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == b_+10) { inventoryMenuState3__subState0_hook(gb); return; }
-    else if (jt_ == b_+46) { inventoryMenuState3__subState1_hook(gb); return; }
-    else if (jt_ == b_+70) { inventoryMenuState3__subState2_hook(gb); return; }
+    if (jt_ == b_+O(10)) { inventoryMenuState3__subState0_hook(gb); return; }
+    else if (jt_ == b_+O(46)) { inventoryMenuState3__subState1_hook(gb); return; }
+    else if (jt_ == b_+O(70)) { inventoryMenuState3__subState2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -8687,57 +8687,57 @@ void inventoryMenuState3_hook(GB *gb) {
 void inventoryMenuState3__subState0_hook(GB *gb) {
   BASE(inventoryMenuState3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+10, b_+13); SET_HL(wInventorySubmenu);
-  CYC(b_+13, b_+14); A = mem_rd(gb, HL);
-  CYC(b_+14, b_+15); A = alu_inc8(gb, A);
-  CYC(b_+15, b_+17); alu_cp(gb, 3);
-  if (F & FC) { CYCT(b_+17, b_+19); goto set_submenu; }
-  CYC(b_+17, b_+19); CYC(b_+19, b_+20); alu_xor(gb, A);
+  CYC(b_+O(10), b_+OE(13)); SET_HL(wInventorySubmenu);
+  CYC(b_+O(13), b_+OE(14)); A = mem_rd(gb, HL);
+  CYC(b_+O(14), b_+OE(15)); A = alu_inc8(gb, A);
+  CYC(b_+O(15), b_+OE(17)); alu_cp(gb, 3);
+  if (F & FC) { CYCT(b_+O(17), b_+OE(19)); goto set_submenu; }
+  CYC(b_+O(17), b_+OE(19)); CYC(b_+O(19), b_+OE(20)); alu_xor(gb, A);
 set_submenu:
-  CYC(b_+20, b_+21); mem_wr(gb, HL, A);
-  CYC(b_+21, b_+24); A = W8(wInventory_cbba);
-  CYC(b_+24, b_+26); alu_xor(gb, 1);
-  CYC(b_+26, b_+29); W8(wInventory_cbba) = A;
-  CALL_C(b_+29, func_02_55b2_hook, SYM(func_02_55b2), b_+32);
-  CYC(b_+32, b_+34); A = 0x9f;
-  CYC(b_+34, b_+37); W8(wGfxRegs2_WINX) = A;
-  CYC(b_+37, b_+40); SET_HL(wSubmenuState);
-  CYC(b_+40, b_+41); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+41, b_+43); A = 0x54;
-  CALL_C(b_+43, playSound_b00_hook, SYM(playSound_b00), b_+46);
+  CYC(b_+O(20), b_+OE(21)); mem_wr(gb, HL, A);
+  CYC(b_+O(21), b_+OE(24)); A = W8(wInventory_cbba);
+  CYC(b_+O(24), b_+OE(26)); alu_xor(gb, 1);
+  CYC(b_+O(26), b_+OE(29)); W8(wInventory_cbba) = A;
+  CALL_C(b_+O(29), func_02_55b2_hook, SYM(func_02_55b2), b_+OE(32));
+  CYC(b_+O(32), b_+OE(34)); A = 0x9f;
+  CYC(b_+O(34), b_+OE(37)); W8(wGfxRegs2_WINX) = A;
+  CYC(b_+O(37), b_+OE(40)); SET_HL(wSubmenuState);
+  CYC(b_+O(40), b_+OE(41)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(41), b_+OE(43)); A = 0x54;
+  CALL_C(b_+O(43), playSound_b00_hook, SYM(playSound_b00), b_+OE(46));
   TAIL(inventoryMenuState3__subState1);
 }
 
 void inventoryMenuState3__subState1_hook(GB *gb) {
   BASE(inventoryMenuState3);
-  CYC(b_+46, b_+49); SET_BC(0x070c);
-  CYC(b_+49, b_+52); A = W8(wGfxRegs2_WINX);
-  CYC(b_+52, b_+53); alu_sub(gb, C);
-  CYC(b_+53, b_+54); alu_cp(gb, B);
-  if (!(F & FC)) { CYCT(b_+54, b_+56); goto store; }
-  CYC(b_+54, b_+56); CYC(b_+56, b_+57); A = B;
+  CYC(b_+O(46), b_+OE(49)); SET_BC(0x070c);
+  CYC(b_+O(49), b_+OE(52)); A = W8(wGfxRegs2_WINX);
+  CYC(b_+O(52), b_+OE(53)); alu_sub(gb, C);
+  CYC(b_+O(53), b_+OE(54)); alu_cp(gb, B);
+  if (!(F & FC)) { CYCT(b_+O(54), b_+OE(56)); goto store; }
+  CYC(b_+O(54), b_+OE(56)); CYC(b_+O(56), b_+OE(57)); A = B;
 store:
-  CYC(b_+57, b_+60); W8(wGfxRegs2_WINX) = A;
-  CYC(b_+60, b_+63); A = W8(wGfxRegs2_SCX);
-  CYC(b_+63, b_+64); alu_add(gb, C);
-  CYC(b_+64, b_+67); W8(wGfxRegs2_SCX) = A;
-  CYC(b_+67, b_+69); alu_cp(gb, 0x98);
-  if (F & FC) { CYCT(b_+69, b_+70); ret_effect(gb); return; }
-  CYC(b_+69, b_+70);
+  CYC(b_+O(57), b_+OE(60)); W8(wGfxRegs2_WINX) = A;
+  CYC(b_+O(60), b_+OE(63)); A = W8(wGfxRegs2_SCX);
+  CYC(b_+O(63), b_+OE(64)); alu_add(gb, C);
+  CYC(b_+O(64), b_+OE(67)); W8(wGfxRegs2_SCX) = A;
+  CYC(b_+O(67), b_+OE(69)); alu_cp(gb, 0x98);
+  if (F & FC) { CYCT(b_+O(69), b_+OE(70)); ret_effect(gb); return; }
+  CYC(b_+O(69), b_+OE(70));
   TAIL(inventoryMenuState3__subState2);
 }
 
 void inventoryMenuState3__subState2_hook(GB *gb) {
   BASE(inventoryMenuState3);
-  CYC(b_+70, b_+72); A = 0xc7;
-  CYC(b_+72, b_+75); W8(wGfxRegs2_WINX) = A;
-  CYC(b_+75, b_+76); alu_xor(gb, A);
-  CYC(b_+76, b_+79); W8(wGfxRegs2_SCX) = A;
-  CYC(b_+79, b_+82); A = W8(wGfxRegs2_LCDC);
-  CYC(b_+82, b_+84); alu_xor(gb, 0x48);
-  CYC(b_+84, b_+87); W8(wGfxRegs2_LCDC) = A;
-  CYC(b_+87, b_+89); A = 1;
-  CYC(b_+89, b_+92); TAIL(inventoryMenuState1__func_02_5606);
+  CYC(b_+O(70), b_+OE(72)); A = 0xc7;
+  CYC(b_+O(72), b_+OE(75)); W8(wGfxRegs2_WINX) = A;
+  CYC(b_+O(75), b_+OE(76)); alu_xor(gb, A);
+  CYC(b_+O(76), b_+OE(79)); W8(wGfxRegs2_SCX) = A;
+  CYC(b_+O(79), b_+OE(82)); A = W8(wGfxRegs2_LCDC);
+  CYC(b_+O(82), b_+OE(84)); alu_xor(gb, 0x48);
+  CYC(b_+O(84), b_+OE(87)); W8(wGfxRegs2_LCDC) = A;
+  CYC(b_+O(87), b_+OE(89)); A = 1;
+  CYC(b_+O(89), b_+OE(92)); TAIL(inventoryMenuState1__func_02_5606);
 }
 
 void getDirectionButtonOffsetFromHl_hook(GB *gb) {

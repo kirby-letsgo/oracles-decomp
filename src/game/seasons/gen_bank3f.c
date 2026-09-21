@@ -211,60 +211,6 @@ L_53a1:
   RET(0x53ab); return;  // ret
 }
 
-// 3f:4757
-void s_decideItemDrop_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4757, 1); A = C;  // ld a,c
-  I(0x4758, 1); alu_or(gb, A);  // or a
-  I(0x4759, 2); A = (uint8_t)(A | (1 << 7));  // set 7,a
-  if (!(F & FZ)) { I(0x475b, 3); goto L_4763; } I(0x475b, 2);  // jr nz,$4763
-  I(0x475d, 3); A = mem_rd(gb, 0xffac);  // ldh a,($ffac)
-  I(0x475f, 2); alu_add(gb, 0x02);  // add $02
-  I(0x4761, 1); E = A;  // ld e,a
-  I(0x4762, 2); A = mem_rd(gb, DE);  // ld a,(de)
-L_4763:
-  I(0x4763, 3); SET_HL(0x4a75);  // ld hl,$4a75
-  RST_PUSH(0x4766, 0x4767);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4767, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4768, 1); C = A;  // ld c,a
-  I(0x4769, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { I(0x476b, 3); goto L_47ae; } I(0x476b, 2);  // jr z,$47ae
-  I(0x476d, 2); A = alu_swap(gb, A);  // swap a
-  I(0x476f, 1); alu_rrca(gb);  // rrca
-  I(0x4770, 2); alu_and(gb, 0x07);  // and $07
-  I(0x4772, 3); SET_HL(0x481d);  // ld hl,$481d
-  RST_PUSH(0x4775, 0x4776);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x4776, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4777, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x4778, 1); L = A;  // ld l,a
-  CALL(0x4779, getRandomNumber_hook, 0x041a, 0x477c);  // call $041a
-  I(0x477c, 2); alu_and(gb, 0x3f);  // and $3f
-  CALL(0x477e, checkFlag_hook, 0x0205, 0x4781);  // call $0205
-  if ((F & FZ)) { I(0x4781, 3); goto L_47ae; } I(0x4781, 2);  // jr z,$47ae
-  I(0x4783, 1); A = C;  // ld a,c
-  I(0x4784, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x4786, 3); SET_HL(0x47dd);  // ld hl,$47dd
-  RST_PUSH(0x4789, 0x478a);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x478a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x478b, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x478c, 1); L = A;  // ld l,a
-  CALL(0x478d, getRandomNumber_hook, 0x041a, 0x4790);  // call $041a
-  I(0x4790, 2); alu_and(gb, 0x1f);  // and $1f
-  RST_PUSH(0x4792, 0x4793);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4793, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4794, 1); C = A;  // ld c,a
-  s_checkItemDropAvailable_body(gb); return;  // fallthrough
-L_47ae:
-  I(0x47ae, 2); C = 0xff;  // ld c,$ff
-  RET(0x47b0); return;  // ret
-}
-
 // 3f:5263
 void s_displayNextTextCharacter__endLine(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1374,7 +1320,7 @@ L_59db:
   I(0x59e7, 2); E = 0x46;  // ld e,$46
   I(0x59e9, 2); A = 0x5a;  // ld a,$5a
   I(0x59eb, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x59ec, s_darkenRoomLightly, 0x31d0, 0x59ef);  // call $31d0
+  CALL(0x59ec, darkenRoomLightly_hook, 0x31d0, 0x59ef);  // call $31d0
   I(0x59ef, 4); if (hook_is(gb, 0x239b, interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(0x239b);  // jp $239b
 }
 
