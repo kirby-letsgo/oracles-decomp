@@ -13345,6 +13345,9 @@ enum {
   S_zora_subid1B__textTable,
   S_zora_textIndices,
   S_zora_waitForLinkToMoveDown,
+  S_seasonsFunc_05_5ed3,
+  S_interactionCode85,
+  S_miscNPC_state1,
   SYM_COUNT
 };
 enum {

@@ -20905,29 +20905,6 @@ L_571b:
   s_func_5723(gb); return;  // fallthrough
 }
 
-// 08:57ab
-void s_miscNPC_state1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x57ab, interactionRunScript_hook, 0x250c, 0x57ae);  // call $250c
-L_57ae:
-  I(0x57ae, 2); E = 0x43;  // ld e,$43
-  I(0x57b0, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57b1, 2); alu_and(gb, 0x80);  // and $80
-  if (!(F & FZ)) { I(0x57b3, 4); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686); } I(0x57b3, 3);  // jp nz,$2686
-  I(0x57b6, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
-}
-
-// 08:57ae
-void s_miscNPC_state1__afterCall57ae(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_57ae:
-  I(0x57ae, 2); E = 0x43;  // ld e,$43
-  I(0x57b0, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x57b1, 2); alu_and(gb, 0x80);  // and $80
-  if (!(F & FZ)) { I(0x57b3, 4); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686); } I(0x57b3, 3);  // jp nz,$2686
-  I(0x57b6, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
-}
-
 // 08:5732
 void s_mrWrite_spawnLightableTorch(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

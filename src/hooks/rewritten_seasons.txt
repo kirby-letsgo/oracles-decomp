@@ -1,0 +1,6 @@
+# Seasons-only routines rewritten by hand in src/game/seasons/ (hook s_<label>_hook); the
+# generator (tools/transliterate.py --game=seasons) skips them and their locals.
+checkLinkPushingAgainstTreeStump
+seasonsFunc_05_5ed3
+interactionCode85
+miscNPC_state1

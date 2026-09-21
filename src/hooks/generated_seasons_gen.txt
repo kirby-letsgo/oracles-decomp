@@ -1328,9 +1328,7 @@
 09:7bfd s_interactionCode84__runSubid06 L
 09:7c05 s_interactionCode84__animateFlickerAndTakeRelatedObj1Position L
 09:7c15 s_interactionCode84__runSubid08 L
-09:7c1f s_interactionCode85 -
-09:7c27 s_interactionCode85__state0 L
-09:7c44 s_interactionCode85__state1 L
+09:7c1f s_interactionCode85_hook -
 09:7c57 s_interactionCode86 -
 09:7c62 s_interactionCode86__afterCall7c62 L
 09:7c7e s_interactionCode86__state1 L
@@ -3722,7 +3720,7 @@
 05:44a7 s_checkCollisionForCompanion__checkCollision L
 05:5fd6 s_checkLinkJumpingOffCliff__setSpeed140 L
 05:5fdb s_checkLinkJumpingOffCliff__checkCliffTile L
-05:5e74 s_checkLinkPushingAgainstTreeStump -
+05:5e74 s_checkLinkPushingAgainstTreeStump_hook -
 05:47fd s_companionCheckCanSpawn -
 05:482c s_companionCheckCanSpawn__canSpawn L
 05:48bb s_companionCheckEnableTerrainEffects -
@@ -4089,7 +4087,7 @@
 05:71d3 s_rickyStateC__parameter1 L
 05:71fd s_rickyStateC__initializeRicky L
 05:71b1 s_rickyWaitUntilJumpDone__onGround L
-05:5ed3 s_seasonsFunc_05_5ed3 -
+05:5ed3 s_seasonsFunc_05_5ed3_hook -
 05:44f6 s_specialObjectCheckFacingWall__checkVertical L
 05:450b s_specialObjectCheckFacingWall__ret L
 05:6293 s_specialObjectCode_linkRidingAnimal__state0 L
@@ -4835,8 +4833,7 @@
 08:56bd s_miscNPC_state0 -
 08:56e9 s_miscNPC_state0__afterCall56e9 L
 08:571b s_miscNPC_state0__afterCall571b L
-08:57ab s_miscNPC_state1 -
-08:57ae s_miscNPC_state1__afterCall57ae L
+08:57ab s_miscNPC_state1_hook -
 08:5732 s_mrWrite_spawnLightableTorch -
 08:50f6 s_objectOscillateZ_body -
 08:6ab6 s_runScriptSetPriorityRelativeToLink_withTerrainEffects -

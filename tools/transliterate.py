@@ -54,6 +54,8 @@ def body_ok(bank, addr):
     return _body_ok[(bank, addr)]
 ported = set(l.split('#')[0].strip() for l in open(sys.argv[3]) if l.split('#')[0].strip()) if sys.argv[3] != '-' else set()
 rewritten = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten.txt') and not SEASONS else set()
+# Seasons-only routines rewritten by hand (src/game/seasons/*.c, hook s_<name>_hook): label names
+rewritten_seasons = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten_seasons.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten_seasons.txt') and SEASONS else set()
 # Seasons: the shared C hooks that run under Seasons (tools/seasons_hooks.py) play the part of
 # the rewritten routines: they are called by name and not generated
 shared_hooks = {}
@@ -63,7 +65,7 @@ if SEASONS:
         if len(pp) >= 2: shared_hooks[(int(pp[0][:2], 16), int(pp[0][3:], 16))] = pp[1]
 entries.update(shared_hooks)
 def is_rewritten(n, b, a):
-    if SEASONS: return (b, a) in shared_hooks
+    if SEASONS: return (b, a) in shared_hooks or n in rewritten_seasons or cname_at(b, a)[2:] in rewritten_seasons
     return n in rewritten or cname_at(b, a) in rewritten
 rewritten_noverify = set(l.split('#')[0].strip() for l in open('src/hooks/rewritten_noverify.txt') if l.split('#')[0].strip()) if _os.path.exists('src/hooks/rewritten_noverify.txt') else set()
 def has_unsupported(n):
@@ -438,9 +440,9 @@ if names and names[0] == '--out':
             if (b, a) in seen_addrs: continue
             seen_addrs.add((b, a))
             if is_rewritten(n, b, a):
-                entries[(b, a)] = shared_hooks[(b, a)] if SEASONS else cname_at(b, a) + '_hook'
+                entries[(b, a)] = shared_hooks[(b, a)] if (b, a) in shared_hooks else cname_at(b, a) + '_hook'
                 items_by_bank.setdefault(b, []).append((n, b, a))
-                if SEASONS:     # a shared routine's @locals that no shared hook covers are generated
+                if (b, a) in shared_hooks:     # a shared routine's @locals that no shared hook covers are generated
                     for la, ln in sorted(locals_of.get((b, n), [])):
                         if (b, la) in shared_hooks or (b, la) in entries or not body_ok(b, la): continue
                         entries[(b, la)] = cname_at(b, la)
@@ -486,7 +488,7 @@ if names and names[0] == '--out':
     for bank, items in by_bank.items():
         for n, b, a in items:
             if is_rewritten(n, b, a):
-                if not SEASONS: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-'))
+                if not SEASONS or (b, a) not in shared_hooks: generated.append((b, a, cname_at(b, a) + '_hook', 'H' if (n in rewritten_noverify or cname_at(b, a) in rewritten_noverify) else '-'))
                 continue
             if (b, a) in externs:
                 # hand-written (ram_code.c), game-neutral: the same function serves both games
@@ -534,7 +536,7 @@ elif names and names[0] == '--report':
                     while j > 0 and lines[j - 1].startswith(';'): j -= 1
                     return path, i + 1, lines[j:i]
         return None, None, []
-    pnames = [l.split('#')[0].strip() for l in open(sys.argv[3])]
+    pnames = [l.split('#')[0].strip() for l in open(sys.argv[3])] if sys.argv[3] != '-' else []
     pnames = [x for x in pnames if x and x in labels]
     def report(n):
         if n not in labels: print(f'unknown routine {n}'); return

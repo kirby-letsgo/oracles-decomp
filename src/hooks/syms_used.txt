@@ -13341,3 +13341,6 @@ zora_subid1B__state1 zora_subid1B@state1 0b:622d
 zora_subid1B__textTable zora_subid1B@textTable 0b:6255
 zora_textIndices zora_textIndices 0b:6281
 zora_waitForLinkToMoveDown zora_waitForLinkToMoveDown 15:7700
+seasonsFunc_05_5ed3 seasonsFunc_05_5ed3 -
+interactionCode85 interactionCode85 -
+miscNPC_state1 miscNPC_state1 -
