@@ -1499,7 +1499,6 @@
 3f:5443 s_func_53eb__func L
 3f:54a8 s_func_53eb__dmaHeartPieceDisplay L
 3f:4539 s_giveTreasure_body__ret L
-3f:454e s_giveTreasure_body__applyParameter L
 3f:5739 s_handleTextControlCode__controlCode0 L
 3f:5745 s_handleTextControlCode__controlCode1 L
 3f:574d s_handleTextControlCode__controlCode6 L

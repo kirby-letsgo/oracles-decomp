@@ -64,132 +64,132 @@ static uint16_t treasure_jump_table(GB *gb) {
 void giveTreasure_body_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); push_effect(gb, HL);
-  CYC(b_+1, b_+2); push_effect(gb, DE);
-  CYC(b_+2, b_+3); A = B;
-  CYC(b_+3, b_+5); H8(hFF8B) = A;
-  CYC(b_+5, b_+6); push_effect(gb, BC);
-  CYC(b_+6, b_+9); SET_HL(GV(b_+127, 0x4544));
-  CALL_C(b_+9, giveTreasure_body__findItemInTable_hook, b_+40, b_+12);
+  CYC(b_+O(0), b_+OE(1)); push_effect(gb, HL);
+  CYC(b_+O(1), b_+OE(2)); push_effect(gb, DE);
+  CYC(b_+O(2), b_+OE(3)); A = B;
+  CYC(b_+O(3), b_+OE(5)); H8(hFF8B) = A;
+  CYC(b_+O(5), b_+OE(6)); push_effect(gb, BC);
+  CYC(b_+O(6), b_+OE(9)); SET_HL(GV(b_+O(127), 0x4544));
+  CALL_C(b_+O(9), giveTreasure_body__findItemInTable_hook, b_+O(40), b_+OE(12));
   if (F & FZ) {
-    CYCT(b_+12, b_+14);
+    CYCT(b_+O(12), b_+OE(14));
   } else {
-    CYC(b_+12, b_+14);
-    CALL_C(b_+14, loseTreasure_helper_hook, SYM(loseTreasure_helper), b_+17);
-    CYC(b_+17, b_+18); A = C;
-    CALL_C(b_+18, loseTreasure_helper_hook, SYM(loseTreasure_helper), b_+21);
+    CYC(b_+O(12), b_+OE(14));
+    CALL_C(b_+O(14), loseTreasure_helper_hook, SYM(loseTreasure_helper), b_+OE(17));
+    CYC(b_+O(17), b_+OE(18)); A = C;
+    CALL_C(b_+O(18), loseTreasure_helper_hook, SYM(loseTreasure_helper), b_+OE(21));
   }
-  CYC(b_+21, b_+22); SET_BC(pop_effect(gb));
-  CYC(b_+22, b_+23); A = B;
-  CALL_C(b_+23, giveTreasure_body__giveTreasure_hook, b_+57, b_+26);
-  CYC(b_+26, b_+27); push_effect(gb, AF);
-  CYC(b_+27, b_+30); SET_HL(b_+114);
-  CALL_C(b_+30, giveTreasure_body__findItemInTable_hook, b_+40, b_+33);
+  CYC(b_+O(21), b_+OE(22)); SET_BC(pop_effect(gb));
+  CYC(b_+O(22), b_+OE(23)); A = B;
+  CALL_C(b_+O(23), giveTreasure_body__giveTreasure_hook, b_+O(57), b_+OE(26));
+  CYC(b_+O(26), b_+OE(27)); push_effect(gb, AF);
+  CYC(b_+O(27), b_+OE(30)); SET_HL(b_+O(114));
+  CALL_C(b_+O(30), giveTreasure_body__findItemInTable_hook, b_+O(40), b_+OE(33));
   if (!(F & FZ)) {
-    CALL_C_CC(b_+33, giveTreasure_body__giveTreasure_hook, b_+57, b_+36);
+    CALL_C_CC(b_+O(33), giveTreasure_body__giveTreasure_hook, b_+O(57), b_+OE(36));
   } else {
-    CYC(b_+33, b_+36);
+    CYC(b_+O(33), b_+OE(36));
   }
-  CYC(b_+36, b_+37); SET_BC(pop_effect(gb));
-  CYC(b_+37, b_+38); SET_DE(pop_effect(gb));
-  CYC(b_+38, b_+39); SET_HL(pop_effect(gb));
-  CYC(b_+39, b_+40); ret_effect(gb);
+  CYC(b_+O(36), b_+OE(37)); SET_BC(pop_effect(gb));
+  CYC(b_+O(37), b_+OE(38)); SET_DE(pop_effect(gb));
+  CYC(b_+O(38), b_+OE(39)); SET_HL(pop_effect(gb));
+  CYC(b_+O(39), b_+OE(40)); ret_effect(gb);
 }
 
 void giveTreasure_body__findItemInTable_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+40, b_+42); A = H8(hFF8B);
-  CYC(b_+42, b_+43); C = A;
+  CYC(b_+O(40), b_+OE(42)); A = H8(hFF8B);
+  CYC(b_+O(42), b_+OE(43)); C = A;
   for (;;) {
-    CYC(b_+43, b_+44); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+44, b_+45); alu_cp(gb, C);
+    CYC(b_+O(43), b_+OE(44)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(44), b_+OE(45)); alu_cp(gb, C);
     if (F & FZ) {
-      CYCT(b_+45, b_+47);
+      CYCT(b_+O(45), b_+OE(47));
       break;
     }
-    CYC(b_+45, b_+47);
-    CYC(b_+47, b_+48); alu_or(gb, A);
+    CYC(b_+O(45), b_+OE(47));
+    CYC(b_+O(47), b_+OE(48)); alu_or(gb, A);
     if (F & FZ) {
-      CYCT(b_+48, b_+49); ret_effect(gb); return;
+      CYCT(b_+O(48), b_+OE(49)); ret_effect(gb); return;
     }
-    CYC(b_+48, b_+49);
-    CYC(b_+49, b_+50); SET_HL(HL + 1);
-    CYC(b_+50, b_+51); SET_HL(HL + 1);
-    CYC(b_+51, b_+53);
+    CYC(b_+O(48), b_+OE(49));
+    CYC(b_+O(49), b_+OE(50)); SET_HL(HL + 1);
+    CYC(b_+O(50), b_+OE(51)); SET_HL(HL + 1);
+    CYC(b_+O(51), b_+OE(53));
   }
-  CYC(b_+53, b_+54); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+54, b_+55); C = mem_rd(gb, HL);
-  CYC(b_+55, b_+56); alu_or(gb, A);
-  CYC(b_+56, b_+57); ret_effect(gb);
+  CYC(b_+O(53), b_+OE(54)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(54), b_+OE(55)); C = mem_rd(gb, HL);
+  CYC(b_+O(55), b_+OE(56)); alu_or(gb, A);
+  CYC(b_+O(56), b_+OE(57)); ret_effect(gb);
 }
 
 void giveTreasure_body__giveTreasure_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+57, b_+59); H8(hFF8B) = A;
-  CALL_C(b_+59, checkIncreaseGashaMaturityForGettingTreasure_hook, SYM(checkIncreaseGashaMaturityForGettingTreasure), b_+62);
-  CALL_C(b_+62, addTreasureToInventory_hook, SYM(addTreasureToInventory), b_+65);
-  CYC(b_+65, b_+68); SET_HL(wObtainedTreasureFlags);
-  CYC(b_+68, b_+70); A = H8(hFF8B);
-  CALL_C(b_+70, setFlag_hook, SYM(setFlag), b_+73);
-  CYC(b_+73, b_+74); push_effect(gb, BC);
-  CYC(b_+74, b_+76); A = H8(hFF8B);
-  CYC(b_+76, b_+77); C = A;
-  CYC(b_+77, b_+79); B = 0x00;
-  CYC(b_+79, b_+82); SET_HL(SYM(treasureCollectionBehaviourTable));
-  CYC(b_+82, b_+83); alu_add_hl(gb, BC);
-  CYC(b_+83, b_+84); alu_add_hl(gb, BC);
-  CYC(b_+84, b_+85); alu_add_hl(gb, BC);
-  CYC(b_+85, b_+86); SET_BC(pop_effect(gb));
-  CYC(b_+86, b_+88); D = 0xc6;
-  CYC(b_+88, b_+89); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+89, b_+90); E = A;
-  CYC(b_+90, b_+91); alu_or(gb, A);
+  CYC(b_+O(57), b_+OE(59)); H8(hFF8B) = A;
+  CALL_C(b_+O(59), checkIncreaseGashaMaturityForGettingTreasure_hook, SYM(checkIncreaseGashaMaturityForGettingTreasure), b_+OE(62));
+  CALL_C(b_+O(62), addTreasureToInventory_hook, SYM(addTreasureToInventory), b_+OE(65));
+  CYC(b_+O(65), b_+OE(68)); SET_HL(wObtainedTreasureFlags);
+  CYC(b_+O(68), b_+OE(70)); A = H8(hFF8B);
+  CALL_C(b_+O(70), setFlag_hook, SYM(setFlag), b_+OE(73));
+  CYC(b_+O(73), b_+OE(74)); push_effect(gb, BC);
+  CYC(b_+O(74), b_+OE(76)); A = H8(hFF8B);
+  CYC(b_+O(76), b_+OE(77)); C = A;
+  CYC(b_+O(77), b_+OE(79)); B = 0x00;
+  CYC(b_+O(79), b_+OE(82)); SET_HL(SYM(treasureCollectionBehaviourTable));
+  CYC(b_+O(82), b_+OE(83)); alu_add_hl(gb, BC);
+  CYC(b_+O(83), b_+OE(84)); alu_add_hl(gb, BC);
+  CYC(b_+O(84), b_+OE(85)); alu_add_hl(gb, BC);
+  CYC(b_+O(85), b_+OE(86)); SET_BC(pop_effect(gb));
+  CYC(b_+O(86), b_+OE(88)); D = 0xc6;
+  CYC(b_+O(88), b_+OE(89)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(89), b_+OE(90)); E = A;
+  CYC(b_+O(90), b_+OE(91)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+91, b_+93);
+    CYCT(b_+O(91), b_+OE(93));
   } else {
-    CYC(b_+91, b_+93);
-    CYC(b_+93, b_+95); E = (uint8_t)wShortSecretIndex;
+    CYC(b_+O(91), b_+OE(93));
+    CYC(b_+O(93), b_+OE(95)); E = (uint8_t)wShortSecretIndex;
   }
-  CYC(b_+95, b_+96); A = mem_rd(gb, HL);
-  CYC(b_+96, b_+98); alu_and(gb, 0x0f);
-  CYC(b_+98, b_+99); push_effect(gb, HL);
-  CALL_C(b_+99, giveTreasure_body__applyParameter_hook, SYM(giveTreasure_body__applyParameter), b_+102);
-  CYC(b_+102, b_+103); SET_HL(pop_effect(gb));
-  CYC(b_+103, b_+105); alu_bit(gb, 7, mem_rd(gb, HL));
-  CYC(b_+105, b_+106); SET_HL(HL + 1);
-  CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(95), b_+OE(96)); A = mem_rd(gb, HL);
+  CYC(b_+O(96), b_+OE(98)); alu_and(gb, 0x0f);
+  CYC(b_+O(98), b_+OE(99)); push_effect(gb, HL);
+  CALL_C(b_+O(99), giveTreasure_body__applyParameter_hook, SYM(giveTreasure_body__applyParameter), b_+OE(102));
+  CYC(b_+O(102), b_+OE(103)); SET_HL(pop_effect(gb));
+  CYC(b_+O(103), b_+OE(105)); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(b_+O(105), b_+OE(106)); SET_HL(HL + 1);
+  CYC(b_+O(106), b_+OE(107)); A = mem_rd(gb, HL); SET_HL(HL + 1);
   if (!(F & FZ)) {
-    CYCT(b_+107, b_+109);
+    CYCT(b_+O(107), b_+OE(109));
   } else {
-    CYC(b_+107, b_+109);
-    CALL_C(b_+109, playSound_b00_hook, SYM(playSound_b00), b_+112);
-    CYC(b_+112, b_+113); alu_xor(gb, A);
+    CYC(b_+O(107), b_+OE(109));
+    CALL_C(b_+O(109), playSound_b00_hook, SYM(playSound_b00), b_+OE(112));
+    CYC(b_+O(112), b_+OE(113)); alu_xor(gb, A);
   }
-  CYC(b_+113, b_+114); ret_effect(gb);
+  CYC(b_+O(113), b_+OE(114)); ret_effect(gb);
 }
 
 void giveTreasure_body__applyParameter_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+128, b_+129); push_effect(gb, b_+129);
+  CYC(b_+O(128), b_+OE(129)); push_effect(gb, b_+OE(129));
   do { uint16_t jt_ = (treasure_jump_table(gb));
-    if (jt_ == b_+113) { CYC(b_+113, b_+114); ret_effect(gb); return; }
-    else if (jt_ == b_+161) { giveTreasure_body__modeb_hook(gb); return; }
-    else if (jt_ == b_+168) { giveTreasure_body__mode8_hook(gb); return; }
-    else if (jt_ == b_+179) { giveTreasure_body__mode5_hook(gb); return; }
-    else if (jt_ == b_+182) { giveTreasure_body__mode6_hook(gb); return; }
-    else if (jt_ == b_+186) { giveTreasure_body__mode1_hook(gb); return; }
-    else if (jt_ == b_+192) { giveTreasure_body__mode2_hook(gb); return; }
-    else if (jt_ == b_+196) { giveTreasure_body__mode3_hook(gb); return; }
-    else if (jt_ == b_+198) { giveTreasure_body__mode4_hook(gb); return; }
-    else if (jt_ == b_+207) { giveTreasure_body__mode7_hook(gb); return; }
-    else if (jt_ == b_+220) { giveTreasure_body__modea_hook(gb); return; }
-    else if (jt_ == b_+224) { giveTreasure_body__modec_hook(gb); return; }
-    else if (jt_ == b_+244) { giveTreasure_body__moded_hook(gb); return; }
-    else if (jt_ == b_+255) { giveTreasure_body__modee_hook(gb); return; }
-    else if (jt_ == b_+310) { giveTreasure_body__modef_hook(gb); return; }
-    else if (jt_ == b_+332) { giveTreasure_body__mode9_hook(gb); return; }
+    if (jt_ == b_+O(113)) { CYC(b_+O(113), b_+OE(114)); ret_effect(gb); return; }
+    else if (jt_ == b_+O(161)) { giveTreasure_body__modeb_hook(gb); return; }
+    else if (jt_ == b_+O(168)) { giveTreasure_body__mode8_hook(gb); return; }
+    else if (jt_ == b_+O(179)) { giveTreasure_body__mode5_hook(gb); return; }
+    else if (jt_ == b_+O(182)) { giveTreasure_body__mode6_hook(gb); return; }
+    else if (jt_ == b_+O(186)) { giveTreasure_body__mode1_hook(gb); return; }
+    else if (jt_ == b_+O(192)) { giveTreasure_body__mode2_hook(gb); return; }
+    else if (jt_ == b_+O(196)) { giveTreasure_body__mode3_hook(gb); return; }
+    else if (jt_ == b_+O(198)) { giveTreasure_body__mode4_hook(gb); return; }
+    else if (jt_ == b_+O(207)) { giveTreasure_body__mode7_hook(gb); return; }
+    else if (jt_ == b_+O(220)) { giveTreasure_body__modea_hook(gb); return; }
+    else if (jt_ == b_+O(224)) { giveTreasure_body__modec_hook(gb); return; }
+    else if (jt_ == b_+O(244)) { giveTreasure_body__moded_hook(gb); return; }
+    else if (jt_ == b_+O(255)) { giveTreasure_body__modee_hook(gb); return; }
+    else if (jt_ == b_+O(310)) { giveTreasure_body__modef_hook(gb); return; }
+    else if (jt_ == b_+O(332)) { giveTreasure_body__mode9_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 }
@@ -630,292 +630,292 @@ void checkItemDropAvailable_body_hook(GB *gb) {
 
 void giveTreasure_body__modeb_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+161, b_+162); A = C;
-  CYC(b_+162, b_+165); SET_HL(wUpgradesObtained);
-  CYC(b_+165, b_+168); TAIL(setFlag);
+  CYC(b_+O(161), b_+OE(162)); A = C;
+  CYC(b_+O(162), b_+OE(165)); SET_HL(wUpgradesObtained);
+  CYC(b_+O(165), b_+OE(168)); TAIL(setFlag);
 }
 
 void giveTreasure_body__mode8_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+168, b_+169); A = mem_rd(gb, DE);
-  CYC(b_+169, b_+170); alu_cp(gb, C);
+  CYC(b_+O(168), b_+OE(169)); A = mem_rd(gb, DE);
+  CYC(b_+O(169), b_+OE(170)); alu_cp(gb, C);
   if (!(F & FC)) {
-    CYCT(b_+170, b_+171); ret_effect(gb); return;
+    CYCT(b_+O(170), b_+OE(171)); ret_effect(gb); return;
   }
-  CYC(b_+170, b_+171);
-  CYC(b_+171, b_+172); A = C;
-  CYC(b_+172, b_+173); mem_wr(gb, DE, A);
-  CYC(b_+173, b_+176); SET_HL(wStatusBarNeedsRefresh);
-  CYC(b_+176, b_+178); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(b_+178, b_+179); ret_effect(gb);
+  CYC(b_+O(170), b_+OE(171));
+  CYC(b_+O(171), b_+OE(172)); A = C;
+  CYC(b_+O(172), b_+OE(173)); mem_wr(gb, DE, A);
+  CYC(b_+O(173), b_+OE(176)); SET_HL(wStatusBarNeedsRefresh);
+  CYC(b_+O(176), b_+OE(178)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+  CYC(b_+O(178), b_+OE(179)); ret_effect(gb);
 }
 
 void giveTreasure_body__mode5_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+179, b_+180); A = C;
-  CYC(b_+180, b_+181); mem_wr(gb, DE, A);
-  CYC(b_+181, b_+182); ret_effect(gb);
+  CYC(b_+O(179), b_+OE(180)); A = C;
+  CYC(b_+O(180), b_+OE(181)); mem_wr(gb, DE, A);
+  CYC(b_+O(181), b_+OE(182)); ret_effect(gb);
 }
 
 void giveTreasure_body__mode1_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+186, b_+187); A = C;
-  CYC(b_+187, b_+188); H = D;
-  CYC(b_+188, b_+189); L = E;
-  CYC(b_+189, b_+192); TAIL(setFlag);
+  CYC(b_+O(186), b_+OE(187)); A = C;
+  CYC(b_+O(187), b_+OE(188)); H = D;
+  CYC(b_+O(188), b_+OE(189)); L = E;
+  CYC(b_+O(189), b_+OE(192)); TAIL(setFlag);
 }
 
 void giveTreasure_body__mode6_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+182, b_+185); A = W8(wDungeonIndex);
-  CYC(b_+185, b_+186); C = A;
+  CYC(b_+O(182), b_+OE(185)); A = W8(wDungeonIndex);
+  CYC(b_+O(185), b_+OE(186)); C = A;
   TAIL(giveTreasure_body__mode1);
 }
 
 void giveTreasure_body__mode2_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+192, b_+193); A = mem_rd(gb, DE);
-  CYC(b_+193, b_+194); A = alu_inc8(gb, A);
-  CYC(b_+194, b_+195); mem_wr(gb, DE, A);
-  CYC(b_+195, b_+196); ret_effect(gb);
+  CYC(b_+O(192), b_+OE(193)); A = mem_rd(gb, DE);
+  CYC(b_+O(193), b_+OE(194)); A = alu_inc8(gb, A);
+  CYC(b_+O(194), b_+OE(195)); mem_wr(gb, DE, A);
+  CYC(b_+O(195), b_+OE(196)); ret_effect(gb);
 }
 
 void giveTreasure_body__mode4_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+198, b_+199); A = mem_rd(gb, DE);
-  CYC(b_+199, b_+200); alu_add(gb, C);
-  CYC(b_+200, b_+201); alu_daa(gb);
+  CYC(b_+O(198), b_+OE(199)); A = mem_rd(gb, DE);
+  CYC(b_+O(199), b_+OE(200)); alu_add(gb, C);
+  CYC(b_+O(200), b_+OE(201)); alu_daa(gb);
   if (!(F & FC)) {
-    CYCT(b_+201, b_+203);
+    CYCT(b_+O(201), b_+OE(203));
   } else {
-    CYC(b_+201, b_+203);
-    CYC(b_+203, b_+205); A = 0x99;
+    CYC(b_+O(201), b_+OE(203));
+    CYC(b_+O(203), b_+OE(205)); A = 0x99;
   }
-  CYC(b_+205, b_+206); mem_wr(gb, DE, A);
-  CYC(b_+206, b_+207); ret_effect(gb);
+  CYC(b_+O(205), b_+OE(206)); mem_wr(gb, DE, A);
+  CYC(b_+O(206), b_+OE(207)); ret_effect(gb);
 }
 
 void giveTreasure_body__mode3_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+196, b_+198); C = 0x01;
+  CYC(b_+O(196), b_+OE(198)); C = 0x01;
   TAIL(giveTreasure_body__mode4);
 }
 
 void giveTreasure_body__mode7_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+207, b_+210); A = W8(wDungeonIndex);
-  CYC(b_+210, b_+211); alu_add(gb, E);
-  CYC(b_+211, b_+212); L = A;
-  CYC(b_+212, b_+213); H = D;
-  CYC(b_+213, b_+214); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+214, b_+217); SET_HL(wStatusBarNeedsRefresh);
-  CYC(b_+217, b_+219); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
-  CYC(b_+219, b_+220); ret_effect(gb);
+  CYC(b_+O(207), b_+OE(210)); A = W8(wDungeonIndex);
+  CYC(b_+O(210), b_+OE(211)); alu_add(gb, E);
+  CYC(b_+O(211), b_+OE(212)); L = A;
+  CYC(b_+O(212), b_+OE(213)); H = D;
+  CYC(b_+O(213), b_+OE(214)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(214), b_+OE(217)); SET_HL(wStatusBarNeedsRefresh);
+  CYC(b_+O(217), b_+OE(219)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
+  CYC(b_+O(219), b_+OE(220)); ret_effect(gb);
 }
 
 void giveTreasure_body__modea_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+220, b_+221); A = mem_rd(gb, DE);
-  CYC(b_+221, b_+222); alu_add(gb, C);
-  CYC(b_+222, b_+223); mem_wr(gb, DE, A);
-  CYC(b_+223, b_+224); ret_effect(gb);
+  CYC(b_+O(220), b_+OE(221)); A = mem_rd(gb, DE);
+  CYC(b_+O(221), b_+OE(222)); alu_add(gb, C);
+  CYC(b_+O(222), b_+OE(223)); mem_wr(gb, DE, A);
+  CYC(b_+O(223), b_+OE(224)); ret_effect(gb);
 }
 
 void giveTreasure_body__modec_hook(GB *gb) {
   BASE(giveTreasure_body);
-  CYC(b_+224, b_+225); H = D;
-  CYC(b_+225, b_+226); L = E;
-  CYC(b_+226, b_+228); A = (uint8_t)wLinkHealth;
-  CYC(b_+228, b_+229); alu_cp(gb, E);
-  CYC(b_+229, b_+230); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(224), b_+OE(225)); H = D;
+  CYC(b_+O(225), b_+OE(226)); L = E;
+  CYC(b_+O(226), b_+OE(228)); A = (uint8_t)wLinkHealth;
+  CYC(b_+O(228), b_+OE(229)); alu_cp(gb, E);
+  CYC(b_+O(229), b_+OE(230)); A = mem_rd(gb, HL); SET_HL(HL + 1);
   if (!(F & FZ)) {
-    CYCT(b_+230, b_+232);
+    CYCT(b_+O(230), b_+OE(232));
   } else {
-    CYC(b_+230, b_+232);
-    CYC(b_+232, b_+233); alu_cp(gb, mem_rd(gb, HL));
+    CYC(b_+O(230), b_+OE(232));
+    CYC(b_+O(232), b_+OE(233)); alu_cp(gb, mem_rd(gb, HL));
     if (F & FZ) {
-      CYC(b_+233, b_+235);
-      CYC(b_+235, b_+237); A = 0x57;
-      CYC(b_+237, b_+240); playSound_b00_hook(gb);
+      CYC(b_+O(233), b_+OE(235));
+      CYC(b_+O(235), b_+OE(237)); A = 0x57;
+      CYC(b_+O(237), b_+OE(240)); playSound_b00_hook(gb);
       return;
     }
-    CYCT(b_+233, b_+235);
+    CYCT(b_+O(233), b_+OE(235));
   }
-  CYC(b_+240, b_+241); alu_add(gb, C);
-  CYC(b_+241, b_+242); mem_wr(gb, DE, A);
-  CYC(b_+242, b_+244);
-  CYC(b_+250, b_+251); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+O(240), b_+OE(241)); alu_add(gb, C);
+  CYC(b_+O(241), b_+OE(242)); mem_wr(gb, DE, A);
+  CYC(b_+O(242), b_+OE(244));
+  CYC(b_+O(250), b_+OE(251)); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
-    CYCT(b_+251, b_+252); ret_effect(gb); return;
+    CYCT(b_+O(251), b_+OE(252)); ret_effect(gb); return;
   }
-  CYC(b_+251, b_+252);
-  CYC(b_+252, b_+253); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+253, b_+254); mem_wr(gb, HL, A);
-  CYC(b_+254, b_+255); ret_effect(gb);
+  CYC(b_+O(251), b_+OE(252));
+  CYC(b_+O(252), b_+OE(253)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(253), b_+OE(254)); mem_wr(gb, HL, A);
+  CYC(b_+O(254), b_+OE(255)); ret_effect(gb);
 }
 
 void giveTreasure_body__moded_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+244, giveTreasure_body__mode4_hook, b_+198, b_+247);
-  CYC(b_+247, b_+248); H = D;
-  CYC(b_+248, b_+249); L = E;
-  CYC(b_+249, b_+250); L = alu_inc8(gb, L);
-  CYC(b_+250, b_+251); alu_cp(gb, mem_rd(gb, HL));
+  CALL_C(b_+O(244), giveTreasure_body__mode4_hook, b_+O(198), b_+OE(247));
+  CYC(b_+O(247), b_+OE(248)); H = D;
+  CYC(b_+O(248), b_+OE(249)); L = E;
+  CYC(b_+O(249), b_+OE(250)); L = alu_inc8(gb, L);
+  CYC(b_+O(250), b_+OE(251)); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
-    CYCT(b_+251, b_+252); ret_effect(gb); return;
+    CYCT(b_+O(251), b_+OE(252)); ret_effect(gb); return;
   }
-  CYC(b_+251, b_+252);
-  CYC(b_+252, b_+253); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+253, b_+254); mem_wr(gb, HL, A);
-  CYC(b_+254, b_+255); ret_effect(gb);
+  CYC(b_+O(251), b_+OE(252));
+  CYC(b_+O(252), b_+OE(253)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(253), b_+OE(254)); mem_wr(gb, HL, A);
+  CYC(b_+O(254), b_+OE(255)); ret_effect(gb);
 }
 
 void giveTreasure_body__modee_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+255, b_+256); A = C;
-  CALL_C(b_+256, getRupeeValue_hook, SYM(getRupeeValue), b_+259);
-  CYC(b_+259, b_+260); A = E;
-  CYC(b_+260, b_+262); alu_cp(gb, (uint8_t)wNumRupees);
+  CYC(b_+O(255), b_+OE(256)); A = C;
+  CALL_C(b_+O(256), getRupeeValue_hook, SYM(getRupeeValue), b_+OE(259));
+  CYC(b_+O(259), b_+OE(260)); A = E;
+  CYC(b_+O(260), b_+OE(262)); alu_cp(gb, (uint8_t)wNumRupees);
   if (!(F & FZ)) {
-    CYCT(b_+262, b_+264);
+    CYCT(b_+O(262), b_+OE(264));
   } else {
-    CYC(b_+262, b_+264);
-    CYC(b_+264, b_+266); A = 0x01;
-    CALL_C(b_+266, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+269);
+    CYC(b_+O(262), b_+OE(264));
+    CYC(b_+O(264), b_+OE(266)); A = 0x01;
+    CALL_C(b_+O(266), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+OE(269));
     if (!(F & FZ)) {
-      CYCT(b_+269, b_+271);
+      CYCT(b_+O(269), b_+OE(271));
     } else {
-      CYC(b_+269, b_+271);
-      CYC(b_+271, b_+272); H = D;
-      CYC(b_+272, b_+274); L = (uint8_t)wTotalRupeesCollected;
-      CALL_C(b_+274, addDecimalToHlRef_hook, SYM(addDecimalToHlRef), b_+277);
+      CYC(b_+O(269), b_+OE(271));
+      CYC(b_+O(271), b_+OE(272)); H = D;
+      CYC(b_+O(272), b_+OE(274)); L = (uint8_t)wTotalRupeesCollected;
+      CALL_C(b_+O(274), addDecimalToHlRef_hook, SYM(addDecimalToHlRef), b_+OE(277));
       if (!(F & FC)) {
-        CYCT(b_+277, b_+279);
+        CYCT(b_+O(277), b_+OE(279));
       } else {
-        CYC(b_+277, b_+279);
-        CYC(b_+279, b_+281); A = 0x01;
-        CALL_C(b_+281, setGlobalFlag_hook, SYM(setGlobalFlag), b_+284);
+        CYC(b_+O(277), b_+OE(279));
+        CYC(b_+O(279), b_+OE(281)); A = 0x01;
+        CALL_C(b_+O(281), setGlobalFlag_hook, SYM(setGlobalFlag), b_+OE(284));
       }
     }
   }
-  CYC(b_+284, b_+285); H = D;
-  CYC(b_+285, b_+286); L = E;
-  CALL_C(b_+286, addDecimalToHlRef_hook, SYM(addDecimalToHlRef), b_+289);
-  CYC(b_+289, b_+290); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+290, b_+291); H = mem_rd(gb, HL);
-  CYC(b_+291, b_+292); L = A;
-  CYC(b_+292, b_+295); SET_BC(0x0999);
-  CALL_C(b_+295, compareHlToBc_hook, SYM(compareHlToBc), b_+298);
-  CYC(b_+298, b_+299); A = alu_dec8(gb, A);
+  CYC(b_+O(284), b_+OE(285)); H = D;
+  CYC(b_+O(285), b_+OE(286)); L = E;
+  CALL_C(b_+O(286), addDecimalToHlRef_hook, SYM(addDecimalToHlRef), b_+OE(289));
+  CYC(b_+O(289), b_+OE(290)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(290), b_+OE(291)); H = mem_rd(gb, HL);
+  CYC(b_+O(291), b_+OE(292)); L = A;
+  CYC(b_+O(292), b_+OE(295)); SET_BC(0x0999);
+  CALL_C(b_+O(295), compareHlToBc_hook, SYM(compareHlToBc), b_+OE(298));
+  CYC(b_+O(298), b_+OE(299)); A = alu_dec8(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+299, b_+300); ret_effect(gb); return;
+    CYCT(b_+O(299), b_+OE(300)); ret_effect(gb); return;
   }
-  CYC(b_+299, b_+300);
-  CYC(b_+300, b_+301); A = C;
-  CYC(b_+301, b_+302); mem_wr(gb, DE, A);
-  CYC(b_+302, b_+303); E = alu_inc8(gb, E);
-  CYC(b_+303, b_+304); A = B;
-  CYC(b_+304, b_+305); mem_wr(gb, DE, A);
-  CYC(b_+305, b_+307); A = 0x61;
-  CYC(b_+307, b_+310); TAIL(playSound_b00);
+  CYC(b_+O(299), b_+OE(300));
+  CYC(b_+O(300), b_+OE(301)); A = C;
+  CYC(b_+O(301), b_+OE(302)); mem_wr(gb, DE, A);
+  CYC(b_+O(302), b_+OE(303)); E = alu_inc8(gb, E);
+  CYC(b_+O(303), b_+OE(304)); A = B;
+  CYC(b_+O(304), b_+OE(305)); mem_wr(gb, DE, A);
+  CYC(b_+O(305), b_+OE(307)); A = 0x61;
+  CYC(b_+O(307), b_+OE(310)); TAIL(playSound_b00);
 }
 
 void giveTreasure_body__modef_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+310, giveTreasure_body__mode4_hook, b_+198, b_+313);
-  CALL_C(b_+313, setStatusBarNeedsRefreshBit1_hook, SYM(setStatusBarNeedsRefreshBit1), b_+316);
-  CYC(b_+316, b_+319); A = W8(wSeedSatchelLevel);
-  CYC(b_+319, b_+322); SET_HL(GV(b_+328, 0x4616));
-  CYC(b_+322, b_+323); treasure_add_index_to_hl_from_rst(gb, b_+323);
-  CYC(b_+323, b_+324); A = mem_rd(gb, DE);
-  CYC(b_+324, b_+325); alu_cp(gb, mem_rd(gb, HL));
+  CALL_C(b_+O(310), giveTreasure_body__mode4_hook, b_+O(198), b_+OE(313));
+  CALL_C(b_+O(313), setStatusBarNeedsRefreshBit1_hook, SYM(setStatusBarNeedsRefreshBit1), b_+OE(316));
+  CYC(b_+O(316), b_+OE(319)); A = W8(wSeedSatchelLevel);
+  CYC(b_+O(319), b_+OE(322)); SET_HL(GV(b_+O(328), 0x4616));
+  CYC(b_+O(322), b_+OE(323)); treasure_add_index_to_hl_from_rst(gb, b_+OE(323));
+  CYC(b_+O(323), b_+OE(324)); A = mem_rd(gb, DE);
+  CYC(b_+O(324), b_+OE(325)); alu_cp(gb, mem_rd(gb, HL));
   if (F & FC) {
-    CYCT(b_+325, b_+326); ret_effect(gb); return;
+    CYCT(b_+O(325), b_+OE(326)); ret_effect(gb); return;
   }
-  CYC(b_+325, b_+326);
-  CYC(b_+326, b_+327); A = mem_rd(gb, HL);
-  CYC(b_+327, b_+328); mem_wr(gb, DE, A);
-  CYC(b_+328, b_+329); ret_effect(gb);
+  CYC(b_+O(325), b_+OE(326));
+  CYC(b_+O(326), b_+OE(327)); A = mem_rd(gb, HL);
+  CYC(b_+O(327), b_+OE(328)); mem_wr(gb, DE, A);
+  CYC(b_+O(328), b_+OE(329)); ret_effect(gb);
 }
 
 void giveTreasure_body__mode9_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+332, b_+334); C |= 0x40;
-  CALL_C(b_+334, realignUnappraisedRings_hook, SYM(realignUnappraisedRings), b_+337);
-  CYC(b_+337, b_+339); alu_cp(gb, 0x64);
+  CYC(b_+O(332), b_+OE(334)); C |= 0x40;
+  CALL_C(b_+O(334), realignUnappraisedRings_hook, SYM(realignUnappraisedRings), b_+OE(337));
+  CYC(b_+O(337), b_+OE(339)); alu_cp(gb, 0x64);
   if (F & FC) {
-    CYCT(b_+339, b_+341);
+    CYCT(b_+O(339), b_+OE(341));
   } else {
-    CYC(b_+339, b_+341);
-    CALL_C(b_+341, giveTreasure_body__removeOneDuplicateRing_hook, b_+353, b_+344);
-    CALL_C(b_+344, realignUnappraisedRings_hook, SYM(realignUnappraisedRings), b_+347);
+    CYC(b_+O(339), b_+OE(341));
+    CALL_C(b_+O(341), giveTreasure_body__removeOneDuplicateRing_hook, b_+O(353), b_+OE(344));
+    CALL_C(b_+O(344), realignUnappraisedRings_hook, SYM(realignUnappraisedRings), b_+OE(347));
   }
-  CYC(b_+347, b_+348); A = C;
-  CYC(b_+348, b_+351); mem_wr(gb, wUnappraisedRingsEnd - 1, A);
-  CYC(b_+351, b_+353); TAIL(realignUnappraisedRings);
+  CYC(b_+O(347), b_+OE(348)); A = C;
+  CYC(b_+O(348), b_+OE(351)); mem_wr(gb, wUnappraisedRingsEnd - 1, A);
+  CYC(b_+O(351), b_+OE(353)); TAIL(realignUnappraisedRings);
 }
 
 void giveTreasure_body__removeOneDuplicateRing_hook(GB *gb) {
   BASE(giveTreasure_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+353, b_+355); A = hram_rd(gb, R_SVBK);
-  CYC(b_+355, b_+356); push_effect(gb, AF);
-  CYC(b_+356, b_+358); A = 0x04;
-  CYC(b_+358, b_+360); hram_wr(gb, R_SVBK, A);
-  CYC(b_+360, b_+363); SET_HL(w4TmpRingBuffer);
-  CYC(b_+363, b_+365); B = 0x40;
-  CALL_C(b_+365, clearMemory_hook, SYM(clearMemory), b_+368);
-  CYC(b_+368, b_+371); SET_DE(wUnappraisedRings);
-  CYC(b_+371, b_+373); B = 0x40;
+  CYC(b_+O(353), b_+OE(355)); A = hram_rd(gb, R_SVBK);
+  CYC(b_+O(355), b_+OE(356)); push_effect(gb, AF);
+  CYC(b_+O(356), b_+OE(358)); A = 0x04;
+  CYC(b_+O(358), b_+OE(360)); hram_wr(gb, R_SVBK, A);
+  CYC(b_+O(360), b_+OE(363)); SET_HL(w4TmpRingBuffer);
+  CYC(b_+O(363), b_+OE(365)); B = 0x40;
+  CALL_C(b_+O(365), clearMemory_hook, SYM(clearMemory), b_+OE(368));
+  CYC(b_+O(368), b_+OE(371)); SET_DE(wUnappraisedRings);
+  CYC(b_+O(371), b_+OE(373)); B = 0x40;
   do {
-    CYC(b_+373, b_+374); A = mem_rd(gb, DE);
-    CYC(b_+374, b_+376); alu_and(gb, 0x3f);
-    CYC(b_+376, b_+379); SET_HL(w4TmpRingBuffer);
-    CYC(b_+379, b_+380); treasure_add_index_to_hl_from_rst(gb, b_+380);
-    CYC(b_+380, b_+381); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-    CYC(b_+381, b_+382); E = alu_inc8(gb, E);
-    CYC(b_+382, b_+383); B = alu_dec8(gb, B);
-    if (!(F & FZ)) CYCT(b_+383, b_+385);
-    else CYC(b_+383, b_+385);
+    CYC(b_+O(373), b_+OE(374)); A = mem_rd(gb, DE);
+    CYC(b_+O(374), b_+OE(376)); alu_and(gb, 0x3f);
+    CYC(b_+O(376), b_+OE(379)); SET_HL(w4TmpRingBuffer);
+    CYC(b_+O(379), b_+OE(380)); treasure_add_index_to_hl_from_rst(gb, b_+OE(380));
+    CYC(b_+O(380), b_+OE(381)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+    CYC(b_+O(381), b_+OE(382)); E = alu_inc8(gb, E);
+    CYC(b_+O(382), b_+OE(383)); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(b_+O(383), b_+OE(385));
+    else CYC(b_+O(383), b_+OE(385));
   } while (!(F & FZ));
-  CYC(b_+385, b_+388); SET_HL(w4TmpRingBuffer);
-  CYC(b_+388, b_+391); SET_DE(0x0000);
-  CYC(b_+391, b_+393); B = 0x40;
+  CYC(b_+O(385), b_+OE(388)); SET_HL(w4TmpRingBuffer);
+  CYC(b_+O(388), b_+OE(391)); SET_DE(0x0000);
+  CYC(b_+O(391), b_+OE(393)); B = 0x40;
   do {
-    CYC(b_+393, b_+394); A = mem_rd(gb, HL);
-    CYC(b_+394, b_+395); alu_cp(gb, D);
+    CYC(b_+O(393), b_+OE(394)); A = mem_rd(gb, HL);
+    CYC(b_+O(394), b_+OE(395)); alu_cp(gb, D);
     if (F & FC) {
-      CYCT(b_+395, b_+397);
+      CYCT(b_+O(395), b_+OE(397));
     } else {
-      CYC(b_+395, b_+397);
-      CYC(b_+397, b_+398); D = A;
-      CYC(b_+398, b_+399); E = L;
+      CYC(b_+O(395), b_+OE(397));
+      CYC(b_+O(397), b_+OE(398)); D = A;
+      CYC(b_+O(398), b_+OE(399)); E = L;
     }
-    CYC(b_+399, b_+400); L = alu_inc8(gb, L);
-    CYC(b_+400, b_+401); B = alu_dec8(gb, B);
-    if (!(F & FZ)) CYCT(b_+401, b_+403);
-    else CYC(b_+401, b_+403);
+    CYC(b_+O(399), b_+OE(400)); L = alu_inc8(gb, L);
+    CYC(b_+O(400), b_+OE(401)); B = alu_dec8(gb, B);
+    if (!(F & FZ)) CYCT(b_+O(401), b_+OE(403));
+    else CYC(b_+O(401), b_+OE(403));
   } while (!(F & FZ));
-  CYC(b_+403, b_+404); A = E;
-  CYC(b_+404, b_+406); alu_sub(gb, (uint8_t)w4TmpRingBuffer);
-  CYC(b_+406, b_+408); alu_or(gb, 0x40);
-  CYC(b_+408, b_+409); E = A;
-  CYC(b_+409, b_+410); SET_AF(pop_effect(gb));
-  CYC(b_+410, b_+412); hram_wr(gb, R_SVBK, A);
-  CYC(b_+412, b_+415); SET_HL(wUnappraisedRingsEnd - 1);
+  CYC(b_+O(403), b_+OE(404)); A = E;
+  CYC(b_+O(404), b_+OE(406)); alu_sub(gb, (uint8_t)w4TmpRingBuffer);
+  CYC(b_+O(406), b_+OE(408)); alu_or(gb, 0x40);
+  CYC(b_+O(408), b_+OE(409)); E = A;
+  CYC(b_+O(409), b_+OE(410)); SET_AF(pop_effect(gb));
+  CYC(b_+O(410), b_+OE(412)); hram_wr(gb, R_SVBK, A);
+  CYC(b_+O(412), b_+OE(415)); SET_HL(wUnappraisedRingsEnd - 1);
   do {
-    CYC(b_+415, b_+416); A = mem_rd(gb, HL); SET_HL(HL - 1);
-    CYC(b_+416, b_+417); alu_cp(gb, E);
-    if (!(F & FZ)) CYCT(b_+417, b_+419);
-    else CYC(b_+417, b_+419);
+    CYC(b_+O(415), b_+OE(416)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+    CYC(b_+O(416), b_+OE(417)); alu_cp(gb, E);
+    if (!(F & FZ)) CYCT(b_+O(417), b_+OE(419));
+    else CYC(b_+O(417), b_+OE(419));
   } while (!(F & FZ));
-  CYC(b_+419, b_+420); SET_HL(HL + 1);
-  CYC(b_+420, b_+422); mem_wr(gb, HL, 0xff);
-  CYC(b_+422, b_+423); ret_effect(gb);
+  CYC(b_+O(419), b_+OE(420)); SET_HL(HL + 1);
+  CYC(b_+O(420), b_+OE(422)); mem_wr(gb, HL, 0xff);
+  CYC(b_+O(422), b_+OE(423)); ret_effect(gb);
 }
 
 void checkIncreaseGashaMaturityForGettingTreasure_hook(GB *gb) {

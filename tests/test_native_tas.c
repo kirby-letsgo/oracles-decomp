@@ -58,7 +58,7 @@ static void native_full_tas_matches_reference(void) {
 
 // Seasons: the recorded playthrough, whole (33,337 frames), on the same binary
 static void native_seasons_play_matches_reference(void) {
-  native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", TAS_DIR "/seasons-boot.state", 67281);
+  native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", TAS_DIR "/seasons-boot.state", 87496);
 }
 
 int main(void) { RUN(native_full_tas_matches_reference); RUN(native_seasons_play_matches_reference); return 0; }

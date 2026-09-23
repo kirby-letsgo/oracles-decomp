@@ -29,6 +29,7 @@ enemyCode79
 func_5a60
 func_5c18
 functionCaller_b02
+giveTreasure_body
 initializeFile_b07
 interactionCode0f
 interactionCode60
