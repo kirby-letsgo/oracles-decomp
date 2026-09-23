@@ -13,11 +13,11 @@
 static void linked_reset_fade(GB *gb) {
   BASE(seasonsFunc_15_6334);
   CYC(b_+3, b_+4); alu_xor(gb, A);
-  CYC(b_+4, b_+7); mem_wr(gb, wPaletteThread_counterRefill + 0x02, A);
-  CYC(b_+7, b_+10); mem_wr(gb, wPaletteThread_counterRefill + 0x04, A);
+  CYC(b_+4, b_+7); mem_wr(gb, wDirtyFadeSprPalettes, A);
+  CYC(b_+7, b_+10); mem_wr(gb, wFadeSprPaletteSources, A);
   CYC(b_+10, b_+12); A = 0x7e;
-  CYC(b_+12, b_+15); mem_wr(gb, wPaletteThread_counterRefill + 0x01, A);
-  CYC(b_+15, b_+18); mem_wr(gb, wPaletteThread_counterRefill + 0x03, A);
+  CYC(b_+12, b_+15); mem_wr(gb, wDirtyFadeBgPalettes, A);
+  CYC(b_+15, b_+18); mem_wr(gb, wFadeBgPaletteSources, A);
   RET(b_+18); return;
 }
 
