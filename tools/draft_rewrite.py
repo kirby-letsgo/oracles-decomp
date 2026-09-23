@@ -186,7 +186,7 @@ def draft(name):
     for a in sorted(seen):
         op = rd(bank, a); n = seen[a]; e = a + n; x, y = a - base, e - base
         if prev_end is not None and a != prev_end: out.append('')
-        if a in labels and a != base: out.append(f'{lab(a)}:')
+        if a in labels: out.append(f'{lab(a)}:')
         prev_end = e
         cy = f'CYC(b_+{x}, b_+{y});'
         cyt = f'CYCT(b_+{x}, b_+{y});'
