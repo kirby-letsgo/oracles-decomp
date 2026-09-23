@@ -167,6 +167,7 @@ def draft(name, start=None, helper=None, pending=None):
                 ents, p = [], nxt
                 first = None
                 while p + 1 < hi and (first is None or p < first):
+                    if ents and ((bank, p) in locs or (bank, p) in name_at): break
                     t = rd(bank, p) | rd(bank, p + 1) << 8
                     if not (base <= t < hi) and (t < 0x4000 or ((bank, t) not in name_at and (bank, t) not in locs)): break
                     ents.append(t)
@@ -204,7 +205,13 @@ def draft(name, start=None, helper=None, pending=None):
                 go = tail_of(name_at[(bank if t >= 0x4000 else 0, t)])
             else:
                 l = locs.get((bank if t >= 0x4000 else 0, t))
-                go = f'/* TODO jump to {l or hex(t)} */ HANDOFF(0x{t:04x});'
+                tb2 = bank if t >= 0x4000 else 0
+                owner = max((a2 for a2 in top_addrs.get(tb2, ()) if a2 <= t), default=None)
+                if owner is not None:
+                    on = name_at[(tb2, owner)]
+                    go = f'HANDOFF(SYM({symref(on)}) + {t - owner}); /* {l or on + "+" + str(t - owner)}, interpreted */'
+                else:
+                    go = f'/* TODO jump to {hex(t)} */ HANDOFF(0x{t:04x});'
             if cond is None: return f'  {cy}\n  {go}'
             return f'  if ({cond}) {{ {cyt} {go} }}\n  {cy}'
         if op == 0x00: s = f'  {cy}'
@@ -286,7 +293,7 @@ def draft(name, start=None, helper=None, pending=None):
                     nm = name_at[(bank, t)]; f = fn_of(nm)
                     lines.append(f'    if (jt_ == SYM({symref(nm)}) && hook_is(gb, SYM({symref(nm)}), {f})) {{ {f}(gb); return; }}')
                 elif (bank, t) in locs:
-                    lines.append(f'    if (jt_ == 0x{t:04x}) {{ /* TODO {locs[(bank, t)]} */ HANDOFF(HL); }}')
+                    lines.append(f'    // {locs[(bank, t)]}: interpreted, through the HANDOFF below')
             lines.append('    HANDOFF(HL);')
             lines.append('  } while (0);')
             s = '\n'.join(lines)
