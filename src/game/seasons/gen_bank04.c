@@ -13,7 +13,7 @@ void s_applyAllTileSubstitutions(GB *gb) {
   if ((F & FZ)) { I(0x5da2, 3); goto L_5db7; } I(0x5da2, 2);  // jr z,$5db7
   I(0x5da4, 2); alu_cp(gb, 0x04);  // cp $04
   if (!(F & FC)) { I(0x5da6, 3); goto L_5dae; } I(0x5da6, 2);  // jr nc,$5dae
-  CALL(0x5da8, s_loadSubrosiaObjectGfxHeader, 0x5dbc, 0x5dab);  // call $5dbc
+  CALL(0x5da8, s_loadSubrosiaObjectGfxHeader_hook, 0x5dbc, 0x5dab);  // call $5dbc
 L_5dab:
   I(0x5dab, 4); if (hook_is(gb, 0x60ab, applyRoomSpecificTileChanges_hook)) { applyRoomSpecificTileChanges_hook(gb); return; } HANDOFF(0x60ab);  // jp $60ab
 L_5dae:
@@ -737,81 +737,6 @@ L_4736:
   RET(0x473b); return;  // ret
 }
 
-// 04:6d36
-void s_getMoblinKeepScreenIndex(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6d36, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x6d39, 2); B = 0x05;  // ld b,$05
-  I(0x6d3b, 3); SET_HL(0x6d49);  // ld hl,$6d49
-L_6d3e:
-  I(0x6d3e, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x6d3f, 3); goto L_6d47; } I(0x6d3f, 2);  // jr z,$6d47
-  I(0x6d41, 2); SET_HL(HL + 1);  // inc hl
-  I(0x6d42, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6d43, 3); goto L_6d3e; } I(0x6d43, 2);  // jr nz,$6d3e
-  I(0x6d45, 1); alu_xor(gb, A);  // xor a
-  RET(0x6d46); return;  // ret
-L_6d47:
-  I(0x6d47, 1); alu_scf(gb);  // scf
-  RET(0x6d48); return;  // ret
-}
-
-// 04:6d17
-void s_getMoblinKeepSeasonsTilesetData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_6d17;
-L_6cfa:
-  I(0x6cfa, 1); alu_xor(gb, A);  // xor a
-  I(0x6cfb, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x6cfd, 1); alu_scf(gb);  // scf
-  RET(0x6cfe); return;  // ret
-L_6d17:
-  I(0x6d17, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x6d1a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x6d1b); return; } I(0x6d1b, 2);  // ret nz
-  CALL(0x6d1c, s_getMoblinKeepScreenIndex, 0x6d36, 0x6d1f);  // call $6d36
-  if (!(F & FC)) { RET_TAKEN(0x6d1f); return; } I(0x6d1f, 2);  // ret nc
-  I(0x6d20, 2); A = 0x16;  // ld a,$16
-  CALL(0x6d22, checkGlobalFlag_hook, 0x30c7, 0x6d25);  // call $30c7
-  if ((F & FZ)) { RET_TAKEN(0x6d25); return; } I(0x6d25, 2);  // ret z
-  I(0x6d26, 4); A = mem_rd(gb, 0xc610);  // ld a,($c610)
-  I(0x6d29, 2); alu_sub(gb, 0x0a);  // sub $0a
-  I(0x6d2b, 2); alu_and(gb, 0x03);  // and $03
-  CALL(0x6d2d, multiplyABy8_hook, 0x01b7, 0x6d30);  // call $01b7
-  I(0x6d30, 3); SET_HL(0x531c);  // ld hl,$531c
-  I(0x6d33, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x6d34, 3); goto L_6cfa;  // jr $6cfa
-}
-
-// 04:6ce6
-void s_getTempleRemainsSeasonsTilesetData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6ce6, 2); A = 0x15;  // ld a,$15
-  CALL(0x6ce8, checkGlobalFlag_hook, 0x30c7, 0x6ceb);  // call $30c7
-  if ((F & FZ)) { RET_TAKEN(0x6ceb); return; } I(0x6ceb, 2);  // ret z
-  CALL(0x6cec, s_checkIsTempleRemains, 0x6cff, 0x6cef);  // call $6cff
-  if (!(F & FC)) { RET_TAKEN(0x6cef); return; } I(0x6cef, 2);  // ret nc
-  I(0x6cf0, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  CALL(0x6cf3, multiplyABy8_hook, 0x01b7, 0x6cf6);  // call $01b7
-  I(0x6cf6, 3); SET_HL(0x52fc);  // ld hl,$52fc
-  I(0x6cf9, 2); alu_add_hl(gb, BC);  // add hl,bc
-L_6cfa:
-  I(0x6cfa, 1); alu_xor(gb, A);  // xor a
-  I(0x6cfb, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x6cfd, 1); alu_scf(gb);  // scf
-  RET(0x6cfe); return;  // ret
-}
-
-// 04:6cfa
-void s_getTempleRemainsSeasonsTilesetData__returnAlteredData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6cfa:
-  I(0x6cfa, 1); alu_xor(gb, A);  // xor a
-  I(0x6cfb, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x6cfd, 1); alu_scf(gb);  // scf
-  RET(0x6cfe); return;  // ret
-}
-
 // 04:574c
 void s_initializeAnimations(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1197,22 +1122,12 @@ void s_loadGaleTreeGfx(GB *gb) {
   I(0x67a9, 4); if (hook_is(gb, 0x1646, loadTreeGfx_hook)) { loadTreeGfx_hook(gb); return; } HANDOFF(0x1646);  // jp $1646
 }
 
-// 04:5dbc
-void s_loadSubrosiaObjectGfxHeader(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5dbc, 4); A = mem_rd(gb, 0xc63a);  // ld a,($c63a)
-  I(0x5dbf, 2); alu_cp(gb, 0x01);  // cp $01
-  if (!(F & FZ)) { RET_TAKEN(0x5dc1); return; } I(0x5dc1, 2);  // ret nz
-  I(0x5dc2, 2); E = 0x06;  // ld e,$06
-  I(0x5dc4, 4); if (hook_is(gb, 0x1632, loadObjectGfxHeaderToSlot4_hook)) { loadObjectGfxHeaderToSlot4_hook(gb); return; } HANDOFF(0x1632);  // jp $1632
-}
-
 // 04:6c6d
 void s_loadTilesetData_body(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6c6d, s_getTempleRemainsSeasonsTilesetData, 0x6ce6, 0x6c70);  // call $6ce6
+  CALL(0x6c6d, s_getTempleRemainsSeasonsTilesetData_hook, 0x6ce6, 0x6c70);  // call $6ce6
   if ((F & FC)) { I(0x6c70, 3); goto L_6ca3; } I(0x6c70, 2);  // jr c,$6ca3
-  CALL(0x6c72, s_getMoblinKeepSeasonsTilesetData, 0x6d17, 0x6c75);  // call $6d17
+  CALL(0x6c72, s_getMoblinKeepSeasonsTilesetData_hook, 0x6d17, 0x6c75);  // call $6d17
   if ((F & FC)) { I(0x6c75, 3); goto L_6ca3; } I(0x6c75, 2);  // jr c,$6ca3
   I(0x6c77, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
   I(0x6c7a, 3); SET_HL(0x533c);  // ld hl,$533c

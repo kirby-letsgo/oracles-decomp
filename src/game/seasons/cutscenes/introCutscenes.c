@@ -1934,3 +1934,19 @@ void s_cutscene0eFunc7_hook(GB *gb) {
   CYC(b_+33, b_+36); mem_wr(gb, wWarpTransition2, A);
   RET(b_+36); return;
 }
+
+// The bank-3 entry of the five intro cutscenes, called from bank 0 with the index in e.
+void s_multiIntroCutsceneHandler_hook(GB *gb) {
+  BASE(multiIntroCutsceneHandler);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+1); A = E;
+  CYC(b_+1, b_+2); push_effect(gb, b_+2);
+  do { uint16_t jt_ = (intro_jump_table(gb));
+    if (jt_ == SYM(cutsceneDinDancing) && hook_is(gb, SYM(cutsceneDinDancing), s_cutsceneDinDancing_hook)) { s_cutsceneDinDancing_hook(gb); return; }
+    else if (jt_ == SYM(cutsceneDinImprisoned) && hook_is(gb, SYM(cutsceneDinImprisoned), s_cutsceneDinImprisoned_hook)) { s_cutsceneDinImprisoned_hook(gb); return; }
+    else if (jt_ == SYM(cutsceneTempleSinking) && hook_is(gb, SYM(cutsceneTempleSinking), s_cutsceneTempleSinking_hook)) { s_cutsceneTempleSinking_hook(gb); return; }
+    else if (jt_ == SYM(cutscenePregameIntro) && hook_is(gb, SYM(cutscenePregameIntro), s_cutscenePregameIntro_hook)) { s_cutscenePregameIntro_hook(gb); return; }
+    else if (jt_ == SYM(cutsceneOnoxTaunting) && hook_is(gb, SYM(cutsceneOnoxTaunting), s_cutsceneOnoxTaunting_hook)) { s_cutsceneOnoxTaunting_hook(gb); return; }
+    else { HANDOFF(HL); }
+  } while (0);
+}

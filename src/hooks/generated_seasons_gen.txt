@@ -488,7 +488,7 @@
 00:1c69 s_checkGrabbableObjects__objectLoop L
 00:1c78 s_checkGrabbableObjects__nextObject L
 00:1c81 s_checkGrabbableObjects__collision L
-00:3e07 s_checkIfHoronVillageNPCShouldBeSeen -
+00:3e07 s_checkIfHoronVillageNPCShouldBeSeen_hook -
 00:1d16 s_checkLinkCollisionsEnabled__noCarry L
 00:1cde s_checkLinkID0AndControlNormal -
 00:3ab2 s_checkRoomPackAfterWarp -
@@ -538,7 +538,7 @@
 00:203f s_getPositionOffsetForVelocity__invalid L
 00:20f1 s_getScaledPositionOffsetForVelocity__scaleComponent L
 00:29c1 s_getSimulatedInput__returnInput L
-00:3e3e s_getSunkenCityNPCVisibleSubId_caller -
+00:3e3e s_getSunkenCityNPCVisibleSubId_caller_hook -
 00:3a25 s_getTileMappingData -
 00:0265 s_hexToDec__doneHundreds L
 00:3017 s_initializeRoom -
@@ -588,8 +588,7 @@
 00:3810 s_loadUniqueGfxHeaderEntry__loadPaletteIndex L
 00:324e s_mainThreadStart__mainThread L
 00:180b s_makeActiveObjectFollowLink_b00 -
-00:35b8 s_multiIntroCutsceneCaller -
-00:35c5 s_multiIntroCutsceneCaller__afterCall35c5 L
+00:35b8 s_multiIntroCutsceneCaller_hook -
 00:2646 s_npcFaceLinkAndAnimate -
 00:1af7 s_objectAddToAButtonSensitiveObjectList__next L
 00:1b02 s_objectAddToAButtonSensitiveObjectList__foundBlankEntry L
@@ -617,7 +616,7 @@
 00:364f s_roomTileChangesAfterLoad02 -
 00:2582 s_scriptFunc_jump -
 00:257f s_scriptFunc_jump_scf -
-00:2678 s_seasonsFunc_2678 -
+00:2678 s_seasonsFunc_2678_hook -
 00:331b s_seasonsFunc_331b -
 00:3328 s_seasonsFunc_331b__afterCall3328 L
 00:332f s_seasonsFunc_332f -
@@ -641,7 +640,7 @@
 00:1883 s_textThreadStart__dontShowText L
 00:188d s_textThreadStart__showText L
 00:0d35 s_timerInterrupt__interruptEnd L
-00:3276 s_updateAnimationsAfterCutscene -
+00:3276 s_updateAnimationsAfterCutscene_hook -
 00:0aff s_updateDirtyPalettes__writePaletteRegs L
 00:2edc s_updateEnemies__label_00_348 L
 00:2edd s_updateEnemies__label_00_349 L
@@ -778,8 +777,8 @@
 09:7a99 s_func_7a99 -
 09:7a9f s_func_7a9f -
 09:7aa5 s_func_7aa5 -
-09:7cb3 s_func_7cb3 -
-09:7ccd s_func_7ccd -
+09:7cb3 s_func_7cb3_hook -
+09:7ccd s_func_7ccd_hook -
 09:6644 s_graveSecretEntrance_hook -
 09:640d s_greenJoyRing_hook -
 09:66e1 s_hardOre_hook -
@@ -1302,7 +1301,7 @@
 09:704f s_seasonsFunc_09_704f -
 09:7055 s_seasonsFunc_09_7055 -
 09:7ee2 s_seasonsFunc_09_7ee2 -
-09:7f01 s_seasonsFunc_09_7f01 -
+09:7f01 s_seasonsFunc_09_7f01_hook -
 09:7f17 s_seasonsFunc_09_7f17 -
 09:6677 s_sentBackFromOnoxCastleBarrier_hook -
 09:6632 s_setEnteredWarpSetStairsPlaySolvedSound_hook -
@@ -1345,7 +1344,7 @@
 01:5cc4 s_checkPlayRoomMusic -
 01:5ce3 s_checkPlayRoomMusic__setMusic L
 01:7dec s_checkRoomPack -
-01:7e6e s_checkRoomPackAfterWarp_body -
+01:7e6e s_checkRoomPackAfterWarp_body_hook -
 01:5efd s_checkSeedTreeRefillIndex -
 01:5f28 s_checkSeedTreeRefillIndex__addRoom L
 01:5f2b s_checkSeedTreeRefillIndex__treeScreen L
@@ -3122,7 +3121,7 @@
 03:72ba s_loadInteracIdb4_subid2And3 -
 03:72c5 s_loadInteracIdb4_subid4And5 -
 03:72d0 s_loadInteracIdb4_subid6And7 -
-03:72ff s_multiIntroCutsceneHandler -
+03:72ff s_multiIntroCutsceneHandler_hook -
 03:4091 s_oamDmaFunction -
 03:4ce9 s_runIntro__nextStage L
 03:5367 s_seasonsFunc_03_5367 -
@@ -3560,8 +3559,8 @@
 06:6d78 s_seasonsFunc_06_6d78 -
 06:6d89 s_seasonsFunc_06_6d89 -
 06:6da0 s_seasonsFunc_06_6da0 -
-06:7178 s_seasonsFunc_06_7178 -
-06:71a4 s_setRelatedObj2Animation -
+06:7178 s_seasonsFunc_06_7178_hook -
+06:71a4 s_setRelatedObj2Animation_hook -
 06:432a s_specialObjectCheckPushingAgainstTile__func_433f L
 06:4333 s_specialObjectCheckPushingAgainstTile__func L
 06:5593 s_specialObjectCode_minecart__state0_b06 L
@@ -4058,8 +4057,8 @@
 08:5e04 s_func_5e04 -
 08:5e22 s_func_5e22 -
 08:5f70 s_func_5f70 -
-08:6abc s_func_6abc -
-08:6ac1 s_func_6ac1 -
+08:6abc s_func_6abc_hook -
+08:6ac1 s_func_6ac1_hook -
 08:6bc4 s_func_6bc4 -
 08:6be9 s_func_6be9 -
 08:6c29 s_func_6c29 -
@@ -4790,10 +4789,9 @@
 04:4693 s_findWarpSourceAndDest__foundWarpSource L
 04:4730 s_getLinkWarpQuadrant__smallRoom L
 04:4736 s_getLinkWarpQuadrant__largeRoom L
-04:6d36 s_getMoblinKeepScreenIndex -
-04:6d17 s_getMoblinKeepSeasonsTilesetData -
-04:6ce6 s_getTempleRemainsSeasonsTilesetData -
-04:6cfa s_getTempleRemainsSeasonsTilesetData__returnAlteredData L
+04:6d36 s_getMoblinKeepScreenIndex_hook -
+04:6d17 s_getMoblinKeepSeasonsTilesetData_hook -
+04:6ce6 s_getTempleRemainsSeasonsTilesetData_hook -
 04:574c s_initializeAnimations -
 04:5755 s_initializeAnimations__locFunc L
 04:45f8 s_label_04_033 -
@@ -4808,7 +4806,7 @@
 04:68fc s_loadDinsTroupeTileChanges__nextAddress L
 04:690e s_loadDinsTroupeTileChanges__done L
 04:67a4 s_loadGaleTreeGfx -
-04:5dbc s_loadSubrosiaObjectGfxHeader -
+04:5dbc s_loadSubrosiaObjectGfxHeader_hook -
 04:6c6d s_loadTilesetData_body -
 04:6ca3 s_loadTilesetData_body__gotTilesetData L
 04:6cc1 s_loadTilesetData_body__copyloop L
@@ -5879,7 +5877,7 @@
 0c:61d9 s_wallmaster_state1__delete L
 0c:6229 s_wallmaster_state9__hitGround L
 02:66ab s_checkPirateShipMoved -
-02:58f0 s_checkWhetherToDisplaySeasonInSubscreen -
+02:58f0 s_checkWhetherToDisplaySeasonInSubscreen_hook -
 02:5372 s_drawTreasureExtraTiles -
 02:5383 s_drawTreasureExtraTiles__val04 L
 02:5396 s_drawTreasureExtraTiles__val01 L

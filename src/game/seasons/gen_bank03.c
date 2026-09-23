@@ -8084,17 +8084,6 @@ void s_loadInteracIdb4_subid6And7(GB *gb) {
   s_loadInteracIdb4(gb); return;  // fallthrough
 }
 
-// 03:72ff
-void s_multiIntroCutsceneHandler(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x72ff, 1); A = E;  // ld a,e
-  RST_PUSH(0x7300, 0x7301);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
 // 03:4091
 void s_oamDmaFunction(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

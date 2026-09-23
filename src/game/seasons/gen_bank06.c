@@ -1568,7 +1568,7 @@ L_6f71:
   I(0x6f71, 2); A = 0x07;  // ld a,$07
   CALL(0x6f73, specialObjectSetAnimation_hook, 0x2a51, 0x6f76);  // call $2a51
   I(0x6f76, 2); A = 0x08;  // ld a,$08
-  I(0x6f78, 4); s_setRelatedObj2Animation(gb); return;  // jp $71a4
+  I(0x6f78, 4); if (hook_is(gb, 0x71a4, s_setRelatedObj2Animation_hook)) { s_setRelatedObj2Animation_hook(gb); return; } HANDOFF(0x71a4);  // jp $71a4
 L_6f7b:
   CALL(0x6f7b, itemDecCounter1_hook, 0x2391, 0x6f7e);  // call $2391
   if (!(F & FZ)) { I(0x6f7e, 3); goto L_6f87; } I(0x6f7e, 2);  // jr nz,$6f87
@@ -1585,7 +1585,7 @@ L_6f8d:
   I(0x6f93, 2); A = 0x10;  // ld a,$10
   CALL(0x6f95, specialObjectSetAnimation_hook, 0x2a51, 0x6f98);  // call $2a51
   I(0x6f98, 2); A = 0x0d;  // ld a,$0d
-  CALL(0x6f9a, s_setRelatedObj2Animation, 0x71a4, 0x6f9d);  // call $71a4
+  CALL(0x6f9a, s_setRelatedObj2Animation_hook, 0x71a4, 0x6f9d);  // call $71a4
   I(0x6f9d, 4); if (hook_is(gb, 0x23aa, itemIncSubstate_hook)) { itemIncSubstate_hook(gb); return; } HANDOFF(0x23aa);  // jp $23aa
 L_6fa0:
   CALL(0x6fa0, itemDecCounter1_hook, 0x2391, 0x6fa3);  // call $2391
@@ -1823,7 +1823,7 @@ L_6f71:
   I(0x6f71, 2); A = 0x07;  // ld a,$07
   CALL(0x6f73, specialObjectSetAnimation_hook, 0x2a51, 0x6f76);  // call $2a51
   I(0x6f76, 2); A = 0x08;  // ld a,$08
-  I(0x6f78, 4); s_setRelatedObj2Animation(gb); return;  // jp $71a4
+  I(0x6f78, 4); if (hook_is(gb, 0x71a4, s_setRelatedObj2Animation_hook)) { s_setRelatedObj2Animation_hook(gb); return; } HANDOFF(0x71a4);  // jp $71a4
 L_6f7b:
   CALL(0x6f7b, itemDecCounter1_hook, 0x2391, 0x6f7e);  // call $2391
   if (!(F & FZ)) { I(0x6f7e, 3); goto L_6f87; } I(0x6f7e, 2);  // jr nz,$6f87
@@ -1840,7 +1840,7 @@ L_6f8d:
   I(0x6f93, 2); A = 0x10;  // ld a,$10
   CALL(0x6f95, specialObjectSetAnimation_hook, 0x2a51, 0x6f98);  // call $2a51
   I(0x6f98, 2); A = 0x0d;  // ld a,$0d
-  CALL(0x6f9a, s_setRelatedObj2Animation, 0x71a4, 0x6f9d);  // call $71a4
+  CALL(0x6f9a, s_setRelatedObj2Animation_hook, 0x71a4, 0x6f9d);  // call $71a4
   I(0x6f9d, 4); if (hook_is(gb, 0x23aa, itemIncSubstate_hook)) { itemIncSubstate_hook(gb); return; } HANDOFF(0x23aa);  // jp $23aa
 L_6fa0:
   CALL(0x6fa0, itemDecCounter1_hook, 0x2391, 0x6fa3);  // call $2391
@@ -2063,7 +2063,7 @@ L_6f71:
   I(0x6f71, 2); A = 0x07;  // ld a,$07
   CALL(0x6f73, specialObjectSetAnimation_hook, 0x2a51, 0x6f76);  // call $2a51
   I(0x6f76, 2); A = 0x08;  // ld a,$08
-  I(0x6f78, 4); s_setRelatedObj2Animation(gb); return;  // jp $71a4
+  I(0x6f78, 4); if (hook_is(gb, 0x71a4, s_setRelatedObj2Animation_hook)) { s_setRelatedObj2Animation_hook(gb); return; } HANDOFF(0x71a4);  // jp $71a4
 }
 
 // 06:6f71
@@ -2073,7 +2073,7 @@ L_6f71:
   I(0x6f71, 2); A = 0x07;  // ld a,$07
   CALL(0x6f73, specialObjectSetAnimation_hook, 0x2a51, 0x6f76);  // call $2a51
   I(0x6f76, 2); A = 0x08;  // ld a,$08
-  I(0x6f78, 4); s_setRelatedObj2Animation(gb); return;  // jp $71a4
+  I(0x6f78, 4); if (hook_is(gb, 0x71a4, s_setRelatedObj2Animation_hook)) { s_setRelatedObj2Animation_hook(gb); return; } HANDOFF(0x71a4);  // jp $71a4
 }
 
 // 06:6f7b
@@ -2084,7 +2084,7 @@ L_6f71:
   I(0x6f71, 2); A = 0x07;  // ld a,$07
   CALL(0x6f73, specialObjectSetAnimation_hook, 0x2a51, 0x6f76);  // call $2a51
   I(0x6f76, 2); A = 0x08;  // ld a,$08
-  I(0x6f78, 4); s_setRelatedObj2Animation(gb); return;  // jp $71a4
+  I(0x6f78, 4); if (hook_is(gb, 0x71a4, s_setRelatedObj2Animation_hook)) { s_setRelatedObj2Animation_hook(gb); return; } HANDOFF(0x71a4);  // jp $71a4
 L_6f7b:
   CALL(0x6f7b, itemDecCounter1_hook, 0x2391, 0x6f7e);  // call $2391
   if (!(F & FZ)) { I(0x6f7e, 3); goto L_6f87; } I(0x6f7e, 2);  // jr nz,$6f87
@@ -2114,7 +2114,7 @@ L_6f8d:
   I(0x6f93, 2); A = 0x10;  // ld a,$10
   CALL(0x6f95, specialObjectSetAnimation_hook, 0x2a51, 0x6f98);  // call $2a51
   I(0x6f98, 2); A = 0x0d;  // ld a,$0d
-  CALL(0x6f9a, s_setRelatedObj2Animation, 0x71a4, 0x6f9d);  // call $71a4
+  CALL(0x6f9a, s_setRelatedObj2Animation_hook, 0x71a4, 0x6f9d);  // call $71a4
   I(0x6f9d, 4); if (hook_is(gb, 0x23aa, itemIncSubstate_hook)) { itemIncSubstate_hook(gb); return; } HANDOFF(0x23aa);  // jp $23aa
 }
 
@@ -2510,7 +2510,7 @@ L_7125:
   I(0x7147, 2); A = 0x53;  // ld a,$53
   CALL(0x7149, playSound_b00_hook, 0x0c74, 0x714c);  // call $0c74
 L_714c:
-  CALL(0x714c, s_seasonsFunc_06_7178, 0x7178, 0x714f);  // call $7178
+  CALL(0x714c, s_seasonsFunc_06_7178_hook, 0x7178, 0x714f);  // call $7178
   if (!(F & FZ)) { RET_TAKEN(0x714f); return; } I(0x714f, 2);  // ret nz
   CALL(0x7150, itemIncSubstate_hook, 0x23aa, 0x7153);  // call $23aa
   I(0x7153, 2); L = 0x06;  // ld l,$06
@@ -2572,7 +2572,7 @@ L_7125:
   I(0x7147, 2); A = 0x53;  // ld a,$53
   CALL(0x7149, playSound_b00_hook, 0x0c74, 0x714c);  // call $0c74
 L_714c:
-  CALL(0x714c, s_seasonsFunc_06_7178, 0x7178, 0x714f);  // call $7178
+  CALL(0x714c, s_seasonsFunc_06_7178_hook, 0x7178, 0x714f);  // call $7178
   if (!(F & FZ)) { RET_TAKEN(0x714f); return; } I(0x714f, 2);  // ret nz
   CALL(0x7150, itemIncSubstate_hook, 0x23aa, 0x7153);  // call $23aa
   I(0x7153, 2); L = 0x06;  // ld l,$06
@@ -2632,7 +2632,7 @@ L_7125:
   I(0x7147, 2); A = 0x53;  // ld a,$53
   CALL(0x7149, playSound_b00_hook, 0x0c74, 0x714c);  // call $0c74
 L_714c:
-  CALL(0x714c, s_seasonsFunc_06_7178, 0x7178, 0x714f);  // call $7178
+  CALL(0x714c, s_seasonsFunc_06_7178_hook, 0x7178, 0x714f);  // call $7178
   if (!(F & FZ)) { RET_TAKEN(0x714f); return; } I(0x714f, 2);  // ret nz
   CALL(0x7150, itemIncSubstate_hook, 0x23aa, 0x7153);  // call $23aa
   I(0x7153, 2); L = 0x06;  // ld l,$06
@@ -2689,7 +2689,7 @@ L_7125:
   I(0x7147, 2); A = 0x53;  // ld a,$53
   CALL(0x7149, playSound_b00_hook, 0x0c74, 0x714c);  // call $0c74
 L_714c:
-  CALL(0x714c, s_seasonsFunc_06_7178, 0x7178, 0x714f);  // call $7178
+  CALL(0x714c, s_seasonsFunc_06_7178_hook, 0x7178, 0x714f);  // call $7178
   if (!(F & FZ)) { RET_TAKEN(0x714f); return; } I(0x714f, 2);  // ret nz
   CALL(0x7150, itemIncSubstate_hook, 0x23aa, 0x7153);  // call $23aa
   I(0x7153, 2); L = 0x06;  // ld l,$06
@@ -2738,7 +2738,7 @@ L_7125:
   I(0x7147, 2); A = 0x53;  // ld a,$53
   CALL(0x7149, playSound_b00_hook, 0x0c74, 0x714c);  // call $0c74
 L_714c:
-  CALL(0x714c, s_seasonsFunc_06_7178, 0x7178, 0x714f);  // call $7178
+  CALL(0x714c, s_seasonsFunc_06_7178_hook, 0x7178, 0x714f);  // call $7178
   if (!(F & FZ)) { RET_TAKEN(0x714f); return; } I(0x714f, 2);  // ret nz
   CALL(0x7150, itemIncSubstate_hook, 0x23aa, 0x7153);  // call $23aa
   I(0x7153, 2); L = 0x06;  // ld l,$06
@@ -2750,7 +2750,7 @@ L_714c:
 void s_linkCutscene2__substate1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_714c:
-  CALL(0x714c, s_seasonsFunc_06_7178, 0x7178, 0x714f);  // call $7178
+  CALL(0x714c, s_seasonsFunc_06_7178_hook, 0x7178, 0x714f);  // call $7178
   if (!(F & FZ)) { RET_TAKEN(0x714f); return; } I(0x714f, 2);  // ret nz
   CALL(0x7150, itemIncSubstate_hook, 0x23aa, 0x7153);  // call $23aa
   I(0x7153, 2); L = 0x06;  // ld l,$06
@@ -9749,46 +9749,6 @@ void s_seasonsFunc_06_6da0(GB *gb) {
   I(0x6da4, 2); alu_and(gb, 0x1f);  // and $1f
   I(0x6da6, 2); mem_wr(gb, DE, A);  // ld (de),a
   RET(0x6da7); return;  // ret
-}
-
-// 06:7178
-void s_seasonsFunc_06_7178(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x7178, specialObjectAnimate_hook, 0x2a36, 0x717b);  // call $2a36
-  I(0x717b, 2); C = 0x20;  // ld c,$20
-  CALL(0x717d, objectUpdateSpeedZ_paramC_hook, 0x1f04, 0x7180);  // call $1f04
-  if ((F & FZ)) { I(0x7180, 3); goto L_7195; } I(0x7180, 2);  // jr z,$7195
-  I(0x7182, 1); H = D;  // ld h,d
-  I(0x7183, 2); L = 0x15;  // ld l,$15
-  I(0x7185, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x7186, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if (!(F & FZ)) { RET_TAKEN(0x7188); return; } I(0x7188, 2);  // ret nz
-  I(0x7189, 2); alu_cp(gb, 0x03);  // cp $03
-  if ((F & FC)) { RET_TAKEN(0x718b); return; } I(0x718b, 2);  // ret c
-  I(0x718c, 2); L = 0x14;  // ld l,$14
-  I(0x718e, 1); alu_xor(gb, A);  // xor a
-  I(0x718f, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x7190, 2); A = 0x03;  // ld a,$03
-  I(0x7192, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x7193, 1); alu_or(gb, A);  // or a
-  RET(0x7194); return;  // ret
-L_7195:
-  I(0x7195, 2); A = 0x00;  // ld a,$00
-  I(0x7197, 4); if (hook_is(gb, 0x2a51, specialObjectSetAnimation_hook)) { specialObjectSetAnimation_hook(gb); return; } HANDOFF(0x2a51);  // jp $2a51
-}
-
-// 06:71a4
-void s_setRelatedObj2Animation(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x71a4, 1); B = A;  // ld b,a
-  PUSH(0x71a5, DE);  // push de
-  I(0x71a6, 2); E = 0x19;  // ld e,$19
-  I(0x71a8, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x71a9, 1); D = A;  // ld d,a
-  I(0x71aa, 1); A = B;  // ld a,b
-  CALL(0x71ab, interactionSetAnimation_hook, 0x25cb, 0x71ae);  // call $25cb
-  SET_DE(POP(0x71ae));  // pop de
-  RET(0x71af); return;  // ret
 }
 
 // 06:432a
