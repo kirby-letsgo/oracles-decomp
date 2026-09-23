@@ -1204,7 +1204,7 @@ void s_flameOfDestructionsCutsceneCaller(GB *gb) {
   I(0x3349, 2); A = 0x03;  // ld a,$03
   I(0x334b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x334d, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3350, s_flameOfDestructionCutsceneBody, 0x6dfd, 0x3353);  // call $6dfd
+  CALL(0x3350, s_flameOfDestructionCutsceneBody_hook, 0x6dfd, 0x3353);  // call $6dfd
 L_3353:
   SET_AF(POP(0x3353));  // pop af
   I(0x3354, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -4323,7 +4323,7 @@ void s_zeldaAndVillagersCutsceneCaller(GB *gb) {
   I(0x335d, 2); A = 0x03;  // ld a,$03
   I(0x335f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3361, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3364, s_zeldaAndVillagersCutsceneBody, 0x6e05, 0x3367);  // call $6e05
+  CALL(0x3364, s_zeldaAndVillagersCutsceneBody_hook, 0x6e05, 0x3367);  // call $6e05
 L_3367:
   SET_AF(POP(0x3367));  // pop af
   I(0x3368, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -4349,7 +4349,7 @@ void s_zeldaKidnappedCutsceneCaller(GB *gb) {
   I(0x3371, 2); A = 0x03;  // ld a,$03
   I(0x3373, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3375, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3378, s_zeldaKidnappedCutsceneBody, 0x6e0d, 0x337b);  // call $6e0d
+  CALL(0x3378, s_zeldaKidnappedCutsceneBody_hook, 0x6e0d, 0x337b);  // call $6e0d
 L_337b:
   SET_AF(POP(0x337b));  // pop af
   I(0x337c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
