@@ -61,6 +61,7 @@ def rank(n):
     return (r, len(n))
 
 def ram(v):
+    if 0xcfc0 < v < 0xd000: return f'wTmpcfc0 + 0x{v - 0xcfc0:02x}'
     names = ram_names.get(v, [])
     cands = [n for n in ram_sym.get(v, []) if n in names] or names
     if cands: return min(cands, key=rank)
@@ -109,7 +110,8 @@ def field(n):
     base = {0x40: 'INTERACTION_BASE', 0x80: 'ENEMY_BASE', 0xc0: 'PART_BASE'}.get(n & 0xc0)
     names = fields.get(n & 0x3f)
     if not base or not names: return f'0x{n:02x}'
-    best = min(names, key=lambda s: (2 * ('VAR' in s) + ('SCRIPT' in s or 'TEXT' in s or 'PRESSED' in s or 'COLLIDE' in s), names.index(s)))
+    var_first = base != 'INTERACTION_BASE' and (n & 0x3f) >= 0x2a
+    best = min(names, key=lambda s: ((0 if 'VAR' in s else 3) if var_first else 2 * ('VAR' in s) + ('SCRIPT' in s or 'TEXT' in s or 'PRESSED' in s or 'COLLIDE' in s), names.index(s)))
     return f'{base} + {best}'
 def r8get(i): return 'mem_rd(gb, HL)' if i == 6 else R8[i]
 def r8set(i, v): return f'mem_wr(gb, HL, {v});' if i == 6 else f'{R8[i]} = {v};'
@@ -125,13 +127,14 @@ def length(op):
               0xe6, 0xee, 0xf6, 0xfe, 0xe0, 0xf0, 0xe8, 0xf8, 0x10): return 2
     return 1
 
-def imm16_expr(bank, v, base, lo, hi):
+def imm16_expr(bank, v, base, lo, hi, guess=True):
     if v >= 0x8000 and v < 0xa000: return f'0x{v:04x}'
     if v >= 0xa000: return ram(v) if v in ram_names or (v >= 0xc000 and v < 0xe000) or v >= 0xff80 else f'0x{v:04x}'
     if lo <= v < hi: return f'b_+{v - base}'
     n = name_at.get((bank if v >= 0x4000 else 0, v))
     if n: return f'SYM({symref(n)})'
     loc = locs.get((bank if v >= 0x4000 else 0, v))
+    if not guess: return f'0x{v:04x}'
     if loc: return f'0x{v:04x} /* TODO {loc} */'
     other = [nm for (b, a), nm in name_at.items() if a == v and v >= 0x4000]
     if other: return f'0x{v:04x} /* TODO SYM of one of: {" ".join(sorted(other)[:6])} */'
@@ -165,6 +168,7 @@ def draft(name):
                 first = None
                 while p + 1 < hi and (first is None or p < first):
                     t = rd(bank, p) | rd(bank, p + 1) << 8
+                    if not (base <= t < hi) and (t < 0x4000 or ((bank, t) not in name_at and (bank, t) not in locs)): break
                     ents.append(t)
                     if base <= t < hi:
                         first = t if first is None else min(first, t)
@@ -207,7 +211,8 @@ def draft(name):
         elif hi3 == 0 and lo3 == 6: s = f'  {cy} ' + r8set(mid, field(n1) if OBJ and mid in (3, 5) and n1 >= 0x40 else f'0x{n1:02x}')
         elif hi3 == 0 and lo3 == 1 and mid % 2 == 0:
             rp = RP[mid // 2]
-            v = imm16_expr(bank, n16, base, base, hi)
+            v = imm16_expr(bank, n16, base, base, hi, guess=(rp == 'HL'))
+            if rp in ('BC', 'DE') and (v.startswith('SYM') or v.startswith('b_')): v += f' /* TODO pointer or the constant 0x{n16:04x}? */'
             s = f'  {cy} SET_{rp}({v});' if rp != 'SP' else f'  {cy} /* TODO ld sp */'
         elif hi3 == 0 and lo3 == 3:
             rp = RP[mid // 2]
@@ -271,6 +276,8 @@ def draft(name):
                 elif (bank, t) in name_at:
                     nm = name_at[(bank, t)]; f = fn_of(nm)
                     lines.append(f'    if (jt_ == SYM({symref(nm)}) && hook_is(gb, SYM({symref(nm)}), {f})) {{ {f}(gb); return; }}')
+                elif (bank, t) in locs:
+                    lines.append(f'    if (jt_ == 0x{t:04x}) {{ /* TODO {locs[(bank, t)]} */ HANDOFF(HL); }}')
             lines.append('    HANDOFF(HL);')
             lines.append('  } while (0);')
             s = '\n'.join(lines)
