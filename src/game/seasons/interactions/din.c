@@ -57,29 +57,29 @@ void s_dinState0_hook(GB *gb) {
 subid0:
   CYC(b_+33, b_+34); H = D;
   CYC(b_+34, b_+36); L = 0x4b; // Interaction.yh
-  CYC(b_+36, b_+39); mem_wr(gb, HL, 0x00);
+  CYC(b_+36, b_+38); mem_wr(gb, HL, 0x00);
+  CYC(b_+38, b_+39); L = alu_inc8(gb, L);
   CYC(b_+39, b_+40); L = alu_inc8(gb, L);
-  CYC(b_+40, b_+41); L = alu_inc8(gb, L);
-  CYC(b_+41, b_+44); mem_wr(gb, HL, 0xa0);
-  CYC(b_+44, b_+46); L = 0x66; // Interaction.collisionRadiusY
-  CYC(b_+46, b_+49); mem_wr(gb, HL, 0x20);
-  CYC(b_+49, b_+50); L = alu_inc8(gb, L);
-  CYC(b_+50, b_+53); mem_wr(gb, HL, 0x08);
-  CYC(b_+53, b_+55); L = 0x49; // Interaction.angle
-  CYC(b_+55, b_+58); mem_wr(gb, HL, 0x10);
-  CYC(b_+58, b_+60); L = 0x50; // Interaction.speed
-  CYC(b_+60, b_+63); mem_wr(gb, HL, 0x14);
-  CYC(b_+63, b_+66);
+  CYC(b_+40, b_+42); mem_wr(gb, HL, 0xa0);
+  CYC(b_+42, b_+44); L = 0x66; // Interaction.collisionRadiusY
+  CYC(b_+44, b_+46); mem_wr(gb, HL, 0x20);
+  CYC(b_+46, b_+47); L = alu_inc8(gb, L);
+  CYC(b_+47, b_+49); mem_wr(gb, HL, 0x08);
+  CYC(b_+49, b_+51); L = 0x49; // Interaction.angle
+  CYC(b_+51, b_+53); mem_wr(gb, HL, 0x10);
+  CYC(b_+53, b_+55); L = 0x50; // Interaction.speed
+  CYC(b_+55, b_+57); mem_wr(gb, HL, 0x14);
+  CYC(b_+57, b_+60);
   TAIL(setCameraFocusedObject);
 
 subid1:
   CYC(b_+60, b_+61); H = D;
   CYC(b_+61, b_+63); L = 0x4b; // Interaction.yh
-  CYC(b_+63, b_+66); mem_wr(gb, HL, 0x98);
+  CYC(b_+63, b_+65); mem_wr(gb, HL, 0x98);
+  CYC(b_+65, b_+66); L = alu_inc8(gb, L);
   CYC(b_+66, b_+67); L = alu_inc8(gb, L);
-  CYC(b_+67, b_+68); L = alu_inc8(gb, L);
-  CYC(b_+68, b_+71); mem_wr(gb, HL, 0xa0);
-  RET(b_+71); return;
+  CYC(b_+67, b_+69); mem_wr(gb, HL, 0xa0);
+  RET(b_+69); return;
 
 subid2:
   CYC(b_+70, b_+73); SET_HL(SYM(dinScript_subid2Init));
@@ -94,10 +94,10 @@ subid4:
 subid6:
   CYC(b_+82, b_+83); H = D;
   CYC(b_+83, b_+85); L = 0x4b; // Interaction.yh
-  CYC(b_+85, b_+88); mem_wr(gb, HL, 0x48);
+  CYC(b_+85, b_+87); mem_wr(gb, HL, 0x48);
+  CYC(b_+87, b_+88); L = alu_inc8(gb, L);
   CYC(b_+88, b_+89); L = alu_inc8(gb, L);
-  CYC(b_+89, b_+90); L = alu_inc8(gb, L);
-  CYC(b_+90, b_+93); mem_wr(gb, HL, 0x80);
+  CYC(b_+89, b_+91); mem_wr(gb, HL, 0x80);
 stub:
   RET(b_+91); return;
 

@@ -3509,7 +3509,7 @@ void s_seasonsFunc_331b(GB *gb) {
   I(0x331e, 2); A = 0x0f;  // ld a,$0f
   I(0x3320, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3322, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3325, s_seasonsFunc_0f_6f75, 0x6f75, 0x3328);  // call $6f75
+  CALL(0x3325, s_seasonsFunc_0f_6f75_hook, 0x6f75, 0x3328);  // call $6f75
 L_3328:
   SET_AF(POP(0x3328));  // pop af
   I(0x3329, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -3535,7 +3535,7 @@ void s_seasonsFunc_332f(GB *gb) {
   I(0x3332, 2); A = 0x0f;  // ld a,$0f
   I(0x3334, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3336, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3339, s_seasonsFunc_0f_704d, 0x704d, 0x333c);  // call $704d
+  CALL(0x3339, s_seasonsFunc_0f_704d_hook, 0x704d, 0x333c);  // call $704d
   CALL_ASM(0x333c, 0x7182, 0x333f); /* unported */  // call $7182
   SET_AF(POP(0x333f));  // pop af
   I(0x3340, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -3576,7 +3576,7 @@ L_34d5:
   I(0x34d5, 2); A = 0x0f;  // ld a,$0f
   I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159, 0x7159, 0x34df);  // call $7159
+  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
   I(0x34df, 2); A = 0x06;  // ld a,$06
   I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3592,7 +3592,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3632,7 +3632,7 @@ L_34d5:
   I(0x34d5, 2); A = 0x0f;  // ld a,$0f
   I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159, 0x7159, 0x34df);  // call $7159
+  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
   I(0x34df, 2); A = 0x06;  // ld a,$06
   I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3648,7 +3648,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3683,7 +3683,7 @@ L_34d5:
   I(0x34d5, 2); A = 0x0f;  // ld a,$0f
   I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159, 0x7159, 0x34df);  // call $7159
+  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
   I(0x34df, 2); A = 0x06;  // ld a,$06
   I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3699,7 +3699,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3729,7 +3729,7 @@ L_34d5:
   I(0x34d5, 2); A = 0x0f;  // ld a,$0f
   I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159, 0x7159, 0x34df);  // call $7159
+  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
   I(0x34df, 2); A = 0x06;  // ld a,$06
   I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3745,7 +3745,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3770,7 +3770,7 @@ L_34d5:
   I(0x34d5, 2); A = 0x0f;  // ld a,$0f
   I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159, 0x7159, 0x34df);  // call $7159
+  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
   I(0x34df, 2); A = 0x06;  // ld a,$06
   I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3786,7 +3786,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3806,7 +3806,7 @@ L_34d5:
   I(0x34d5, 2); A = 0x0f;  // ld a,$0f
   I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159, 0x7159, 0x34df);  // call $7159
+  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
   I(0x34df, 2); A = 0x06;  // ld a,$06
   I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3822,7 +3822,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3842,7 +3842,7 @@ L_34fa:
   I(0x34fa, 2); A = 0x0f;  // ld a,$0f
   I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182, 0x7182, 0x3504);  // call $7182
+  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
   I(0x3504, 2); A = 0x04;  // ld a,$04
   I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
