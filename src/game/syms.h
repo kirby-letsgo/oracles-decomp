@@ -13881,6 +13881,21 @@ enum {
   S_zeldaKidnapped_zeldaData,
   S_zeldaKidnapped_moblinData,
   S_table_65cf,
+  S_cutsceneHandler_0b,
+  S_cutsceneHandler_0b_stage0,
+  S_cutsceneHandler_0b_stage1,
+  S_seasonsFunc_03_6c5f,
+  S_cutsceneHandler_0b_stage2,
+  S_cutsceneHandler_0b_stage3,
+  S_cutsceneHandler_0b_stage4,
+  S_cutsceneHandler_0b_stage5,
+  S_seasonsFunc_03_6d8b,
+  S_seasonsFunc_03_6d9f,
+  S_seasonsFunc_03_6db1,
+  S_seasonsFunc_03_6dcb,
+  S_seasonsFunc_03_6ddf,
+  S_seasonsFunc_03_6de4,
+  S_seasonsFunc_03_6df8,
   SYM_COUNT
 };
 enum {
