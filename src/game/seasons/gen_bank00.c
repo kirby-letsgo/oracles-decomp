@@ -3928,7 +3928,7 @@ void s_setMakuTreeStageAndMapText(GB *gb) {
   I(0x3e2d, 2); A = 0x15;  // ld a,$15
   I(0x3e2f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e31, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e34, s_makuTree_setMapTextBasedOnStage, 0x60fc, 0x3e37);  // call $60fc
+  CALL(0x3e34, s_makuTree_setMapTextBasedOnStage_hook, 0x60fc, 0x3e37);  // call $60fc
   SET_AF(POP(0x3e37));  // pop af
   I(0x3e38, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e3a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
