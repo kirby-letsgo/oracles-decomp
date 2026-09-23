@@ -1024,6 +1024,7 @@
 02:5fd5 dungeonMap_drawSmallKeyCount_hook -
 02:5fe3 dungeonMap_calculateVisitedFloorsAndLinkPosition_hook -
 02:6016 mapMenu_state1_hook -
+02:609b mapGetRoomTextOrReturn_hook -
 02:612d mapMenu_loadPopupData_hook -
 02:619a getMinimapPopupType_hook -
 02:61be minimapPopupType_normal_hook -
@@ -1397,6 +1398,7 @@
 05:441e companionUpdateMovement_hook -
 05:442a companionTryToBreakTileFromMoving_hook -
 05:4439 companionCalculateAdjacentWallsBitset_hook -
+05:4471 checkCollisionForCompanion_hook -
 05:44aa specialObjectGetRelativeTileWithDirectionTable_hook -
 05:44ae specialObjectGetRelativeTileFromHl_hook -
 05:44b9 specialObjectCheckMovingAwayFromWall_hook -
@@ -1407,6 +1409,7 @@
 05:4525 companionUpdateDirectionAndAnimate_hook -
 05:453d companionUpdateDirectionAndSetAnimation_hook -
 05:4547 companionSetAnimation_hook -
+05:4552 companionTryToMount_hook -
 05:4583 setLinkMountingSpeed_hook -
 05:459f companionCheckHazards_hook -
 05:45a4 companionGotoHazardHandlingState_hook -
@@ -1423,6 +1426,7 @@
 05:485a companionSetAnimationToVar3f_hook -
 05:4865 companionFlashFromChargingAnimation_hook -
 05:4878 companionCheckMountingComplete_hook -
+05:48bb companionCheckEnableTerrainEffects_hook -
 05:48ef companionSetPriorityRelativeToLink_hook -
 05:48f8 companionDecCounter1ToJumpDownCliff_hook -
 05:4917 companionDecCounter1IfNonzero_hook -
@@ -1905,6 +1909,7 @@
 08:457e interactionCode1c_hook -
 08:479a checkReloadShopItemTiles_hook -
 08:48a5 shopkeeperState6_hook -
+08:48c8 shopkeeperState2_hook -
 08:490d shopkeeperLoadScript_hook -
 08:4915 shopkeeperPromptChestGame_hook -
 08:4993 shopkeeperState5_hook -
@@ -1920,6 +1925,7 @@
 08:4b8a shopItemState4_hook -
 08:4ba6 shopItemClearRupeeDisplay_hook -
 08:4bb8 shopItemUpdateRupeeDisplay_hook -
+08:4be0 shopItemState3_hook -
 08:4c24 shopItemGetTilesForRupeeDisplay_hook -
 08:4ca7 shopItemCheckGrabbed_hook -
 08:4d5a interactionCode4a_hook -
@@ -1965,6 +1971,7 @@
 09:47fa spinner_updateLinkPosition_hook -
 09:4813 spinner_setLinkRelativePosition_hook -
 09:4ba3 interaction7f_subid02_hook -
+09:65e5 spawnBridge_hook -
 09:6d3d companionScript_delete_hook -
 0a:41e7 interactionCode91_hook -
 0a:42a8 interactionCode98_hook -
@@ -1980,6 +1987,13 @@
 0a:433d interactionCodea0_hook -
 0a:4345 interactionCodea0__state0_hook -
 0a:4367 interactionCodea0__state1_hook -
+0a:43a0 interactionCodeac_hook -
+0a:43b9 interactionCodeac__checkUpdateState_hook -
+0a:43d9 interactionCodeac__gotoNextState_hook -
+0a:43ea interactionCodeac__need2Essences_hook -
+0a:43f2 interactionCodeac__gotoNextState_2_hook -
+0a:43f4 interactionCodeac__need4Essences_hook -
+0a:43fc interactionCodeac__need6Essences_hook -
 0a:4404 initializeChildOnGameStart_hook -
 0a:4410 decideInitialChildPersonality_hook -
 0a:4415 decideFinalChildPersonality_hook -
@@ -2883,8 +2897,11 @@
 0e:4553 enemyBoss_spawnShadow_b0f_hook -
 0e:4565 enemyBoss_initializeRoom_b0f_hook -
 0e:4571 enemyBoss_initializeRoomWithoutExtraGfx_b10_hook -
+0e:55d3 enemyCode75_hook -
 0e:564a vire_state_uninitialized_hook -
 0e:565c vire_state_stub_hook -
+0e:565d vire_mainForm_hook -
+0e:5689 vire_mainForm_state8_hook -
 0e:570b vire_mainForm_state9_hook -
 0e:573f vire_mainForm_stateA_hook -
 0e:5783 vire_mainForm_stateB_hook -
@@ -3190,6 +3207,7 @@
 10:4c69 volcanoRock_subid0_setSpeedFromAngle_hook -
 10:4c7c volcanoRock_setCollisionSize_hook -
 10:4c93 partCode12_hook -
+10:4cf4 partCode13_hook -
 10:4d76 partCode14_hook -
 10:4fbc partCode17_hook -
 10:5073 func_5010_hook -
@@ -3215,6 +3233,7 @@
 10:5541 partCode23_hook -
 10:5598 func_5535_hook -
 10:55a2 func_553f_hook -
+10:55b6 partCode27_hook -
 10:5673 partCode28_hook -
 10:571c func_56b6_hook -
 10:5733 func_56cd_hook -
@@ -3270,6 +3289,7 @@
 10:6bdd func_6e4a_hook -
 10:6be3 func_6e50_hook -
 10:6bf0 func_6e5d_hook -
+10:6ec5 kingMoblinBomb_state2_hook -
 10:6f1e kingMoblinBomb_state4_hook -
 10:6f25 kingMoblinBomb_state5_hook -
 10:6f3d kingMoblinBomb_state6_hook -

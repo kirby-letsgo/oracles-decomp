@@ -7,6 +7,7 @@ applyWarpDest
 braceletCheckBreakable
 calculateAdjacentWallsBitset
 checkAndDecKeyCount
+checkCollisionForCompanion
 checkItemUsed 7=13
 checkLinkJumpingOffCliff
 checkLinkOnGround
@@ -14,6 +15,7 @@ checkSkipPointer
 checkTileWarps
 checkUseItems_b06
 companionCheckMountingComplete
+companionTryToMount
 cutscene01
 cutscene05
 cutscene09
@@ -55,6 +57,7 @@ loadScreenMusic
 loadScreenMusicAndSetRoomPack
 loadTilesetAndRoomLayout
 loadTilesetLayout
+mapGetRoomTextOrReturn
 mapMenu_checkRoomVisited
 mapMenu_drawSpriteAtRoomIndex
 mapMenu_loadPopupData
@@ -66,14 +69,18 @@ parseGivenObjectData_b12
 parseStaticObjects
 partCode09
 partCode13
+partCode27
 rickyStateA
 screenTransitionState2
 scriptCmd_initNpcHitbox
 scriptCmd_jumpRandom
 scriptCmd_loadScript
+shopItemState3 30=37
+shopkeeperState2
 specialObjectCode_linkInCutscene_b06
 standardGameState
 updateInteraction
 updateSpecialObjects
 updateStatusBar_body
 vire_batForm_stateA
+vire_mainForm_state8

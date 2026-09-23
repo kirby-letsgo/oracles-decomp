@@ -73,11 +73,11 @@ void spawnBridge_hook(GB *gb) {
   CYC(b_+3, b_+4);
   CYC(b_+4, b_+6); mem_wr(gb, HL, 0x0c);
   CYC(b_+6, b_+8); L = 0xc7;
-  CYC(b_+8, b_+9); mem_wr(gb, HL, B);
+  CYC(b_+8, b_+9); mem_wr(gb, HL, game_seasons ? E : B);
   CYC(b_+9, b_+11); L = 0xc9;
-  CYC(b_+11, b_+12); mem_wr(gb, HL, C);
+  CYC(b_+11, b_+12); mem_wr(gb, HL, game_seasons ? B : C);
   CYC(b_+12, b_+14); L = 0xcb;
-  CYC(b_+14, b_+15); mem_wr(gb, HL, E);
+  CYC(b_+14, b_+15); mem_wr(gb, HL, game_seasons ? C : E);
   RET(b_+15);
 }
 

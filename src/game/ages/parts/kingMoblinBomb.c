@@ -169,7 +169,8 @@ void kingMoblinBomb_state2_hook(GB *gb) {
     if (target == b_+O(11)) goto justGrabbed;
     if (target == b_+O(21)) goto beingHeld;
     if (target == b_+O(28)) goto released;
-    goto atRest;
+    if (target == b_+O(59)) goto atRest;
+    hook_continue(gb, target, sp0_); return;
   }
 
 justGrabbed:

@@ -259,40 +259,46 @@ L_43b0:
 void shopItemState3_hook(GB *gb) {
   BASE(shopItemState3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); E = 0x42;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+6); SET_HL(SYM(shopItemPrices));
-  CYC(b_+6, b_+7); shopItem_addAToHl(gb, b_+7);
-  CYC(b_+7, b_+8); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CALL_C(b_+8, removeRupeeValue_hook, SYM(removeRupeeValue), b_+11);
-  CYC(b_+11, b_+13); E = 0x42;
-  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
-  CYC(b_+14, b_+17); SET_HL(SYM(shopItemTreasureToGive));
-  CYC(b_+17, b_+18); shopItem_addDoubleIndex(gb, b_+18);
-  CYC(b_+18, b_+19); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+19, b_+20); C = mem_rd(gb, HL);
-  CYC(b_+20, b_+22); alu_cp(gb, 0);
-  if (!(F & FZ)) { CYCT(b_+22, b_+24); goto L_4425; } CYC(b_+22, b_+24);
-  CALL_C(b_+24, getRandomRingOfGivenTier_hook, SYM(getRandomRingOfGivenTier), b_+27);
+  CYC(b_+O(0), b_+OE(2)); E = 0x42;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(6)); SET_HL(SYM(shopItemPrices));
+  CYC(b_+O(6), b_+OE(7)); shopItem_addAToHl(gb, b_+O(7));
+  CYC(b_+O(7), b_+OE(8)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CALL_C(b_+O(8), removeRupeeValue_hook, SYM(removeRupeeValue), b_+OE(11));
+  CYC(b_+O(11), b_+OE(13)); E = 0x42;
+  CYC(b_+O(13), b_+OE(14)); A = mem_rd(gb, DE);
+  CYC(b_+O(14), b_+OE(17)); SET_HL(SYM(shopItemTreasureToGive));
+  CYC(b_+O(17), b_+OE(18)); shopItem_addDoubleIndex(gb, b_+O(18));
+  CYC(b_+O(18), b_+OE(19)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(19), b_+OE(20)); C = mem_rd(gb, HL);
+  CYC(b_+O(20), b_+OE(22)); alu_cp(gb, 0);
+  if (!(F & FZ)) { CYCT(b_+O(22), b_+OE(24)); goto L_4425; } CYC(b_+O(22), b_+OE(24));
+  CALL_C(b_+O(24), getRandomRingOfGivenTier_hook, SYM(getRandomRingOfGivenTier), b_+OE(27));
 L_4425:
-  CALL_C(b_+27, giveTreasure_hook, SYM(giveTreasure), b_+30);
-  CYC(b_+30, b_+32); E = 0x44;
-  CYC(b_+32, b_+34); A = 5;
-  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
-  CYC(b_+35, b_+37); A = 4;
-  CYC(b_+37, b_+40); mem_wr(gb, wLinkForceState, A);
-  CYC(b_+40, b_+42); A = 1;
-  CYC(b_+42, b_+45); mem_wr(gb, wcc50, A);
-  CYC(b_+45, b_+47); E = 0x42;
-  CYC(b_+47, b_+48); A = mem_rd(gb, DE);
-  CYC(b_+48, b_+51); SET_HL(SYM(shopItemTextTable));
-  CYC(b_+51, b_+52); shopItem_addAToHl(gb, b_+52);
-  CYC(b_+52, b_+53); A = mem_rd(gb, HL);
-  CYC(b_+53, b_+54); C = A;
-  CYC(b_+54, b_+55); alu_or(gb, A);
-  CYC(b_+55, b_+57); B = 0;
-  if (!(F & FZ)) { CYCT(b_+57, b_+60); showText_hook(gb); return; } CYC(b_+57, b_+60);
-  CYC(b_+60, b_+61); ret_effect(gb);
+  CALL_C(b_+O(27), giveTreasure_hook, SYM(giveTreasure), b_+OE(30));
+  if (game_seasons) {
+    CYC(b_+S(30), b_+S(32)); E = 0x42;
+    CYC(b_+S(32), b_+S(33)); A = mem_rd(gb, DE);
+    CYC(b_+S(33), b_+S(34)); alu_or(gb, A);
+    if (F & FZ) CALL_C_CC(b_+S(34), refillSeedSatchel_hook, SYM(refillSeedSatchel), b_+S(37)); else CYC(b_+S(34), b_+S(37));
+  }
+  CYC(b_+O(30), b_+OE(32)); E = 0x44;
+  CYC(b_+O(32), b_+OE(34)); A = 5;
+  CYC(b_+O(34), b_+OE(35)); mem_wr(gb, DE, A);
+  CYC(b_+O(35), b_+OE(37)); A = 4;
+  CYC(b_+O(37), b_+OE(40)); mem_wr(gb, wLinkForceState, A);
+  CYC(b_+O(40), b_+OE(42)); A = 1;
+  CYC(b_+O(42), b_+OE(45)); mem_wr(gb, wcc50, A);
+  CYC(b_+O(45), b_+OE(47)); E = 0x42;
+  CYC(b_+O(47), b_+OE(48)); A = mem_rd(gb, DE);
+  CYC(b_+O(48), b_+OE(51)); SET_HL(SYM(shopItemTextTable));
+  CYC(b_+O(51), b_+OE(52)); shopItem_addAToHl(gb, b_+O(52));
+  CYC(b_+O(52), b_+OE(53)); A = mem_rd(gb, HL);
+  CYC(b_+O(53), b_+OE(54)); C = A;
+  CYC(b_+O(54), b_+OE(55)); alu_or(gb, A);
+  CYC(b_+O(55), b_+OE(57)); B = 0;
+  if (!(F & FZ)) { CYCT(b_+O(57), b_+OE(60)); showText_hook(gb); return; } CYC(b_+O(57), b_+OE(60));
+  CYC(b_+O(60), b_+OE(61)); ret_effect(gb);
 }
 
 void shopItemState4_hook(GB *gb) {

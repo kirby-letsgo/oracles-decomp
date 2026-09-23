@@ -101,36 +101,43 @@ L_40e9:
 void shopkeeperState2_hook(GB *gb) {
   BASE(shopkeeperState2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); E = 0x42;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+5); alu_and(gb, 0x80);
-  if (!(F & FZ)) { CYCT(b_+5, b_+7); shopkeeperPromptChestGame_hook(gb); return; } CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); A = mem_rd(gb, wLinkGrabState);
-  CYC(b_+10, b_+11); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+11, b_+13); goto L_4124; } CYC(b_+11, b_+13);
-  CYC(b_+13, b_+16); A = mem_rd(gb, (w1Link_relatedObj2 + 1));
-  CYC(b_+16, b_+17); H = A;
-  CYC(b_+17, b_+19); E = 0x7b;
-  CYC(b_+19, b_+20); mem_wr(gb, DE, A);
-  CYC(b_+20, b_+22); L = 0x42;
-  CYC(b_+22, b_+23); A = mem_rd(gb, HL);
-  CYC(b_+23, b_+25); E = 0x77;
-  CYC(b_+25, b_+26); mem_wr(gb, DE, A);
-  CALL_C(b_+26, shopkeeperGetItemPrice_hook, SYM(shopkeeperGetItemPrice), b_+29);
-  CYC(b_+29, b_+31); E = 0x77;
-  CYC(b_+31, b_+32); A = mem_rd(gb, DE);
-  CALL_C(b_+32, shopkeeperCheckLinkHasItemAlready_hook, SYM(shopkeeperCheckLinkHasItemAlready), b_+35);
-  CYC(b_+35, b_+38); SET_HL((SYM(interactionCode50__state0__substate0) + 14));
-  CYC(b_+38, b_+41); TAIL(shopkeeperLoadScript);
+  CYC(b_+O(0), b_+OE(2)); E = 0x42;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(5)); alu_and(gb, 0x80);
+  if (!(F & FZ)) { CYCT(b_+O(5), b_+OE(7)); TAIL(shopkeeperPromptChestGame); } CYC(b_+O(5), b_+OE(7));
+  if (game_seasons) {
+    CYC(b_+S(7), b_+S(9)); A = 0x05;
+    CALL_C(b_+S(9), checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+S(12));
+    CYC(b_+S(12), b_+S(15)); SET_HL(0x4986);
+    if (!(F & FC)) { CYCT(b_+S(15), b_+S(17)); TAIL(shopkeeperLoadScript); }
+    CYC(b_+S(15), b_+S(17));
+  }
+  CYC(b_+O(7), b_+OE(10)); A = mem_rd(gb, wLinkGrabState);
+  CYC(b_+O(10), b_+OE(11)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(11), b_+OE(13)); goto L_4124; } CYC(b_+O(11), b_+OE(13));
+  CYC(b_+O(13), b_+OE(16)); A = mem_rd(gb, (w1Link_relatedObj2 + 1));
+  CYC(b_+O(16), b_+OE(17)); H = A;
+  CYC(b_+O(17), b_+OE(19)); E = 0x7b;
+  CYC(b_+O(19), b_+OE(20)); mem_wr(gb, DE, A);
+  CYC(b_+O(20), b_+OE(22)); L = 0x42;
+  CYC(b_+O(22), b_+OE(23)); A = mem_rd(gb, HL);
+  CYC(b_+O(23), b_+OE(25)); E = 0x77;
+  CYC(b_+O(25), b_+OE(26)); mem_wr(gb, DE, A);
+  CALL_C(b_+O(26), shopkeeperGetItemPrice_hook, SYM(shopkeeperGetItemPrice), b_+OE(29));
+  CYC(b_+O(29), b_+OE(31)); E = 0x77;
+  CYC(b_+O(31), b_+OE(32)); A = mem_rd(gb, DE);
+  CALL_C(b_+O(32), shopkeeperCheckLinkHasItemAlready_hook, SYM(shopkeeperCheckLinkHasItemAlready), b_+OE(35));
+  CYC(b_+O(35), b_+OE(38)); SET_HL(GV((SYM(interactionCode50__state0__substate0) + 14), 0x47b8));
+  CYC(b_+O(38), b_+OE(41)); TAIL(shopkeeperLoadScript);
 L_4124:
-  CALL_C(b_+41, shopkeeperCheckAllItemsBought_hook, SYM(shopkeeperCheckAllItemsBought), b_+44);
-  if (!(F & FZ)) { CYCT(b_+44, b_+46); shopkeeperLoadScript_hook(gb); return; } CYC(b_+44, b_+46);
-  CYC(b_+46, b_+48); E = 0x42;
-  CYC(b_+48, b_+49); A = mem_rd(gb, DE);
-  CYC(b_+49, b_+51); alu_cp(gb, 2);
-  CYC(b_+51, b_+54); SET_HL((SYM(interactionCode50__state0__substate0) + 5));
-  if (!(F & FZ)) { CYCT(b_+54, b_+56); shopkeeperLoadScript_hook(gb); return; } CYC(b_+54, b_+56);
-  CYC(b_+56, b_+59); SET_HL((SYM(interactionCode50__state0__substate0) + 8));
+  CALL_C(b_+O(41), shopkeeperCheckAllItemsBought_hook, SYM(shopkeeperCheckAllItemsBought), b_+OE(44));
+  if (!(F & FZ)) { CYCT(b_+O(44), b_+OE(46)); shopkeeperLoadScript_hook(gb); return; } CYC(b_+O(44), b_+OE(46));
+  CYC(b_+O(46), b_+OE(48)); E = 0x42;
+  CYC(b_+O(48), b_+OE(49)); A = mem_rd(gb, DE);
+  CYC(b_+O(49), b_+OE(51)); alu_cp(gb, 2);
+  CYC(b_+O(51), b_+OE(54)); SET_HL(GV((SYM(interactionCode50__state0__substate0) + 5), 0x47af));
+  if (!(F & FZ)) { CYCT(b_+O(54), b_+OE(56)); shopkeeperLoadScript_hook(gb); return; } CYC(b_+O(54), b_+OE(56));
+  CYC(b_+O(56), b_+OE(59)); SET_HL(GV((SYM(interactionCode50__state0__substate0) + 8), 0x47b2));
   TAIL(shopkeeperLoadScript);
 }
 

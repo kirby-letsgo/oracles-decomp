@@ -724,6 +724,7 @@ l5a30:
 // INTERAC_COMPANION_SCRIPTS
 void interactionCode71_hook(GB *gb) {
   BASE(interactionCode71);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+O(0), b_+OE(3)); A = W8(wLinkDeathTrigger);
   CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+O(4), b_+OE(6)); goto l5915; } // jr z
@@ -751,6 +752,7 @@ l5915:
     if (target == SYM(companionScript_subid0b)) { companionScript_subid0b_hook(gb); return; }
     if (target == SYM(companionScript_subid0c)) { companionScript_subid0c_hook(gb); return; }
     if (target == SYM(companionScript_subid0d)) { companionScript_subid0d_hook(gb); return; }
-    TAIL(companionScript_subid00); // target == 0x5935
+    if (target == SYM(companionScript_subid00)) TAIL(companionScript_subid00);
+    hook_continue(gb, target, sp0_); return;
   }
 }

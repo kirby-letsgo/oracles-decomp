@@ -985,6 +985,7 @@ state1:
 // INTERAC_MISCELLANEOUS_1
 void interactionCode6b_hook(GB *gb) {
   BASE(interactionCode6b);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+O(0), b_+OE(2)); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
   {
@@ -1008,6 +1009,7 @@ void interactionCode6b_hook(GB *gb) {
     if (target == SYM(interaction6b_subid11)) { interaction6b_subid11_hook(gb); return; }
     if (target == SYM(interaction6b_subid13)) { interaction6b_subid13_hook(gb); return; } // also subid14
     if (target == SYM(interaction6b_subid15)) { interaction6b_subid15_hook(gb); return; }
-    TAIL(interaction6b_subid16); // target == 0x5233
+    if (target == SYM(interaction6b_subid16)) TAIL(interaction6b_subid16);
+    hook_continue(gb, target, sp0_); return;
   }
 }

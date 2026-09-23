@@ -62,6 +62,7 @@ collisionEffect33
 collisionEffect34
 collisionEffect35
 collisionEffect3d
+companionCheckEnableTerrainEffects
 companionCheckHopDownCliff
 companionDragToCenterOfHole
 copyFileFromHlToDe
@@ -175,6 +176,8 @@ interactionAnimate
 interactionCode10
 interactionCode1c
 interactionCode7d
+interactionCodeac
+interactionCodeac@checkUpdateState
 interactionCodeae
 interactionCodeaf
 interactionCodeb9
@@ -302,6 +305,7 @@ shopkeeperPromptChestGame
 shopkeeperState5
 sidescrollUpdateActiveTile
 spark_state9
+spawnBridge
 specialObjectCode_linkRidingAnimal
 specialObjectCode_minecart_b05
 specialObjectCode_minecart_b06

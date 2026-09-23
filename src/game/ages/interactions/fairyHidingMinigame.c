@@ -271,6 +271,7 @@ state0:
 // INTERAC_FAIRY_HIDING_MINIGAME
 void interactionCode6c_hook(GB *gb) {
   BASE(interactionCode6c);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+O(0), b_+OE(2)); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
   {
@@ -278,6 +279,7 @@ void interactionCode6c_hook(GB *gb) {
     uint16_t target = fairyHidingMinigame_jump_table(gb);
     if (target == SYM(fairyHidingMinigame_subid00)) { fairyHidingMinigame_subid00_hook(gb); return; }
     if (target == SYM(fairyHidingMinigame_subid01)) { fairyHidingMinigame_subid01_hook(gb); return; }
-    TAIL(fairyHidingMinigame_subid02); // target == 0x53a3
+    if (target == SYM(fairyHidingMinigame_subid02)) TAIL(fairyHidingMinigame_subid02);
+    hook_continue(gb, target, sp0_); return;
   }
 }

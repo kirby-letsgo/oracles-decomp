@@ -646,70 +646,78 @@ void companionCalculateAdjacentWallsBitset_hook(GB *gb) {
 void checkCollisionForCompanion_hook(GB *gb) {
   BASE(checkCollisionForCompanion);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, getTileAtPosition_hook, SYM(getTileAtPosition), b_+3);
-  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
-  CYC(b_+4, b_+6); alu_cp(gb, 0xd6);
+  CALL_C(b_+O(0), getTileAtPosition_hook, SYM(getTileAtPosition), b_+OE(3));
+  CYC(b_+O(3), b_+OE(4)); A = mem_rd(gb, HL);
+  CYC(b_+O(4), b_+OE(6)); alu_cp(gb, GV(0xd6, 0xdf));
   if (F & FZ) {
-    CYCT(b_+6, b_+8);
+    CYCT(b_+O(6), b_+OE(8));
     goto set_collision;
   }
-  CYC(b_+6, b_+8);
-  CYC(b_+8, b_+10); alu_cp(gb, 0xd5);
+  CYC(b_+O(6), b_+OE(8));
+  CYC(b_+O(8), b_+OE(10)); alu_cp(gb, GV(0xd5, 0xde));
   if (F & FZ) {
-    CYCT(b_+10, b_+12);
+    CYCT(b_+O(10), b_+OE(12));
     goto set_collision;
   }
-  CYC(b_+10, b_+12);
-  CYC(b_+12, b_+14); alu_cp(gb, 0xd4);
-  CYC(b_+14, b_+16); A = 0x03;
+  CYC(b_+O(10), b_+OE(12));
+  CYC(b_+O(12), b_+OE(14)); alu_cp(gb, GV(0xd4, 0xdd));
+  CYC(b_+O(14), b_+OE(16)); A = 0x03;
   if (F & FZ) {
-    CYCT(b_+16, b_+19);
+    CYCT(b_+O(16), b_+OE(19));
     TAIL(checkGivenCollision_allowHoles);
   }
-  CYC(b_+16, b_+19);
-  CYC(b_+19, b_+21); E = 0x01;
-  CYC(b_+21, b_+22); A = mem_rd(gb, DE);
-  CYC(b_+22, b_+24); alu_cp(gb, 0x0b);
+  CYC(b_+O(16), b_+OE(19));
+  CYC(b_+O(19), b_+OE(21)); E = 0x01;
+  CYC(b_+O(21), b_+OE(22)); A = mem_rd(gb, DE);
+  CYC(b_+O(22), b_+OE(24)); alu_cp(gb, 0x0b);
   if (!(F & FZ)) {
-    CYCT(b_+24, b_+26);
+    CYCT(b_+O(24), b_+OE(26));
     goto not_ricky;
   }
-  CYC(b_+24, b_+26);
-  CYC(b_+26, b_+28); E = 0x0f;
-  CYC(b_+28, b_+29); A = mem_rd(gb, DE);
-  CYC(b_+29, b_+31); alu_bit(gb, 7, A);
+  CYC(b_+O(24), b_+OE(26));
+  CYC(b_+O(26), b_+OE(28)); E = 0x0f;
+  CYC(b_+O(28), b_+OE(29)); A = mem_rd(gb, DE);
+  CYC(b_+O(29), b_+OE(31)); alu_bit(gb, 7, A);
   if (F & FZ) {
-    CYCT(b_+31, b_+33);
+    CYCT(b_+O(31), b_+OE(33));
     goto check_collision;
   }
-  CYC(b_+31, b_+33);
-  CYC(b_+33, b_+34); A = mem_rd(gb, HL);
-  CYC(b_+34, b_+36);
+  CYC(b_+O(31), b_+OE(33));
+  CYC(b_+O(33), b_+OE(34)); A = mem_rd(gb, HL);
+  if (game_seasons) {
+    CYC(b_+S(34), b_+S(36)); alu_cp(gb, 0xd9);
+    if (F & FZ) { CYCT(b_+S(36), b_+S(37)); ret_effect(gb); return; }
+    CYC(b_+S(36), b_+S(37));
+    CYC(b_+S(37), b_+S(39)); alu_cp(gb, 0xda);
+    if (F & FZ) { CYCT(b_+S(39), b_+S(40)); ret_effect(gb); return; }
+    CYC(b_+S(39), b_+S(40));
+  }
+  CYC(b_+O(34), b_+OE(36));
   goto check_collision;
 
 not_ricky:
-  CYC(b_+36, b_+38); alu_cp(gb, 0x0c);
+  CYC(b_+O(36), b_+OE(38)); alu_cp(gb, 0x0c);
   if (!(F & FZ)) {
-    CYCT(b_+38, b_+40);
+    CYCT(b_+O(38), b_+OE(40));
     goto check_collision;
   }
-  CYC(b_+38, b_+40);
-  CYC(b_+40, b_+41); A = mem_rd(gb, HL);
-  CYC(b_+41, b_+43); alu_cp(gb, 0xfe);
+  CYC(b_+O(38), b_+OE(40));
+  CYC(b_+O(40), b_+OE(41)); A = mem_rd(gb, HL);
+  CYC(b_+O(41), b_+OE(43)); alu_cp(gb, 0xfe);
   if (!(F & FC)) {
-    CYCT(b_+43, b_+44); ret_effect(gb); return;
+    CYCT(b_+O(43), b_+OE(44)); ret_effect(gb); return;
   }
-  CYC(b_+43, b_+44);
-  CYC(b_+44, b_+46);
+  CYC(b_+O(43), b_+OE(44));
+  CYC(b_+O(44), b_+OE(46));
   goto check_collision;
 
 set_collision:
-  CYC(b_+46, b_+47); alu_scf(gb);
-  CYC(b_+47, b_+48); ret_effect(gb);
+  CYC(b_+O(46), b_+OE(47)); alu_scf(gb);
+  CYC(b_+O(47), b_+OE(48)); ret_effect(gb);
   return;
 
 check_collision:
-  CYC(b_+48, b_+51);
+  CYC(b_+O(48), b_+OE(51));
   TAIL(checkCollisionPosition_disallowSmallBridges);
 }
 
@@ -922,64 +930,70 @@ void companionSetAnimation_hook(GB *gb) {
 void companionTryToMount_hook(GB *gb) {
   BASE(companionTryToMount);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); A = W8(wActiveTileType);
-  CYC(b_+3, b_+5); alu_cp(gb, 0x01);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wActiveTileType);
+  CYC(b_+O(3), b_+OE(5)); alu_cp(gb, 0x01);
   if (F & FZ) {
-    CYCT(b_+5, b_+7);
+    CYCT(b_+O(5), b_+OE(7));
     goto cant_mount;
   }
-  CYC(b_+5, b_+7);
-  CYC(b_+7, b_+10); A = W8(wDisallowMountingCompanion);
-  CYC(b_+10, b_+11); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(b_+11, b_+13);
-    goto cant_mount;
+  CYC(b_+O(5), b_+OE(7));
+  if (game_seasons) {
+    CALL_C(b_+S(7), checkLinkID0AndControlNormal_hook, SYM(checkLinkID0AndControlNormal), b_+S(10));
+    if (F & FC) { CYCT(b_+S(10), b_+S(12)); goto try_mounting; }
+    CYC(b_+S(10), b_+S(12));
+  } else {
+    CYC(b_+7, b_+10); A = W8(wDisallowMountingCompanion);
+    CYC(b_+10, b_+11); alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+11, b_+13);
+      goto cant_mount;
+    }
+    CYC(b_+11, b_+13);
+    CALL_C(b_+13, checkLinkVulnerableAndIDZero_hook, SYM(checkLinkVulnerableAndIDZero), b_+16);
+    if (F & FC) {
+      CYCT(b_+16, b_+18);
+      goto try_mounting;
+    }
+    CYC(b_+16, b_+18);
   }
-  CYC(b_+11, b_+13);
-  CALL_C(b_+13, checkLinkVulnerableAndIDZero_hook, SYM(checkLinkVulnerableAndIDZero), b_+16);
-  if (F & FC) {
-    CYCT(b_+16, b_+18);
-    goto try_mounting;
-  }
-  CYC(b_+16, b_+18);
 
 cant_mount:
-  CYC(b_+18, b_+19); alu_or(gb, D);
-  CYC(b_+19, b_+20); ret_effect(gb);
+  CYC(b_+O(18), b_+OE(19)); alu_or(gb, D);
+  CYC(b_+O(19), b_+OE(20)); ret_effect(gb);
   return;
 
 try_mounting:
-  CYC(b_+20, b_+23); A = W8(w1Link_state);
-  CYC(b_+23, b_+25); alu_cp(gb, 0x01);
+  CYC(b_+O(20), b_+OE(23)); A = W8(w1Link_state);
+  CYC(b_+O(23), b_+OE(25)); alu_cp(gb, 0x01);
   if (!(F & FZ)) {
-    CYCT(b_+25, b_+26); ret_effect(gb); return;
+    CYCT(b_+O(25), b_+OE(26)); ret_effect(gb); return;
   }
-  CYC(b_+25, b_+26);
-  CYC(b_+26, b_+29); A = W8(wLinkSwimmingState);
-  CYC(b_+29, b_+30); alu_or(gb, A);
+  CYC(b_+O(25), b_+OE(26));
+  CYC(b_+O(26), b_+OE(29)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(29), b_+OE(30)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+30, b_+31); ret_effect(gb); return;
+    CYCT(b_+O(30), b_+OE(31)); ret_effect(gb); return;
   }
-  CYC(b_+30, b_+31);
-  CYC(b_+31, b_+34); A = W8(wLinkGrabState);
-  CYC(b_+34, b_+35); alu_or(gb, A);
+  CYC(b_+O(30), b_+OE(31));
+  CYC(b_+O(31), b_+OE(34)); A = W8(wLinkGrabState);
+  CYC(b_+O(34), b_+OE(35)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+35, b_+36); ret_effect(gb); return;
+    CYCT(b_+O(35), b_+OE(36)); ret_effect(gb); return;
   }
-  CYC(b_+35, b_+36);
-  CYC(b_+36, b_+39); A = W8(wLinkInAir);
-  CYC(b_+39, b_+40); alu_or(gb, A);
+  CYC(b_+O(35), b_+OE(36));
+  CYC(b_+O(36), b_+OE(39)); A = W8(wLinkInAir);
+  CYC(b_+O(39), b_+OE(40)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+40, b_+41); ret_effect(gb); return;
+    CYCT(b_+O(40), b_+OE(41)); ret_effect(gb); return;
   }
-  CYC(b_+40, b_+41);
-  CYC(b_+41, b_+42); A = alu_inc8(gb, A);
-  CYC(b_+42, b_+45); W8(wDisableWarpTiles) = A;
-  CYC(b_+45, b_+48); W8(wWarpsDisabled) = A;
-  CYC(b_+48, b_+50); E = 0x04;
-  CYC(b_+50, b_+52); A = 0x03;
-  CYC(b_+52, b_+53); mem_wr(gb, DE, A);
-  CYC(b_+53, b_+55); A = 0xff;
+  CYC(b_+O(40), b_+OE(41));
+  CYC(b_+O(41), b_+OE(42)); A = alu_inc8(gb, A);
+  CYC(b_+O(42), b_+OE(45)); W8(wDisableWarpTiles) = A;
+  CYC(b_+O(45), b_+OE(48)); W8(wWarpsDisabled) = A;
+  CYC(b_+O(48), b_+OE(50)); E = 0x04;
+  CYC(b_+O(50), b_+OE(52)); A = 0x03;
+  CYC(b_+O(52), b_+OE(53)); mem_wr(gb, DE, A);
+  CYC(b_+O(53), b_+OE(55)); A = 0xff;
   TAIL(setLinkMountingSpeed);
 }
 
@@ -1767,12 +1781,42 @@ void companionCheckEnableTerrainEffects_hook(GB *gb) {
   CYC(b_+15, b_+17); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
     CYCT(b_+17, b_+19);
+    if (game_seasons) {
+      CYC(b_+S(47), b_+S(49)); L = 0x1a;
+      CYC(b_+S(49), b_+S(51)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
+      CYC(b_+S(51), b_+S(52)); ret_effect(gb);
+      return;
+    }
     goto enable_terrain_effects;
   }
   CYC(b_+17, b_+19);
   CYC(b_+19, b_+22); SET_BC(0x0500);
   CALL_C(b_+22, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+25);
   CYC(b_+25, b_+26); H = D;
+  if (game_seasons) {
+    CYC(b_+S(26), b_+S(28)); alu_cp(gb, 0xfa);
+    if (F & FZ) { CYCT(b_+S(28), b_+S(30)); goto seasons_disable; }
+    CYC(b_+S(28), b_+S(30));
+    CYC(b_+S(30), b_+S(32)); alu_cp(gb, 0xfb);
+    if (F & FZ) { CYCT(b_+S(32), b_+S(34)); goto seasons_disable; }
+    CYC(b_+S(32), b_+S(34));
+    CYC(b_+S(34), b_+S(36)); alu_cp(gb, 0xfc);
+    if (!(F & FZ)) {
+      CYCT(b_+S(36), b_+S(38));
+      CYC(b_+S(43), b_+S(45)); L = 0x0f;
+      CYC(b_+S(45), b_+S(47)); mem_wr(gb, HL, 0x00);
+      CYC(b_+S(47), b_+S(49)); L = 0x1a;
+      CYC(b_+S(49), b_+S(51)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x40);
+      CYC(b_+S(51), b_+S(52)); ret_effect(gb);
+      return;
+    }
+    CYC(b_+S(36), b_+S(38));
+seasons_disable:
+    CYC(b_+S(38), b_+S(40)); L = 0x1a;
+    CYC(b_+S(40), b_+S(42)); mem_wr(gb, HL, mem_rd(gb, HL) & 0xbf);
+    CYC(b_+S(42), b_+S(43)); ret_effect(gb);
+    return;
+  }
   CYC(b_+26, b_+28); alu_cp(gb, 0xf9);
   if (!(F & FZ)) {
     CYCT(b_+28, b_+30);

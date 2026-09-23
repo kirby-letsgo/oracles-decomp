@@ -46,3 +46,7 @@ generateRandomBuffer_b00
 getRandomPositionForEnemy_b00
 gameCompleteDialog_markGameAsComplete   # Seasons tail written out
 linkedNpc_initHighTextIndex   # Seasons body written out, falls into linkedNpc_calcLowTextIndex
+interactionCodeac   # flag number and seed-tree bit per game as GV
+interactionCodeac@checkUpdateState
+spawnBridge   # Seasons stores the registers to other fields
+companionCheckEnableTerrainEffects   # Seasons tile checks written out from +26

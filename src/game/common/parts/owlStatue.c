@@ -67,7 +67,8 @@ normalStatus:
     if (target == b_+O(34)) goto state0;
     if (target == b_+O(51)) goto stateStub;
     if (target == b_+O(52)) goto state2;
-    goto state3;
+    if (target == b_+O(103)) goto state3;
+    hook_continue(gb, target, sp0_); return;
   }
 
 state0:

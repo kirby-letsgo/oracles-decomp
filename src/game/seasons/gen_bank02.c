@@ -809,7 +809,7 @@ L_5e49:
 void s_galeSeedMenu_state1__bPressed(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5e4c:
-  CALL(0x5e4c, s_mapGetRoomTextOrReturn, 0x609b, 0x5e4f);  // call $609b
+  CALL(0x5e4c, mapGetRoomTextOrReturn_hook, 0x609b, 0x5e4f);  // call $609b
   I(0x5e4f, 2); A = 0x03;  // ld a,$03
   I(0x5e51, 2); C = 0x01;  // ld c,$01
   I(0x5e53, 3); goto L_5e60;  // jr $5e60
@@ -823,7 +823,7 @@ L_5e60:
 void s_galeSeedMenu_state1__aPressed(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5e55:
-  CALL(0x5e55, s_mapGetRoomTextOrReturn, 0x609b, 0x5e58);  // call $609b
+  CALL(0x5e55, mapGetRoomTextOrReturn_hook, 0x609b, 0x5e58);  // call $609b
   I(0x5e58, 1); A = C;  // ld a,c
   I(0x5e59, 4); mem_wr(gb, 0xcbb1, A);  // ld ($cbb1),a
   I(0x5e5c, 2); C = 0x00;  // ld c,$00
@@ -2701,32 +2701,6 @@ L_6128:
   RET(0x612c); return;  // ret
 }
 
-// 02:609b
-void s_mapGetRoomTextOrReturn(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x609b, mapMenu_checkCursorRoomVisited_hook, 0x655d, 0x609e);  // call $655d
-  if (!(F & FZ)) { I(0x609e, 3); goto L_60a2; } I(0x609e, 2);  // jr nz,$60a2
-  SET_AF(POP(0x60a0));  // pop af
-  RET(0x60a1); return;  // ret
-L_60a2:
-  I(0x60a2, 2); C = 0x80;  // ld c,$80
-  I(0x60a4, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x60a7, 1); alu_rrca(gb);  // rrca
-  if (!(F & FC)) { I(0x60a8, 3); goto L_60ac; } I(0x60a8, 2);  // jr nc,$60ac
-  I(0x60aa, 2); C = 0x40;  // ld c,$40
-L_60ac:
-  I(0x60ac, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x60af, 1); alu_cp(gb, C);  // cp c
-  I(0x60b0, 2); A = 0x03;  // ld a,$03
-  if ((F & FC)) { I(0x60b2, 3); goto L_60b5; } I(0x60b2, 2);  // jr c,$60b5
-  I(0x60b4, 1); alu_xor(gb, A);  // xor a
-L_60b5:
-  I(0x60b5, 4); mem_wr(gb, 0xcbac, A);  // ld ($cbac),a
-  I(0x60b8, 2); A = 0x09;  // ld a,$09
-  I(0x60ba, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-  s_mapGetRoomText(gb); return;  // fallthrough
-}
-
 // 02:60a2
 void s_mapGetRoomTextOrReturn__visited(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3712,7 +3686,7 @@ L_6080:
   if (!(F & FZ)) { I(0x6089, 4); if (hook_is(gb, 0x4f7b, closeMenu_hook)) { closeMenu_hook(gb); return; } HANDOFF(0x4f7b); } I(0x6089, 3);  // jp nz,$4f7b
   RET(0x608c); return;  // ret
 L_608d:
-  CALL(0x608d, s_mapGetRoomTextOrReturn, 0x609b, 0x6090);  // call $609b
+  CALL(0x608d, mapGetRoomTextOrReturn_hook, 0x609b, 0x6090);  // call $609b
   I(0x6090, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x6093, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x6094, 4); if (hook_is(gb, 0x184b, showText_hook)) { showText_hook(gb); return; } HANDOFF(0x184b);  // jp $184b
@@ -3788,7 +3762,7 @@ L_6080:
   if (!(F & FZ)) { I(0x6089, 4); if (hook_is(gb, 0x4f7b, closeMenu_hook)) { closeMenu_hook(gb); return; } HANDOFF(0x4f7b); } I(0x6089, 3);  // jp nz,$4f7b
   RET(0x608c); return;  // ret
 L_608d:
-  CALL(0x608d, s_mapGetRoomTextOrReturn, 0x609b, 0x6090);  // call $609b
+  CALL(0x608d, mapGetRoomTextOrReturn_hook, 0x609b, 0x6090);  // call $609b
   I(0x6090, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x6093, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x6094, 4); if (hook_is(gb, 0x184b, showText_hook)) { showText_hook(gb); return; } HANDOFF(0x184b);  // jp $184b
@@ -3874,7 +3848,7 @@ L_6080:
   if (!(F & FZ)) { I(0x6089, 4); if (hook_is(gb, 0x4f7b, closeMenu_hook)) { closeMenu_hook(gb); return; } HANDOFF(0x4f7b); } I(0x6089, 3);  // jp nz,$4f7b
   RET(0x608c); return;  // ret
 L_608d:
-  CALL(0x608d, s_mapGetRoomTextOrReturn, 0x609b, 0x6090);  // call $609b
+  CALL(0x608d, mapGetRoomTextOrReturn_hook, 0x609b, 0x6090);  // call $609b
   I(0x6090, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x6093, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x6094, 4); if (hook_is(gb, 0x184b, showText_hook)) { showText_hook(gb); return; } HANDOFF(0x184b);  // jp $184b
@@ -3884,7 +3858,7 @@ L_608d:
 void s_mapMenu_state1__showRoomText(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_608d:
-  CALL(0x608d, s_mapGetRoomTextOrReturn, 0x609b, 0x6090);  // call $609b
+  CALL(0x608d, mapGetRoomTextOrReturn_hook, 0x609b, 0x6090);  // call $609b
   I(0x6090, 3); SET_HL(0xcbce);  // ld hl,$cbce
   I(0x6093, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
   I(0x6094, 4); if (hook_is(gb, 0x184b, showText_hook)) { showText_hook(gb); return; } HANDOFF(0x184b);  // jp $184b

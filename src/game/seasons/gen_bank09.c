@@ -21946,22 +21946,6 @@ void s_seasonsFunc_09_7f17(GB *gb) {
   RET(0x7f27); return;  // ret
 }
 
-// 09:65e5
-void s_spawnBridge(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_65e5:
-  CALL(0x65e5, getFreePartSlot_hook, 0x3ea7, 0x65e8);  // call $3ea7
-  if (!(F & FZ)) { RET_TAKEN(0x65e8); return; } I(0x65e8, 2);  // ret nz
-  I(0x65e9, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
-  I(0x65eb, 2); L = 0xc7;  // ld l,$c7
-  I(0x65ed, 2); mem_wr(gb, HL, E);  // ld (hl),e
-  I(0x65ee, 2); L = 0xc9;  // ld l,$c9
-  I(0x65f0, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x65f1, 2); L = 0xcb;  // ld l,$cb
-  I(0x65f3, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  RET(0x65f4); return;  // ret
-}
-
 // 09:699c
 void s_spawnHider(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

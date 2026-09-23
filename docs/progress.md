@@ -448,6 +448,21 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-24: DIFFERENT batch 6, gated by `--verify-shadow`: checkCollisionForCompanion,
+  companionTryToMount, companionCheckEnableTerrainEffects, interactionCodeac (Bipin & Blossom
+  spawner), mapGetRoomTextOrReturn, shopItemState3 (anchor 30=37), shopkeeperState2, spawnBridge,
+  vire_mainForm_state8, partCode27. Seven jump-table chains had no interpreter fallback, so
+  seasons_hooks silently left them out of the Seasons table (interactionCodeac, partCode13,
+  partCode27, kingMoblinBomb_state2, interactionCode6b/6c/71); interactionCodeac's chain also
+  returned on an unknown state. All now end in `hook_continue(gb, target, sp0_)`. Shared Seasons
+  hooks 3,667 -> 3,687. Gates: shadow verify 0 mismatches on both movies with --ref-check
+  (13.5M Seasons, 45.8M Ages calls), ctest 10/10, native both, lint and audits 0.
+
+- 2026-09-23 (night): merged Fable's Seasons milestone 3 batches 4f-5a (`2aab5e6`..`51ce426`,
+  merge `269e4e2`): 493 of 1,279 Seasons-only routines now hand-written, scriptHelper.s done.
+  Clean merge; regenerated. First shadow verify of the hand-written Seasons code: 0 mismatches
+  over 13.5M calls on the 87k playthrough, reference matched; ctest 10/10, native both, audits 0.
+
 - 2026-09-23 (later): `--verify-shadow`, a verify gate that can be trusted. The old
   `--verify-hooks-continue` held interrupts for the length of every hook, so the Seasons
   playthrough desynced at ~30k frames (it never reached room 04; every VERIFY_ALL pass since has

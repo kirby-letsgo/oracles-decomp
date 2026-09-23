@@ -186,10 +186,10 @@ void interactionCodeac__gotoNextState_2_hook(GB *gb) {
 void interactionCodeac__need4Essences_hook(GB *gb) { bipin_need_essences(gb, SYM(interactionCodeac__need4Essences), 4); }
 void interactionCodeac__need6Essences_hook(GB *gb) { bipin_need_essences(gb, SYM(interactionCodeac__need6Essences), 6); }
 
-static void bipin_check_update_state(GB *gb) {
+static void bipin_check_update_state(GB *gb, uint16_t sp0_) {
   BASE(interactionCodeac);
   CYC(b_+25, b_+28); A = mem_rd(gb, wSeedTreeRefilledBitset);
-  CYC(b_+28, b_+30); alu_bit(gb, 1, A);
+  CYC(b_+28, b_+30); alu_bit(gb, GV(1, 0), A);
   if (F & FZ) {
     CYCT(b_+30, b_+31); ret_effect(gb);
     return;
@@ -205,12 +205,12 @@ static void bipin_check_update_state(GB *gb) {
     else if (jt_ == b_+82) { interactionCodeac__gotoNextState_2_hook(gb); return; }
     else if (jt_ == b_+84) { interactionCodeac__need4Essences_hook(gb); return; }
     else if (jt_ == b_+92) { interactionCodeac__need6Essences_hook(gb); return; }
-    else { return; }
+    else { hook_continue(gb, jt_, sp0_); return; }
   } while (0);
 }
 
 void interactionCodeac__checkUpdateState_hook(GB *gb) {
-  bipin_check_update_state(gb);
+  bipin_check_update_state(gb, gb->sp);
 }
 
 void spawnBipinBlossomFamilyObjects_hook(GB *gb) {
@@ -280,7 +280,7 @@ void spawnBipinBlossomFamilyObjects_hook(GB *gb) {
 void interactionCodeac_hook(GB *gb) {
   BASE(interactionCodeac);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); A = 0x14;
+  CYC(b_+0, b_+2); A = GV(0x14, 0x28);
   CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+8); interactionDelete_hook(gb);
@@ -289,9 +289,9 @@ void interactionCodeac_hook(GB *gb) {
   CYC(b_+5, b_+8);
   CALL_C(b_+8, childSetVar38ToNumEssencesObtained_hook, SYM(childSetVar38ToNumEssencesObtained), b_+11);
   CYC(b_+11, b_+14); push_effect(gb, b_+14);
-  bipin_check_update_state(gb);
+  bipin_check_update_state(gb, gb->sp);
   CALL_C(b_+14, spawnBipinBlossomFamilyObjects_hook, SYM(spawnBipinBlossomFamilyObjects), b_+17);
   CYC(b_+17, b_+20); SET_HL(wSeedTreeRefilledBitset);
-  CYC(b_+20, b_+22); mem_wr(gb, HL, mem_rd(gb, HL) & ~0x02);
+  CYC(b_+20, b_+22); mem_wr(gb, HL, mem_rd(gb, HL) & ~GV(0x02, 0x01));
   CYC(b_+22, b_+25); TAIL(interactionDelete);
 }

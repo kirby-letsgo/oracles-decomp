@@ -1299,7 +1299,6 @@
 09:6632 s_setEnteredWarpSetStairsPlaySolvedSound_hook -
 09:66aa s_sidescrollingStaticGashaSeed_hook -
 09:66b0 s_sidescrollingStaticSeedSatchel_hook -
-09:65e5 s_spawnBridge -
 09:699c s_spawnHider -
 09:4820 s_spinner_setLinkRelativePosition__func L
 09:47c7 s_spinner_subid02__state0 L
@@ -1621,7 +1620,6 @@
 10:433d s_itemDrop_spawnEnemy__delete L
 10:6f9b s_kingMoblinBomb_playSound -
 10:6eaf s_kingMoblinBomb_state0 -
-10:6ec5 s_kingMoblinBomb_state2 -
 10:6ed0 s_kingMoblinBomb_state2__justGrabbed L
 10:6eda s_kingMoblinBomb_state2__beingHeld L
 10:6ee1 s_kingMoblinBomb_state2__released L
@@ -1766,7 +1764,6 @@
 10:4c9a s_partCode12__state1 L
 10:4cd3 s_partCode12__delete L
 10:4cd6 s_partCode12__state0 L
-10:4cf4 s_partCode13 -
 10:4d0a s_partCode13__normalStatus L
 10:4d16 s_partCode13__state0 L
 10:4d27 s_partCode13__stateStub L
@@ -1867,7 +1864,6 @@
 10:66a4 s_partCode26__state1 L
 10:66bd s_partCode26__func_66bd L
 10:66d5 s_partCode26__state2 L
-10:55b6 s_partCode27 -
 10:55c0 s_partCode27__state0 L
 10:55e3 s_partCode27__state1 L
 10:55f1 s_partCode27__state2 L
@@ -2329,7 +2325,6 @@
 0e:51b6 s_enemyCode74__state0 L
 0e:51c5 s_enemyCode74__state1 L
 0e:51e7 s_enemyCode74__stateStub L
-0e:55d3 s_enemyCode75 -
 0e:55f8 s_enemyCode75__dead L
 0e:560d s_enemyCode75__subid0Dead L
 0e:5629 s_enemyCode75__normalStatus L
@@ -2731,11 +2726,9 @@
 0e:540f s_sygerSubId01__var35_02__substate4 L
 0e:541f s_sygerSubId01__var35_02__substate5 L
 0e:5a92 s_vire_batForm_stateC__notReachedPosition L
-0e:565d s_vire_mainForm -
 0e:5673 s_vire_mainForm__runState L
 0e:5b57 s_vire_mainForm_circleAroundScreen__setAngleAndSpeed L
 0e:5b64 s_vire_mainForm_circleAroundScreen__offsetAngle L
-0e:5689 s_vire_mainForm_state8 -
 0e:5694 s_vire_mainForm_state8__substate0 L
 0e:56c2 s_vire_mainForm_state8__substate1 L
 0e:56d4 s_vire_mainForm_state8__substate2 L
@@ -3544,7 +3537,6 @@
 06:4844 s_updateParentItemButtonAssignment_body__itemLoop L
 05:50a5 s_bounceLinkOffTrampolineAfterFalling -
 05:5d96 s_calculateAdjacentWallsBitset__loop L
-05:4471 s_checkCollisionForCompanion -
 05:449b s_checkCollisionForCompanion__notRicky L
 05:44a5 s_checkCollisionForCompanion__setCollision L
 05:44a7 s_checkCollisionForCompanion__checkCollision L
@@ -3553,7 +3545,6 @@
 05:5e74 s_checkLinkPushingAgainstTreeStump_hook -
 05:47fd s_companionCheckCanSpawn -
 05:482c s_companionCheckCanSpawn__canSpawn L
-05:48bb s_companionCheckEnableTerrainEffects -
 05:48e6 s_companionCheckEnableTerrainEffects__label_05_067 L
 05:48ea s_companionCheckEnableTerrainEffects__enableTerrainEffects L
 05:474c s_companionCheckHopDownCliff__vineTop L
@@ -3576,7 +3567,6 @@
 05:46f2 s_companionRespawn__applyDamageAndSetState L
 05:4706 s_companionRespawn__setState L
 05:4858 s_companionRetIfInactiveWithoutStateCheck__ret L
-05:4552 s_companionTryToMount -
 05:455e s_companionTryToMount__cantMount L
 05:4560 s_companionTryToMount__tryMounting L
 05:76c5 s_dimitriCheckAddToGrabbableObjectBuffer__ret L
@@ -4659,9 +4649,6 @@
 08:4b4f s_shopItemState0__afterCall4b4f L
 08:4b79 s_shopItemState2__substate0 L
 08:4b86 s_shopItemState2__substate1 L
-08:4be0 s_shopItemState3 -
-08:4bfe s_shopItemState3__afterCall4bfe L
-08:4c05 s_shopItemState3__afterCall4c05 L
 08:4bca s_shopItemUpdateRupeeDisplay__nextTile L
 08:4aa0 s_shopkeeperCheckAllItemsBought__next L
 08:4a81 s_shopkeeperCheckLinkHasItemAlready__cantSell L
@@ -4675,7 +4662,6 @@
 08:487f s_shopkeeperState1__setNormalCollisionRadii L
 08:4885 s_shopkeeperState1__pressedA L
 08:4898 s_shopkeeperState1__goToState6 L
-08:48c8 s_shopkeeperState2 -
 08:48fb s_shopkeeperState2__holdingNothing L
 08:491f s_shopkeeperState3 -
 08:4925 s_shopkeeperState4 -
@@ -5929,7 +5915,6 @@
 02:6108 s_mapGetRoomText__specialCode3 L
 02:6111 s_mapGetRoomText__specialCode4 L
 02:611a s_mapGetRoomText__checkDungeonEntered L
-02:609b s_mapGetRoomTextOrReturn -
 02:60a2 s_mapGetRoomTextOrReturn__visited L
 02:6670 s_mapMenu_clearUnvisitedTiles -
 02:6688 s_mapMenu_clearUnvisitedTiles__rowLoop L
@@ -6424,14 +6409,6 @@
 0a:69ba s_interactionCodeab__subid2 L
 0a:69cd s_interactionCodeab__state1 L
 0a:69d0 s_interactionCodeab__afterCall69d0 L
-0a:43a0 s_interactionCodeac -
-0a:43ae s_interactionCodeac__afterCall43ae L
-0a:43b9 s_interactionCodeac__checkUpdateState L
-0a:43d9 s_interactionCodeac__gotoNextState L
-0a:43ea s_interactionCodeac__need2Essences L
-0a:43f2 s_interactionCodeac__gotoNextState_2 L
-0a:43f4 s_interactionCodeac__need4Essences L
-0a:43fc s_interactionCodeac__need6Essences L
 0a:6a39 s_interactionCodead -
 0a:6a41 s_interactionCodead__state0 L
 0a:6a47 s_interactionCodead__afterCall6a47 L

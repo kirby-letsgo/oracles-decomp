@@ -3177,26 +3177,32 @@ show_room_text:
 void mapGetRoomTextOrReturn_hook(GB *gb) {
   BASE(mapGetRoomTextOrReturn);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, mapMenu_checkCursorRoomVisited_hook, SYM(mapMenu_checkCursorRoomVisited), b_+3);
-  if (!(F & FZ)) CYCT(b_+3, b_+5);
+  CALL_C(b_+O(0), mapMenu_checkCursorRoomVisited_hook, SYM(mapMenu_checkCursorRoomVisited), b_+OE(3));
+  if (!(F & FZ)) CYCT(b_+O(3), b_+OE(5));
   else {
-    CYC(b_+3, b_+5);
-    CYC(b_+5, b_+6); SET_AF(pop_effect(gb));
-    CYC(b_+6, b_+7); ret_effect(gb);
+    CYC(b_+O(3), b_+OE(5));
+    CYC(b_+O(5), b_+OE(6)); SET_AF(pop_effect(gb));
+    CYC(b_+O(6), b_+OE(7)); ret_effect(gb);
     return;
   }
-  CYC(b_+7, b_+9); C = 0x80;
-  CYC(b_+9, b_+12); A = W8(wMapMenu_cursorIndex);
-  CYC(b_+12, b_+13); alu_cp(gb, C);
-  CYC(b_+13, b_+15); A = 0x03;
-  if (F & FC) CYCT(b_+15, b_+17);
-  else {
-    CYC(b_+15, b_+17);
-    CYC(b_+17, b_+18); alu_xor(gb, A);
+  CYC(b_+O(7), b_+OE(9)); C = GV(0x80, 0x40);
+  if (game_seasons) {
+    CYC(b_+S(9), b_+S(12)); A = W8(wMapMenu_mode);
+    CYC(b_+S(12), b_+S(13)); alu_rrca(gb);
+    if (!(F & FC)) CYCT(b_+S(13), b_+S(15));
+    else { CYC(b_+S(13), b_+S(15)); CYC(b_+S(15), b_+S(17)); C = 0x40; }
   }
-  CYC(b_+18, b_+21); W8(wTextboxPosition) = A;
-  CYC(b_+21, b_+23); A = 0x09;
-  CYC(b_+23, b_+26); W8(wTextboxFlags) = A;
+  CYC(b_+O(9), b_+OE(12)); A = W8(wMapMenu_cursorIndex);
+  CYC(b_+O(12), b_+OE(13)); alu_cp(gb, C);
+  CYC(b_+O(13), b_+OE(15)); A = 0x03;
+  if (F & FC) CYCT(b_+O(15), b_+OE(17));
+  else {
+    CYC(b_+O(15), b_+OE(17));
+    CYC(b_+O(17), b_+OE(18)); alu_xor(gb, A);
+  }
+  CYC(b_+O(18), b_+OE(21)); W8(wTextboxPosition) = A;
+  CYC(b_+O(21), b_+OE(23)); A = 0x09;
+  CYC(b_+O(23), b_+OE(26)); W8(wTextboxFlags) = A;
   TAIL(mapGetRoomText);
 }
 
