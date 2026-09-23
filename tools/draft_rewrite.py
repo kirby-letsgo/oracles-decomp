@@ -269,8 +269,13 @@ def draft(name, start=None, helper=None, pending=None):
             t = n16; tb = bank if t >= 0x4000 else 0
             if base <= t < hi:
                 callee, target, local = f'{PREFIX}_{lab(t)}', None, True
-                if pending is not None: pending.setdefault(t, callee)
+                if pending is not None: pending.setdefault(t, (name, callee))
             elif (tb, t) in name_at: nm = name_at[(tb, t)]; callee, target, local = fn_of(nm), f'SYM({symref(nm)})', False
+            elif (tb, t) in locs and tb == bank:
+                owner = max(a2 for a2 in top_addrs[bank] if a2 <= t)
+                on = name_at[(bank, owner)]
+                callee, target, local = f'{PREFIX}_{on}_{locs[(tb, t)].split("@")[-1]}', None, True
+                if pending is not None: pending.setdefault(t, (on, callee))
             else: callee, target, local = f'TODO_{locs.get((tb, t), hex(t))}', f'0x{t:04x}', False
             if op == 0xcd:
                 s = f'  CALL_L(b_+{x}, {callee}, b_+{y});' if local else f'  CALL_C(b_+{x}, {callee}, {target}, b_+{y});'
@@ -306,12 +311,13 @@ def draft(name, start=None, helper=None, pending=None):
     out.append('}')
     return '\n'.join(out)
 
+pending, done = {}, set()
 for n in args:
-    pending, done, helpers = {}, set(), []
+    helpers = []
     main = draft(n, pending=pending)
     while set(pending) - done:
         t = min(set(pending) - done); done.add(t)
-        helpers.append(draft(n, start=t, helper=pending[t], pending=pending))
+        helpers.append(draft(pending[t][0], start=t, helper=pending[t][1], pending=pending))
     for h in reversed(helpers): print(h); print()
     print(main); print()
 missing = sorted(x for x in needed if not re.search(rf'^{re.escape(x)} ', open('src/hooks/syms_used.txt').read(), re.M))
