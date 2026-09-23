@@ -105,8 +105,10 @@ static uint8_t key_bit(SDL_Scancode sc) {
   case SDL_SCANCODE_RIGHT: return JOY_RIGHT;
   case SDL_SCANCODE_X: return JOY_A;
   case SDL_SCANCODE_Z: return JOY_B;
-  case SDL_SCANCODE_RETURN: return JOY_START;
-  case SDL_SCANCODE_RSHIFT: return JOY_SELECT;
+  case SDL_SCANCODE_RETURN:
+  case SDL_SCANCODE_ESCAPE: return JOY_START;
+  case SDL_SCANCODE_RSHIFT:
+  case SDL_SCANCODE_BACKSPACE: return JOY_SELECT;
   default: return 0;
   }
 }
@@ -166,13 +168,17 @@ int main(int argc, char **argv) {
   bool running = true;
   gb->input_at = live_input;
   uint64_t frames = 0;
+  bool muted = false;
   while (running) {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       switch (ev.type) {
       case SDL_EVENT_QUIT: running = false; break;
       case SDL_EVENT_KEY_DOWN:
-        if (ev.key.scancode == SDL_SCANCODE_ESCAPE) running = false;
+        if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
+          muted = !muted;
+          if (audio) SDL_SetAudioStreamGain(audio, muted ? 0.0f : 1.0f);
+        }
         else if (ev.key.scancode == SDL_SCANCODE_F12) {
           char path[256];
           snprintf(path, sizeof path, "out/screenshot_%llu.png", (unsigned long long)frames);
