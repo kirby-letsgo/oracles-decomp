@@ -140,11 +140,12 @@ def imm16_expr(bank, v, base, lo, hi, guess=True):
     if other: return f'0x{v:04x} /* TODO SYM of one of: {" ".join(sorted(other)[:6])} */'
     return f'0x{v:04x}'
 
-def draft(name):
+def draft(name, start=None, helper=None, pending=None):
     bank, base = tops[name]
     later = sorted(a for a in top_addrs.get(bank if base >= 0x4000 else 0, set()) if a > base)
     hi = later[0] if later else base + 0x400
-    seen, work, tables = {}, [base], {}
+    entry = base if start is None else start
+    seen, work, tables = {}, [entry], {}
     labels = set()
     while work:
         a = work.pop()
@@ -160,8 +161,7 @@ def draft(name):
                 if base <= t < hi and t not in name_at: labels.add(t); work.append(t)
                 if op == 0xc3: break
             elif op in (0xc4, 0xcc, 0xd4, 0xdc, 0xcd):
-                t = rd(bank, a + 1) | rd(bank, a + 2) << 8
-                if base <= t < hi: labels.add(t); work.append(t)
+                pass
             elif op in (0xc9, 0xd9, 0xe9): break
             elif op == 0xc7:
                 ents, p = [], nxt
@@ -178,7 +178,10 @@ def draft(name):
                 tables[a] = ents
                 break
             a = nxt
-    out = [f'void s_{name}_hook(GB *gb) {{', f'  BASE({symref(name)});', '  uint16_t sp0_ = gb->sp; (void)sp0_;']
+    if helper:
+        out = [f'// {locs.get((bank, entry), hex(entry))}', f'static void {helper}(GB *gb) {{', f'  BASE({symref(name)});', '  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;']
+    else:
+        out = [f'void s_{name}_hook(GB *gb) {{', f'  BASE({symref(name)});', '  uint16_t sp0_ = gb->sp; (void)sp0_;']
     def lab(t):
         l = locs.get((bank, t))
         return (l.split('@', 1)[1] if l else f'L_{t:04x}').replace('@', '_')
@@ -212,7 +215,11 @@ def draft(name):
         elif hi3 == 0 and lo3 == 1 and mid % 2 == 0:
             rp = RP[mid // 2]
             v = imm16_expr(bank, n16, base, base, hi, guess=(rp == 'HL'))
-            if rp in ('BC', 'DE') and (v.startswith('SYM') or v.startswith('b_')): v += f' /* TODO pointer or the constant 0x{n16:04x}? */'
+            if rp in ('BC', 'DE') and v.startswith('b_'):
+                loc = locs.get((bank, n16))
+                v += f' /* @{loc.split("@", 1)[1]} */' if loc else f' /* TODO pointer or the constant 0x{n16:04x}? */'
+            elif rp == 'HL' and v.startswith('b_') and locs.get((bank, n16)):
+                v += f' /* @{locs[(bank, n16)].split("@", 1)[1]} */'
             s = f'  {cy} SET_{rp}({v});' if rp != 'SP' else f'  {cy} /* TODO ld sp */'
         elif hi3 == 0 and lo3 == 3:
             rp = RP[mid // 2]
@@ -253,7 +260,9 @@ def draft(name):
         elif op in (0xc2, 0xca, 0xd2, 0xda): s = jump(n16, CC[(op >> 3) & 3])
         elif op in (0xcd, 0xc4, 0xcc, 0xd4, 0xdc):
             t = n16; tb = bank if t >= 0x4000 else 0
-            if base <= t < hi: callee, target, local = f'TODO_local_{lab(t)}', None, True
+            if base <= t < hi:
+                callee, target, local = f'{PREFIX}_{lab(t)}', None, True
+                if pending is not None: pending.setdefault(t, callee)
             elif (tb, t) in name_at: nm = name_at[(tb, t)]; callee, target, local = fn_of(nm), f'SYM({symref(nm)})', False
             else: callee, target, local = f'TODO_{locs.get((tb, t), hex(t))}', f'0x{t:04x}', False
             if op == 0xcd:
@@ -290,6 +299,13 @@ def draft(name):
     out.append('}')
     return '\n'.join(out)
 
-for n in args: print(draft(n)); print()
+for n in args:
+    pending, done, helpers = {}, set(), []
+    main = draft(n, pending=pending)
+    while set(pending) - done:
+        t = min(set(pending) - done); done.add(t)
+        helpers.append(draft(n, start=t, helper=pending[t], pending=pending))
+    for h in reversed(helpers): print(h); print()
+    print(main); print()
 missing = sorted(x for x in needed if not re.search(rf'^{re.escape(x)} ', open('src/hooks/syms_used.txt').read(), re.M))
 if missing: print('// syms_used.txt needs: ' + ' '.join(missing))
