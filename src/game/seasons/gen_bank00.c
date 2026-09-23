@@ -573,25 +573,6 @@ L_1c81:
   RET(0x1c98); return;  // ret
 }
 
-// 00:3e07
-void s_checkIfHoronVillageNPCShouldBeSeen(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3e07, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3e09, AF);  // push af
-  I(0x3e0a, 2); A = 0x08;  // ld a,$08
-  I(0x3e0c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e0e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e11, s_checkHoronVillageNPCShouldBeSeen_body__main_hook, 0x57db, 0x3e14);  // call $57db
-  I(0x3e14, 2); C = 0x01;  // ld c,$01
-  if ((F & FC)) { I(0x3e16, 3); goto L_3e19; } I(0x3e16, 2);  // jr c,$3e19
-  I(0x3e18, 1); C = alu_dec8(gb, C);  // dec c
-L_3e19:
-  SET_AF(POP(0x3e19));  // pop af
-  I(0x3e1a, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e1c, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3e1f); return;  // ret
-}
-
 // 00:1d16
 void s_checkLinkCollisionsEnabled__noCarry(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -618,7 +599,7 @@ void s_checkRoomPackAfterWarp(GB *gb) {
   I(0x3ab5, 2); A = 0x01;  // ld a,$01
   I(0x3ab7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3ab9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3abc, s_checkRoomPackAfterWarp_body, 0x7e6e, 0x3abf);  // call $7e6e
+  CALL(0x3abc, s_checkRoomPackAfterWarp_body_hook, 0x7e6e, 0x3abf);  // call $7e6e
   SET_AF(POP(0x3abf));  // pop af
   I(0x3ac0, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3ac2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -1670,21 +1651,6 @@ void s_getSimulatedInput__returnInput(GB *gb) {
 L_29c1:
   I(0x29c1, 4); A = mem_rd(gb, 0xcbc9);  // ld a,($cbc9)
   RET(0x29c4); return;  // ret
-}
-
-// 00:3e3e
-void s_getSunkenCityNPCVisibleSubId_caller(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3e3e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3e40, AF);  // push af
-  I(0x3e41, 2); A = 0x08;  // ld a,$08
-  I(0x3e43, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e45, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e48, s_getSunkenCityNPCVisibleSubId__main_hook, 0x5874, 0x3e4b);  // call $5874
-  SET_AF(POP(0x3e4b));  // pop af
-  I(0x3e4c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e4e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3e51); return;  // ret
 }
 
 // 00:3a25
@@ -2985,32 +2951,6 @@ void s_makeActiveObjectFollowLink_b00(GB *gb) {
   RET(0x181e); return;  // ret
 }
 
-// 00:35b8
-void s_multiIntroCutsceneCaller(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x35b8, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x35ba, AF);  // push af
-  I(0x35bb, 2); A = 0x03;  // ld a,$03
-  I(0x35bd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35bf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x35c2, s_multiIntroCutsceneHandler, 0x72ff, 0x35c5);  // call $72ff
-L_35c5:
-  SET_AF(POP(0x35c5));  // pop af
-  I(0x35c6, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35c8, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x35cb); return;  // ret
-}
-
-// 00:35c5
-void s_multiIntroCutsceneCaller__afterCall35c5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_35c5:
-  SET_AF(POP(0x35c5));  // pop af
-  I(0x35c6, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35c8, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x35cb); return;  // ret
-}
-
 // 00:2646
 void s_npcFaceLinkAndAnimate(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3037,7 +2977,7 @@ L_265d:
   if ((F & FZ)) { I(0x2664, 3); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686); } I(0x2664, 2);  // jr z,$2686
   I(0x2666, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x2667, 2); B = alu_srl(gb, B);  // srl b
-  CALL(0x2669, s_seasonsFunc_2678, 0x2678, 0x266c);  // call $2678
+  CALL(0x2669, s_seasonsFunc_2678_hook, 0x2678, 0x266c);  // call $2678
   I(0x266c, 1); A = B;  // ld a,b
   CALL(0x266d, interactionSetAnimation_hook, 0x25cb, 0x2670);  // call $25cb
   I(0x2670, 2); E = 0x6b;  // ld e,$6b
@@ -3561,21 +3501,6 @@ L_2583:
   RET(0x2589); return;  // ret
 }
 
-// 00:2678
-void s_seasonsFunc_2678(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x2678, 2); E = 0x41;  // ld e,$41
-  I(0x267a, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x267b, 2); alu_sub(gb, 0x24);  // sub $24
-  I(0x267d, 2); alu_cp(gb, 0x24);  // cp $24
-  if (!(F & FC)) { RET_TAKEN(0x267f); return; } I(0x267f, 2);  // ret nc
-  I(0x2680, 2); E = 0x77;  // ld e,$77
-  I(0x2682, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x2683, 1); alu_add(gb, B);  // add b
-  I(0x2684, 1); B = A;  // ld b,a
-  RET(0x2685); return;  // ret
-}
-
 // 00:331b
 void s_seasonsFunc_331b(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4003,7 +3928,7 @@ void s_setMakuTreeStageAndMapText(GB *gb) {
   I(0x3e2d, 2); A = 0x15;  // ld a,$15
   I(0x3e2f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e31, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e34, s_makuTree_setMapTextBasedOnStage, 0x60fc, 0x3e37);  // call $60fc
+  CALL(0x3e34, s_makuTree_setMapTextBasedOnStage_hook, 0x60fc, 0x3e37);  // call $60fc
   SET_AF(POP(0x3e37));  // pop af
   I(0x3e38, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3e3a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -4133,21 +4058,6 @@ L_0d35:
   SET_BC(POP(0x0d37));  // pop bc
   SET_AF(POP(0x0d38));  // pop af
   RETI(0x0d39); return;  // reti
-}
-
-// 00:3276
-void s_updateAnimationsAfterCutscene(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3276, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3278, AF);  // push af
-  I(0x3279, 2); A = 0x04;  // ld a,$04
-  I(0x327b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x327d, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3280, updateAnimations_hook, 0x575e, 0x3283);  // call $575e
-  SET_AF(POP(0x3283));  // pop af
-  I(0x3284, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3286, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3289); return;  // ret
 }
 
 // 00:0aff

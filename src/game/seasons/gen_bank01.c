@@ -176,26 +176,6 @@ L_7df4:
   s_determineSeasonForRoomPack(gb); return;  // fallthrough
 }
 
-// 01:7e6e
-void s_checkRoomPackAfterWarp_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7e6e, 2); A = 0x30;  // ld a,$30
-  CALL(0x7e70, checkGlobalFlag_hook, 0x30c7, 0x7e73);  // call $30c7
-  I(0x7e73, 4); A = mem_rd(gb, 0xcc4d);  // ld a,($cc4d)
-  if (!(F & FZ)) { I(0x7e76, 4); s_determineSeasonForRoomPack(gb); return; } I(0x7e76, 3);  // jp nz,$7e09
-  I(0x7e79, 2); alu_cp(gb, 0xf0);  // cp $f0
-  if (!(F & FC)) { I(0x7e7b, 4); s_determineCompanionRegionSeason(gb); return; } I(0x7e7b, 3);  // jp nc,$7e3c
-  I(0x7e7e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x7e7f); return; } I(0x7e7f, 2);  // ret z
-  I(0x7e80, 3); SET_HL(0x7e50);  // ld hl,$7e50
-  RST_PUSH(0x7e83, 0x7e84);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x7e84, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x7e85, 4); mem_wr(gb, 0xcc4e, A);  // ld ($cc4e),a
-  RET(0x7e88); return;  // ret
-}
-
 // 01:5efd
 void s_checkSeedTreeRefillIndex(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -615,18 +595,18 @@ L_5acf:
 void s_cutscene06(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5bd2, 2); E = 0x00;  // ld e,$00
-  I(0x5bd4, 4); s_multiIntroCutsceneCaller(gb); return;  // jp $35b8
+  I(0x5bd4, 4); if (hook_is(gb, 0x35b8, s_multiIntroCutsceneCaller_hook)) { s_multiIntroCutsceneCaller_hook(gb); return; } HANDOFF(0x35b8);  // jp $35b8
 }
 
 // 01:5bd7
 void s_cutscene07(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5bd7, 2); E = 0x01;  // ld e,$01
-  CALL(0x5bd9, s_multiIntroCutsceneCaller, 0x35b8, 0x5bdc);  // call $35b8
+  CALL(0x5bd9, s_multiIntroCutsceneCaller_hook, 0x35b8, 0x5bdc);  // call $35b8
 L_5bdc:
   CALL(0x5bdc, updateInteractionsAndDrawAllSprites_hook, 0x3445, 0x5bdf);  // call $3445
 L_5bdf:
-  I(0x5bdf, 4); s_updateAnimationsAfterCutscene(gb); return;  // jp $3276
+  I(0x5bdf, 4); if (hook_is(gb, 0x3276, s_updateAnimationsAfterCutscene_hook)) { s_updateAnimationsAfterCutscene_hook(gb); return; } HANDOFF(0x3276);  // jp $3276
 }
 
 // 01:5bdc
@@ -635,21 +615,21 @@ void s_cutscene07__afterCall5bdc(GB *gb) {
 L_5bdc:
   CALL(0x5bdc, updateInteractionsAndDrawAllSprites_hook, 0x3445, 0x5bdf);  // call $3445
 L_5bdf:
-  I(0x5bdf, 4); s_updateAnimationsAfterCutscene(gb); return;  // jp $3276
+  I(0x5bdf, 4); if (hook_is(gb, 0x3276, s_updateAnimationsAfterCutscene_hook)) { s_updateAnimationsAfterCutscene_hook(gb); return; } HANDOFF(0x3276);  // jp $3276
 }
 
 // 01:5bdf
 void s_cutscene07__afterCall5bdf(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5bdf:
-  I(0x5bdf, 4); s_updateAnimationsAfterCutscene(gb); return;  // jp $3276
+  I(0x5bdf, 4); if (hook_is(gb, 0x3276, s_updateAnimationsAfterCutscene_hook)) { s_updateAnimationsAfterCutscene_hook(gb); return; } HANDOFF(0x3276);  // jp $3276
 }
 
 // 01:5be2
 void s_cutscene08(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x5be2, 2); E = 0x02;  // ld e,$02
-  CALL(0x5be4, s_multiIntroCutsceneCaller, 0x35b8, 0x5be7);  // call $35b8
+  CALL(0x5be4, s_multiIntroCutsceneCaller_hook, 0x35b8, 0x5be7);  // call $35b8
 L_5be7:
   I(0x5be7, 4); if (hook_is(gb, 0x3445, updateInteractionsAndDrawAllSprites_hook)) { updateInteractionsAndDrawAllSprites_hook(gb); return; } HANDOFF(0x3445);  // jp $3445
 }
@@ -701,7 +681,7 @@ void s_cutscene0d(GB *gb) {
   CALL(0x5c1b, refreshLoadedTreeGfx_hook, 0x1601, 0x5c1e);  // call $1601
 L_5c1e:
   I(0x5c1e, 2); E = 0x03;  // ld e,$03
-  I(0x5c20, 4); s_multiIntroCutsceneCaller(gb); return;  // jp $35b8
+  I(0x5c20, 4); if (hook_is(gb, 0x35b8, s_multiIntroCutsceneCaller_hook)) { s_multiIntroCutsceneCaller_hook(gb); return; } HANDOFF(0x35b8);  // jp $35b8
 }
 
 // 01:5c1e
@@ -709,7 +689,7 @@ void s_cutscene0d__afterCall5c1e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5c1e:
   I(0x5c1e, 2); E = 0x03;  // ld e,$03
-  I(0x5c20, 4); s_multiIntroCutsceneCaller(gb); return;  // jp $35b8
+  I(0x5c20, 4); if (hook_is(gb, 0x35b8, s_multiIntroCutsceneCaller_hook)) { s_multiIntroCutsceneCaller_hook(gb); return; } HANDOFF(0x35b8);  // jp $35b8
 }
 
 // 01:5c23
@@ -719,16 +699,16 @@ void s_cutscene0e(GB *gb) {
   I(0x5c26, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5c27, 3); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85); } I(0x5c27, 2);  // jr nz,$5c85
   I(0x5c29, 2); E = 0x04;  // ld e,$04
-  CALL(0x5c2b, s_multiIntroCutsceneCaller, 0x35b8, 0x5c2e);  // call $35b8
+  CALL(0x5c2b, s_multiIntroCutsceneCaller_hook, 0x35b8, 0x5c2e);  // call $35b8
 L_5c2e:
-  I(0x5c2e, 4); s_updateAnimationsAfterCutscene(gb); return;  // jp $3276
+  I(0x5c2e, 4); if (hook_is(gb, 0x3276, s_updateAnimationsAfterCutscene_hook)) { s_updateAnimationsAfterCutscene_hook(gb); return; } HANDOFF(0x3276);  // jp $3276
 }
 
 // 01:5c2e
 void s_cutscene0e__afterCall5c2e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5c2e:
-  I(0x5c2e, 4); s_updateAnimationsAfterCutscene(gb); return;  // jp $3276
+  I(0x5c2e, 4); if (hook_is(gb, 0x3276, s_updateAnimationsAfterCutscene_hook)) { s_updateAnimationsAfterCutscene_hook(gb); return; } HANDOFF(0x3276);  // jp $3276
 }
 
 // 01:5c31

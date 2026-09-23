@@ -2118,7 +2118,7 @@ void s_interactionCode8a(GB *gb) {
   I(0x4bf4, 2); alu_cp(gb, 0x02);  // cp $02
   if ((F & FC)) { I(0x4bf6, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9); } I(0x4bf6, 3);  // jp c,$3ad9
 L_4bf9:
-  CALL(0x4bf9, s_getSunkenCityNPCVisibleSubId_caller, 0x3e3e, 0x4bfc);  // call $3e3e
+  CALL(0x4bf9, s_getSunkenCityNPCVisibleSubId_caller_hook, 0x3e3e, 0x4bfc);  // call $3e3e
   I(0x4bfc, 2); E = 0x42;  // ld e,$42
   I(0x4bfe, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4bff, 1); alu_cp(gb, B);  // cp b

@@ -9,14 +9,6 @@ void s_checkPirateShipMoved(GB *gb) {
   I(0x66ad, 4); if (hook_is(gb, 0x30c7, checkGlobalFlag_hook)) { checkGlobalFlag_hook(gb); return; } HANDOFF(0x30c7);  // jp $30c7
 }
 
-// 02:58f0
-void s_checkWhetherToDisplaySeasonInSubscreen(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x58f0, 4); A = mem_rd(gb, 0xcc50);  // ld a,($cc50)
-  I(0x58f3, 2); alu_and(gb, 0xfc);  // and $fc
-  RET(0x58f5); return;  // ret
-}
-
 // 02:5372
 void s_drawTreasureExtraTiles(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -987,7 +979,7 @@ L_5533:
   I(0x5537, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
   I(0x553a, 1); A = alu_dec8(gb, A);  // dec a
   I(0x553b, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  CALL(0x553e, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x5541);  // call $58f0
+  CALL(0x553e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5541);  // call $58f0
   if ((F & FZ)) { I(0x5541, 3); goto L_5545; } I(0x5541, 2);  // jr z,$5545
   I(0x5543, 2); A = 0x01;  // ld a,$01
 L_5545:
@@ -1879,7 +1871,7 @@ L_5964:
 void s_inventorySubmenu2CheckDirectionButtons(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   I(0x58b4, 2); E = 0x80;  // ld e,$80
-  CALL(0x58b6, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x58b9);  // call $58f0
+  CALL(0x58b6, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x58b9);  // call $58f0
   if ((F & FZ)) { I(0x58b9, 3); goto L_58bd; } I(0x58b9, 2);  // jr z,$58bd
   I(0x58bb, 2); E = 0x00;  // ld e,$00
 L_58bd:
@@ -2041,7 +2033,7 @@ L_5c0f:
   I(0x5c1b, 1); C = alu_dec8(gb, C);  // dec c
   if (!(F & FZ)) { I(0x5c1c, 3); goto L_5c0f; } I(0x5c1c, 2);  // jr nz,$5c0f
 L_5c1e:
-  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x5c21);  // call $58f0
+  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5c21);  // call $58f0
   I(0x5c21, 3); SET_HL(0xd04d);  // ld hl,$d04d
   I(0x5c24, 3); SET_BC(0x0406);  // ld bc,$0406
   if (!(F & FZ)) { I(0x5c27, 4); if (hook_is(gb, 0x5cb8, fillRectangleInTileMapWithMenuBlock_hook)) { fillRectangleInTileMapWithMenuBlock_hook(gb); return; } HANDOFF(0x5cb8); } I(0x5c27, 3);  // jp nz,$5cb8
@@ -2121,7 +2113,7 @@ L_5c0f:
   I(0x5c1b, 1); C = alu_dec8(gb, C);  // dec c
   if (!(F & FZ)) { I(0x5c1c, 3); goto L_5c0f; } I(0x5c1c, 2);  // jr nz,$5c0f
 L_5c1e:
-  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x5c21);  // call $58f0
+  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5c21);  // call $58f0
   I(0x5c21, 3); SET_HL(0xd04d);  // ld hl,$d04d
   I(0x5c24, 3); SET_BC(0x0406);  // ld bc,$0406
   if (!(F & FZ)) { I(0x5c27, 4); if (hook_is(gb, 0x5cb8, fillRectangleInTileMapWithMenuBlock_hook)) { fillRectangleInTileMapWithMenuBlock_hook(gb); return; } HANDOFF(0x5cb8); } I(0x5c27, 3);  // jp nz,$5cb8
@@ -2202,7 +2194,7 @@ L_5c0f:
   I(0x5c1b, 1); C = alu_dec8(gb, C);  // dec c
   if (!(F & FZ)) { I(0x5c1c, 3); goto L_5c0f; } I(0x5c1c, 2);  // jr nz,$5c0f
 L_5c1e:
-  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x5c21);  // call $58f0
+  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5c21);  // call $58f0
   I(0x5c21, 3); SET_HL(0xd04d);  // ld hl,$d04d
   I(0x5c24, 3); SET_BC(0x0406);  // ld bc,$0406
   if (!(F & FZ)) { I(0x5c27, 4); if (hook_is(gb, 0x5cb8, fillRectangleInTileMapWithMenuBlock_hook)) { fillRectangleInTileMapWithMenuBlock_hook(gb); return; } HANDOFF(0x5cb8); } I(0x5c27, 3);  // jp nz,$5cb8
@@ -2244,7 +2236,7 @@ L_5c0f:
   I(0x5c1b, 1); C = alu_dec8(gb, C);  // dec c
   if (!(F & FZ)) { I(0x5c1c, 3); goto L_5c0f; } I(0x5c1c, 2);  // jr nz,$5c0f
 L_5c1e:
-  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x5c21);  // call $58f0
+  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5c21);  // call $58f0
   I(0x5c21, 3); SET_HL(0xd04d);  // ld hl,$d04d
   I(0x5c24, 3); SET_BC(0x0406);  // ld bc,$0406
   if (!(F & FZ)) { I(0x5c27, 4); if (hook_is(gb, 0x5cb8, fillRectangleInTileMapWithMenuBlock_hook)) { fillRectangleInTileMapWithMenuBlock_hook(gb); return; } HANDOFF(0x5cb8); } I(0x5c27, 3);  // jp nz,$5cb8
@@ -2277,7 +2269,7 @@ L_5c3a:
 void s_inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5c1e:
-  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen, 0x58f0, 0x5c21);  // call $58f0
+  CALL(0x5c1e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5c21);  // call $58f0
   I(0x5c21, 3); SET_HL(0xd04d);  // ld hl,$d04d
   I(0x5c24, 3); SET_BC(0x0406);  // ld bc,$0406
   if (!(F & FZ)) { I(0x5c27, 4); if (hook_is(gb, 0x5cb8, fillRectangleInTileMapWithMenuBlock_hook)) { fillRectangleInTileMapWithMenuBlock_hook(gb); return; } HANDOFF(0x5cb8); } I(0x5c27, 3);  // jp nz,$5cb8

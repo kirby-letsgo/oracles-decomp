@@ -412,27 +412,6 @@ void s_func_5f70(GB *gb) {
   RET(0x5f7d); return;  // ret
 }
 
-// 08:6abc
-void s_func_6abc(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6abc, 1); H = D;  // ld h,d
-  I(0x6abd, 2); L = 0x76;  // ld l,$76
-  I(0x6abf, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x6ac0); return;  // ret
-}
-
-// 08:6ac1
-void s_func_6ac1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6ac1, 1); H = D;  // ld h,d
-  I(0x6ac2, 2); L = 0x77;  // ld l,$77
-  I(0x6ac4, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6ac5, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x6ac6); return; } I(0x6ac6, 2);  // ret z
-  I(0x6ac7, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  RET(0x6ac8); return;  // ret
-}
-
 // 08:6bc4
 void s_func_6bc4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -10348,7 +10327,7 @@ L_6901:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x6909: goto L_6909; case 0x6920: goto L_6920; default: HANDOFF(HL); }
 L_6909:
-  CALL(0x6909, s_func_6abc, 0x6abc, 0x690c);  // call $6abc
+  CALL(0x6909, s_func_6abc_hook, 0x6abc, 0x690c);  // call $6abc
   if (!(F & FZ)) { I(0x690c, 3); goto L_691d; } I(0x690c, 2);  // jr nz,$691d
   I(0x690e, 2); L = 0x60;  // ld l,$60
   I(0x6910, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -10409,7 +10388,7 @@ L_6980:
   I(0x6986, 2); L = 0x77;  // ld l,$77
   I(0x6988, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_698a:
-  CALL(0x698a, s_func_6ac1, 0x6ac1, 0x698d);  // call $6ac1
+  CALL(0x698a, s_func_6ac1_hook, 0x6ac1, 0x698d);  // call $6ac1
   if (!(F & FZ)) { I(0x698d, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x698d, 3);  // jp nz,$6ab6
   CALL(0x6990, objectApplySpeed_hook, 0x1fdb, 0x6993);  // call $1fdb
   I(0x6993, 2); alu_cp(gb, 0x4b);  // cp $4b
@@ -10446,7 +10425,7 @@ L_69bb:
   I(0x69d3, 2); A = 0x06;  // ld a,$06
   I(0x69d5, 4); if (hook_is(gb, 0x25cb, interactionSetAnimation_hook)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x25cb);  // jp $25cb
 L_69d8:
-  CALL(0x69d8, s_func_6abc, 0x6abc, 0x69db);  // call $6abc
+  CALL(0x69d8, s_func_6abc_hook, 0x6abc, 0x69db);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x69db); return; } I(0x69db, 2);  // ret nz
   CALL(0x69dc, interactionIncSubstate_hook, 0x23a0, 0x69df);  // call $23a0
   I(0x69df, 2); A = 0x05;  // ld a,$05
@@ -10479,7 +10458,7 @@ L_6a06:
   I(0x6a17, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   RET(0x6a19); return;  // ret
 L_6a1a:
-  CALL(0x6a1a, s_func_6abc, 0x6abc, 0x6a1d);  // call $6abc
+  CALL(0x6a1a, s_func_6abc_hook, 0x6abc, 0x6a1d);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a1d); return; } I(0x6a1d, 2);  // ret nz
   I(0x6a1e, 4); if (hook_is(gb, 0x23a0, interactionIncSubstate_hook)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23a0);  // jp $23a0
 L_6a21:
@@ -10489,7 +10468,7 @@ L_6a21:
   I(0x6a27, 2); L = 0x77;  // ld l,$77
   I(0x6a29, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a2b:
-  CALL(0x6a2b, s_func_6ac1, 0x6ac1, 0x6a2e);  // call $6ac1
+  CALL(0x6a2b, s_func_6ac1_hook, 0x6ac1, 0x6a2e);  // call $6ac1
   if (!(F & FZ)) { I(0x6a2e, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a2e, 3);  // jp nz,$6ab6
   CALL(0x6a31, objectApplySpeed_hook, 0x1fdb, 0x6a34);  // call $1fdb
   I(0x6a34, 2); E = 0x4b;  // ld e,$4b
@@ -10504,7 +10483,7 @@ L_6a2b:
 L_6a46:
   I(0x6a46, 4); s_animateRunScript(gb); return;  // jp $6ab3
 L_6a49:
-  CALL(0x6a49, s_func_6abc, 0x6abc, 0x6a4c);  // call $6abc
+  CALL(0x6a49, s_func_6abc_hook, 0x6abc, 0x6a4c);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a4c); return; } I(0x6a4c, 2);  // ret nz
   I(0x6a4d, 2); L = 0x49;  // ld l,$49
   I(0x6a4f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -10520,7 +10499,7 @@ L_6a5b:
   I(0x6a61, 2); L = 0x77;  // ld l,$77
   I(0x6a63, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a65:
-  CALL(0x6a65, s_func_6ac1, 0x6ac1, 0x6a68);  // call $6ac1
+  CALL(0x6a65, s_func_6ac1_hook, 0x6ac1, 0x6a68);  // call $6ac1
   if (!(F & FZ)) { I(0x6a68, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a68, 2);  // jr nz,$6ab6
   CALL(0x6a6a, objectApplySpeed_hook, 0x1fdb, 0x6a6d);  // call $1fdb
   I(0x6a6d, 2); alu_cp(gb, 0x18);  // cp $18
@@ -10539,7 +10518,7 @@ L_6a7f:
   I(0x6a85, 2); L = 0x77;  // ld l,$77
   I(0x6a87, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a89:
-  CALL(0x6a89, s_func_6ac1, 0x6ac1, 0x6a8c);  // call $6ac1
+  CALL(0x6a89, s_func_6ac1_hook, 0x6ac1, 0x6a8c);  // call $6ac1
   if (!(F & FZ)) { I(0x6a8c, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a8c, 2);  // jr nz,$6ab6
   CALL(0x6a8e, objectApplySpeed_hook, 0x1fdb, 0x6a91);  // call $1fdb
   I(0x6a91, 2); E = 0x4b;  // ld e,$4b
@@ -10554,7 +10533,7 @@ L_6a89:
 L_6aa3:
   I(0x6aa3, 4); s_animateRunScript(gb); return;  // jp $6ab3
 L_6aa6:
-  CALL(0x6aa6, s_func_6abc, 0x6abc, 0x6aa9);  // call $6abc
+  CALL(0x6aa6, s_func_6abc_hook, 0x6abc, 0x6aa9);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6aa9); return; } I(0x6aa9, 2);  // ret nz
   I(0x6aaa, 2); L = 0x45;  // ld l,$45
   I(0x6aac, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -10962,7 +10941,7 @@ L_6901:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x6909: goto L_6909; case 0x6920: goto L_6920; default: HANDOFF(HL); }
 L_6909:
-  CALL(0x6909, s_func_6abc, 0x6abc, 0x690c);  // call $6abc
+  CALL(0x6909, s_func_6abc_hook, 0x6abc, 0x690c);  // call $6abc
   if (!(F & FZ)) { I(0x690c, 3); goto L_691d; } I(0x690c, 2);  // jr nz,$691d
   I(0x690e, 2); L = 0x60;  // ld l,$60
   I(0x6910, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -11023,7 +11002,7 @@ L_6980:
   I(0x6986, 2); L = 0x77;  // ld l,$77
   I(0x6988, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_698a:
-  CALL(0x698a, s_func_6ac1, 0x6ac1, 0x698d);  // call $6ac1
+  CALL(0x698a, s_func_6ac1_hook, 0x6ac1, 0x698d);  // call $6ac1
   if (!(F & FZ)) { I(0x698d, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x698d, 3);  // jp nz,$6ab6
   CALL(0x6990, objectApplySpeed_hook, 0x1fdb, 0x6993);  // call $1fdb
   I(0x6993, 2); alu_cp(gb, 0x4b);  // cp $4b
@@ -11060,7 +11039,7 @@ L_69bb:
   I(0x69d3, 2); A = 0x06;  // ld a,$06
   I(0x69d5, 4); if (hook_is(gb, 0x25cb, interactionSetAnimation_hook)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x25cb);  // jp $25cb
 L_69d8:
-  CALL(0x69d8, s_func_6abc, 0x6abc, 0x69db);  // call $6abc
+  CALL(0x69d8, s_func_6abc_hook, 0x6abc, 0x69db);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x69db); return; } I(0x69db, 2);  // ret nz
   CALL(0x69dc, interactionIncSubstate_hook, 0x23a0, 0x69df);  // call $23a0
   I(0x69df, 2); A = 0x05;  // ld a,$05
@@ -11093,7 +11072,7 @@ L_6a06:
   I(0x6a17, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   RET(0x6a19); return;  // ret
 L_6a1a:
-  CALL(0x6a1a, s_func_6abc, 0x6abc, 0x6a1d);  // call $6abc
+  CALL(0x6a1a, s_func_6abc_hook, 0x6abc, 0x6a1d);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a1d); return; } I(0x6a1d, 2);  // ret nz
   I(0x6a1e, 4); if (hook_is(gb, 0x23a0, interactionIncSubstate_hook)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23a0);  // jp $23a0
 L_6a21:
@@ -11103,7 +11082,7 @@ L_6a21:
   I(0x6a27, 2); L = 0x77;  // ld l,$77
   I(0x6a29, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a2b:
-  CALL(0x6a2b, s_func_6ac1, 0x6ac1, 0x6a2e);  // call $6ac1
+  CALL(0x6a2b, s_func_6ac1_hook, 0x6ac1, 0x6a2e);  // call $6ac1
   if (!(F & FZ)) { I(0x6a2e, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a2e, 3);  // jp nz,$6ab6
   CALL(0x6a31, objectApplySpeed_hook, 0x1fdb, 0x6a34);  // call $1fdb
   I(0x6a34, 2); E = 0x4b;  // ld e,$4b
@@ -11118,7 +11097,7 @@ L_6a2b:
 L_6a46:
   I(0x6a46, 4); s_animateRunScript(gb); return;  // jp $6ab3
 L_6a49:
-  CALL(0x6a49, s_func_6abc, 0x6abc, 0x6a4c);  // call $6abc
+  CALL(0x6a49, s_func_6abc_hook, 0x6abc, 0x6a4c);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a4c); return; } I(0x6a4c, 2);  // ret nz
   I(0x6a4d, 2); L = 0x49;  // ld l,$49
   I(0x6a4f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -11134,7 +11113,7 @@ L_6a5b:
   I(0x6a61, 2); L = 0x77;  // ld l,$77
   I(0x6a63, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a65:
-  CALL(0x6a65, s_func_6ac1, 0x6ac1, 0x6a68);  // call $6ac1
+  CALL(0x6a65, s_func_6ac1_hook, 0x6ac1, 0x6a68);  // call $6ac1
   if (!(F & FZ)) { I(0x6a68, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a68, 2);  // jr nz,$6ab6
   CALL(0x6a6a, objectApplySpeed_hook, 0x1fdb, 0x6a6d);  // call $1fdb
   I(0x6a6d, 2); alu_cp(gb, 0x18);  // cp $18
@@ -11153,7 +11132,7 @@ L_6a7f:
   I(0x6a85, 2); L = 0x77;  // ld l,$77
   I(0x6a87, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a89:
-  CALL(0x6a89, s_func_6ac1, 0x6ac1, 0x6a8c);  // call $6ac1
+  CALL(0x6a89, s_func_6ac1_hook, 0x6ac1, 0x6a8c);  // call $6ac1
   if (!(F & FZ)) { I(0x6a8c, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a8c, 2);  // jr nz,$6ab6
   CALL(0x6a8e, objectApplySpeed_hook, 0x1fdb, 0x6a91);  // call $1fdb
   I(0x6a91, 2); E = 0x4b;  // ld e,$4b
@@ -11168,7 +11147,7 @@ L_6a89:
 L_6aa3:
   I(0x6aa3, 4); s_animateRunScript(gb); return;  // jp $6ab3
 L_6aa6:
-  CALL(0x6aa6, s_func_6abc, 0x6abc, 0x6aa9);  // call $6abc
+  CALL(0x6aa6, s_func_6abc_hook, 0x6abc, 0x6aa9);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6aa9); return; } I(0x6aa9, 2);  // ret nz
   I(0x6aaa, 2); L = 0x45;  // ld l,$45
   I(0x6aac, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -11188,7 +11167,7 @@ L_6901:
   I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
   switch (HL) { case 0x6909: goto L_6909; case 0x6920: goto L_6920; default: HANDOFF(HL); }
 L_6909:
-  CALL(0x6909, s_func_6abc, 0x6abc, 0x690c);  // call $6abc
+  CALL(0x6909, s_func_6abc_hook, 0x6abc, 0x690c);  // call $6abc
   if (!(F & FZ)) { I(0x690c, 3); goto L_691d; } I(0x690c, 2);  // jr nz,$691d
   I(0x690e, 2); L = 0x60;  // ld l,$60
   I(0x6910, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -11217,7 +11196,7 @@ L_6936:
 void s_interactionCode3e__state1__var03_00__substate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6909:
-  CALL(0x6909, s_func_6abc, 0x6abc, 0x690c);  // call $6abc
+  CALL(0x6909, s_func_6abc_hook, 0x6abc, 0x690c);  // call $6abc
   if (!(F & FZ)) { I(0x690c, 3); goto L_691d; } I(0x690c, 2);  // jr nz,$691d
   I(0x690e, 2); L = 0x60;  // ld l,$60
   I(0x6910, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
@@ -11334,7 +11313,7 @@ L_6980:
   I(0x6986, 2); L = 0x77;  // ld l,$77
   I(0x6988, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_698a:
-  CALL(0x698a, s_func_6ac1, 0x6ac1, 0x698d);  // call $6ac1
+  CALL(0x698a, s_func_6ac1_hook, 0x6ac1, 0x698d);  // call $6ac1
   if (!(F & FZ)) { I(0x698d, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x698d, 3);  // jp nz,$6ab6
   CALL(0x6990, objectApplySpeed_hook, 0x1fdb, 0x6993);  // call $1fdb
   I(0x6993, 2); alu_cp(gb, 0x4b);  // cp $4b
@@ -11371,7 +11350,7 @@ L_69bb:
   I(0x69d3, 2); A = 0x06;  // ld a,$06
   I(0x69d5, 4); if (hook_is(gb, 0x25cb, interactionSetAnimation_hook)) { interactionSetAnimation_hook(gb); return; } HANDOFF(0x25cb);  // jp $25cb
 L_69d8:
-  CALL(0x69d8, s_func_6abc, 0x6abc, 0x69db);  // call $6abc
+  CALL(0x69d8, s_func_6abc_hook, 0x6abc, 0x69db);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x69db); return; } I(0x69db, 2);  // ret nz
   CALL(0x69dc, interactionIncSubstate_hook, 0x23a0, 0x69df);  // call $23a0
   I(0x69df, 2); A = 0x05;  // ld a,$05
@@ -11404,7 +11383,7 @@ L_6a06:
   I(0x6a17, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   RET(0x6a19); return;  // ret
 L_6a1a:
-  CALL(0x6a1a, s_func_6abc, 0x6abc, 0x6a1d);  // call $6abc
+  CALL(0x6a1a, s_func_6abc_hook, 0x6abc, 0x6a1d);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a1d); return; } I(0x6a1d, 2);  // ret nz
   I(0x6a1e, 4); if (hook_is(gb, 0x23a0, interactionIncSubstate_hook)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23a0);  // jp $23a0
 L_6a21:
@@ -11414,7 +11393,7 @@ L_6a21:
   I(0x6a27, 2); L = 0x77;  // ld l,$77
   I(0x6a29, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a2b:
-  CALL(0x6a2b, s_func_6ac1, 0x6ac1, 0x6a2e);  // call $6ac1
+  CALL(0x6a2b, s_func_6ac1_hook, 0x6ac1, 0x6a2e);  // call $6ac1
   if (!(F & FZ)) { I(0x6a2e, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a2e, 3);  // jp nz,$6ab6
   CALL(0x6a31, objectApplySpeed_hook, 0x1fdb, 0x6a34);  // call $1fdb
   I(0x6a34, 2); E = 0x4b;  // ld e,$4b
@@ -11429,7 +11408,7 @@ L_6a2b:
 L_6a46:
   I(0x6a46, 4); s_animateRunScript(gb); return;  // jp $6ab3
 L_6a49:
-  CALL(0x6a49, s_func_6abc, 0x6abc, 0x6a4c);  // call $6abc
+  CALL(0x6a49, s_func_6abc_hook, 0x6abc, 0x6a4c);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a4c); return; } I(0x6a4c, 2);  // ret nz
   I(0x6a4d, 2); L = 0x49;  // ld l,$49
   I(0x6a4f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -11445,7 +11424,7 @@ L_6a5b:
   I(0x6a61, 2); L = 0x77;  // ld l,$77
   I(0x6a63, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a65:
-  CALL(0x6a65, s_func_6ac1, 0x6ac1, 0x6a68);  // call $6ac1
+  CALL(0x6a65, s_func_6ac1_hook, 0x6ac1, 0x6a68);  // call $6ac1
   if (!(F & FZ)) { I(0x6a68, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a68, 2);  // jr nz,$6ab6
   CALL(0x6a6a, objectApplySpeed_hook, 0x1fdb, 0x6a6d);  // call $1fdb
   I(0x6a6d, 2); alu_cp(gb, 0x18);  // cp $18
@@ -11464,7 +11443,7 @@ L_6a7f:
   I(0x6a85, 2); L = 0x77;  // ld l,$77
   I(0x6a87, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a89:
-  CALL(0x6a89, s_func_6ac1, 0x6ac1, 0x6a8c);  // call $6ac1
+  CALL(0x6a89, s_func_6ac1_hook, 0x6ac1, 0x6a8c);  // call $6ac1
   if (!(F & FZ)) { I(0x6a8c, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a8c, 2);  // jr nz,$6ab6
   CALL(0x6a8e, objectApplySpeed_hook, 0x1fdb, 0x6a91);  // call $1fdb
   I(0x6a91, 2); E = 0x4b;  // ld e,$4b
@@ -11479,7 +11458,7 @@ L_6a89:
 L_6aa3:
   I(0x6aa3, 4); s_animateRunScript(gb); return;  // jp $6ab3
 L_6aa6:
-  CALL(0x6aa6, s_func_6abc, 0x6abc, 0x6aa9);  // call $6abc
+  CALL(0x6aa6, s_func_6abc_hook, 0x6abc, 0x6aa9);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6aa9); return; } I(0x6aa9, 2);  // ret nz
   I(0x6aaa, 2); L = 0x45;  // ld l,$45
   I(0x6aac, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
@@ -11497,7 +11476,7 @@ L_6980:
   I(0x6986, 2); L = 0x77;  // ld l,$77
   I(0x6988, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_698a:
-  CALL(0x698a, s_func_6ac1, 0x6ac1, 0x698d);  // call $6ac1
+  CALL(0x698a, s_func_6ac1_hook, 0x6ac1, 0x698d);  // call $6ac1
   if (!(F & FZ)) { I(0x698d, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x698d, 3);  // jp nz,$6ab6
   CALL(0x6990, objectApplySpeed_hook, 0x1fdb, 0x6993);  // call $1fdb
   I(0x6993, 2); alu_cp(gb, 0x4b);  // cp $4b
@@ -11549,7 +11528,7 @@ L_69bb:
 void s_interactionCode3e__state1__var03_02__substate3(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_69d8:
-  CALL(0x69d8, s_func_6abc, 0x6abc, 0x69db);  // call $6abc
+  CALL(0x69d8, s_func_6abc_hook, 0x6abc, 0x69db);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x69db); return; } I(0x69db, 2);  // ret nz
   CALL(0x69dc, interactionIncSubstate_hook, 0x23a0, 0x69df);  // call $23a0
   I(0x69df, 2); A = 0x05;  // ld a,$05
@@ -11597,7 +11576,7 @@ L_6a06:
 void s_interactionCode3e__state1__var03_02__substate6(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6a1a:
-  CALL(0x6a1a, s_func_6abc, 0x6abc, 0x6a1d);  // call $6abc
+  CALL(0x6a1a, s_func_6abc_hook, 0x6abc, 0x6a1d);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a1d); return; } I(0x6a1d, 2);  // ret nz
   I(0x6a1e, 4); if (hook_is(gb, 0x23a0, interactionIncSubstate_hook)) { interactionIncSubstate_hook(gb); return; } HANDOFF(0x23a0);  // jp $23a0
 }
@@ -11612,7 +11591,7 @@ L_6a21:
   I(0x6a27, 2); L = 0x77;  // ld l,$77
   I(0x6a29, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a2b:
-  CALL(0x6a2b, s_func_6ac1, 0x6ac1, 0x6a2e);  // call $6ac1
+  CALL(0x6a2b, s_func_6ac1_hook, 0x6ac1, 0x6a2e);  // call $6ac1
   if (!(F & FZ)) { I(0x6a2e, 4); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a2e, 3);  // jp nz,$6ab6
   CALL(0x6a31, objectApplySpeed_hook, 0x1fdb, 0x6a34);  // call $1fdb
   I(0x6a34, 2); E = 0x4b;  // ld e,$4b
@@ -11632,7 +11611,7 @@ L_6a46:
 void s_interactionCode3e__state1__var03_02__substate8(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6a49:
-  CALL(0x6a49, s_func_6abc, 0x6abc, 0x6a4c);  // call $6abc
+  CALL(0x6a49, s_func_6abc_hook, 0x6abc, 0x6a4c);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6a4c); return; } I(0x6a4c, 2);  // ret nz
   I(0x6a4d, 2); L = 0x49;  // ld l,$49
   I(0x6a4f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -11653,7 +11632,7 @@ L_6a5b:
   I(0x6a61, 2); L = 0x77;  // ld l,$77
   I(0x6a63, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a65:
-  CALL(0x6a65, s_func_6ac1, 0x6ac1, 0x6a68);  // call $6ac1
+  CALL(0x6a65, s_func_6ac1_hook, 0x6ac1, 0x6a68);  // call $6ac1
   if (!(F & FZ)) { I(0x6a68, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a68, 2);  // jr nz,$6ab6
   CALL(0x6a6a, objectApplySpeed_hook, 0x1fdb, 0x6a6d);  // call $1fdb
   I(0x6a6d, 2); alu_cp(gb, 0x18);  // cp $18
@@ -11677,7 +11656,7 @@ L_6a7f:
   I(0x6a85, 2); L = 0x77;  // ld l,$77
   I(0x6a87, 3); mem_wr(gb, HL, 0x0c);  // ld (hl),$0c
 L_6a89:
-  CALL(0x6a89, s_func_6ac1, 0x6ac1, 0x6a8c);  // call $6ac1
+  CALL(0x6a89, s_func_6ac1_hook, 0x6ac1, 0x6a8c);  // call $6ac1
   if (!(F & FZ)) { I(0x6a8c, 3); s_runScriptSetPriorityRelativeToLink_withTerrainEffects(gb); return; } I(0x6a8c, 2);  // jr nz,$6ab6
   CALL(0x6a8e, objectApplySpeed_hook, 0x1fdb, 0x6a91);  // call $1fdb
   I(0x6a91, 2); E = 0x4b;  // ld e,$4b
@@ -11697,7 +11676,7 @@ L_6aa3:
 void s_interactionCode3e__state1__var03_02__substateC(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_6aa6:
-  CALL(0x6aa6, s_func_6abc, 0x6abc, 0x6aa9);  // call $6abc
+  CALL(0x6aa6, s_func_6abc_hook, 0x6abc, 0x6aa9);  // call $6abc
   if (!(F & FZ)) { RET_TAKEN(0x6aa9); return; } I(0x6aa9, 2);  // ret nz
   I(0x6aaa, 2); L = 0x45;  // ld l,$45
   I(0x6aac, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
