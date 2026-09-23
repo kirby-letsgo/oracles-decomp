@@ -1494,7 +1494,6 @@ void s_func_53eb(GB *gb);
 void s_func_53eb__func(GB *gb);
 void s_func_53eb__dmaHeartPieceDisplay(GB *gb);
 void s_giveTreasure_body__ret(GB *gb);
-void s_giveTreasure_body__applyParameter(GB *gb);
 void s_handleTextControlCode__controlCode0(GB *gb);
 void s_handleTextControlCode__controlCode1(GB *gb);
 void s_handleTextControlCode__controlCode6(GB *gb);

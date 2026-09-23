@@ -3541,6 +3541,7 @@
 3f:44c8 giveTreasure_body_hook -
 3f:44f0 giveTreasure_body__findItemInTable_hook -
 3f:4501 giveTreasure_body__giveTreasure_hook -
+3f:454e giveTreasure_body__applyParameter_hook -
 3f:456f giveTreasure_body__modeb_hook -
 3f:4576 giveTreasure_body__mode8_hook -
 3f:4581 giveTreasure_body__mode5_hook -

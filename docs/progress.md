@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-23: Seasons playthrough extended to 87,496 frames (Gnarled Root dungeon). The replay
+  diverged at frame 80,049 with 0 verify failures; a Seasons hook bisect (HOOK_ONLY halves over
+  both Seasons lists) named `itemDrop_countdownToDisappear_hook`: its `xor $80` was written as
+  `A = A ^ 0x80`, leaving carry set from the `cp 60`, so every blinking item drop vanished early
+  (a latent Ages bug too). Next failure: `giveTreasure_body`'s mode handlers sit 6 bytes later in
+  Seasons but were burned as Ages `b_+N`; the routine is now in `ofs_routines.txt`, and
+  `seasons_hooks.py` rejects a hook whose raw `b_+N` burn lands in a label at another offset in
+  Seasons. Verify blind spot found: a routine reached only through `CALL_C`/chains from other C
+  never has its C compared (under verify the C side runs such callees as asm); the reference
+  replay is what catches those. Also: SDL apps got M (mute), Backspace (Select), Esc (Start).
+  Shared Seasons hooks 3,667. Gates: ctest 10/10 (87k Seasons), whole movie, Ages verify 30k,
+  Seasons 87k `OFS_TRAP=1 VERIFY_ALL=1`, native both, lint 0.
+
 - 2026-09-22: merged Fable's Seasons milestone 3 batches 1 through 4e (`0a51603`..`3e683b2`):
   270 Seasons-only routines rewritten by hand under `src/game/seasons/` (`rewritten_seasons.txt`),
   the local-hook rule (a rewritten routine's local that generated code reaches needs a

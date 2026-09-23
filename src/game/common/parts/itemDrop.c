@@ -369,7 +369,7 @@ void itemDrop_countdownToDisappear_hook(GB *gb) {
   BASE(itemDrop_countdownToDisappear);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); A = W8(wFrameCounter);
-  CYC(b_+3, b_+4); A = A ^ D;
+  CYC(b_+3, b_+4); alu_xor(gb, D);
   CYC(b_+4, b_+5); alu_rrca(gb);
   if (!(F & FC)) { RET_TAKEN(b_+5); return; } // ret nc
   CYC(b_+5, b_+6);
@@ -396,7 +396,7 @@ void itemDrop_countdownToDisappear_hook(GB *gb) {
   CYC(b_+27, b_+28);
   CYC(b_+28, b_+30); L = 0xda; // Part.visible
   CYC(b_+30, b_+31); A = mem_rd(gb, HL);
-  CYC(b_+31, b_+33); A = A ^ 0x80;
+  CYC(b_+31, b_+33); alu_xor(gb, 0x80);
   CYC(b_+33, b_+34); mem_wr(gb, HL, A);
   CYC(b_+34, b_+35); ret_effect(gb); return;
 

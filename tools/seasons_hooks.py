@@ -202,6 +202,13 @@ def main():
                     if not cover or cover == base: continue
                     v = label_verdict(cover.replace('@', '__'))
                     if v is not None and v != 'IDENTICAL': ok = False; why.setdefault(key, f'burns {base}+{n} in {cover} ({v})'); break
+                    # b_+N must land on the same instruction in Seasons: the covering label has to sit
+                    # at the same distance from the base in both games
+                    sb_ = pairs.get((base,) + a); ca = [x for x in ages_labels.get(cover, []) if x[0] == a[0] or x[0] == 0]
+                    if sb_ and ca:
+                        sc = pairs.get((cover,) + ca[0])
+                        if sc is None or (sc[1] - sb_[1]) != (ca[0][1] - a[1]):
+                            ok = False; why.setdefault(key, f'burns {base}+{n} in {cover}, which sits at another offset in Seasons'); break
         for lab, off in local_calls[key]:
             base = lab or (base_labels[0] if len(base_labels) == 1 else None)
             if base is None or not local_call_ok(base, off): ok = False; why.setdefault(key, f'CALL_L target at {base}+{off} differs')
