@@ -88,11 +88,16 @@ def symref(n):
     if n not in ages_spelling: needed.add(n)
     return s
 
+genh = set(re.findall(r'\bs_\w+', open('src/game/seasons/gen.h').read()))
+def hooked(n):
+    return n in hand or f's_{n}' in genh or f's_{n}_hook' in genh
+
 def fn_of(n):
     if n in hand: return f's_{n}_hook'
     return f's_{n}'
 
 def tail_of(n):
+    if not hooked(n): return f'HANDOFF(SYM({symref(n)})); /* no hook: interpreted */'
     if n in hand: return f'TAIL_S({symref(n)});'
     s = ages_spelling.get(n, n)
     if f'{s}_hook' in shared: return f'TAIL({s});'
@@ -277,7 +282,11 @@ def draft(name, start=None, helper=None, pending=None):
                 callee, target, local = f'{PREFIX}_{on}_{locs[(tb, t)].split("@")[-1]}', None, True
                 if pending is not None: pending.setdefault(t, (on, callee))
             else: callee, target, local = f'TODO_{locs.get((tb, t), hex(t))}', f'0x{t:04x}', False
-            if op == 0xcd:
+            rom_call = not local and target and target.startswith('SYM(') and (tb, t) in name_at and not hooked(name_at[(tb, t)])
+            if rom_call:
+                s = (f'  CALL_ROM(b_+{x}, {target}); /* no hook: interpreted */' if op == 0xcd else
+                     f'  if ({CC[(op >> 3) & 3]}) CALL_ROM_CC(b_+{x}, {target});\n  else {cy}')
+            elif op == 0xcd:
                 s = f'  CALL_L(b_+{x}, {callee}, b_+{y});' if local else f'  CALL_C(b_+{x}, {callee}, {target}, b_+{y});'
             else:
                 c1 = f'CALL_L_CC(b_+{x}, {callee}, b_+{y});' if local else f'CALL_C_CC(b_+{x}, {callee}, {target}, b_+{y});'
