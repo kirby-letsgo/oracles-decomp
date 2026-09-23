@@ -22,7 +22,7 @@ static void postman_load_script_and_init_graphics(GB *gb, uint16_t sp0_) {
   CALL_C(b_+33, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+36);
   CYC(b_+36, b_+38); A = 0x0b;
   CALL_C(b_+38, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+41);
-  CYC(b_+41, b_+43); E = OBJ_SUBID;
+  CYC(b_+41, b_+43); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+43, b_+44); A = mem_rd(gb, DE);
   CYC(b_+44, b_+47); SET_HL(b_+57);
   CYC(b_+47, b_+48); postman_add_double_index(gb, b_+48);
@@ -45,7 +45,7 @@ void interactionCode55_hook(GB *gb) {
   CALL_C(b_+8, interactionRunScript_hook, SYM(interactionRunScript), b_+11);
   if (F & FC) { CYCT(b_+11, b_+14); interactionDelete_hook(gb); return; }
   CYC(b_+11, b_+14);
-  CYC(b_+14, b_+16); E = OBJ_VAR3F;
+  CYC(b_+14, b_+16); E = INTERACTION_BASE + OBJ_VAR3F;
   CYC(b_+16, b_+17); A = mem_rd(gb, DE);
   CYC(b_+17, b_+18); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+18, b_+21); npcFaceLinkAndAnimate_hook(gb); return; }

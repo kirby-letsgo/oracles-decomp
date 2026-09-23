@@ -14,7 +14,10 @@ static void cpu_push(GB *gb, uint16_t v) {
   gb_tick(gb); bus_write(gb, --gb->sp, (uint8_t)v);
 }
 
+uint64_t gb_irq_dispatched;
+
 void cpu_dispatch_interrupt(GB *gb) {
+  gb_irq_dispatched++;
   uint8_t pending = gb->ie & gb->io[R_IF] & 0x1f;
   gb_tick(gb);
   gb_tick(gb);

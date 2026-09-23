@@ -67,17 +67,17 @@ void parentItemCode_flute_hook(GB *gb) {
 
 state0:
   CALL_C(b_+8, checkLinkOnGround_hook, SYM(checkLinkOnGround), b_+11);
-  if (!(F & FZ)) { CYCT(b_+11, b_+14); goto clear_self; }
+  if (!(F & FZ)) { CYCT(b_+11, b_+14); TAIL(clearParentItem); }
   CYC(b_+11, b_+14);
   CYC(b_+14, b_+17); A = W8(wInstrumentsDisabledCounter);
   CYC(b_+17, b_+18); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+18, b_+21); goto clear_self; }
+  if (!(F & FZ)) { CYCT(b_+18, b_+21); TAIL(clearParentItem); }
   CYC(b_+18, b_+21);
   CALL_C(b_+21, isLinkInHole_hook, SYM(isLinkInHole), b_+24);
-  if (F & FC) { CYCT(b_+24, b_+27); goto clear_self; }
+  if (F & FC) { CYCT(b_+24, b_+27); TAIL(clearParentItem); }
   CYC(b_+24, b_+27);
   CALL_C(b_+27, checkNoOtherParentItemsInUse_hook, SYM(checkNoOtherParentItemsInUse), b_+30);
-  if (!(F & FZ)) { CYCT(b_+30, b_+33); goto clear_self; }
+  if (!(F & FZ)) { CYCT(b_+30, b_+33); TAIL(clearParentItem); }
   CYC(b_+30, b_+33);
   CYC(b_+33, b_+35); A = 0x80;
   CYC(b_+35, b_+38); W8(wcc95) = A;

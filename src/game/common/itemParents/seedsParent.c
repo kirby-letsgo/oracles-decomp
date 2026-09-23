@@ -77,14 +77,14 @@ void parentItemCode_satchel_hook(GB *gb) {
 state0:
   CYC(b_+8, b_+11); A = W8(w1Companion_id);
   CYC(b_+11, b_+13); alu_cp(gb, 0x13);
-  if (F & FZ) { CYCT(b_+13, b_+16); goto clear; }
+  if (F & FZ) { CYCT(b_+13, b_+16); TAIL(clearParentItem); }
   CYC(b_+13, b_+16);
   CALL_C(b_+16, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+19);
-  if (!(F & FZ)) { CYCT(b_+19, b_+22); goto clear; }
+  if (!(F & FZ)) { CYCT(b_+19, b_+22); TAIL(clearParentItem); }
   CYC(b_+19, b_+22);
   CYC(b_+22, b_+25); A = W8(wLinkSwimmingState);
   CYC(b_+25, b_+26); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+26, b_+29); goto clear; }
+  if (!(F & FZ)) { CYCT(b_+26, b_+29); TAIL(clearParentItem); }
   CYC(b_+26, b_+29);
   CALL_C(b_+29, clearSelfIfNoSeeds_hook, SYM(clearSelfIfNoSeeds), b_+32);
   CYC(b_+32, b_+33); A = B;
@@ -99,7 +99,7 @@ state0:
   CYC(b_+45, b_+47); E = 0x01;
   CALL_C(b_+47, itemCreateChildWithID_hook, SYM(itemCreateChildWithID), b_+50);
   CYC(b_+50, b_+51); SET_BC(pop_effect(gb));
-  if (F & FC) { CYCT(b_+51, b_+54); goto clear; }
+  if (F & FC) { CYCT(b_+51, b_+54); TAIL(clearParentItem); }
   CYC(b_+51, b_+54);
   CYC(b_+54, b_+55); A = B;
   CYC(b_+55, b_+58); TAIL(decNumActiveSeeds);

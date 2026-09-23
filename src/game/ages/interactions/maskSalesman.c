@@ -16,7 +16,7 @@ static void mask_salesman_add_double_index(GB *gb, uint16_t ra) {
 static void mask_salesman_load_script_and_init_graphics(GB *gb, uint16_t sp0_) {
   BASE(interactionCode5c);
   CALL_C(b_+26, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+29);
-  CYC(b_+29, b_+31); E = OBJ_SUBID; CYC(b_+31, b_+32); A = mem_rd(gb, DE); CYC(b_+32, b_+35); SET_HL(b_+45);
+  CYC(b_+29, b_+31); E = INTERACTION_BASE + OBJ_SUBID; CYC(b_+31, b_+32); A = mem_rd(gb, DE); CYC(b_+32, b_+35); SET_HL(b_+45);
   CYC(b_+35, b_+36); mask_salesman_add_double_index(gb, b_+36); CYC(b_+36, b_+37); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+37, b_+38); H = mem_rd(gb, HL); CYC(b_+38, b_+39); L = A; CALL_C(b_+39, interactionSetScript_hook, SYM(interactionSetScript), b_+42);
   CYC(b_+42, b_+45); interactionIncState_hook(gb);

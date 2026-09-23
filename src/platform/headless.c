@@ -178,6 +178,7 @@ int main(int argc, char **argv) {
   if (arg_flag(argc, argv, "--no-hooks")) hook_mode = HOOK_MODE_OFF;
   if (arg_flag(argc, argv, "--verify-hooks")) hook_mode = HOOK_MODE_VERIFY;
   if (arg_flag(argc, argv, "--verify-hooks-continue")) { hook_mode = HOOK_MODE_VERIFY; hook_verify_abort = false; }
+  if (arg_flag(argc, argv, "--verify-shadow")) { hook_mode = HOOK_MODE_REPLACE; hook_shadow = 1; hook_verify_abort = false; }
   if (arg_flag(argc, argv, "--log-lcdc")) dbg_log_lcdc = 1;
   if (init_ram && !oracles_load_init_ram(gb, init_ram)) { fprintf(stderr, "cannot read %s\n", init_ram); return 2; }
   gb_reset(gb);

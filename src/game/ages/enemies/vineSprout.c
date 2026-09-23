@@ -342,7 +342,7 @@ void vineSprout_updateTileAtPosition_hook(GB *gb) {
   CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) { RET_TAKEN(b_+4); return; } // ret nz
+  if (!(F & FZ)) { RET_TAKEN(b_+4); return; } CYC(b_+4, b_+5); // ret nz
   CALL_C(b_+5, objectGetTileCollisions_hook, SYM(objectGetTileCollisions), b_+8);
   CYC(b_+8, b_+10); mem_wr(gb, HL, 0x0f);
   CYC(b_+10, b_+12); E = ENEMY_BASE + OBJ_PRESSED_A_BUTTON; // Enemy.var31

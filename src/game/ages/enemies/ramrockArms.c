@@ -818,7 +818,7 @@ void ramrockArm_subid4_substate2_hook(GB *gb) {
     TAIL(ramrockArm_subid4_substate3);
   }
   CYC(b_+7, b_+9);
-  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
+  CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_VAR2A;
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+13); alu_rlca(gb);
   if (F & FC) {

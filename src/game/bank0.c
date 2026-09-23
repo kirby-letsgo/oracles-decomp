@@ -4979,7 +4979,7 @@ static void enemy_die_common(GB *gb) {
   CYC(b_+2, b_+5);
   push_effect(gb, b_+5);
   enemy_create_death_puff(gb);
-  alu_bit(gb, 0, B);
+  CYC(b_+5, b_+7); alu_bit(gb, 0, B);
   if (!(F & FZ)) { CYCT(b_+7, b_+10); push_effect(gb, b_+10); asm_call(gb, ROM_markEnemyAsKilledInRoom, b_+10); }
   else CYC(b_+7, b_+10);
   A = 0x00;

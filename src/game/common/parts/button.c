@@ -32,9 +32,9 @@ void partCode09_hook(GB *gb) {
   if (F & FC) { CYCT(b_+O(18), b_+OE(20)); goto linkTouchedButton; } // jr c
   CYC(b_+O(18), b_+OE(20));
   if (game_seasons) {
-    CYC(b_+S(20), b_+S(23)); SET_HL(w1Companion);
+    CYC(b_+S(20), b_+S(23)); SET_HL(w1MagnetBall);
     CALL_C(b_+S(23), checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+S(26));
-    if (F & FC) { CYCT(b_+S(26), b_+S(28)); goto companionTouchedButton; }
+    if (F & FC) { CYCT(b_+S(26), b_+S(28)); goto magnetBallTouchedButton; }
     CYC(b_+S(26), b_+S(28));
   }
   CALL_C(b_+O(20), objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+OE(23));
@@ -96,7 +96,7 @@ linkTouchedButton:
   if (!(F & FZ)) { RET_TAKEN(b_+O(107)); return; } // ret nz
   CYC(b_+O(107), b_+OE(108));
 
-companionTouchedButton:
+magnetBallTouchedButton:
   CYC(b_+O(108), b_+OE(110)); E = 0xc2; // Part.subid
   CYC(b_+O(110), b_+OE(111)); A = mem_rd(gb, DE);
   CYC(b_+O(111), b_+OE(112)); alu_rlca(gb);

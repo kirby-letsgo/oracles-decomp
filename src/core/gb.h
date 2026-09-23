@@ -118,6 +118,7 @@ void gb_reset(GB *gb);
 void gb_tick(GB *gb);
 void gb_step(GB *gb);
 void cpu_dispatch_interrupt(GB *gb);
+extern uint64_t gb_irq_dispatched;
 void gb_run_cycles(GB *gb, uint64_t target);
 uint64_t gb_run_frame(GB *gb);
 uint8_t gb_input_now(GB *gb);

@@ -140,6 +140,7 @@ void doorController_checkMinecartCollidedWithDoor_hook(GB *gb) {
   if (!(F & FC)) {
     RET_TAKEN(b_+8); return;
   }
+  CYC(b_+8, b_+9);
   CALL_C(b_+9, objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+12);
   if (!(F & FC)) {
     RET_TAKEN(b_+12); return;

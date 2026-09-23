@@ -605,9 +605,9 @@ void ambiGuard_checkSpottedLink_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, wScentSeedActive);
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+4, b_+6); goto scentSeed; } // jr nz
+  CYC(b_+4, b_+6);
 
 normalCheck:
-  CYC(b_+4, b_+6);
   CYC(b_+6, b_+9); A = mem_rd(gb, wLinkPlayingInstrument);
   CYC(b_+9, b_+10); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+10, b_+12); goto faceLink; } // jr nz

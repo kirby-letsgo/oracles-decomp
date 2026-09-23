@@ -30,7 +30,7 @@ void interactionCode59__afterCall6c0b_hook(GB *gb) {
   BASE(interactionCode59);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+111, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+114);
-  CYC(b_+114, b_+116); E = OBJ_SUBID; CYC(b_+116, b_+117); A = mem_rd(gb, DE); CYC(b_+117, b_+120); SET_HL(b_+130); CYC(b_+120, b_+121); poe_add_double_index(gb, b_+121);
+  CYC(b_+114, b_+116); E = INTERACTION_BASE + OBJ_SUBID; CYC(b_+116, b_+117); A = mem_rd(gb, DE); CYC(b_+117, b_+120); SET_HL(b_+130); CYC(b_+120, b_+121); poe_add_double_index(gb, b_+121);
   CYC(b_+121, b_+122); A = mem_rd(gb, HL); SET_HL(HL + 1); CYC(b_+122, b_+123); H = mem_rd(gb, HL); CYC(b_+123, b_+124); L = A; CALL_C(b_+124, interactionSetScript_hook, SYM(interactionSetScript), b_+127); CYC(b_+127, b_+130); interactionIncState_hook(gb);
 }
 
@@ -38,8 +38,8 @@ void interactionCode59__afterCall6be7_hook(GB *gb) {
   BASE(interactionCode59);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+75, interactionRunScript_hook, SYM(interactionRunScript), b_+78); if (F & FC) { CYCT(b_+78, b_+81); interactionDelete_hook(gb); return; } CYC(b_+78, b_+81);
-  CYC(b_+81, b_+83); E = OBJ_VAR3E; CYC(b_+83, b_+84); A = mem_rd(gb, DE); CYC(b_+84, b_+85); alu_or(gb, A); if (!(F & FZ)) { CYCT(b_+85, b_+86); ret_effect(gb); return; } CYC(b_+85, b_+86);
-  CYC(b_+86, b_+88); E = OBJ_VAR3F; CYC(b_+88, b_+89); A = mem_rd(gb, DE); CYC(b_+89, b_+90); alu_or(gb, A); if (F & FZ) { CYCT(b_+90, b_+93); npcFaceLinkAndAnimate_hook(gb); return; } CYC(b_+90, b_+93); CALL_C(b_+93, interactionAnimate_hook, SYM(interactionAnimate), b_+96); CYC(b_+96, b_+99); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
+  CYC(b_+81, b_+83); E = INTERACTION_BASE + OBJ_VAR3E; CYC(b_+83, b_+84); A = mem_rd(gb, DE); CYC(b_+84, b_+85); alu_or(gb, A); if (!(F & FZ)) { CYCT(b_+85, b_+86); ret_effect(gb); return; } CYC(b_+85, b_+86);
+  CYC(b_+86, b_+88); E = INTERACTION_BASE + OBJ_VAR3F; CYC(b_+88, b_+89); A = mem_rd(gb, DE); CYC(b_+89, b_+90); alu_or(gb, A); if (F & FZ) { CYCT(b_+90, b_+93); npcFaceLinkAndAnimate_hook(gb); return; } CYC(b_+90, b_+93); CALL_C(b_+93, interactionAnimate_hook, SYM(interactionAnimate), b_+96); CYC(b_+96, b_+99); objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb);
 }
 
 void interactionCode59_hook(GB *gb) {

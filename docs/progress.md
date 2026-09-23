@@ -448,6 +448,25 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-23 (later): `--verify-shadow`, a verify gate that can be trusted. The old
+  `--verify-hooks-continue` held interrupts for the length of every hook, so the Seasons
+  playthrough desynced at ~30k frames (it never reached room 04; every VERIFY_ALL pass since has
+  checked a stuck game) and C reached only from C was never compared. Shadow mode runs replace
+  mode (so it follows the movie and takes `--ref-check`), replays each returned, uninterrupted
+  hook call as the original code from the same state and compares, and routes `CALL_C`/`CALL`/
+  `TAIL` through the same check (`hook_run`). First full pass: 402 Ages and 410 Seasons
+  mismatches; after fixes 0 and 0 (45.8M Ages and 13.5M Seasons calls compared, both movies on
+  their references). Bugs fixed: enemyDie never burned `bit 0,b` (every enemy death 2 cycles
+  short, both games); partCode09's Seasons block checked `d100` instead of the Magnet Ball at
+  `dd00`; 7 `ret cc` fall-throughs without a burn (`tools/audit_retcc.py`); 23 `ld r,n`
+  constants that differ from the ROM, mostly a missing INTERACTION_BASE/ENEMY_BASE
+  (`tools/audit_imm.py`); jumps to a local that jumps onward instead of to the ROM target and
+  taken branches burned at the not-taken cost (`tools/audit_jumps.py`: seedsParent,
+  harpFluteParent, hardhatWorker, oldMan, ambiGuard; vire.c subid0-2 rewritten from the
+  disassembly). Switchable-bank burns now read the mapped bank (the common enemy code sits in
+  several banks). New: `SHADOW_ONLY`, `tools/shadow_trace.py`, `BURNLOG=<mcycle>`, BURN/PCT on
+  stderr. Gates: ctest 10/10, native both, lint 0, all audits 0.
+
 - 2026-09-23: Seasons playthrough extended to 87,496 frames (Gnarled Root dungeon). The replay
   diverged at frame 80,049 with 0 verify failures; a Seasons hook bisect (HOOK_ONLY halves over
   both Seasons lists) named `itemDrop_countdownToDisappear_hook`: its `xor $80` was written as
@@ -504,7 +523,7 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   checkLinkOnGround, checkSkipPointer, cutscene09, dragonfly_state0, enemyCode37,
   itemInitializeFromLinkPosition, companionCheckMountingComplete, initializeFile_b07 (two
   symbolizer mislabels fixed: initializeChildOnGameStart, initializeVinePositions),
-  checkAndDecKeyCount, partCode09 (Seasons companion collision), loadItemIconGfx
+  checkAndDecKeyCount, partCode09 (Seasons Magnet Ball collision), loadItemIconGfx
   (`spr_item_icons_1`, bank via SYMBANK), interactionCodeb5. Tooling: `seasons_hooks.py` reads
   the C through `symfiles.seasons_code` (Ages-only blocks are invisible, so a TAIL inside
   `if (!game_seasons)` no longer disqualifies) and accepts the `@locals` of every routine in

@@ -288,7 +288,7 @@ state9:
   CYC(b_+35, b_+37); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
   CYC(b_+37, b_+39); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+39, b_+41); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+41, b_+43); L = 0x15; // Enemy.speedZ+1
+  CYC(b_+41, b_+43); L = 0x95; // Enemy.speedZ+1
   CYC(b_+43, b_+44); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+44, b_+46); A = 0x59; // SND_FALLINHOLE
   CALL_C(b_+46, playSound_b00_hook, SYM(playSound_b00), b_+49);
@@ -301,7 +301,7 @@ stateA:
   CALL_C(b_+59, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+62);
   if (!(F & FZ)) { RET_TAKEN(b_+62); return; } // ret nz
   CYC(b_+62, b_+63);
-  CYC(b_+63, b_+65); L = 0x14; // Enemy.speedZ
+  CYC(b_+63, b_+65); L = 0x94; // Enemy.speedZ
   CYC(b_+65, b_+66); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+66, b_+67); mem_wr(gb, HL, A);
   CYC(b_+67, b_+69); L = ENEMY_BASE + OBJ_STATE;
@@ -378,7 +378,7 @@ state8:
   CYC(b_+12, b_+13); H = D;
   CYC(b_+13, b_+14); L = E;
   CYC(b_+14, b_+15); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 9
-  CYC(b_+15, b_+17); L = 0x14; // Enemy.speedZ
+  CYC(b_+15, b_+17); L = 0x94; // Enemy.speedZ
   CYC(b_+17, b_+19); A = 0xfe;
   CYC(b_+19, b_+20); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0xfe);
@@ -398,7 +398,7 @@ state9:
   CYC(b_+43, b_+45);
   CYC(b_+45, b_+47); A = 0x52; // SND_BOMB_LAND
   if (F & FZ) { CALL_C_CC(b_+47, playSound_b00_hook, SYM(playSound_b00), b_+50); } else { CYC(b_+47, b_+50); } // call z
-  CYC(b_+50, b_+52); E = 0x15; // Enemy.speedZ+1
+  CYC(b_+50, b_+52); E = 0x95; // Enemy.speedZ+1
   CYC(b_+52, b_+53); A = mem_rd(gb, DE);
   CYC(b_+53, b_+54); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+54, b_+56); goto applyVelocity2; } // jr nz

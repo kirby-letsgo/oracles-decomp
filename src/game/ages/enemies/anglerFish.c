@@ -98,7 +98,7 @@ justHit:
   CYC(b_+24, b_+26);
 
 antennaHit:
-  CYC(b_+26, b_+28); A = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
+  CYC(b_+26, b_+28); A = OBJ_INVINCIBILITY_COUNTER;
   CALL_C(b_+28, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+31);
   CYC(b_+31, b_+32); E = L;
   CYC(b_+32, b_+33); A = mem_rd(gb, DE);

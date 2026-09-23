@@ -135,7 +135,7 @@ afterAngleCheck:
   if (F & FZ) { CYCT(b_+145, b_+147); goto pushingAgainstRoller; } // jr z
   CYC(b_+145, b_+147);
   CYC(b_+147, b_+150); SET_HL(wInventoryB);
-  CYC(b_+150, b_+152); A = 0x14; // ITEM_BRACELET
+  CYC(b_+150, b_+152); A = 0x16; // ITEM_BRACELET
   CYC(b_+152, b_+153); alu_cp(gb, mem_rd(gb, HL));
   if (F & FZ) { CYCT(b_+153, b_+155); goto notPushingAgainstRoller; } // jr z
   CYC(b_+153, b_+155);

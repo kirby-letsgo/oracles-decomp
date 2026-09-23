@@ -89,8 +89,8 @@ subid2:
   CYC(b_+81, b_+84); TAIL(setWarpDestVariables);
 generic:
   CALL_C(b_+89, checkInteractionState_hook, SYM(checkInteractionState), b_+92);
-  if (!(F & FZ)) { CYCT(b_+92, b_+94); goto generic_state1; }
-  CYC(b_+92, b_+94);
+  if (!(F & FZ)) { CYC(b_+92, b_+94); goto generic_state1; }
+  CYCT(b_+92, b_+94);
   CALL_C(b_+100, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+103);
   CALL_C(b_+103, interactionIncState_hook, SYM(interactionIncState), b_+106);
   CYC(b_+106, b_+108); L = 0x73; CYC(b_+108, b_+110); mem_wr(gb, HL, 0x33);
@@ -113,5 +113,5 @@ generic:
   CALL_C(b_+164, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+167); CALL_C(b_+167, objectSetVisiblec2_hook, SYM(objectSetVisiblec2), b_+170);
   CYC(b_+170, b_+173); SET_HL((SYM(impaNpc_subid01) + 19)); CYC(b_+173, b_+176); interactionSetScript_hook(gb); return;
 generic_state1:
-  CALL_C(b_+94, interactionRunScript_hook, SYM(interactionRunScript), b_+97); CYC(b_+97, b_+100); interactionAnimateAsNpc_hook(gb);
+  CALL_C(b_+94, interactionRunScript_hook, SYM(interactionRunScript), b_+97); CYC(b_+97, b_+100); TAIL(interactionAnimateAsNpc);
 }

@@ -86,7 +86,7 @@ void enemyCode39_hook(GB *gb) {
   CYC(b_+8, b_+9); A = alu_dec8(gb, A);
   if (!(F & FZ)) { CYCT(b_+9, b_+12); ecom_updateKnockbackNoSolidity_b0e_hook(gb); return; } // jp nz
   CYC(b_+9, b_+12);
-  CYC(b_+12, b_+14); E = OBJ_VAR2A;
+  CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_VAR2A;
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+17); alu_cp(gb, 0x80); // $80|ITEMCOLLISION_LINK
   if (!(F & FZ)) { RET_TAKEN(b_+17); return; } // ret nz

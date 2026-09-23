@@ -21,6 +21,11 @@ extern int hook_in_verify;
 extern int hook_suppress_interrupts;
 extern uint64_t hook_verify_failures;
 extern bool hook_verify_abort;
+// replace mode that also runs each executed routine's original code on a copy of the machine and
+// compares (--verify-shadow): the run follows the replay exactly, C-only callees included
+extern int hook_shadow;
+extern uint64_t hook_shadow_checked, hook_shadow_skipped;
+void hook_run(GB *gb, HookFn fn, uint16_t target);
 
 void hooks_init(void);
 bool hook_dispatch(GB *gb);

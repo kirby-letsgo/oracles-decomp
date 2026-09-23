@@ -510,7 +510,7 @@ gameStillGoing:
   CYC(b_+126, b_+127); A = mem_rd(gb, HL);
   CYC(b_+127, b_+129); alu_and(gb, 0x0f);
   CYC(b_+129, b_+131); alu_cp(gb, 0x08);
-  if (!(F & FZ)) { RET_TAKEN(b_+131); return; } // ret nz
+  if (!(F & FZ)) { RET_TAKEN(b_+131); return; } CYC(b_+131, b_+132); // ret nz
   CALL_C(b_+132, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+135);
   CYC(b_+135, b_+136); E = A;
   CYC(b_+136, b_+137); A = L;

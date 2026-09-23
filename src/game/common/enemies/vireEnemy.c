@@ -139,7 +139,7 @@ dead:
   if (F & FZ) { CYCT(b_+41, b_+43); goto subid0Dead; } // jr z
   CYC(b_+41, b_+43);
   CALL_C(b_+43, objectCreatePuff_hook, SYM(objectCreatePuff), b_+46);
-  CYC(b_+46, b_+48); A = ENEMY_BASE + 0x34; // Object.var34 offset
+  CYC(b_+46, b_+48); A = OBJ_VAR34; // Object.var34 offset
   CALL_C(b_+48, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+51);
   CYC(b_+51, b_+52); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (F & FZ) { CALL_C_CC(b_+52, objectCopyPosition_hook, SYM(objectCopyPosition), b_+55); } else { CYC(b_+52, b_+55); } // call z
@@ -157,7 +157,7 @@ subid0Dead:
   CYC(b_+70, b_+72); mem_wr(gb, HL, 0x00); // [substate]
   CYC(b_+72, b_+73); L = alu_inc8(gb, L);
   CYC(b_+73, b_+75); mem_wr(gb, HL, 0x14); // [counter1]
-  CYC(b_+75, b_+77); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+75, b_+77); L = ENEMY_BASE + OBJ_HEALTH;
   CYC(b_+77, b_+79); mem_wr(gb, HL, 0x01);
   CYC(b_+79, b_+81); L = ENEMY_BASE + OBJ_DIRECTION;
   CYC(b_+81, b_+82); alu_xor(gb, A);

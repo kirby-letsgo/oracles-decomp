@@ -216,6 +216,81 @@ static void verify(GB *gb, Hook *h) {
   verify_depth--;
 }
 
+int hook_shadow;
+uint64_t hook_shadow_checked, hook_shadow_skipped;
+static GBSample shadow_samples[16];
+
+static void report_mismatch(Hook *h, const char *bad, size_t off, const GB *c, const GB *a, uint64_t cyc_c, uint64_t cyc_asm) {
+  hook_verify_failures++;
+  fprintf(stderr, "HOOK MISMATCH %s (%02x:%04x) %s off=%zu frame %llu: C=%llu cycles asm=%llu cycles regs C=%02x %02x %02x%02x %02x%02x %02x%02x asm=%02x %02x %02x%02x %02x%02x %02x%02x\n",
+          h->name, h->bank, h->addr, bad, off, (unsigned long long)GRID_FRAME(c->cycles), (unsigned long long)cyc_c, (unsigned long long)cyc_asm,
+          c->a, c->f, c->b, c->c, c->d, c->e, c->h, c->l, a->a, a->f, a->b, a->c, a->d, a->e, a->h, a->l);
+  if (hook_verify_abort) exit(3);
+}
+
+// Run the hook's C for real (exactly as replace mode), then the original code on a copy of the
+// machine from the same starting state, and compare. A call during which the C side took an
+// interrupt is not comparable (the copy runs with interrupts held) and is only counted.
+static void shadow(GB *gb, Hook *h) {
+  static const char *only; static int only_init;
+  if (!only_init) { only_init = 1; only = getenv("SHADOW_ONLY"); }
+  if (only && strcmp(only, h->name) != 0) { if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb); return; }
+  const int my = verify_depth;
+  if (my >= 16) { h->fn(gb); return; }
+  if (!snap_pool[my][0]) { snap_pool[my][0] = malloc(sizeof(GB)); snap_pool[my][1] = malloc(sizeof(GB)); }
+  GB *snap = snap_pool[my][0], *after = snap_pool[my][1];
+  uint16_t sp0 = gb->sp;
+  memcpy(snap, gb, sizeof *snap);
+  uint16_t ret_pc = (uint16_t)(bus_read(gb, sp0) | (bus_read(gb, sp0 + 1) << 8));
+  uint64_t c0 = gb->mcycles, irq0 = gb_irq_dispatched;
+  static int vlog = -1; if (vlog < 0) vlog = getenv("VERIFYLOG") != NULL;
+  if (vlog) fprintf(stderr, "VERIFY> %s frame %llu mc %llu sp %04x\n", h->name, (unsigned long long)GRID_FRAME(gb->cycles), (unsigned long long)gb->mcycles, gb->sp);
+  verify_depth = my + 1;
+  if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
+  verify_depth = my;
+  uint64_t cyc_c = gb->mcycles - c0;
+  // only calls that ran to their `ret` without an interrupt are comparable: the original code is
+  // replayed with interrupts held, and a handoff (thread switch, reset) has no end to compare at
+  if (gb_irq_dispatched != irq0 || !(gb->pc == ret_pc && gb->sp == (uint16_t)(sp0 + 2))) {
+    if (only) fprintf(stderr, "SHADOW skip %s frame %llu irq %d pc %04x sp %04x want %04x %04x\n", h->name, (unsigned long long)GRID_FRAME(gb->cycles), gb_irq_dispatched != irq0, gb->pc, gb->sp, ret_pc, (uint16_t)(sp0 + 2));
+    hook_shadow_skipped++; return;
+  }
+  if (vlog) fprintf(stderr, "VERIFY= %s cycC %llu pc %04x sp %04x\n", h->name, (unsigned long long)cyc_c, gb->pc, gb->sp);
+  memcpy(after, gb, sizeof *after);
+  memcpy(gb, snap, sizeof *gb);
+  gb->samples = shadow_samples; gb->frame_cb = NULL; gb->ring = NULL; gb->trace_hi = 0;
+  int saved = hook_mode;
+  hook_mode = HOOK_MODE_OFF;
+  hook_suppress_interrupts++;
+  uint64_t guard = 0;
+  do { gb->step(gb); } while (!(gb->pc == ret_pc && gb->sp == (uint16_t)(sp0 + 2)) && !gb->hung && gb->mcycles - c0 <= cyc_c + 1000000 && guard++ < 5000000ULL);
+  hook_suppress_interrupts--;
+  hook_mode = saved;
+  uint64_t cyc_asm = gb->mcycles - c0;
+  if (vlog) fprintf(stderr, "VERIFY %s frame %llu returned 1 cycC %llu cycAsm %llu\n", h->name, (unsigned long long)GRID_FRAME(gb->cycles), (unsigned long long)cyc_c, (unsigned long long)cyc_asm);
+  hook_shadow_checked++;
+  size_t off = 0;
+  const char *bad = NULL;
+  uint8_t ra[] = {after->a, after->f, after->b, after->c, after->d, after->e, after->h, after->l};
+  uint8_t rb[] = {gb->a, gb->f, gb->b, gb->c, gb->d, gb->e, gb->h, gb->l};
+  if (differs("regs", ra, rb, sizeof ra, &off)) bad = off == 0 ? "reg a" : "regs";
+  else if (after->sp != gb->sp || after->pc != gb->pc) bad = "sp/pc";
+  else if (wram_differs(after->wram, gb->wram, &off)) bad = "wram";
+  else if (hram_differs(after->hram, gb->hram, &off)) bad = "hram";
+  else if (differs("vram", after->vram, gb->vram, sizeof gb->vram, &off)) bad = "vram";
+  else if (differs("oam", after->oam, gb->oam, sizeof gb->oam, &off)) bad = "oam";
+  else if (differs("eram", after->eram, gb->eram, sizeof gb->eram, &off)) bad = "eram";
+  else if (differs("io", after->io, gb->io, sizeof gb->io, &off)) bad = "io";
+  else if (cyc_c != cyc_asm) bad = "cycles";
+  if (bad) report_mismatch(h, bad, off, after, gb, cyc_c, cyc_asm);
+  memcpy(gb, after, sizeof *gb);
+}
+
+void hook_run(GB *gb, HookFn fn, uint16_t target) {
+  if (hook_shadow) { Hook *h = lookup(gb, target); if (h && h->fn == fn) { h->calls++; gb->pc = target; shadow(gb, h); return; } }
+  fn(gb);
+}
+
 bool hook_enabled_at(const GB *gb, uint16_t addr) {
   if (!inited) hooks_init();
   int i = first_at[addr];
@@ -249,7 +324,8 @@ bool hook_dispatch(GB *gb) {
   if (gb->trace_hi) { uint64_t fr = GRID_FRAME(gb->cycles); if (fr >= gb->trace_lo && fr <= gb->trace_hi) fprintf(stderr, "%s %02x:%04x %s mc %llu frame %llu sp %04x\n", gb->native ? "NAT" : "REF", h->bank, h->addr, h->name, (unsigned long long)gb->mcycles, (unsigned long long)fr, gb->sp); }
   int depth0 = depth;
   depth++;
-  if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
+  if (hook_shadow) shadow(gb, h);
+  else if (hook_jmp_depth < 128) { hook_jmp_depth++; if (setjmp(hook_jmp[hook_jmp_depth - 1]) == 0) h->fn(gb); hook_jmp_depth--; } else h->fn(gb);
   depth = depth0;
   if (hooklog) fprintf(stderr, "HOOK< %s mc %llu frame %llu sp %04x pc %04x ime %d\n", h->name, (unsigned long long)gb->mcycles, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, gb->pc, gb->ime);
   return true;
@@ -259,6 +335,7 @@ void hooks_report(void) {
   uint64_t total = 0;
   for (size_t i = 0; i < NHOOKS; i++) total += hooks[i].calls;
   fprintf(stderr, "hooks: %zu routines, %llu calls, %llu verify failures\n", NHOOKS, (unsigned long long)total, (unsigned long long)hook_verify_failures);
+  if (hook_shadow) fprintf(stderr, "shadow: %llu calls compared, %llu interrupted (not compared)\n", (unsigned long long)hook_shadow_checked, (unsigned long long)hook_shadow_skipped);
   fprintf(stderr, "vblank dispatch: mid-logic %llu, from halt %llu, interpreter %llu (of which halted %llu)\n", (unsigned long long)dbg_vbl_midlogic, (unsigned long long)dbg_vbl_halt, (unsigned long long)dbg_vbl_step, (unsigned long long)dbg_vbl_step_halted);
   for (size_t i = 0; i < NHOOKS; i++) {
     size_t n = strlen(hooks[i].name);

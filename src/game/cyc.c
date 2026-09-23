@@ -106,7 +106,15 @@ static void burn_tab(GB *gb, int bank, uint16_t from, uint16_t to, bool last_tak
   }
 }
 
+// Switchable-bank code is burned from the bank that is mapped, as the CPU fetches it: shared C
+// names one copy of code the ROM keeps in several banks (the enemy/part common code), and the
+// copy that runs is the caller's bank's. BANKDBG=1 lists where the named bank differs.
 void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
+  if (from >= 0x4000 && from < 0x8000 && bank != (int)gb->rom_bank) {
+    static int dbg = -1, n; if (dbg < 0) dbg = getenv("BANKDBG") != NULL;
+    if (dbg && n++ < 50) fprintf(stderr, "BANK burn %02x:%04x mapped %02x\n", bank, from, gb->rom_bank);
+    bank = (int)gb->rom_bank;
+  }
   if (gb->cyctab) { burn_tab(gb, bank, from, to, last_taken); return; }
   uint16_t a = from;
   while (a < to) {
@@ -118,7 +126,7 @@ void burn_rom(GB *gb, int bank, uint16_t from, uint16_t to, bool last_taken) {
       exit(4);
     }
     gb->hook_pc = a;
-    { static int bl = -1; if (bl < 0) bl = getenv("BURNLOG") != NULL; if (bl) printf("BURN %02x:%04x op %02x cyc %d mc %llu\n", bank, a, op, insn_cycles(op, op2, last_taken && last), (unsigned long long)gb->mcycles); }
+    { static int bl = -1; static unsigned long long bl_from; if (bl < 0) { bl = getenv("BURNLOG") != NULL; if (bl) bl_from = strtoull(getenv("BURNLOG"), NULL, 10); } if (bl && gb->mcycles >= bl_from) fprintf(stderr, "BURN %02x:%04x op %02x cyc %d mc %llu\n", bank, a, op, insn_cycles(op, op2, last_taken && last), (unsigned long long)gb->mcycles); }
     gb_burn(gb, insn_cycles(op, op2, last_taken && last));
     a = (uint16_t)(a + len);
   }
