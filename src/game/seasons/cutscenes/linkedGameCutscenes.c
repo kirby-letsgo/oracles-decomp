@@ -315,7 +315,7 @@ loadImpaRoomAndMusic:
   CYC(b_+28, b_+29);
   CYC(b_+29, b_+31); A = 0x03;
   CYC(b_+31, b_+34); SET_BC(0x00b6); // ROOM_SEASONS_0b6
-  CALL_C(b_+34, s_disableLcdAndLoadRoom_body, SYM(disableLcdAndLoadRoom_body), b_+37);
+  CALL_C(b_+34, s_disableLcdAndLoadRoom_body_hook, SYM(disableLcdAndLoadRoom_body), b_+37);
   CYC(b_+37, b_+39); A = 0xf1; // SNDCTRL_STOPSFX
   CALL_C(b_+39, playSound_b00_hook, SYM(playSound_b00), b_+42);
   CYC(b_+42, b_+44); A = 0x20; // MUS_TRIUMPHANT
@@ -352,7 +352,7 @@ loadSokraRoomAndMusic:
   if (!(F & FZ)) { RET_TAKEN(b_+89); return; }
   CYC(b_+89, b_+90);
   CYC(b_+90, b_+93); SET_BC(0x00e9); // ROOM_SEASONS_0e9
-  CALL_C(b_+93, s_disableLcdAndLoadRoom_body, SYM(disableLcdAndLoadRoom_body), b_+96);
+  CALL_C(b_+93, s_disableLcdAndLoadRoom_body_hook, SYM(disableLcdAndLoadRoom_body), b_+96);
   CYC(b_+96, b_+98); A = 0xf1; // SNDCTRL_STOPSFX
   CALL_C(b_+98, playSound_b00_hook, SYM(playSound_b00), b_+101);
   CYC(b_+101, b_+103); A = 0x02;
@@ -442,7 +442,7 @@ loadSokraRoomAndInteractions:
   if (!(F & FZ)) { RET_TAKEN(b_+56); return; }
   CYC(b_+56, b_+57);
   CYC(b_+57, b_+60); SET_BC(0x00e9); // ROOM_SEASONS_0e9
-  CALL_C(b_+60, s_disableLcdAndLoadRoom_body, SYM(disableLcdAndLoadRoom_body), b_+63);
+  CALL_C(b_+60, s_disableLcdAndLoadRoom_body_hook, SYM(disableLcdAndLoadRoom_body), b_+63);
   CYC(b_+63, b_+65); A = 0x02;
   CALL_C(b_+65, s_loadGfxRegisterStateIndex, SYM(loadGfxRegisterStateIndex), b_+68);
   CALL_C(b_+68, s_restartSound, SYM(restartSound), b_+71);
@@ -788,7 +788,7 @@ void s_bank3CutsceneLoadRoomOfRites_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); SET_BC(0x059a); // ROOM_ZELDA_IN_FINAL_DUNGEON
-  CALL_C(b_+4, s_disableLcdAndLoadRoom_body, SYM(disableLcdAndLoadRoom_body), b_+7);
+  CALL_C(b_+4, s_disableLcdAndLoadRoom_body_hook, SYM(disableLcdAndLoadRoom_body), b_+7);
   CYC(b_+7, b_+9); A = 0xac; // PALH_ac
   CALL_C(b_+9, s_loadPaletteHeader, SYM(loadPaletteHeader), b_+12);
   CYC(b_+12, b_+14); A = 0x28;
