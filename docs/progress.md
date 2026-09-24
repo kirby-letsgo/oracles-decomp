@@ -4,6 +4,16 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-24, Seasons 4 batch 2: 12 more routines (shopItemState0, shopkeeperState1, itemCode20
+  (slingshot), pushblock (Seasons state 2 slides until blocked), flute parent (the song-address
+  helper is based on its own label), bipin, feather parent (Roc's Cape double jump),
+  companionTutorial, doorController, dungeonStuff (subid 5 magnet ball), seedsOnTree
+  (season-gated trees), businessScrub). Eligible hooks 3,731 -> 3,743. What is left in my
+  directories with ratio >= 0.7: interaction7f_subid00, interactionCode7e and
+  interactionCodeb6, whose Ages body holds a data table that `ofsmap.py` decodes as
+  instructions, so the alignment desyncs after it (anchors do not help); they need an ofsmap
+  change or label-relative bases. The rest of the DIFFERENT list pairs unrelated routines by
+  name (ratio < 0.7).
 - 2026-09-24, Seasons 4 (DIFFERENT shared routines under Seasons, object code) batch 1: 19
   routines mapped with `ofsmap.py --apply` plus per-game blocks (satchel, bomb and bracelet
   parents, sword, boomerang parent and item, bracelet item, seedItemState1, galeSeedTryToWarpLink,

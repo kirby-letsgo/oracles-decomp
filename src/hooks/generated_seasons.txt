@@ -1689,6 +1689,7 @@
 06:4a4e parentItemCode_foolsOre_hook -
 06:4a6b parentItemCode_punch_hook -
 06:4aa1 parentItemCode_sword_hook -
+06:4c83 parentItemCode_flute_hook -
 06:4d6d parentItemCode_satchel_hook -
 06:4db4 clearSelfIfNoSeeds_hook -
 06:4dc7 parentItemGenericState1_hook -
@@ -1699,6 +1700,7 @@
 06:4eed tryPickupBombs_hook -
 06:4f13 makeLinkPickupObjectH_hook -
 06:4f26 parentItemCode_bracelet_hook -
+06:5134 parentItemCode_feather_hook -
 06:52d0 checkNoOtherParentItemsInUse_hook -
 06:52e2 parentItemLoadAnimationAndIncState_hook -
 06:5326 itemCreateChildIfDoesntExistAlready_hook -
@@ -1854,6 +1856,7 @@
 07:4b7d itemCheckCanPassSolidTile_hook -
 07:4ba7 checkTileIsPassableFromDirection_hook -
 07:4bdf itemUpdateConveyorBelt_hook -
+07:4cc3 itemCode20_hook -
 07:4d3c seedItemState1_hook -
 07:4e6a seedItemDelete_hook -
 07:4e7b seedItemState3_hook -
@@ -1925,14 +1928,18 @@
 07:62a2 itemCode1a_hook -
 08:40a0 interactionCode0f_hook -
 08:4110 interactionCode10_hook -
+08:414f interactionCode12_hook -
 08:427e interactionCode13_hook -
+08:42e1 interactionCode14_hook -
 08:443b interactionCode16_hook -
 08:44e3 interactionCode17_hook -
 08:4548 interactionCode18_hook -
 08:457e interactionCode1c_hook -
+08:4627 interactionCode1e_hook -
 08:479a checkReloadShopItemTiles_hook -
 08:47b0 interactionCode46_hook -
 08:47cb shopkeeperState0_hook -
+08:480f shopkeeperState1_hook -
 08:48a5 shopkeeperState6_hook -
 08:48c8 shopkeeperState2_hook -
 08:490d shopkeeperLoadScript_hook -
@@ -1945,6 +1952,7 @@
 08:4a93 shopkeeperCheckAllItemsBought_hook -
 08:4aab shopkeeperTurnToFaceLink_hook -
 08:4ac1 interactionCode47_hook -
+08:4ad1 shopItemState0_hook -
 08:4b63 shopItemState5_hook -
 08:4b6d shopItemPopStackAndDeleteSelf_hook -
 08:4b71 shopItemState2_hook -
@@ -1970,6 +1978,7 @@
 08:52d4 interactionCode20_hook -
 08:56b5 interactionCode36_hook -
 08:56b5 interactionCode37_hook -
+08:5beb interactionCode28_hook -
 08:5e2f interactionCode2b_hook -
 08:6392 interactionCode35_hook -
 08:6468 interac65_state1_hook -
@@ -2857,6 +2866,7 @@
 0d:6762 dragonfly_state5_hook -
 0d:676c dragonfly_applySpeed_hook -
 0d:6866 enemyCode59_hook -
+0d:689a enemyCode5a_hook -
 0d:691d enemyCode5d_hook -
 0d:6980 twinrovaIce_bounceOffShield_hook -
 0d:69e7 enemyCode5e_hook -
@@ -3172,8 +3182,10 @@
 0f:580b ganon_updateSeizurePalette_hook -
 0f:582a ganon_setTileReplacementMode_hook -
 0f:5834 enemyCode00_hook -
+0f:7400 interactionCodece_hook -
 0f:75cf interactionCodecf_hook -
 0f:75dd interactionCodecf__afterCall4b19_hook -
+0f:75f8 interactionCoded0_hook -
 0f:76dd interactionCoded1_hook -
 0f:76f7 interactionCoded2_hook -
 0f:76ff interactionCoded2__state0_hook -

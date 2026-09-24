@@ -929,93 +929,113 @@ init_state3:
 void itemCode20_hook(GB *gb) {
   BASE(itemCode20);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = 0x04;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+OE(2)); E = 0x04;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (seed_jump_table(gb));
-    if (jt_ == b_+12) { break; }
+    if (jt_ == b_+O(12)) { break; }
     else if (jt_ == SYM(seedItemState1) && hook_is(gb, SYM(seedItemState1), seedItemState1_hook)) { seedItemState1_hook(gb); return; }
     else if (jt_ == SYM(seedItemState2) && hook_is(gb, SYM(seedItemState2), seedItemState2_hook)) { seedItemState2_hook(gb); return; }
     else if (jt_ == SYM(seedItemState3) && hook_is(gb, SYM(seedItemState3), seedItemState3_hook)) { seedItemState3_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
-  CALL_C(b_+12, itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+15);
-  CYC(b_+15, b_+16); alu_xor(gb, A);
-  CALL_C(b_+16, itemSetAnimation_hook, SYM(itemSetAnimation), b_+19);
-  CALL_C(b_+19, objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+22);
-  CALL_C(b_+22, itemIncState_hook, SYM(itemIncState), b_+25);
-  CYC(b_+25, b_+28); SET_BC((hSoundChannelBanks + 6));
-  CALL_C(b_+28, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+31);
-  CYC(b_+31, b_+33); L = 0x02;
-  CYC(b_+33, b_+34); A = mem_rd(gb, HL);
-  CYC(b_+34, b_+35); alu_or(gb, A);
-  if (F & FZ) CALL_C_CC(b_+35, itemUpdateAngle_hook, SYM(itemUpdateAngle), b_+38);
-  else CYC(b_+35, b_+38);
-  CYC(b_+38, b_+40); L = 0x34;
-  CYC(b_+40, b_+42); mem_wr(gb, HL, 0x03);
-  CYC(b_+42, b_+44); L = 0x02;
-  CYC(b_+44, b_+45); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+45, b_+46); alu_or(gb, A);
+  CALL_C(b_+O(12), itemLoadAttributesAndGraphics_hook, SYM(itemLoadAttributesAndGraphics), b_+OE(15));
+  CYC(b_+O(15), b_+OE(16)); alu_xor(gb, A);
+  CALL_C(b_+O(16), itemSetAnimation_hook, SYM(itemSetAnimation), b_+OE(19));
+  CALL_C(b_+O(19), objectSetVisiblec1_hook, SYM(objectSetVisiblec1), b_+OE(22));
+  CALL_C(b_+O(22), itemIncState_hook, SYM(itemIncState), b_+OE(25));
+  CYC(b_+O(25), b_+OE(28)); SET_BC(0xffe0);
+  CALL_C(b_+O(28), objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+OE(31));
+  if (!game_seasons) {
+    CYC(b_+31, b_+33); L = 0x02;
+    CYC(b_+33, b_+34); A = mem_rd(gb, HL);
+    CYC(b_+34, b_+35); alu_or(gb, A);
+    if (F & FZ) CALL_C_CC(b_+35, itemUpdateAngle_hook, SYM(itemUpdateAngle), b_+38);
+    else CYC(b_+35, b_+38);
+    CYC(b_+38, b_+40); L = 0x34;
+    CYC(b_+40, b_+42); mem_wr(gb, HL, 0x03);
+  } else {
+    CALL_C(b_+S(31), itemUpdateAngle_hook, SYM(itemUpdateAngle), b_+S(34));
+  }
+  CYC(b_+O(42), b_+OE(44)); L = 0x02;
+  CYC(b_+O(44), b_+OE(45)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(45), b_+OE(46)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+46, b_+48);
+    CYCT(b_+O(46), b_+OE(48));
     goto shooter;
   }
-  CYC(b_+46, b_+48);
-  CYC(b_+48, b_+49); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+49, b_+51); alu_cp(gb, 0x23);
+  CYC(b_+O(46), b_+OE(48));
+  CYC(b_+O(48), b_+OE(49)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(49), b_+OE(51)); alu_cp(gb, 0x23);
   if (!(F & FZ)) {
-    CYCT(b_+51, b_+53);
-    CYC(b_+64, b_+67); SET_HL(b_+124);
-    CALL_C(b_+67, applyOffsetTableHL_hook, SYM(applyOffsetTableHL), b_+70);
-    CYC(b_+70, b_+72); A = 0x1e;
-    CYC(b_+72, b_+74);
+    CYCT(b_+O(51), b_+OE(53));
+    if (!game_seasons) {
+      CYC(b_+64, b_+67); SET_HL(b_+124);
+      CALL_C(b_+67, applyOffsetTableHL_hook, SYM(applyOffsetTableHL), b_+70);
+    }
+    CYC(b_+O(70), b_+OE(72)); A = 0x1e;
+    CYC(b_+O(72), b_+OE(74));
     goto set_speed;
   }
-  CYC(b_+51, b_+53);
-  CYC(b_+53, b_+55); L = 0x0f;
-  CYC(b_+55, b_+56); A = mem_rd(gb, HL);
-  CYC(b_+56, b_+58); alu_add(gb, 0xf8);
-  CYC(b_+58, b_+59); mem_wr(gb, HL, A);
-  CYC(b_+59, b_+61); L = 0x09;
-  CYC(b_+61, b_+63); mem_wr(gb, HL, 0xff);
-  CYC(b_+63, b_+64); ret_effect(gb);
+  CYC(b_+O(51), b_+OE(53));
+  CYC(b_+O(53), b_+OE(55)); L = 0x0f;
+  CYC(b_+O(55), b_+OE(56)); A = mem_rd(gb, HL);
+  CYC(b_+O(56), b_+OE(58)); alu_add(gb, 0xf8);
+  CYC(b_+O(58), b_+OE(59)); mem_wr(gb, HL, A);
+  CYC(b_+O(59), b_+OE(61)); L = 0x09;
+  CYC(b_+O(61), b_+OE(63)); mem_wr(gb, HL, 0xff);
+  CYC(b_+O(63), b_+OE(64)); ret_effect(gb);
   return;
 
 shooter:
-  CYC(b_+74, b_+76); E = 0x09;
-  CYC(b_+76, b_+77); A = mem_rd(gb, DE);
-  CYC(b_+77, b_+78); alu_rrca(gb);
-  CYC(b_+78, b_+81); SET_HL(b_+136);
-  CYC(b_+81, b_+82); seed_add_a_to_hl_from_rst(gb, b_+82);
-  CYC(b_+82, b_+83); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+83, b_+84); C = mem_rd(gb, HL);
-  CYC(b_+84, b_+85); B = A;
-  CYC(b_+85, b_+86); H = D;
-  CYC(b_+86, b_+88); L = 0x0f;
-  CYC(b_+88, b_+89); A = mem_rd(gb, HL);
-  CYC(b_+89, b_+91); alu_add(gb, 0xfe);
-  CYC(b_+91, b_+92); mem_wr(gb, HL, A);
-  CALL_C(b_+92, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+95);
-  CYC(b_+95, b_+98); SET_HL(wIsSeedShooterInUse);
-  CYC(b_+98, b_+99); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+99, b_+101); A = 0x78;
+  if (!game_seasons) {
+    CYC(b_+74, b_+76); E = 0x09;
+    CYC(b_+76, b_+77); A = mem_rd(gb, DE);
+    CYC(b_+77, b_+78); alu_rrca(gb);
+    CYC(b_+78, b_+81); SET_HL(b_+136);
+    CYC(b_+81, b_+82); seed_add_a_to_hl_from_rst(gb, b_+82);
+    CYC(b_+82, b_+83); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+83, b_+84); C = mem_rd(gb, HL);
+    CYC(b_+84, b_+85); B = A;
+    CYC(b_+85, b_+86); H = D;
+    CYC(b_+86, b_+88); L = 0x0f;
+    CYC(b_+88, b_+89); A = mem_rd(gb, HL);
+    CYC(b_+89, b_+91); alu_add(gb, 0xfe);
+    CYC(b_+91, b_+92); mem_wr(gb, HL, A);
+    CALL_C(b_+92, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+95);
+  } else {
+    CYC(b_+S(60), b_+S(63)); SET_HL(b_+S(105));
+    CYC(b_+S(63), b_+S(64)); seed_add_a_to_hl_from_rst(gb, b_+S(64));
+    CYC(b_+S(64), b_+S(66)); E = 0x09;
+    CYC(b_+S(66), b_+S(67)); A = mem_rd(gb, DE);
+    CYC(b_+S(67), b_+S(68)); alu_add(gb, mem_rd(gb, HL));
+    CYC(b_+S(68), b_+S(70)); alu_and(gb, 0x1f);
+    CYC(b_+S(70), b_+S(71)); mem_wr(gb, DE, A);
+  }
+  CYC(b_+O(95), b_+OE(98)); SET_HL(wIsSeedShooterInUse);
+  CYC(b_+O(98), b_+OE(99)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(99), b_+OE(101)); A = 0x78;
 
 set_speed:
-  CYC(b_+101, b_+103); E = 0x10;
-  CYC(b_+103, b_+104); mem_wr(gb, DE, A);
-  CYC(b_+104, b_+106); E = 0x01;
-  CYC(b_+106, b_+107); A = mem_rd(gb, DE);
-  CYC(b_+107, b_+109); alu_cp(gb, 0x24);
-  if (!(F & FZ)) {
-    CYCT(b_+109, b_+110); ret_effect(gb); return;
+  CYC(b_+O(101), b_+OE(103)); E = 0x10;
+  CYC(b_+O(103), b_+OE(104)); mem_wr(gb, DE, A);
+  if (game_seasons) {
+    CYC(b_+S(80), b_+S(83)); SET_HL(b_+S(109));
+    CALL_C(b_+S(83), applyOffsetTableHL_hook, SYM(applyOffsetTableHL), b_+S(86));
   }
-  CYC(b_+109, b_+110);
-  CALL_C(b_+110, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+113);
-  CYC(b_+113, b_+115); alu_and(gb, 0x03);
-  CYC(b_+115, b_+117); E = 0x03;
-  CYC(b_+117, b_+118); mem_wr(gb, DE, A);
-  CYC(b_+118, b_+120); alu_add(gb, 0x9b);
-  CYC(b_+120, b_+122); E = 0x24;
-  CYC(b_+122, b_+123); mem_wr(gb, DE, A);
-  CYC(b_+123, b_+124); ret_effect(gb);
+  CYC(b_+O(104), b_+OE(106)); E = 0x01;
+  CYC(b_+O(106), b_+OE(107)); A = mem_rd(gb, DE);
+  CYC(b_+O(107), b_+OE(109)); alu_cp(gb, 0x24);
+  if (!(F & FZ)) {
+    CYCT(b_+O(109), b_+OE(110)); ret_effect(gb); return;
+  }
+  CYC(b_+O(109), b_+OE(110));
+  CALL_C(b_+O(110), getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+OE(113));
+  CYC(b_+O(113), b_+OE(115)); alu_and(gb, 0x03);
+  CYC(b_+O(115), b_+OE(117)); E = 0x03;
+  CYC(b_+O(117), b_+OE(118)); mem_wr(gb, DE, A);
+  CYC(b_+O(118), b_+OE(120)); alu_add(gb, 0x9b);
+  CYC(b_+O(120), b_+OE(122)); E = 0x24;
+  CYC(b_+O(122), b_+OE(123)); mem_wr(gb, DE, A);
+  CYC(b_+O(123), b_+OE(124)); ret_effect(gb);
 }

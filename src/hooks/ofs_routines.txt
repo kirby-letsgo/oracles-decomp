@@ -29,6 +29,7 @@ enemyBoss_initializeRoomWithoutExtraGfx_b10
 enemyCode37
 enemyCode4d
 enemyCode4f
+enemyCode5a
 enemyCode79
 func_5a60
 func_5c18
@@ -41,11 +42,17 @@ initializeAnimations
 initializeFile_b07
 interaction7f_subid01
 interactionCode0f
+interactionCode12
+interactionCode14
+interactionCode1e
+interactionCode28
 interactionCode60
 interactionCode6b
 interactionCode6c
 interactionCode71
 interactionCodeb5
+interactionCodece
+interactionCoded0
 interactionCodedc
 interactionCodee0
 introCinematic_inTemple
@@ -54,6 +61,7 @@ inventoryMenuState0
 inventoryMenuState3
 itemCode06
 itemCode16
+itemCode20
 itemDrop_spawnEnemy
 itemInitializeFromLinkPosition
 itemUpdateThrowingVertically
@@ -82,6 +90,8 @@ parentItemCode_bomb
 parentItemCode_bombchu
 parentItemCode_boomerang
 parentItemCode_bracelet
+parentItemCode_feather
+parentItemCode_flute
 parentItemCode_foolsOre
 parentItemCode_punch
 parentItemCode_satchel
@@ -101,9 +111,11 @@ scriptCmd_initNpcHitbox
 scriptCmd_jumpRandom
 scriptCmd_loadScript
 seedItemState1
+shopItemState0
 shopItemState3 30=37
 shopkeeperGotoState1
 shopkeeperState0
+shopkeeperState1
 shopkeeperState2
 specialObjectCode_linkInCutscene_b06
 standardGameState

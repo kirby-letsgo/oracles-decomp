@@ -83,3 +83,4 @@ interactionCode89@state5Substate1
 interactionCode89@state5Substate2
 interactionCode89@state5Substate3
 interactionCode89@state5Substate4
+parentItemCode_harp@getSelectedSongAddr   # Ages-only ret z / ld l,<wSelectedHarpSong written under !game_seasons in flute_get_selected_song_addr

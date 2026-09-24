@@ -55,11 +55,11 @@ static void interactionCoded0_addDoubleIndex(GB *gb, uint16_t return_address) {
 // @setFlagAndDeleteWhenCompanionIsAbove and @setFlagAndDeleteWhenCompanionIsBelowOrRight.
 static void interactionCoded0_cpYToCompanion(GB *gb) {
   BASE(interactionCoded0);
-  CYC(b_+186, b_+188); E = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+188, b_+189); A = mem_rd(gb, DE);
-  CYC(b_+189, b_+192); SET_HL(w1Companion_yh);
-  CYC(b_+192, b_+193); alu_cp(gb, mem_rd(gb, HL));
-  RET(b_+193); return;
+  CYC(b_+O(186), b_+OE(188)); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+O(188), b_+OE(189)); A = mem_rd(gb, DE);
+  CYC(b_+O(189), b_+OE(192)); SET_HL(w1Companion_yh);
+  CYC(b_+O(192), b_+OE(193)); alu_cp(gb, mem_rd(gb, HL));
+  RET(b_+O(193)); return;
 }
 
 // interactionCoded0@checkLinkInXRange (0b:4bf6): true local, called (real `call`) once from
@@ -67,36 +67,36 @@ static void interactionCoded0_cpYToCompanion(GB *gb) {
 // @param[out] zflag z if Link is within a certain range of X-positions for certain rooms?
 static void interactionCoded0_checkLinkInXRange(GB *gb) {
   BASE(interactionCoded0);
-  CYC(b_+194, b_+197); A = mem_rd(gb, wActiveRoom);
-  CYC(b_+197, b_+200); SET_HL(b_+228); // @rooms
-  CYC(b_+200, b_+202); B = 0x00;
+  CYC(b_+O(194), b_+OE(197)); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+O(197), b_+OE(200)); SET_HL(b_+O(228)); // @rooms
+  CYC(b_+O(200), b_+OE(202)); B = 0x00;
 
 roomLoop:
-  CYC(b_+202, b_+203); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+203, b_+205); goto foundRoom; } // jr z
-  CYC(b_+203, b_+205);
-  CYC(b_+205, b_+206); B = alu_inc8(gb, B);
-  CYC(b_+206, b_+207); SET_HL(HL + 1);
-  CYC(b_+207, b_+209); goto roomLoop; // jr $4bfe
+  CYC(b_+O(202), b_+OE(203)); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(203), b_+OE(205)); goto foundRoom; } // jr z
+  CYC(b_+O(203), b_+OE(205));
+  CYC(b_+O(205), b_+OE(206)); B = alu_inc8(gb, B);
+  CYC(b_+O(206), b_+OE(207)); SET_HL(HL + 1);
+  CYC(b_+O(207), b_+OE(209)); goto roomLoop; // jr $4bfe
 
 foundRoom:
-  CYC(b_+209, b_+210); A = B;
-  CYC(b_+210, b_+213); SET_HL(b_+231); // @xRanges
-  CYC(b_+213, b_+214); interactionCoded0_addDoubleIndex(gb, b_+214);
-  CYC(b_+214, b_+217); A = mem_rd(gb, w1Link_xh);
-  CYC(b_+217, b_+218); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(b_+218, b_+220); goto notInRange; } // jr c
-  CYC(b_+218, b_+220);
-  CYC(b_+220, b_+221); SET_HL(HL + 1);
-  CYC(b_+221, b_+222); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(b_+222, b_+224); goto notInRange; } // jr nc
-  CYC(b_+222, b_+224);
-  CYC(b_+224, b_+225); alu_xor(gb, A);
-  RET(b_+225); return;
+  CYC(b_+O(209), b_+OE(210)); A = B;
+  CYC(b_+O(210), b_+OE(213)); SET_HL(b_+O(231)); // @xRanges
+  CYC(b_+O(213), b_+OE(214)); interactionCoded0_addDoubleIndex(gb, b_+O(214));
+  CYC(b_+O(214), b_+OE(217)); A = mem_rd(gb, w1Link_xh);
+  CYC(b_+O(217), b_+OE(218)); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FC) { CYCT(b_+O(218), b_+OE(220)); goto notInRange; } // jr c
+  CYC(b_+O(218), b_+OE(220));
+  CYC(b_+O(220), b_+OE(221)); SET_HL(HL + 1);
+  CYC(b_+O(221), b_+OE(222)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+O(222), b_+OE(224)); goto notInRange; } // jr nc
+  CYC(b_+O(222), b_+OE(224));
+  CYC(b_+O(224), b_+OE(225)); alu_xor(gb, A);
+  RET(b_+O(225)); return;
 
 notInRange:
-  CYC(b_+226, b_+227); alu_or(gb, D);
-  RET(b_+227); return;
+  CYC(b_+O(226), b_+OE(227)); alu_or(gb, D);
+  RET(b_+O(227)); return;
 }
 
 // ==================================================================================================
@@ -111,163 +111,168 @@ notInRange:
 void interactionCoded0_hook(GB *gb) {
   BASE(interactionCoded0);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+OE(2)); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (interactionCoded0_jump_table(gb));
-    if (jt_ == b_+10) { goto state0; }
-    else if (jt_ == b_+14) { goto state1; }
-    else if (jt_ == b_+99) { goto state2; }
+    if (jt_ == b_+O(10)) { goto state0; }
+    else if (jt_ == b_+O(14)) { goto state1; }
+    else if (jt_ == b_+O(99)) { goto state2; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
 state0:
-  CYC(b_+10, b_+12); A = 0x01;
-  CYC(b_+12, b_+13); mem_wr(gb, DE, A);
-  RET(b_+13); return;
+  CYC(b_+O(10), b_+OE(12)); A = 0x01;
+  CYC(b_+O(12), b_+OE(13)); mem_wr(gb, DE, A);
+  RET(b_+O(13)); return;
 
 state1:
-  CYC(b_+14, b_+16); A = 0x02;
-  CYC(b_+16, b_+17); mem_wr(gb, DE, A);
-  CYC(b_+17, b_+20); A = mem_rd(gb, w1Companion_enabled);
-  CYC(b_+20, b_+21); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+21, b_+23); goto deleteIfSubid2Or5; } // jr z
-  CYC(b_+21, b_+23);
+  CYC(b_+O(14), b_+OE(16)); A = 0x02;
+  CYC(b_+O(16), b_+OE(17)); mem_wr(gb, DE, A);
+  CYC(b_+O(17), b_+OE(20)); A = mem_rd(gb, w1Companion_enabled);
+  CYC(b_+O(20), b_+OE(21)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(21), b_+OE(23)); goto deleteIfSubid2Or5; } // jr z
+  CYC(b_+O(21), b_+OE(23));
 
   // Verify that the correct companion is on-screen, otherwise delete self
-  CYC(b_+23, b_+25); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+25, b_+26); A = mem_rd(gb, DE);
-  CYC(b_+26, b_+28); A = alu_srl(gb, A);
-  CYC(b_+28, b_+30); alu_add(gb, 0x0b); // SPECIALOBJECT_FIRST_COMPANION
-  CYC(b_+30, b_+32); alu_cp(gb, 0x0e); // SPECIALOBJECT_LAST_COMPANION+1
-  if (F & FC) { CYCT(b_+32, b_+34); goto afterMoosh; } // jr c
-  CYC(b_+32, b_+34);
-  CYC(b_+34, b_+36); A = 0x0d; // SPECIALOBJECT_MOOSH
+  CYC(b_+O(23), b_+OE(25)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(25), b_+OE(26)); A = mem_rd(gb, DE);
+  CYC(b_+O(26), b_+OE(28)); A = alu_srl(gb, A);
+  CYC(b_+O(28), b_+OE(30)); alu_add(gb, 0x0b); // SPECIALOBJECT_FIRST_COMPANION
+  CYC(b_+O(30), b_+OE(32)); alu_cp(gb, 0x0e); // SPECIALOBJECT_LAST_COMPANION+1
+  if (F & FC) { CYCT(b_+O(32), b_+OE(34)); goto afterMoosh; } // jr c
+  CYC(b_+O(32), b_+OE(34));
+  CYC(b_+O(34), b_+OE(36)); A = 0x0d; // SPECIALOBJECT_MOOSH
 
 afterMoosh:
-  CYC(b_+36, b_+39); SET_HL(w1Companion_id);
-  CYC(b_+39, b_+40); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+40, b_+42); goto delete; } // jr nz
+  CYC(b_+O(36), b_+OE(39)); SET_HL(w1Companion_id);
+  CYC(b_+O(39), b_+OE(40)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(40), b_+OE(42)); goto delete; } // jr nz
 
   // Delete self if tutorial text was already shown
-  CYC(b_+40, b_+42);
-  CYC(b_+42, b_+43); A = mem_rd(gb, DE);
-  CYC(b_+43, b_+46); SET_HL(b_+249); // @flagNumbers
-  CYC(b_+46, b_+47); interactionCoded0_addAToHl(gb, b_+47);
-  CYC(b_+47, b_+48); A = mem_rd(gb, HL);
-  CYC(b_+48, b_+51); SET_HL(wCompanionTutorialTextShown);
-  CALL_C(b_+51, checkFlag_hook, SYM(checkFlag), b_+54);
-  if (!(F & FZ)) { CYCT(b_+54, b_+56); goto delete; } // jr nz
-  CYC(b_+54, b_+56);
+  CYC(b_+O(40), b_+OE(42));
+  CYC(b_+O(42), b_+OE(43)); A = mem_rd(gb, DE);
+  CYC(b_+O(43), b_+OE(46)); SET_HL(b_+(game_seasons ? S(222) : 249)); // @flagNumbers
+  CYC(b_+O(46), b_+OE(47)); interactionCoded0_addAToHl(gb, b_+O(47));
+  CYC(b_+O(47), b_+OE(48)); A = mem_rd(gb, HL);
+  CYC(b_+O(48), b_+OE(51)); SET_HL(wCompanionTutorialTextShown);
+  CALL_C(b_+O(51), checkFlag_hook, SYM(checkFlag), b_+OE(54));
+  if (!(F & FZ)) { CYCT(b_+O(54), b_+OE(56)); goto delete; } // jr nz
+  CYC(b_+O(54), b_+OE(56));
 
   // Check whether to dismount? (subid 2 only)
-  CYC(b_+56, b_+57); A = mem_rd(gb, DE);
-  CYC(b_+57, b_+59); alu_cp(gb, 0x02);
-  if (!(F & FZ)) { CYCT(b_+59, b_+61); goto afterDismountCheck; } // jr nz
-  CYC(b_+59, b_+61);
-  CYC(b_+61, b_+64); A = mem_rd(gb, wLinkObjectIndex);
-  CYC(b_+64, b_+65); alu_rra(gb);
-  CYC(b_+65, b_+66); A = mem_rd(gb, DE);
-  if (!(F & FC)) { CYCT(b_+66, b_+68); goto afterDismountCheck; } // jr nc
-  CYC(b_+66, b_+68);
-  CYC(b_+68, b_+71); mem_wr(gb, wForceCompanionDismount, A);
+  CYC(b_+O(56), b_+OE(57)); A = mem_rd(gb, DE);
+  CYC(b_+O(57), b_+OE(59)); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(b_+O(59), b_+OE(61)); goto afterDismountCheck; } // jr nz
+  CYC(b_+O(59), b_+OE(61));
+  CYC(b_+O(61), b_+OE(64)); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(b_+O(64), b_+OE(65)); alu_rra(gb);
+  CYC(b_+O(65), b_+OE(66)); A = mem_rd(gb, DE);
+  if (!(F & FC)) { CYCT(b_+O(66), b_+OE(68)); goto afterDismountCheck; } // jr nc
+  CYC(b_+O(66), b_+OE(68));
+  CYC(b_+O(68), b_+OE(71)); mem_wr(gb, wForceCompanionDismount, A);
 
 afterDismountCheck:
-  CYC(b_+71, b_+74); SET_HL(b_+237); // @tutorialTextToShow
-  CYC(b_+74, b_+75); interactionCoded0_addDoubleIndex(gb, b_+75);
-  CYC(b_+75, b_+76); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+76, b_+77); C = A;
-  CYC(b_+77, b_+78); B = mem_rd(gb, HL);
-  CYC(b_+78, b_+81); A = mem_rd(gb, wLinkObjectIndex);
-  CYC(b_+81, b_+83); alu_bit(gb, 0, A);
-  if (!(F & FZ)) CALL_C_CC(b_+83, showText_hook, SYM(showText), b_+86); else CYC(b_+83, b_+86); // call nz
+  CYC(b_+O(71), b_+OE(74)); SET_HL(b_+(game_seasons ? S(208) : 237)); // @tutorialTextToShow
+  CYC(b_+O(74), b_+OE(75)); interactionCoded0_addDoubleIndex(gb, b_+O(75));
+  CYC(b_+O(75), b_+OE(76)); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+O(76), b_+OE(77)); C = A;
+  CYC(b_+O(77), b_+OE(78)); B = mem_rd(gb, HL);
+  CYC(b_+O(78), b_+OE(81)); A = mem_rd(gb, wLinkObjectIndex);
+  CYC(b_+O(81), b_+OE(83)); alu_bit(gb, 0, A);
+  if (!(F & FZ)) CALL_C_CC(b_+O(83), showText_hook, SYM(showText), b_+OE(86)); else CYC(b_+O(83), b_+OE(86)); // call nz
 
 deleteIfSubid2Or5:
-  CYC(b_+86, b_+88); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+88, b_+89); A = mem_rd(gb, DE);
-  CYC(b_+89, b_+91); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(b_+91, b_+93); goto delete; } // jr z
-  CYC(b_+91, b_+93);
-  CYC(b_+93, b_+95); alu_cp(gb, 0x05);
-  if (!(F & FZ)) { CYCT(b_+95, b_+96); ret_effect(gb); return; } // ret nz
-  CYC(b_+95, b_+96);
+  CYC(b_+O(86), b_+OE(88)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(88), b_+OE(89)); A = mem_rd(gb, DE);
+  CYC(b_+O(89), b_+OE(91)); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+O(91), b_+OE(93)); goto delete; } // jr z
+  CYC(b_+O(91), b_+OE(93));
+  CYC(b_+O(93), b_+OE(95)); alu_cp(gb, 0x05);
+  if (!(F & FZ)) { CYCT(b_+O(95), b_+OE(96)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(95), b_+OE(96));
 
 delete:
-  CYC(b_+96, b_+99); TAIL(interactionDelete); // jp
+  CYC(b_+O(96), b_+OE(99)); TAIL(interactionDelete); // jp
 
 state2:
-  CYC(b_+99, b_+102); A = mem_rd(gb, w1Companion_enabled);
-  CYC(b_+102, b_+103); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+103, b_+104); ret_effect(gb); return; } // ret z
-  CYC(b_+103, b_+104);
-  CYC(b_+104, b_+106); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+106, b_+107); A = mem_rd(gb, DE);
-  CYC(b_+107, b_+108); push_effect(gb, b_+108);
+  CYC(b_+O(99), b_+OE(102)); A = mem_rd(gb, w1Companion_enabled);
+  CYC(b_+O(102), b_+OE(103)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(103), b_+OE(104)); ret_effect(gb); return; } // ret z
+  CYC(b_+O(103), b_+OE(104));
+  CYC(b_+O(104), b_+OE(106)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(106), b_+OE(107)); A = mem_rd(gb, DE);
+  CYC(b_+O(107), b_+OE(108)); push_effect(gb, b_+OE(108));
   do { uint16_t jt_ = (interactionCoded0_jump_table(gb));
-    if (jt_ == b_+171) { goto setFlagAndDeleteWhenCompanionIsBelowOrRight; }
-    else if (jt_ == b_+135) { goto setFlagAndDeleteWhenCompanionIsAbove; }
-    else if (jt_ == b_+120) { goto setFlagAndDeleteWhenCompanionIsBelow; }
-    else if (jt_ == b_+155) { goto setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange; }
-    else if (jt_ == b_+161) { goto setFlagAndDeleteWhenCompanionIsLeft; }
+    if (!game_seasons && jt_ == b_+171) { goto setFlagAndDeleteWhenCompanionIsBelowOrRight; }
+    else if (jt_ == b_+O(135)) { goto setFlagAndDeleteWhenCompanionIsAbove; }
+    else if (jt_ == b_+O(120)) { goto setFlagAndDeleteWhenCompanionIsBelow; }
+    else if (!game_seasons && jt_ == b_+155) { goto setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange; }
+    else if (!game_seasons && jt_ == b_+161) { goto setFlagAndDeleteWhenCompanionIsLeft; }
+    else if (game_seasons && jt_ == b_+O(130)) { goto setFlagAndDeleteWhenCompanionIsAboveAndVar38NonZero; }
+    else if (game_seasons && jt_ == b_+O(153)) { goto goToDelete; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
 setFlagAndDeleteWhenCompanionIsBelow:
-  CYC(b_+120, b_+122); E = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+122, b_+123); A = mem_rd(gb, DE);
-  CYC(b_+123, b_+126); SET_HL(w1Companion_yh);
-  CYC(b_+126, b_+127); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(b_+127, b_+128); ret_effect(gb); return; } // ret nc
-  CYC(b_+127, b_+128);
-  CYC(b_+128, b_+130); goto setFlagAndDelete; // jr $4bbf
+  CYC(b_+O(120), b_+OE(122)); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+O(122), b_+OE(123)); A = mem_rd(gb, DE);
+  CYC(b_+O(123), b_+OE(126)); SET_HL(w1Companion_yh);
+  CYC(b_+O(126), b_+OE(127)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+O(127), b_+OE(128)); ret_effect(gb); return; } // ret nc
+  CYC(b_+O(127), b_+OE(128));
+  CYC(b_+O(128), b_+OE(130)); goto setFlagAndDelete; // jr $4bbf
 
-  // setFlagAndDeleteWhenCompanionIsAboveAndVar38NonZero (0b:4bb6): dead in ages, falls through.
-  CYC(b_+130, b_+133); A = mem_rd(gb, w1Companion_var38);
-  CYC(b_+133, b_+134); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+134, b_+135); ret_effect(gb); return; } // ret z
-  CYC(b_+134, b_+135);
+  // Only Seasons' table reaches this; in Ages it is dead code.
+setFlagAndDeleteWhenCompanionIsAboveAndVar38NonZero:
+  CYC(b_+O(130), b_+OE(133)); A = mem_rd(gb, w1Companion_var38);
+  CYC(b_+O(133), b_+OE(134)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(134), b_+OE(135)); ret_effect(gb); return; } // ret z
+  CYC(b_+O(134), b_+OE(135));
 
 setFlagAndDeleteWhenCompanionIsAbove:
-  CALL_L(b_+135, interactionCoded0_cpYToCompanion, b_+138);
-  if (F & FC) { CYCT(b_+138, b_+139); ret_effect(gb); return; } // ret c
-  CYC(b_+138, b_+139);
+  CALL_L(b_+O(135), interactionCoded0_cpYToCompanion, b_+OE(138));
+  if (F & FC) { CYCT(b_+O(138), b_+OE(139)); ret_effect(gb); return; } // ret c
+  CYC(b_+O(138), b_+OE(139));
 
 setFlagAndDelete:
-  CYC(b_+139, b_+141); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+141, b_+142); A = mem_rd(gb, DE);
-  CYC(b_+142, b_+145); SET_HL(b_+249); // @flagNumbers
-  CYC(b_+145, b_+146); interactionCoded0_addAToHl(gb, b_+146);
-  CYC(b_+146, b_+147); A = mem_rd(gb, HL);
-  CYC(b_+147, b_+150); SET_HL(wCompanionTutorialTextShown);
-  CALL_C(b_+150, setFlag_hook, SYM(setFlag), b_+153);
+  CYC(b_+O(139), b_+OE(141)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(141), b_+OE(142)); A = mem_rd(gb, DE);
+  CYC(b_+O(142), b_+OE(145)); SET_HL(b_+(game_seasons ? S(222) : 249)); // @flagNumbers
+  CYC(b_+O(145), b_+OE(146)); interactionCoded0_addAToHl(gb, b_+O(146));
+  CYC(b_+O(146), b_+OE(147)); A = mem_rd(gb, HL);
+  CYC(b_+O(147), b_+OE(150)); SET_HL(wCompanionTutorialTextShown);
+  CALL_C(b_+O(150), setFlag_hook, SYM(setFlag), b_+OE(153));
 
-  // goToDelete (falls through, never a goto target)
-  CYC(b_+153, b_+155); goto delete; // jr $4b94
+goToDelete:
+  CYC(b_+O(153), b_+OE(155)); goto delete; // jr $4b94
 
+  if (!game_seasons) {
 setFlagAndDeleteWhenCompanionIsAboveAndLinkInXRange:
-  CALL_L(b_+155, interactionCoded0_checkLinkInXRange, b_+158);
-  if (!(F & FZ)) { CYCT(b_+158, b_+159); ret_effect(gb); return; } // ret nz
-  CYC(b_+158, b_+159);
-  CYC(b_+159, b_+161); goto setFlagAndDeleteWhenCompanionIsAbove; // jr $4bbb
+    CALL_L(b_+155, interactionCoded0_checkLinkInXRange, b_+158);
+    if (!(F & FZ)) { CYCT(b_+158, b_+159); ret_effect(gb); return; } // ret nz
+    CYC(b_+158, b_+159);
+    CYC(b_+159, b_+161); goto setFlagAndDeleteWhenCompanionIsAbove; // jr $4bbb
 
 setFlagAndDeleteWhenCompanionIsLeft:
-  CYC(b_+161, b_+163); E = INTERACTION_BASE + OBJ_XH;
-  CYC(b_+163, b_+164); A = mem_rd(gb, DE);
-  CYC(b_+164, b_+167); SET_HL(w1Companion_xh);
-  CYC(b_+167, b_+168); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(b_+168, b_+169); ret_effect(gb); return; } // ret nc
-  CYC(b_+168, b_+169);
-  CYC(b_+169, b_+171); goto setFlagAndDelete; // jr $4bbf
+    CYC(b_+161, b_+163); E = INTERACTION_BASE + OBJ_XH;
+    CYC(b_+163, b_+164); A = mem_rd(gb, DE);
+    CYC(b_+164, b_+167); SET_HL(w1Companion_xh);
+    CYC(b_+167, b_+168); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FC)) { CYCT(b_+168, b_+169); ret_effect(gb); return; } // ret nc
+    CYC(b_+168, b_+169);
+    CYC(b_+169, b_+171); goto setFlagAndDelete; // jr $4bbf
 
 setFlagAndDeleteWhenCompanionIsBelowOrRight:
-  CALL_L(b_+171, interactionCoded0_cpYToCompanion, b_+174);
-  if (F & FC) { CYCT(b_+174, b_+176); goto setFlagAndDelete; } // jr c
-  CYC(b_+174, b_+176);
-  CYC(b_+176, b_+178); E = INTERACTION_BASE + OBJ_XH;
-  CYC(b_+178, b_+179); A = mem_rd(gb, DE);
-  CYC(b_+179, b_+182); SET_HL(w1Companion_xh);
-  CYC(b_+182, b_+183); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FC) { CYCT(b_+183, b_+184); ret_effect(gb); return; } // ret c
-  CYC(b_+183, b_+184);
-  CYC(b_+184, b_+186); goto setFlagAndDelete; // jr $4bbf
+    CALL_L(b_+171, interactionCoded0_cpYToCompanion, b_+174);
+    if (F & FC) { CYCT(b_+174, b_+176); goto setFlagAndDelete; } // jr c
+    CYC(b_+174, b_+176);
+    CYC(b_+176, b_+178); E = INTERACTION_BASE + OBJ_XH;
+    CYC(b_+178, b_+179); A = mem_rd(gb, DE);
+    CYC(b_+179, b_+182); SET_HL(w1Companion_xh);
+    CYC(b_+182, b_+183); alu_cp(gb, mem_rd(gb, HL));
+    if (F & FC) { CYCT(b_+183, b_+184); ret_effect(gb); return; } // ret c
+    CYC(b_+183, b_+184);
+    CYC(b_+184, b_+186); goto setFlagAndDelete; // jr $4bbf
+  }
 }
