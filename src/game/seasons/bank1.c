@@ -105,6 +105,7 @@ L_5e12:
 static void bank1_d_checkSwordUpgradeTransitions(GB *gb) {
   BASE(screenTransitionLostWoods);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  goto checkSwordUpgradeTransitions;
 checkTransition:
   CYC(b_+46, b_+49); A = mem_rd(gb, wScreenTransitionDirection);
   CYC(b_+49, b_+50); alu_cp(gb, B);
@@ -124,6 +125,7 @@ L_5e12:
   CYC(b_+63, b_+64); alu_xor(gb, A);
   RET(b_+64); return;
 
+checkSwordUpgradeTransitions:
   CYC(b_+94, b_+97); A = mem_rd(gb, wLostWoodsTransitionCounter2);
   CYC(b_+97, b_+98); push_effect(gb, b_+98);
   do { uint16_t jt_ = (bank1_d_jump_table(gb));
@@ -319,15 +321,6 @@ L_5e9d:
   RET(b_+45); return;
 }
 
-// setSeason
-static void bank1_d_setSeason(GB *gb) {
-  BASE(determineSeasonForRoomPack);
-  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+21, b_+24); mem_wr(gb, wRoomStateModifier, A);
-  CYC(b_+24, b_+26); alu_or(gb, 0x01);
-  RET(b_+26); return;
-}
-
 // @param	a	Room pack value
 void s_determineSeasonForRoomPack_hook(GB *gb) {
   BASE(determineSeasonForRoomPack);
@@ -345,7 +338,7 @@ L_7e19:
   CYC(b_+16, b_+19); SET_HL(SYM(roomPackSeasonTable));
   CYC(b_+19, b_+20); bank1_d_add_a_to_hl(gb, b_+20);
   CYC(b_+20, b_+21); A = mem_rd(gb, HL);
-  bank1_d_setSeason(gb); return; // falls through
+  s_setSeason_b01_hook(gb); return; // falls through
 }
 
 // Set a random season for horon village (unless it's spring).
@@ -355,12 +348,12 @@ void s_setHoronVillageSeason_hook(GB *gb) {
   CYC(b_+0, b_+2); A = 0x30;
   CALL_C(b_+2, s_checkGlobalFlag, SYM(checkGlobalFlag), b_+5);
   CYC(b_+5, b_+7); A = 0x00;
-  if (!(F & FZ)) { CYCT(b_+7, b_+9); bank1_d_setSeason(gb); return; }
+  if (!(F & FZ)) { CYCT(b_+7, b_+9); s_setSeason_b01_hook(gb); return; }
   CYC(b_+7, b_+9);
   CALL_C(b_+9, s_getRandomNumber, SYM(getRandomNumber), b_+12);
   CYC(b_+12, b_+14); alu_and(gb, 0x03);
   CYC(b_+14, b_+16);
-  bank1_d_setSeason(gb); return;
+  s_setSeason_b01_hook(gb); return;
 }
 
 // @param	a
@@ -372,13 +365,23 @@ void s_determineCompanionRegionSeason_hook(GB *gb) {
   CYC(b_+2, b_+4);
   CYC(b_+4, b_+6); A = 0x01;
   CYC(b_+6, b_+8);
-  bank1_d_setSeason(gb); return;
+  s_setSeason_b01_hook(gb); return;
 companionRegion:
   CYC(b_+8, b_+11); A = mem_rd(gb, wAnimalCompanion);
   CYC(b_+11, b_+13); alu_sub(gb, 0x0a);
   CYC(b_+13, b_+15); alu_and(gb, 0x03);
   CYC(b_+15, b_+18); mem_wr(gb, wRoomStateModifier, A);
   CYC(b_+18, b_+20);
-  bank1_d_setSeason(gb); return;
+  s_setSeason_b01_hook(gb); return;
 }
 
+
+// setSeason in bank 1 (the symbol names bank 0's copy, so the base is the routine before it):
+// room state modifier a, NZ.
+void s_setSeason_b01_hook(GB *gb) {
+  BASE(determineSeasonForRoomPack);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+21, b_+24); mem_wr(gb, wRoomStateModifier, A);
+  CYC(b_+24, b_+26); alu_or(gb, 0x01);
+  RET(b_+26); return;
+}

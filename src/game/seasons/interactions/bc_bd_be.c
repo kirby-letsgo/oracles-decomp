@@ -59,6 +59,7 @@ static void bc_bd_be_add_double_index(GB *gb, uint16_t return_address) {
 static void bc_bd_be_subid2_func_772e(GB *gb) {
   BASE(interactionCodebb);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  goto subid2_func_772e;
 subid2_setAnimationBasedOnAngle:
   CYC(b_+196, b_+198); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+198, b_+199); A = mem_rd(gb, DE);
@@ -66,6 +67,7 @@ subid2_setAnimationBasedOnAngle:
   CYC(b_+202, b_+205);
   TAIL(interactionSetAnimation);
 
+subid2_func_772e:
   CYC(b_+373, b_+375); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+375, b_+376); A = mem_rd(gb, DE);
   CYC(b_+376, b_+377); A = alu_dec8(gb, A);

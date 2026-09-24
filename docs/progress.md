@@ -4,6 +4,18 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-24, Seasons milestone 3 complete (worktree `m5-step0`): every one of the 1,279 ranked
+  Seasons-only routines is hand-written C. 1,277 are hooks in `src/hooks/rewritten_seasons.txt`
+  (1,420 entries in all); `wRamFunction` and `setCpuToDoubleSpeed` were already hand-written
+  externs (`extra_seasons.sym`, `kernel.c`). The last six are bank copies: `setSeason_b00/_b01`
+  (the bank-1 copy is based on the routine before it, since `SYM(setSeason)` is bank 0's) and
+  `ecom_seasonsFunc_4446_b0c`..`_b0f` (one body at the same address in each enemy bank,
+  `enemies/commonCode.c`). The enemies, parts, interactions, special objects and items were
+  drafted with `tools/draft_rewrite.py` and checked by the audits; its last fix: a helper whose
+  entry is not its lowest address starts with a `goto` to the entry (five helpers had started at
+  the wrong instruction). Audits per batch: lint, audit_bounds/imm/addr/jumps (`--game=seasons`),
+  audit_calls (both ROMs), audit_burns/cyc/retcc/overlap, guard_tailcalls. Gates: 87,496-frame
+  `--verify-shadow --ref-check` 0 failures (state 70bfa69b8df329df), ctest 10/10 with `native_tas`.
 - Milestone 3 (readable C engine) started 2026-09-09: plan in
   `docs/plans/2026-09-09-m3-readable-engine.md`. Goal: the disassembly's `code/` tree (55,673
   lines) as readable C, one file per disassembly file, named RAM, real parameters, verified per

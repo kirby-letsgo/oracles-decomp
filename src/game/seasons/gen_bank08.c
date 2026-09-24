@@ -1768,7 +1768,7 @@ L_5152:
   CALL(0x5156, checkFlag_hook, 0x0205, 0x5159);  // call $0205
   I(0x5159, 1); A = B;  // ld a,b
   if ((F & FZ)) { I(0x515a, 3); goto L_5152; } I(0x515a, 2);  // jr z,$5152
-  CALL(0x515c, s_setSeason_b00, 0x3a9c, 0x515f);  // call $3a9c
+  CALL(0x515c, s_setSeason_b00_hook, 0x3a9c, 0x515f);  // call $3a9c
   I(0x515f, 2); A = 0x5c;  // ld a,$5c
   CALL(0x5161, playSound_b00_hook, 0x0c74, 0x5164);  // call $0c74
   I(0x5164, 2); A = 0x02;  // ld a,$02

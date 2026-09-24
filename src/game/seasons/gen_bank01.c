@@ -2292,14 +2292,6 @@ L_437e:
   RET(0x4388); return;  // ret
 }
 
-// 01:7e1e
-void s_setSeason_b01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7e1e, 4); mem_wr(gb, 0xcc4e, A);  // ld ($cc4e),a
-  I(0x7e21, 2); alu_or(gb, 0x01);  // or $01
-  RET(0x7e23); return;  // ret
-}
-
 // 01:5d6c
 void s_updateActiveRoom__dungeon(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

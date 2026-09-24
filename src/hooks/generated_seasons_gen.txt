@@ -548,7 +548,7 @@
 00:3e20 s_setMakuTreeStageAndMapText_hook -
 00:11da s_setRoomFlagsForUnlockedKeyDoor__setRoomFlag L
 00:11e5 s_setRoomFlagsForUnlockedKeyDoor__notInDungeon L
-00:3a9c s_setSeason_b00 -
+00:3a9c s_setSeason_b00_hook -
 00:3e52 s_setUpCharactersAfterMoblinKeepDestroyed_hook -
 00:2ce9 s_specialObjectCode_linkInCutscene_b00 -
 00:2cf6 s_specialObjectCode_linkInCutscene__afterCall2cf6_b00 L
@@ -1136,7 +1136,7 @@
 01:437e s_screenTransitionState5Substate0__vertical L
 01:5e6b s_screenTransitionSwordUpgrade_hook -
 01:7e2c s_setHoronVillageSeason_hook -
-01:7e1e s_setSeason_b01 -
+01:7e1e s_setSeason_b01_hook -
 01:5d6c s_updateActiveRoom__dungeon L
 01:5d7d s_updateActiveRoom__gotRoom L
 01:5cec s_updateGrassAnimationModifier -
@@ -1776,7 +1776,7 @@
 0e:4108 s_ecom_fallingInHole__checkInCenterOfHole_b0e L
 0e:44ad s_ecom_galeSeedEffect__zero_b0e L
 0e:4233 s_ecom_getAdjacentWallsBitset__checkCollisionAt_b0e L
-0e:4446 s_ecom_seasonsFunc_4446_b0e -
+0e:4446 s_ecom_seasonsFunc_4446_b0e_hook -
 0e:43f9 s_ecom_updateAnimationFromAngle__setAnimation_b0e L
 0e:4526 s_enemyBoss_dead__alreadyPlayedDeathSound_b0e L
 0e:45a2 s_enemyCode70_hook -
@@ -3834,7 +3834,7 @@
 0d:4108 s_ecom_fallingInHole__checkInCenterOfHole_b0d L
 0d:44ad s_ecom_galeSeedEffect__zero_b0d L
 0d:4233 s_ecom_getAdjacentWallsBitset__checkCollisionAt_b0d L
-0d:4446 s_ecom_seasonsFunc_4446_b0d -
+0d:4446 s_ecom_seasonsFunc_4446_b0d_hook -
 0d:43f9 s_ecom_updateAnimationFromAngle__setAnimation_b0d L
 0d:451f s_enemyCode30__normalStatus L
 0d:453b s_enemyCode30__state_uninitialized L
@@ -4122,7 +4122,7 @@
 0c:4108 s_ecom_fallingInHole__checkInCenterOfHole_b0c L
 0c:44ad s_ecom_galeSeedEffect__zero_b0c L
 0c:4233 s_ecom_getAdjacentWallsBitset__checkCollisionAt_b0c L
-0c:4446 s_ecom_seasonsFunc_4446_b0c -
+0c:4446 s_ecom_seasonsFunc_4446_b0c_hook -
 0c:43f9 s_ecom_updateAnimationFromAngle__setAnimation_b0c L
 0c:4517 s_enemyCode08__normalStatus L
 0c:4533 s_enemyCode08__state_uninitialized L
@@ -5056,7 +5056,7 @@
 0f:4108 s_ecom_fallingInHole__checkInCenterOfHole_b0f L
 0f:44ad s_ecom_galeSeedEffect__zero_b0f L
 0f:4233 s_ecom_getAdjacentWallsBitset__checkCollisionAt_b0f L
-0f:4446 s_ecom_seasonsFunc_4446_b0f -
+0f:4446 s_ecom_seasonsFunc_4446_b0f_hook -
 0f:43f9 s_ecom_updateAnimationFromAngle__setAnimation_b0f L
 0f:4526 s_enemyBoss_dead__alreadyPlayedDeathSound_b0f L
 0f:45cb s_enemyCode01__collisionOccurred L

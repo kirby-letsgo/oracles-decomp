@@ -413,3 +413,4 @@ void s_func_57ba_hook(GB *gb) {
   CYC(b_+19, b_+22);
   TAIL(interactionSetScript);
 }
+

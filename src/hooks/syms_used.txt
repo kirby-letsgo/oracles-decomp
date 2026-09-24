@@ -14867,3 +14867,4 @@ table_770a table_770a -
 table_7b59 table_7b59 -
 titlescreenMakuSeedSprite titlescreenMakuSeedSprite -
 titlescreenPressStartSprites titlescreenPressStartSprites -
+ecom_seasonsFunc_4446 ecom_seasonsFunc_4446 -
