@@ -7,8 +7,10 @@ addRoomToEnemiesKilledList_b02
 addTreasureToInventory
 addTreasureToInventory__addToInventory
 agesFunc_3f_4133
+applyAllTileSubstitutions
 applyStandardTileSubstitutions
 applyStandardTileSubstitutions__locFunc
+applyWarpDest_b04
 armos_subid00_stateA
 armos_subid01_stateA
 beetle_chooseRandomAngleAndCounter1
@@ -64,6 +66,7 @@ collisionEffect35
 collisionEffect3d
 companionCheckEnableTerrainEffects
 companionCheckHopDownCliff
+companionDismountAndSavePosition
 companionDragToCenterOfHole
 copyFileFromHlToDe
 createEnergySwirlGoingIn
@@ -124,6 +127,8 @@ faroreGenerateGameTransferSecret
 fileSelectDrawLink
 fileSelectDrawLinkInOtherGame
 fileSelectMode6
+fileSelectMode6@mode2
+fileSelectMode6@updateMode6
 findFreeStaticObjectSlot
 findIndexInLoadedObjectGfx
 findUnusedIndexInLoadedObjectGfx
@@ -141,6 +146,7 @@ func_11_5e8a
 func_2d48
 func_3211
 func_39_400c
+func_410d
 func_4553@getLinkWalkingAnimation
 func_49c9
 func_53eb@dmaHeartPieceDisplay
@@ -213,6 +219,7 @@ keese_subid00_state8
 keese_subid00_state9
 kingMoblinBomb_checkCollisionWithKingMoblin
 kingMoblinBomb_checkCollisionWithLink
+label_04_033
 label_266
 likelike_checkHazards
 likelike_state9
@@ -259,6 +266,7 @@ objectQueueDraw
 objectRemoveFromAButtonSensitiveObjectList
 objectRunMovementScript
 octorok_state_uninitialized
+paletteFadeHandler06
 parseGivenObjectData_b00
 partAnimate
 partCheckCollisions

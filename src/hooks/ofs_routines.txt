@@ -7,7 +7,9 @@ applyWarpDest
 braceletCheckBreakable
 calculateAdjacentWallsBitset
 checkAndDecKeyCount
+checkAndSpawnMaple
 checkCollisionForCompanion
+checkDarkenRoom
 checkDisplayEraOrSeasonInfo
 checkItemDropAvailable_body
 checkItemUsed 7=13
@@ -20,12 +22,15 @@ checkTileWarps
 checkUpdateDungeonMinimap
 checkUseItems_b06
 clearAllItemsAndPutLinkOnGround
+companionCheckCanSpawn
 companionCheckMountingComplete
+companionRespawn
 companionTryToMount
 cutscene01
 cutscene05
 cutscene09
 decideItemDrop_body
+dimitriState0
 dimitriState5
 dimitriUpdateMovement
 dragonfly_state0
@@ -37,6 +42,7 @@ enemyBoss_initializeRoomWithoutExtraGfx_b0f
 enemyBoss_initializeRoomWithoutExtraGfx_b10
 enemyCode37
 enemyCode79
+findWarpSourceAndDest
 func_02_5a35
 func_131f
 func_3539
@@ -67,6 +73,7 @@ inventoryMenuDrawSprites
 inventoryMenuState0
 inventoryMenuState1
 inventoryMenuState3
+inventorySubmenu1_drawCursor
 inventorySubmenu2CheckDirectionButtons
 inventorySubscreen2_drawTreasures
 itemDrop_spawnEnemy
@@ -77,6 +84,9 @@ linkApplyTileTypes 233=227 234=228
 linkCutscene0
 linkState01 149=148
 linkState01_sidescroll
+linkState02
+linkState0d
+linkState12
 linkUpdateInAir_sidescroll
 linkUpdateSwimming_sidescroll
 linkedNpc_calcLowTextIndex
@@ -93,7 +103,10 @@ mapMenu_checkRoomVisited
 mapMenu_clearUnvisitedTiles
 mapMenu_drawSpriteAtRoomIndex
 mapMenu_loadPopupData
+mapMenu_state0
+mapMenu_state1
 mapleStateB
+mooshState0
 nextToPushableBlock
 objectCheckIsOverHazard
 overworldSwimmingState1
@@ -108,7 +121,9 @@ partCode09
 partCode13
 partCode27
 playCompassSoundIfKeyInRoom
+reloadGraphicsOnExitMenu_body
 replaceShutterForLinkEntering
+rickyState0
 rickyStateA
 screenTransitionState2
 screenTransitionState5Substate0
@@ -126,3 +141,5 @@ updateSpecialObjects
 updateStatusBar_body
 vire_batForm_stateA
 vire_mainForm_state8
+warpTransition5_01
+warpTransitionB

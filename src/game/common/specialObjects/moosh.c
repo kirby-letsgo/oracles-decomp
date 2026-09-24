@@ -89,68 +89,99 @@ void specialObjectCode_moosh__runState_hook(GB *gb) {
 void mooshState0_hook(GB *gb) {
   BASE(mooshState0);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, companionCheckCanSpawn_hook, SYM(companionCheckCanSpawn), b_+3);
-  CYC(b_+3, b_+5); A = 0x06;
-  CALL_C(b_+5, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+8);
-  CYC(b_+8, b_+10); A = 0x02;
-  CYC(b_+10, b_+12); L = 0x08;
-  CYC(b_+12, b_+13); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+13, b_+14); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+14, b_+17); SET_HL(wMooshState);
-  CYC(b_+17, b_+19); A = 0x80;
-  CYC(b_+19, b_+20); alu_and(gb, mem_rd(gb, HL));
+  CALL_C(b_+O(0), companionCheckCanSpawn_hook, SYM(companionCheckCanSpawn), b_+OE(3));
+  CYC(b_+O(3), b_+OE(5)); A = 0x06;
+  CALL_C(b_+O(5), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+OE(8));
+  CYC(b_+O(8), b_+OE(10)); A = 0x02;
+  CYC(b_+O(10), b_+OE(12)); L = 0x08;
+  CYC(b_+O(12), b_+OE(13)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(13), b_+OE(14)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(14), b_+OE(17)); SET_HL(wMooshState);
+  CYC(b_+O(17), b_+OE(19)); A = 0x80;
+  CYC(b_+O(19), b_+OE(20)); alu_and(gb, mem_rd(gb, HL));
   if (!(F & FZ)) {
-    CYCT(b_+20, b_+22);
+    CYCT(b_+O(20), b_+OE(22));
     goto set_animation;
   }
-  CYC(b_+20, b_+22);
-  CYC(b_+22, b_+25); A = W8(wActiveRoom);
-  CYC(b_+25, b_+27); alu_cp(gb, 0x54);
-  if (F & FZ) {
-    CYCT(b_+27, b_+29);
-    goto cutscene_state;
+  CYC(b_+O(20), b_+OE(22));
+  if (game_seasons) {
+    CYC(b_+S(22), b_+S(25)); A = W8(wAnimalCompanion);
+    CYC(b_+S(25), b_+S(27)); alu_cp(gb, 0x0d);
+    if (!(F & FZ)) {
+      CYCT(b_+S(27), b_+S(29));
+      goto cutscene_state;
+    }
+    CYC(b_+S(27), b_+S(29));
+    CYC(b_+S(29), b_+S(31)); A = 0x20;
+    CYC(b_+S(31), b_+S(32)); alu_and(gb, mem_rd(gb, HL));
+    if (!(F & FZ)) {
+      CYC(b_+S(32), b_+S(34));
+      CYC(b_+S(34), b_+S(37)); A = W8(wActiveRoom);
+      CYC(b_+S(37), b_+S(39)); alu_cp(gb, 0x2f);
+      if (F & FZ) {
+        CYCT(b_+S(39), b_+S(41));
+        goto cutscene_state;
+      }
+      CYC(b_+S(39), b_+S(41));
+      CYC(b_+S(41), b_+S(43));
+      goto set_animation;
+    }
+    CYCT(b_+S(32), b_+S(34));
+    CYC(b_+S(43), b_+S(46)); A = W8(wActiveRoom);
+    CYC(b_+S(46), b_+S(48)); alu_cp(gb, 0x90);
+    if (!(F & FZ)) {
+      CYCT(b_+S(48), b_+S(50));
+      goto set_animation;
+    }
+    CYC(b_+S(48), b_+S(50));
+  } else {
+    CYC(b_+22, b_+25); A = W8(wActiveRoom);
+    CYC(b_+25, b_+27); alu_cp(gb, 0x54);
+    if (F & FZ) {
+      CYCT(b_+27, b_+29);
+      goto cutscene_state;
+    }
+    CYC(b_+27, b_+29);
+    CYC(b_+29, b_+31); A = 0x20;
+    CYC(b_+31, b_+32); alu_and(gb, mem_rd(gb, HL));
+    if (F & FZ) {
+      CYCT(b_+32, b_+34);
+      goto cutscene_state;
+    }
+    CYC(b_+32, b_+34);
+    CYC(b_+34, b_+36); A = 0x40;
+    CYC(b_+36, b_+37); alu_and(gb, mem_rd(gb, HL));
+    if (!(F & FZ)) {
+      CYCT(b_+37, b_+39);
+      goto cutscene_state;
+    }
+    CYC(b_+37, b_+39);
+    CYC(b_+39, b_+41); A = 0x52;
+    CALL_C(b_+41, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+44);
+    if (!(F & FC)) {
+      CYCT(b_+44, b_+46);
+      goto set_animation;
+    }
+    CYC(b_+44, b_+46);
+    CYC(b_+46, b_+49); A = W8(wActiveRoom);
+    CYC(b_+49, b_+51); alu_cp(gb, 0x6b);
+    if (!(F & FZ)) {
+      CYCT(b_+51, b_+53);
+      goto set_animation;
+    }
+    CYC(b_+51, b_+53);
   }
-  CYC(b_+27, b_+29);
-  CYC(b_+29, b_+31); A = 0x20;
-  CYC(b_+31, b_+32); alu_and(gb, mem_rd(gb, HL));
-  if (F & FZ) {
-    CYCT(b_+32, b_+34);
-    goto cutscene_state;
-  }
-  CYC(b_+32, b_+34);
-  CYC(b_+34, b_+36); A = 0x40;
-  CYC(b_+36, b_+37); alu_and(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) {
-    CYCT(b_+37, b_+39);
-    goto cutscene_state;
-  }
-  CYC(b_+37, b_+39);
-  CYC(b_+39, b_+41); A = 0x52;
-  CALL_C(b_+41, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+44);
-  if (!(F & FC)) {
-    CYCT(b_+44, b_+46);
-    goto set_animation;
-  }
-  CYC(b_+44, b_+46);
-  CYC(b_+46, b_+49); A = W8(wActiveRoom);
-  CYC(b_+49, b_+51); alu_cp(gb, 0x6b);
-  if (!(F & FZ)) {
-    CYCT(b_+51, b_+53);
-    goto set_animation;
-  }
-  CYC(b_+51, b_+53);
 
 cutscene_state:
-  CYC(b_+53, b_+55); E = 0x04;
-  CYC(b_+55, b_+57); A = 0x0a;
-  CYC(b_+57, b_+58); mem_wr(gb, DE, A);
-  CYC(b_+58, b_+61); mooshStateA_hook(gb);
-  return;
+  CYC(b_+O(53), b_+OE(55)); E = 0x04;
+  CYC(b_+O(55), b_+OE(57)); A = 0x0a;
+  CYC(b_+O(57), b_+OE(58)); mem_wr(gb, DE, A);
+  CYC(b_+O(58), b_+OE(61)); TAIL(mooshStateA);
 
 set_animation:
-  CYC(b_+61, b_+63); C = 0x01;
-  CALL_C(b_+63, companionSetAnimation_hook, SYM(companionSetAnimation), b_+66);
-  CYC(b_+66, b_+69); TAIL(objectSetVisiblec1);
+  CYC(b_+O(61), b_+OE(63)); C = 0x01;
+  CALL_C(b_+O(63), companionSetAnimation_hook, SYM(companionSetAnimation), b_+OE(66));
+  CYC(b_+O(66), b_+OE(69)); TAIL(objectSetVisiblec1);
 }
 
 void mooshState1_hook(GB *gb) {

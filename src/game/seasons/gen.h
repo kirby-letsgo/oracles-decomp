@@ -1020,7 +1020,6 @@ void s_tickTockSecretEntrance_hook(GB *gb);
 void s_unblockingD3Dam_hook(GB *gb);
 void s_underwaterGashaSeed_hook(GB *gb);
 void s_applyPaletteFadeTransitionData(GB *gb);
-void s_checkDarkenRoom(GB *gb);
 void s_checkLinkCloseEnoughToWarpTileCenter__tileSolid(GB *gb);
 void s_checkLinkCloseEnoughToWarpTileCenter__func_618f(GB *gb);
 void s_checkRoomPack(GB *gb);
@@ -1093,7 +1092,6 @@ void s_findActiveRoomInDungeonLayout(GB *gb);
 void s_getPaletteFadeTransitionData(GB *gb);
 void s_initializeSeedTreeRefillData(GB *gb);
 void s_makeActiveObjectFollowLink_b01(GB *gb);
-void s_paletteFadeHandler06(GB *gb);
 void s_screenTransitionEyePuzzle__up(GB *gb);
 void s_screenTransitionEyePuzzle__rightOrLeft(GB *gb);
 void s_screenTransitionLostWoods_hook(GB *gb);
@@ -1213,7 +1211,6 @@ void s_parseObjectData(GB *gb);
 void s_parseObjectData__afterCall58c7(GB *gb);
 void s_parseObjectData__afterCall58ca(GB *gb);
 void s_addRoomToEnemiesKilledList__found_b10(GB *gb);
-void s_checkAndSpawnMaple(GB *gb);
 void s_checkAndSpawnMaple__startCheck(GB *gb);
 void s_checkPositionValidForEnemySpawn__scrollingTransition(GB *gb);
 void s_checkPositionValidForEnemySpawn__fail(GB *gb);
@@ -2383,7 +2380,6 @@ void s_checkCollisionForCompanion__checkCollision(GB *gb);
 void s_checkLinkJumpingOffCliff__setSpeed140(GB *gb);
 void s_checkLinkJumpingOffCliff__checkCliffTile(GB *gb);
 void s_checkLinkPushingAgainstTreeStump_hook(GB *gb);
-void s_companionCheckCanSpawn(GB *gb);
 void s_companionCheckCanSpawn__canSpawn(GB *gb);
 void s_companionCheckEnableTerrainEffects__label_05_067(GB *gb);
 void s_companionCheckEnableTerrainEffects__enableTerrainEffects(GB *gb);
@@ -2393,7 +2389,6 @@ void s_companionCheckMountingComplete__stopMounting(GB *gb);
 void s_companionCheckMountingComplete__continue(GB *gb);
 void s_companionCheckMountingComplete__nudgeLinkTowardCompanion(GB *gb);
 void s_companionDecCounter1ToJumpDownCliff__animate(GB *gb);
-void s_companionDismountAndSavePosition(GB *gb);
 void s_companionDismountAndSavePosition__moosh(GB *gb);
 void s_companionDismountAndSavePosition__ricky(GB *gb);
 void s_companionDismountAndSavePosition__dimitri(GB *gb);
@@ -2402,7 +2397,6 @@ void s_companionDragToCenterOfHole__adjustX(GB *gb);
 void s_companionDragToCenterOfHole__adjustY(GB *gb);
 void s_companionDragToCenterOfHole__return(GB *gb);
 void s_companionGotoHazardHandlingState__ret(GB *gb);
-void s_companionRespawn(GB *gb);
 void s_companionRespawn__invalidPosition(GB *gb);
 void s_companionRespawn__applyDamageAndSetState(GB *gb);
 void s_companionRespawn__setState(GB *gb);
@@ -2412,7 +2406,6 @@ void s_companionTryToMount__tryMounting(GB *gb);
 void s_dimitriCheckAddToGrabbableObjectBuffer__ret(GB *gb);
 void s_dimitriCheckCanBeHeldInDirection__diagonalMovement(GB *gb);
 void s_dimitriCheckCanBeHeldInDirection__checkTile(GB *gb);
-void s_dimitriState0(GB *gb);
 void s_dimitriState0__setAnimation(GB *gb);
 void s_dimitriState0__setVisible(GB *gb);
 void s_dimitriState1__onLand(GB *gb);
@@ -2444,7 +2437,6 @@ void s_dimitriUpdateMovement__setNotInWater(GB *gb);
 void s_dimitriUpdateMovement__setWaterStatus(GB *gb);
 void s_fixXYWithinDancingGrid_hook(GB *gb);
 void s_fixXYWithinDancingGrid_helper_hook(GB *gb);
-void s_func_410d(GB *gb);
 void s_func_410d__invalid(GB *gb);
 void s_func_410d__ridingRicky(GB *gb);
 void s_func_410d__ridingDimitri(GB *gb);
@@ -2485,9 +2477,7 @@ void s_linkState01__updateDirection(GB *gb);
 void s_linkState01_sidescroll__notInWater(GB *gb);
 void s_linkState01_sidescroll__onIce(GB *gb);
 void s_linkState01_sidescroll__notOnIce(GB *gb);
-void s_linkState02(GB *gb);
 void s_linkState02__substate0(GB *gb);
-void s_linkState02__afterCall4ef9(GB *gb);
 void s_linkState02__parameter_drown(GB *gb);
 void s_linkState02__parameter_fallDownHole(GB *gb);
 void s_linkState02__parameter_fallDownHoleWithoutCentering(GB *gb);
@@ -2495,7 +2485,6 @@ void s_linkState02__parameter_3(GB *gb);
 void s_linkState02__substate1(GB *gb);
 void s_linkState02__respawn(GB *gb);
 void s_linkState02__substate2(GB *gb);
-void s_linkState02__afterCall4f99(GB *gb);
 void s_linkState02__substate3(GB *gb);
 void s_linkState02__substate4(GB *gb);
 void s_linkState02__substate5(GB *gb);
@@ -2533,7 +2522,6 @@ void s_linkState0b__substate1(GB *gb);
 void s_linkState0c__substate0(GB *gb);
 void s_linkState0c__substate2(GB *gb);
 void s_linkState0c__substate1(GB *gb);
-void s_linkState0d(GB *gb);
 void s_linkState0d__substate0(GB *gb);
 void s_linkState0d__substate2(GB *gb);
 void s_linkState0d__substate3(GB *gb);
@@ -2558,7 +2546,6 @@ void s_linkState10__substate2(GB *gb);
 void s_linkState11__substate0(GB *gb);
 void s_linkState11__substate1(GB *gb);
 void s_linkState11__substate2(GB *gb);
-void s_linkState12(GB *gb);
 void s_linkState12__substate0(GB *gb);
 void s_linkState12__willTransition(GB *gb);
 void s_linkState12__substate1(GB *gb);
@@ -2661,7 +2648,6 @@ void s_mapleStateB__determineAnimation(GB *gb);
 void s_mapleStateB__waitForText(GB *gb);
 void s_mapleStateB__substate1(GB *gb);
 void s_mooshFunc_05_7aff_hook(GB *gb);
-void s_mooshState0(GB *gb);
 void s_mooshState0__gotoCutsceneStateA(GB *gb);
 void s_mooshState0__setAnimation(GB *gb);
 void s_mooshState4__animate(GB *gb);
@@ -2698,7 +2684,6 @@ void s_rickyCheckAtScreenEdge__outsideScreen(GB *gb);
 void s_rickyCheckHopUpCliff__tryOneTileUp(GB *gb);
 void s_rickyCheckHopUpCliff__tryTwoTilesUp(GB *gb);
 void s_rickyCheckHopUpCliff__canJumpUpCliff(GB *gb);
-void s_rickyState0(GB *gb);
 void s_rickyStateB__canTalkToRicky(GB *gb);
 void s_rickyStateB__setAnimation17(GB *gb);
 void s_rickyStateB__setAnimation(GB *gb);
@@ -2780,7 +2765,6 @@ void s_warpTransition3__eachFrame(GB *gb);
 void s_warpTransition3__destInit(GB *gb);
 void s_warpTransition3__enterFromMiddleBottom(GB *gb);
 void s_warpTransition3__enterFromBottom(GB *gb);
-void s_warpTransition5_01(GB *gb);
 void s_warpTransition5_01__trampoline(GB *gb);
 void s_warpTransition6(GB *gb);
 void s_warpTransition6_00_hook(GB *gb);
@@ -2800,7 +2784,6 @@ void s_warpTransition8__substate6(GB *gb);
 void s_warpTransition8__substate7(GB *gb);
 void s_warpTransition9__substate0(GB *gb);
 void s_warpTransition9__substate1(GB *gb);
-void s_warpTransitionB(GB *gb);
 void s_warpTransitionB__warpVar0(GB *gb);
 void s_warpTransitionB__warpVar1(GB *gb);
 void s_warpTransitionB__warpVar2(GB *gb);
@@ -3389,13 +3372,10 @@ void s_zelda_state1__afterCall6e8e(GB *gb);
 void s_zelda_state1__faceLinkAndRunScript(GB *gb);
 void s_zelda_state1__afterCall6e97(GB *gb);
 void s_zelda_state1__runSubid8(GB *gb);
-void s_applyAllTileSubstitutions(GB *gb);
-void s_applyAllTileSubstitutions__afterCall5dab(GB *gb);
 void s_applySingleTileChanges(GB *gb);
 void s_applySingleTileChanges__next(GB *gb);
 void s_applySingleTileChanges__match(GB *gb);
 void s_applySingleTileChanges__notMatch(GB *gb);
-void s_applyWarpDest_b04(GB *gb);
 void s_checkIsTempleRemains_hook(GB *gb);
 void s_checkPirateShipDocked_hook(GB *gb);
 void s_copyRectangleFromTmpGfxBuffer__nextRow(GB *gb);
@@ -3408,7 +3388,6 @@ void s_findScreenEdgeWarpSource__nextWarpSource(GB *gb);
 void s_findScreenEdgeWarpSource__skipRemainingBytes(GB *gb);
 void s_findScreenEdgeWarpSource__pointerWarp(GB *gb);
 void s_findScreenEdgeWarpSource__foundWarpSource(GB *gb);
-void s_findWarpSourceAndDest(GB *gb);
 void s_findWarpSourceAndDest__nextWarpSource(GB *gb);
 void s_findWarpSourceAndDest__skipRemainingBytes(GB *gb);
 void s_findWarpSourceAndDest__pointerWarp(GB *gb);
@@ -3418,7 +3397,6 @@ void s_getLinkWarpQuadrant__largeRoom(GB *gb);
 void s_getMoblinKeepScreenIndex_hook(GB *gb);
 void s_getMoblinKeepSeasonsTilesetData_hook(GB *gb);
 void s_getTempleRemainsSeasonsTilesetData_hook(GB *gb);
-void s_label_04_033(GB *gb);
 void s_label_04_035_hook(GB *gb);
 void s_label_04_036_hook(GB *gb);
 void s_label_04_291_hook(GB *gb);
@@ -4355,8 +4333,6 @@ void s_dungeonMap_checkCompassTile____ret(GB *gb);
 void s_dungeonMap_scrollingState0__moveUpOrDown(GB *gb);
 void s_fileSelectMode1__mode1SubModes(GB *gb);
 void s_fileSelectMode1__state3(GB *gb);
-void s_fileSelectMode6__updateMode6(GB *gb);
-void s_fileSelectMode6__mode2(GB *gb);
 void s_galeSeedMenu_state1__end(GB *gb);
 void s_galeSeedMenu_state1__bPressed(GB *gb);
 void s_galeSeedMenu_state1__aPressed(GB *gb);
@@ -4367,7 +4343,6 @@ void s_inventoryMenuState2__subState1(GB *gb);
 void s_inventoryMenuState2__subState2(GB *gb);
 void s_inventoryMenuState2__buttonPressed(GB *gb);
 void s_inventoryMenuState2__func_02_57f3(GB *gb);
-void s_inventorySubmenu1_drawCursor(GB *gb);
 void s_loadCommonGraphics_body(GB *gb);
 void s_loadCommonGraphics_body__loadMoneyGraphic(GB *gb);
 void s_loadCommonGraphics_body__updateDisplayedMoney(GB *gb);
@@ -4387,14 +4362,10 @@ void s_mapMenu_loadPopupData__gotIcon(GB *gb);
 void s_mapMenu_performTileSubstitutions__nextSubstitution(GB *gb);
 void s_mapMenu_performTileSubstitutions__nextRow(GB *gb);
 void s_mapMenu_performTileSubstitutions__nextTile(GB *gb);
-void s_mapMenu_state0(GB *gb);
 void s_mapMenu_state0__overworld(GB *gb);
 void s_mapMenu_state0__subrosia(GB *gb);
-void s_mapMenu_state0__afterCall5f33(GB *gb);
 void s_mapMenu_state0__dungeon(GB *gb);
 void s_mapMenu_state0__commonCode(GB *gb);
-void s_mapMenu_state0__afterCall5f73(GB *gb);
-void s_mapMenu_state1__checkInput(GB *gb);
 void s_mapMenu_state1__dungeon(GB *gb);
 void s_mapMenu_state1__overworld(GB *gb);
 void s_mapMenu_state1__horizontalMove(GB *gb);
@@ -4415,9 +4386,6 @@ void s_maupMenu_drawPopup__checkPopupExists(GB *gb);
 void s_minimapPopupType_pirateShip_hook(GB *gb);
 void s_minimapPopupType_shop(GB *gb);
 void s_minimapPopupType_templeOfSeasons_hook(GB *gb);
-void s_reloadGraphicsOnExitMenu_body(GB *gb);
-void s_reloadGraphicsOnExitMenu_body__afterCall50ce(GB *gb);
-void s_reloadGraphicsOnExitMenu_body__afterCall50d1(GB *gb);
 void s_getChannelVolume__affectedByMusicVolume(GB *gb);
 void s_getChannelVolume__fullVolume(GB *gb);
 void s_getChannelVolume__halfVolume(GB *gb);
@@ -5769,6 +5737,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_updateGfxRegs2Scroll updateGfxRegs2Scroll_hook
 #define s_screenTransitionState3 screenTransitionState3_hook
 #define s_checkDarkenRoomAndClearPaletteFadeState checkDarkenRoomAndClearPaletteFadeState_hook
+#define s_checkDarkenRoom checkDarkenRoom_hook
 #define s_checkBrightenRoom checkBrightenRoom_hook
 #define s_screenTransitionState4 screenTransitionState4_hook
 #define s_screenTransitionState5 screenTransitionState5_hook
@@ -5833,6 +5802,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_paletteThread_stop paletteThread_stop_hook
 #define s_paletteThread_refreshPalettesAndStop paletteThread_refreshPalettesAndStop_hook
 #define s_paletteFadeHandler05 paletteFadeHandler05_hook
+#define s_paletteFadeHandler06 paletteFadeHandler06_hook
 #define s_paletteFadeHandler07 paletteFadeHandler07_hook
 #define s_paletteFadeHandler08 paletteFadeHandler08_hook
 #define s_paletteThread_calculateFadingPalettes paletteThread_calculateFadingPalettes_hook
@@ -5974,6 +5944,8 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_menuStateFadeIntoMenu menuStateFadeIntoMenu_hook
 #define s_saveGraphicsOnEnterMenu_body saveGraphicsOnEnterMenu_body_hook
 #define s_menuStateFadeOutOfMenu menuStateFadeOutOfMenu_hook
+#define s_reloadGraphicsOnExitMenu_body reloadGraphicsOnExitMenu_body_hook
+#define s_reloadGraphicsOnExitMenu_body__afterCall reloadGraphicsOnExitMenu_body__afterCall_hook
 #define s_menuStateFadeIntoGame menuStateFadeIntoGame_hook
 #define s_playHeartBeepAtInterval playHeartBeepAtInterval_hook
 #define s_updateStatusBar_body updateStatusBar_body_hook
@@ -6002,6 +5974,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_inventorySubmenu2CheckDirectionButtons inventorySubmenu2CheckDirectionButtons_hook
 #define s_func_02_5938 func_02_5938_hook
 #define s_inventorySubscreen0_drawCursor inventorySubscreen0_drawCursor_hook
+#define s_inventorySubmenu1_drawCursor inventorySubmenu1_drawCursor_hook
 #define s_inventorySubmenu2_drawCursor inventorySubmenu2_drawCursor_hook
 #define s_func_02_5a35 func_02_5a35_hook
 #define s_func_02_5afc func_02_5afc_hook
@@ -6024,6 +5997,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_galeSeedMenu_state3 galeSeedMenu_state3_hook
 #define s_galeSeedMenu_addOffsetToWarpIndex galeSeedMenu_addOffsetToWarpIndex_hook
 #define s_runMapMenu runMapMenu_hook
+#define s_mapMenu_state0 mapMenu_state0_hook
 #define s_dungeonMap_drawSmallKeyCount dungeonMap_drawSmallKeyCount_hook
 #define s_dungeonMap_calculateVisitedFloorsAndLinkPosition dungeonMap_calculateVisitedFloorsAndLinkPosition_hook
 #define s_mapMenu_state1 mapMenu_state1_hook
@@ -6269,7 +6243,10 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_b4VBlankFunction30 b4VBlankFunction30_hook
 #define s_b4VBlankFunction31 b4VBlankFunction31_hook
 #define s_vblankRunBank4Function_b04 vblankRunBank4Function_b04_hook
+#define s_applyWarpDest_b04 applyWarpDest_b04_hook
 #define s_label_04_032 label_04_032_hook
+#define s_label_04_033 label_04_033_hook
+#define s_findWarpSourceAndDest findWarpSourceAndDest_hook
 #define s_findScreenEdgeWarpSource findScreenEdgeWarpSource_hook
 #define s_func_04_4732 func_04_4732_hook
 #define s_getLinkWarpQuadrant getLinkWarpQuadrant_hook
@@ -6279,6 +6256,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_updateAnimationData updateAnimationData_hook
 #define s_updateAnimationDataPointer updateAnimationDataPointer_hook
 #define s_loadAnimationGfxIndex loadAnimationGfxIndex_hook
+#define s_applyAllTileSubstitutions applyAllTileSubstitutions_hook
 #define s_replaceTiles replaceTiles_hook
 #define s_applyStandardTileSubstitutions applyStandardTileSubstitutions_hook
 #define s_replaceShutterForLinkEntering replaceShutterForLinkEntering_hook
@@ -6303,6 +6281,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_queueTileWriteAtVBlank queueTileWriteAtVBlank_hook
 #define s_updateSpecialObjects updateSpecialObjects_hook
 #define s_updateGameKeysPressed updateGameKeysPressed_hook
+#define s_func_410d func_410d_hook
 #define s_specialObjectSetOamVariables specialObjectSetOamVariables_hook
 #define s_dealSpikeDamageToLink dealSpikeDamageToLink_hook
 #define s_updateLinkDamageTaken updateLinkDamageTaken_hook
@@ -6331,14 +6310,17 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_setLinkMountingSpeed setLinkMountingSpeed_hook
 #define s_companionCheckHazards companionCheckHazards_hook
 #define s_companionGotoHazardHandlingState companionGotoHazardHandlingState_hook
+#define s_companionDismountAndSavePosition companionDismountAndSavePosition_hook
 #define s_companionDismount companionDismount_hook
 #define s_saveLinkLocalRespawnAndCompanionPosition saveLinkLocalRespawnAndCompanionPosition_hook
 #define s_companionDragToCenterOfHole companionDragToCenterOfHole_hook
+#define s_companionRespawn companionRespawn_hook
 #define s_companionCheckHopDownCliff companionCheckHopDownCliff_hook
 #define s_companionFinalizeMounting companionFinalizeMounting_hook
 #define s_companionFunc_47d8 companionFunc_47d8_hook
 #define s_companionGotoDismountState companionGotoDismountState_hook
 #define s_companionSetAnimationAndGotoState5 companionSetAnimationAndGotoState5_hook
+#define s_companionCheckCanSpawn companionCheckCanSpawn_hook
 #define s_companionRetIfInactive companionRetIfInactive_hook
 #define s_companionRetIfInactiveWithoutStateCheck companionRetIfInactiveWithoutStateCheck_hook
 #define s_companionSetAnimationToVar3f companionSetAnimationToVar3f_hook
@@ -6369,12 +6351,14 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_warpTransition4 warpTransition4_hook
 #define s_warpTransition5 warpTransition5_hook
 #define s_warpTransition5_00 warpTransition5_00_hook
+#define s_warpTransition5_01 warpTransition5_01_hook
 #define s_warpTransition7 warpTransition7_hook
 #define s_warpTransition5_02 warpTransition5_02_hook
 #define s_linkIncrementDirectionOnOddFrames linkIncrementDirectionOnOddFrames_hook
 #define s_linkIncrementDirection linkIncrementDirection_hook
 #define s_warpTransition8 warpTransition8_hook
 #define s_warpTransition9 warpTransition9_hook
+#define s_warpTransitionB warpTransitionB_hook
 #define s_warpTransitionF warpTransitionF_hook
 #define s_linkState08 linkState08_hook
 #define s_linkCancelAllItemUsageAndClearAdjacentWallsBitset linkCancelAllItemUsageAndClearAdjacentWallsBitset_hook
@@ -6384,9 +6368,11 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_linkState04 linkState04_hook
 #define s_setLinkStateToDead setLinkStateToDead_hook
 #define s_linkState03 linkState03_hook
+#define s_linkState02 linkState02_hook
 #define s_linkState0c linkState0c_hook
 #define s_linkState13 linkState13_hook
 #define s_linkState14 linkState14_hook
+#define s_linkState0d linkState0d_hook
 #define s_linkState05 linkState05_hook
 #define s_linkState06 linkState06_hook
 #define s_linkState11 linkState11_hook
@@ -6432,6 +6418,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_specialObjectSetAngleRelativeToVar38 specialObjectSetAngleRelativeToVar38_hook
 #define s_specialObjectSetPositionToVar38IfSet specialObjectSetPositionToVar38IfSet_hook
 #define s_checkLinkJumpingOffCliff checkLinkJumpingOffCliff_hook
+#define s_linkState12 linkState12_hook
 #define s_specialObjectCode_transformedLink specialObjectCode_transformedLink_hook
 #define s_specialObjectCode_linkRidingAnimal specialObjectCode_linkRidingAnimal_hook
 #define s_specialObjectCode_minecart specialObjectCode_minecart_b05_hook
@@ -6470,6 +6457,8 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_mapleFunc_6c27 mapleFunc_6c27_hook
 #define s_mapleIncrementMeetingCounter mapleIncrementMeetingCounter_hook
 #define s_specialObjectCode_ricky specialObjectCode_ricky_hook
+#define s_rickyState0 rickyState0_hook
+#define s_rickyStateB rickyState0_hook
 #define s_rickyState1 rickyState1_hook
 #define s_rickyCheckHazards rickyCheckHazards_hook
 #define s_rickyState9 rickyState9_hook
@@ -6506,6 +6495,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_rickySetJumpSpeed rickySetJumpSpeed_hook
 #define s_rickyCheckAtScreenEdge rickyCheckAtScreenEdge_hook
 #define s_specialObjectCode_dimitri specialObjectCode_dimitri_hook
+#define s_dimitriState0 dimitriState0_hook
 #define s_dimitriState1 dimitriState1_hook
 #define s_dimitriState2 dimitriState2_hook
 #define s_dimitriState2Substate0 dimitriState2Substate0_hook
@@ -6532,6 +6522,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_dimitriCheckCanBeHeldInDirection dimitriCheckCanBeHeldInDirection_hook
 #define s_dimitriAddWaterfallResistance dimitriAddWaterfallResistance_hook
 #define s_specialObjectCode_moosh specialObjectCode_moosh_hook
+#define s_mooshState0 mooshState0_hook
 #define s_mooshState1 mooshState1_hook
 #define s_mooshCheckHazards mooshCheckHazards_hook
 #define s_mooshState3 mooshState3_hook
@@ -8168,6 +8159,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_createEnergySwirlGoingOut_body createEnergySwirlGoingOut_body_hook
 #define s_createEnergySwirlGoingIn_body createEnergySwirlGoingIn_body_hook
 #define s_func_5e1a func_5e1a_hook
+#define s_checkAndSpawnMaple checkAndSpawnMaple_hook
 #define s_functionCaller functionCaller_b02_hook
 #define s_addRoomToEnemiesKilledList addRoomToEnemiesKilledList_b02_hook
 #define s_stub_02_77f4 stub_02_77f4_hook

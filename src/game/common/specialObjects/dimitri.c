@@ -108,61 +108,75 @@ void specialObjectCode_dimitri__runState_hook(GB *gb) {
 void dimitriState0_hook(GB *gb) {
   BASE(dimitriState0);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, companionCheckCanSpawn_hook, SYM(companionCheckCanSpawn), b_+3);
-  CYC(b_+3, b_+5); A = 0x02;
-  CYC(b_+5, b_+7); L = 0x08;
-  CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+8, b_+9); mem_wr(gb, HL, A);
-  CYC(b_+9, b_+12); A = W8(wDimitriState);
-  CYC(b_+12, b_+14); alu_bit(gb, 7, A);
-  if (!(F & FZ)) {
-    CYCT(b_+14, b_+16);
-    goto set_animation;
-  }
-  CYC(b_+14, b_+16);
-  CYC(b_+16, b_+18); alu_bit(gb, 6, A);
-  if (!(F & FZ)) {
-    CYCT(b_+18, b_+20);
-    goto initialize_cutscene;
-  }
-  CYC(b_+18, b_+20);
-  CYC(b_+20, b_+22); alu_and(gb, 0x20);
-  if (!(F & FZ)) {
-    CYCT(b_+22, b_+24);
-    goto set_animation;
-  }
-  CYC(b_+22, b_+24);
-
-initialize_cutscene:
-  CYC(b_+24, b_+26); A = 0x24;
-  CALL_C(b_+26, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+29);
-  CYC(b_+29, b_+30); H = D;
-  CYC(b_+30, b_+32); C = 0x24;
-  if (F & FZ) {
-    CYCT(b_+32, b_+34);
+  CALL_C(b_+O(0), companionCheckCanSpawn_hook, SYM(companionCheckCanSpawn), b_+OE(3));
+  CYC(b_+O(3), b_+OE(5)); A = 0x02;
+  CYC(b_+O(5), b_+OE(7)); L = 0x08;
+  CYC(b_+O(7), b_+OE(8)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(8), b_+OE(9)); mem_wr(gb, HL, A);
+  CYC(b_+O(9), b_+OE(12)); A = W8(wDimitriState);
+  if (game_seasons) {
+    CYC(b_+S(12), b_+S(14)); alu_and(gb, 0x80);
+    if (!(F & FZ)) {
+      CYCT(b_+S(14), b_+S(16));
+      goto set_animation;
+    }
+    CYC(b_+S(14), b_+S(16));
+    CYC(b_+S(16), b_+S(18)); L = 0x04;
+    CYC(b_+S(18), b_+S(20)); mem_wr(gb, HL, 0x0a);
+    CYC(b_+S(20), b_+S(22)); E = 0x3d;
+    CALL_C(b_+S(22), objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+S(25));
+    CYC(b_+S(25), b_+S(27)); A = 0x24;
   } else {
-    CYC(b_+32, b_+34);
-    CYC(b_+34, b_+36); C = 0x1e;
+    CYC(b_+12, b_+14); alu_bit(gb, 7, A);
+    if (!(F & FZ)) {
+      CYCT(b_+14, b_+16);
+      goto set_animation;
+    }
+    CYC(b_+14, b_+16);
+    CYC(b_+16, b_+18); alu_bit(gb, 6, A);
+    if (!(F & FZ)) {
+      CYCT(b_+18, b_+20);
+      goto initialize_cutscene;
+    }
+    CYC(b_+18, b_+20);
+    CYC(b_+20, b_+22); alu_and(gb, 0x20);
+    if (!(F & FZ)) {
+      CYCT(b_+22, b_+24);
+      goto set_animation;
+    }
+    CYC(b_+22, b_+24);
+
+  initialize_cutscene:
+    CYC(b_+24, b_+26); A = 0x24;
+    CALL_C(b_+26, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+29);
+    CYC(b_+29, b_+30); H = D;
+    CYC(b_+30, b_+32); C = 0x24;
+    if (F & FZ) {
+      CYCT(b_+32, b_+34);
+    } else {
+      CYC(b_+32, b_+34);
+      CYC(b_+34, b_+36); C = 0x1e;
+    }
+    CYC(b_+36, b_+38); L = 0x04;
+    CYC(b_+38, b_+40); mem_wr(gb, HL, 0x0a);
+    CYC(b_+40, b_+42); E = 0x3d;
+    CALL_C(b_+42, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+45);
+    CYC(b_+45, b_+46); A = C;
   }
-  CYC(b_+36, b_+38); L = 0x04;
-  CYC(b_+38, b_+40); mem_wr(gb, HL, 0x0a);
-  CYC(b_+40, b_+42); E = 0x3d;
-  CALL_C(b_+42, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+45);
-  CYC(b_+45, b_+46); A = C;
-  CYC(b_+46, b_+48); E = 0x3f;
-  CYC(b_+48, b_+49); mem_wr(gb, DE, A);
-  CALL_C(b_+49, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+52);
-  CYC(b_+52, b_+55); SET_BC(0x0408);
-  CALL_C(b_+55, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+58);
-  CYC(b_+58, b_+60);
+  CYC(b_+O(46), b_+OE(48)); E = 0x3f;
+  CYC(b_+O(48), b_+OE(49)); mem_wr(gb, DE, A);
+  CALL_C(b_+O(49), specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+OE(52));
+  CYC(b_+O(52), b_+OE(55)); SET_BC(0x0408);
+  CALL_C(b_+O(55), objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+OE(58));
+  CYC(b_+O(58), b_+OE(60));
   goto set_visible;
 
 set_animation:
-  CYC(b_+60, b_+62); C = 0x1c;
-  CALL_C(b_+62, companionSetAnimation_hook, SYM(companionSetAnimation), b_+65);
+  CYC(b_+O(60), b_+OE(62)); C = 0x1c;
+  CALL_C(b_+O(62), companionSetAnimation_hook, SYM(companionSetAnimation), b_+OE(65));
 
 set_visible:
-  CYC(b_+65, b_+68); TAIL(objectSetVisible81);
+  CYC(b_+O(65), b_+OE(68)); TAIL(objectSetVisible81);
 }
 
 void dimitriState1_hook(GB *gb) {

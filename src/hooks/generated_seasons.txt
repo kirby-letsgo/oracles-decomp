@@ -632,6 +632,7 @@
 01:4289 updateGfxRegs2Scroll_hook -
 01:42a0 screenTransitionState3_hook -
 01:42cb checkDarkenRoomAndClearPaletteFadeState_hook -
+01:42cf checkDarkenRoom_hook -
 01:42f5 checkBrightenRoom_hook -
 01:430c screenTransitionState4_hook -
 01:432c screenTransitionState5_hook -
@@ -738,6 +739,7 @@
 01:55e8 paletteThread_stop_hook -
 01:55f2 paletteThread_refreshPalettesAndStop_hook -
 01:55fc paletteFadeHandler05_hook -
+01:5612 paletteFadeHandler06_hook -
 01:5628 paletteFadeHandler07_hook -
 01:5657 paletteFadeHandler08_hook -
 01:565d paletteFadeHandler08__seasonsFunc_01_5816_hook -
@@ -885,7 +887,9 @@
 02:44c0 runKidNameEntryMenu__mode1_hook -
 02:44c8 runKidNameEntryMenu__mode2_hook -
 02:44e6 fileSelectMode6_hook -
+02:44ec fileSelectMode6__updateMode6_hook -
 02:44fa fileSelectMode6__mode0_hook -
+02:4501 fileSelectMode6__mode2_hook -
 02:4531 runSecretEntryMenu_hook -
 02:453a runSecretEntryMenu__func_hook -
 02:4548 runSecretEntryMenu__mode0_hook -
@@ -979,6 +983,8 @@
 02:5029 menuStateFadeIntoMenu__openMenu_hook -
 02:5038 saveGraphicsOnEnterMenu_body_hook -
 02:5083 menuStateFadeOutOfMenu_hook -
+02:5092 reloadGraphicsOnExitMenu_body_hook -
+02:50ce reloadGraphicsOnExitMenu_body__afterCall_hook -
 02:50fc menuStateFadeIntoGame_hook -
 02:510d playHeartBeepAtInterval_hook -
 02:5173 updateStatusBar_body_hook -
@@ -1055,6 +1061,7 @@
 02:58e3 inventorySubmenu2CheckDirectionButtons__upOrDown__leftSide_hook -
 02:58f6 func_02_5938_hook -
 02:591c inventorySubscreen0_drawCursor_hook -
+02:5940 inventorySubmenu1_drawCursor_hook -
 02:59a5 inventorySubmenu2_drawCursor_hook -
 02:59ef func_02_5a35_hook -
 02:59f5 func_02_5a35__next_hook -
@@ -1100,9 +1107,11 @@
 02:5ea6 galeSeedMenu_state3_hook -
 02:5eb7 galeSeedMenu_addOffsetToWarpIndex_hook -
 02:5ed8 runMapMenu_hook -
+02:5ee3 mapMenu_state0_hook -
 02:5fd5 dungeonMap_drawSmallKeyCount_hook -
 02:5fe3 dungeonMap_calculateVisitedFloorsAndLinkPosition_hook -
 02:6016 mapMenu_state1_hook -
+02:6020 mapMenu_state1__checkInput_hook -
 02:609b mapGetRoomTextOrReturn_hook -
 02:60bd mapGetRoomText_hook -
 02:60dd mapGetRoomText__specialCode0_hook -
@@ -1436,7 +1445,10 @@
 04:4564 b4VBlankFunction30_hook -
 04:4592 b4VBlankFunction31_hook -
 04:45c0 vblankRunBank4Function_b04_hook -
+04:45d0 applyWarpDest_b04_hook -
 04:45ee label_04_032_hook -
+04:45f8 label_04_033_hook -
+04:4662 findWarpSourceAndDest_hook -
 04:46a8 findScreenEdgeWarpSource_hook -
 04:4712 func_04_4732_hook -
 04:4722 getLinkWarpQuadrant_hook -
@@ -1447,6 +1459,7 @@
 04:579a updateAnimationData_hook -
 04:57cf updateAnimationDataPointer_hook -
 04:580f loadAnimationGfxIndex_hook -
+04:5d94 applyAllTileSubstitutions_hook -
 04:5dc7 replaceTiles_hook -
 04:5de8 applyStandardTileSubstitutions_hook -
 04:5e1b applyStandardTileSubstitutions__locFunc_hook -
@@ -1490,6 +1503,7 @@
 04:6c47 queueTileWriteAtVBlank__getTilePositionInVram6d54_hook -
 05:4000 updateSpecialObjects_hook -
 05:4097 updateGameKeysPressed_hook -
+05:40f1 func_410d_hook -
 05:41b5 specialObjectSetOamVariables_hook -
 05:41f3 dealSpikeDamageToLink_hook -
 05:4226 updateLinkDamageTaken_hook -
@@ -1518,14 +1532,17 @@
 05:4583 setLinkMountingSpeed_hook -
 05:459f companionCheckHazards_hook -
 05:45a4 companionGotoHazardHandlingState_hook -
+05:45bf companionDismountAndSavePosition_hook -
 05:45f5 companionDismount_hook -
 05:4641 saveLinkLocalRespawnAndCompanionPosition_hook -
 05:4665 companionDragToCenterOfHole_hook -
+05:46ab companionRespawn_hook -
 05:4717 companionCheckHopDownCliff_hook -
 05:4779 companionFinalizeMounting_hook -
 05:47b3 companionFunc_47d8_hook -
 05:47e2 companionGotoDismountState_hook -
 05:47f1 companionSetAnimationAndGotoState5_hook -
+05:47fd companionCheckCanSpawn_hook -
 05:483a companionRetIfInactive_hook -
 05:4845 companionRetIfInactiveWithoutStateCheck_hook -
 05:485a companionSetAnimationToVar3f_hook -
@@ -1556,12 +1573,14 @@
 05:4b21 warpTransition4_hook -
 05:4b32 warpTransition5_hook -
 05:4b3c warpTransition5_00_hook -
+05:4b5a warpTransition5_01_hook -
 05:4bde warpTransition7_hook -
 05:4c41 warpTransition5_02_hook -
 05:4c48 linkIncrementDirectionOnOddFrames_hook -
 05:4c4d linkIncrementDirection_hook -
 05:4c55 warpTransition8_hook -
 05:4d41 warpTransition9_hook -
+05:4d6f warpTransitionB_hook -
 05:4dae warpTransitionF_hook -
 05:4db4 linkState08_hook -
 05:4ded linkCancelAllItemUsageAndClearAdjacentWallsBitset_hook -
@@ -1571,9 +1590,11 @@
 05:4e57 linkState04_hook -
 05:4e8f setLinkStateToDead_hook -
 05:4e94 linkState03_hook -
+05:4edc linkState02_hook -
 05:50e8 linkState0c_hook -
 05:5123 linkState13_hook -
 05:517b linkState14_hook -
+05:519a linkState0d_hook -
 05:51ff linkState05_hook -
 05:527b linkState06_hook -
 05:540f linkState11_hook -
@@ -1619,6 +1640,7 @@
 05:5f48 specialObjectSetAngleRelativeToVar38_hook -
 05:5f6b specialObjectSetPositionToVar38IfSet_hook -
 05:5f89 checkLinkJumpingOffCliff_hook -
+05:600a linkState12_hook -
 05:6146 specialObjectCode_transformedLink_hook -
 05:628b specialObjectCode_linkRidingAnimal_hook -
 05:62dc specialObjectCode_minecart_b05_hook -
@@ -1657,6 +1679,7 @@
 05:6b73 mapleFunc_6c27_hook -
 05:6b8e mapleIncrementMeetingCounter_hook -
 05:6c6a specialObjectCode_ricky_hook -
+05:6c94 rickyState0_hook -
 05:6cc2 rickyState1_hook -
 05:6ce6 rickyCheckHazards_hook -
 05:6cec rickyState9_hook -
@@ -1694,6 +1717,7 @@
 05:72a5 rickyCheckAtScreenEdge_hook -
 05:72ce specialObjectCode_dimitri_hook -
 05:72de specialObjectCode_dimitri__runState_hook -
+05:72fe dimitriState0_hook -
 05:732f dimitriState1_hook -
 05:736e dimitriState2_hook -
 05:7379 dimitriState2Substate0_hook -
@@ -1721,6 +1745,7 @@
 05:7703 dimitriAddWaterfallResistance_hook -
 05:772b specialObjectCode_moosh_hook -
 05:7737 specialObjectCode_moosh__runState_hook -
+05:7755 mooshState0_hook -
 05:7797 mooshState1_hook -
 05:77a5 mooshCheckHazards_hook -
 05:77ab mooshState3_hook -
@@ -3390,6 +3415,7 @@
 10:5e56 createEnergySwirlGoingOut_body_hook -
 10:5e5a createEnergySwirlGoingIn_body_hook -
 10:5e80 func_5e1a_hook -
+10:5ed0 checkAndSpawnMaple_hook -
 10:5fbc functionCaller_b02_hook -
 10:5fcb addRoomToEnemiesKilledList_b02_hook -
 10:5ffc stub_02_77f4_hook -

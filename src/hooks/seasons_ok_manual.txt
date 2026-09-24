@@ -57,3 +57,11 @@ func_53eb@dmaHeartPieceDisplay   # same DMA source words in both ROMs (the symbo
 fileSelectMode6   # Seasons tests the byte with or a where Ages decrements it
 initializeRoom   # Seasons body written out
 updateGrassAnimationModifier   # Seasons body written out
+applyWarpDest_b04   # Seasons group-2 path written out
+label_04_033   # Seasons room-pack check written out
+applyAllTileSubstitutions   # Seasons body written out
+fileSelectMode6@updateMode6
+fileSelectMode6@mode2
+func_410d   # the raft entry is Ages-only (Seasons' @ridingRaft is empty)
+companionDismountAndSavePosition   # Seasons body written out
+paletteFadeHandler06   # Seasons body written out

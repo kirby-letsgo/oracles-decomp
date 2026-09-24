@@ -54,6 +54,7 @@ def main():
     # hand-checked routines: per-game offsets and edited C (tools/ofsmap.py), or C that already
     # tells the games apart (seasons_ok_manual.txt, whatever routine_equiv says); a jump table
     # without an interpreter fallback still disqualifies (a Seasons-only entry would be lost)
+    hand_ok = set()
     for path in ('src/hooks/ofs_routines.txt', 'src/hooks/seasons_ok_manual.txt'):
         if not os.path.exists(path): continue
         for l in open(path):
@@ -62,6 +63,7 @@ def main():
             if not n: continue
             if (n + '!') in safe_jt: print(f'{path}: {n} dispatches a jump table without a fallback, left out'); continue
             verdict[n] = verdict[n.replace('@', '__')] = 'IDENTICAL'
+            hand_ok.add(n.replace('__', '@'))
             if path.endswith('ofs_routines.txt'):      # the edited C covers the routine's @locals too
                 for loc in [k for k in verdict if k.startswith((n + '@', n + '__'))]:
                     loc = loc.replace('__', '@')
@@ -156,6 +158,7 @@ def main():
     def label_verdict(sid):
         name = re.sub(r'_b[0-9a-f]{2}$', '', sid).replace('__', '@')
         if '@' in name and name.split('@')[0] in ofs_parents and name in seasons_names: return 'IDENTICAL'   # the mapped C covers its locals
+        if name in hand_ok and name in seasons_names: return 'IDENTICAL'
         if unpairable.match(name): return local_verdict(name) if name in ages_labels else 'AGES_ONLY'
         if name not in seasons_names: return 'AGES_ONLY'
         if name in verdict: return verdict[name]

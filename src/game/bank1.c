@@ -1806,29 +1806,46 @@ void paletteFadeHandler06_hook(GB *gb) {
   BASE(paletteFadeHandler06);
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+3); mem_wr(gb, hFF8B, A);
-  CYC(b_+3, b_+6); A = mem_rd(gb, wPaletteThread_speed);
-  CYC(b_+6, b_+7); C = A;
-  CYC(b_+7, b_+10); A = mem_rd(gb, wPaletteThread_parameter);
-  CYC(b_+10, b_+12); alu_add(gb, 0x1f);
-  CYC(b_+12, b_+13); B = A;
-  CYC(b_+13, b_+16); A = mem_rd(gb, (wThreadStateBuffer + 31));
-  CYC(b_+16, b_+18); alu_add(gb, 0x1f);
-  CYC(b_+18, b_+19); alu_add(gb, C);
-  CYC(b_+19, b_+20); alu_cp(gb, B);
-  if (F & FZ) {
-    CYCT(b_+20, b_+22);
-    TAIL(paletteThread_stop);
+  if (game_seasons) {
+    CYC(b_+S(3), b_+S(6)); A = mem_rd(gb, wPaletteThread_parameter);
+    CYC(b_+S(6), b_+S(7)); A = alu_inc8(gb, A);
+    CYC(b_+S(7), b_+S(8)); B = A;
+    CYC(b_+S(8), b_+S(11)); A = mem_rd(gb, (wThreadStateBuffer + 31));
+    CYC(b_+S(11), b_+S(12)); A = alu_inc8(gb, A);
+    CYC(b_+S(12), b_+S(13)); alu_cp(gb, B);
+    if (F & FZ) {
+      CYCT(b_+S(13), b_+S(15));
+      TAIL(paletteThread_stop);
+    }
+    CYC(b_+S(13), b_+S(15));
+    CYC(b_+S(15), b_+S(18)); mem_wr(gb, (wThreadStateBuffer + 31), A);
+    CYC(b_+S(18), b_+S(19)); C = A;
+    CYC(b_+S(19), b_+S(22)); TAIL(updateFadingPalettes);
+  } else {
+    CYC(b_+3, b_+6); A = mem_rd(gb, wPaletteThread_speed);
+    CYC(b_+6, b_+7); C = A;
+    CYC(b_+7, b_+10); A = mem_rd(gb, wPaletteThread_parameter);
+    CYC(b_+10, b_+12); alu_add(gb, 0x1f);
+    CYC(b_+12, b_+13); B = A;
+    CYC(b_+13, b_+16); A = mem_rd(gb, (wThreadStateBuffer + 31));
+    CYC(b_+16, b_+18); alu_add(gb, 0x1f);
+    CYC(b_+18, b_+19); alu_add(gb, C);
+    CYC(b_+19, b_+20); alu_cp(gb, B);
+    if (F & FZ) {
+      CYCT(b_+20, b_+22);
+      TAIL(paletteThread_stop);
+    }
+    CYC(b_+20, b_+22);
+    if (!(F & FC)) {
+      CYCT(b_+22, b_+25);
+      TAIL(paletteThread_setFadeOffsetAndStop);
+    }
+    CYC(b_+22, b_+25);
+    CYC(b_+25, b_+27); alu_sub(gb, 0x1f);
+    CYC(b_+27, b_+30); mem_wr(gb, (wThreadStateBuffer + 31), A);
+    CYC(b_+30, b_+31); C = A;
+    CYC(b_+31, b_+34); TAIL(updateFadingPalettes);
   }
-  CYC(b_+20, b_+22);
-  if (!(F & FC)) {
-    CYCT(b_+22, b_+25);
-    TAIL(paletteThread_setFadeOffsetAndStop);
-  }
-  CYC(b_+22, b_+25);
-  CYC(b_+25, b_+27); alu_sub(gb, 0x1f);
-  CYC(b_+27, b_+30); mem_wr(gb, (wThreadStateBuffer + 31), A);
-  CYC(b_+30, b_+31); C = A;
-  CYC(b_+31, b_+34); TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler07_hook(GB *gb) {
@@ -3413,16 +3430,34 @@ void checkDarkenRoomAndClearPaletteFadeState_hook(GB *gb) {
 void checkDarkenRoom_hook(GB *gb) {
   BASE(checkDarkenRoom);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = mem_rd(gb, wDungeonIndex);
-  CYC(b_+3, b_+5); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
-  CYC(b_+5, b_+6);
-  CALL_C(b_+6, getThisRoomDungeonProperties_hook, SYM(getThisRoomDungeonProperties), b_+9);
-  CYC(b_+9, b_+12); A = mem_rd(gb, wDungeonRoomProperties);
-  CYC(b_+12, b_+14); alu_bit(gb, 7, A);
-  if (F & FZ) { CYCT(b_+14, b_+15); ret_effect(gb); return; }
-  CYC(b_+14, b_+15);
-  CYC(b_+15, b_+18); TAIL(darkenRoom);
+  CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wDungeonIndex);
+  CYC(b_+O(3), b_+OE(5)); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+O(5), b_+OE(6)); ret_effect(gb); return; }
+  CYC(b_+O(5), b_+OE(6));
+  if (game_seasons) {
+    CYC(b_+S(6), b_+S(9)); A = W8(wActiveGroup);
+    CYC(b_+S(9), b_+S(11)); alu_cp(gb, 0x04);
+    if (!(F & FZ)) CYCT(b_+S(11), b_+S(13));
+    else {
+      CYC(b_+S(11), b_+S(13));
+      CYC(b_+S(13), b_+S(16)); A = W8(wActiveRoom);
+      CYC(b_+S(16), b_+S(18)); alu_cp(gb, 0x39);
+      if (!(F & FZ)) CYCT(b_+S(18), b_+S(20));
+      else {
+        CYC(b_+S(18), b_+S(20));
+        CALL_C(b_+S(20), getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+S(23));
+        CYC(b_+S(23), b_+S(25)); alu_and(gb, 0x80);
+        if (!(F & FZ)) { CYCT(b_+S(25), b_+S(26)); ret_effect(gb); return; }
+        CYC(b_+S(25), b_+S(26));
+      }
+    }
+  }
+  CALL_C(b_+O(6), getThisRoomDungeonProperties_hook, SYM(getThisRoomDungeonProperties), b_+OE(9));
+  CYC(b_+O(9), b_+OE(12)); A = mem_rd(gb, wDungeonRoomProperties);
+  CYC(b_+O(12), b_+OE(14)); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(b_+O(14), b_+OE(15)); ret_effect(gb); return; }
+  CYC(b_+O(14), b_+OE(15));
+  CYC(b_+O(15), b_+OE(18)); TAIL(darkenRoom);
 }
 
 void screenTransitionState4_hook(GB *gb) {

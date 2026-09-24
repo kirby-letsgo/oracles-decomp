@@ -47,29 +47,6 @@ void s_applyPaletteFadeTransitionData(GB *gb) {
   I(0x4842, 4); if (hook_is(gb, 0x3217, startFadeBetweenTwoPalettes_hook)) { startFadeBetweenTwoPalettes_hook(gb); return; } HANDOFF(0x3217);  // jp $3217
 }
 
-// 01:42cf
-void s_checkDarkenRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x42cf, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
-  I(0x42d2, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x42d4); return; } I(0x42d4, 2);  // ret z
-  I(0x42d5, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x42d8, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { I(0x42da, 3); goto L_42e9; } I(0x42da, 2);  // jr nz,$42e9
-  I(0x42dc, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x42df, 2); alu_cp(gb, 0x39);  // cp $39
-  if (!(F & FZ)) { I(0x42e1, 3); goto L_42e9; } I(0x42e1, 2);  // jr nz,$42e9
-  CALL(0x42e3, getThisRoomFlags_hook, 0x1956, 0x42e6);  // call $1956
-  I(0x42e6, 2); alu_and(gb, 0x80);  // and $80
-  if (!(F & FZ)) { RET_TAKEN(0x42e8); return; } I(0x42e8, 2);  // ret nz
-L_42e9:
-  CALL(0x42e9, getThisRoomDungeonProperties_hook, 0x2d2a, 0x42ec);  // call $2d2a
-  I(0x42ec, 4); A = mem_rd(gb, 0xcc58);  // ld a,($cc58)
-  I(0x42ef, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if ((F & FZ)) { RET_TAKEN(0x42f1); return; } I(0x42f1, 2);  // ret z
-  I(0x42f2, 4); if (hook_is(gb, 0x31d4, darkenRoom_hook)) { darkenRoom_hook(gb); return; } HANDOFF(0x31d4);  // jp $31d4
-}
-
 // 01:6028
 void s_checkLinkCloseEnoughToWarpTileCenter__tileSolid(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1536,23 +1513,6 @@ void s_makeActiveObjectFollowLink_b01(GB *gb) {
   I(0x48a3, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
   I(0x48a5, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   if (hook_is(gb, 0x48a6, resetFollowingLinkPath_hook)) { resetFollowingLinkPath_hook(gb); return; } HANDOFF(0x48a6);  // fallthrough
-}
-
-// 01:5612
-void s_paletteFadeHandler06(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5612, 1); alu_xor(gb, A);  // xor a
-  I(0x5613, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x5615, 4); A = mem_rd(gb, 0xc4ae);  // ld a,($c4ae)
-  I(0x5618, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5619, 1); B = A;  // ld b,a
-  I(0x561a, 4); A = mem_rd(gb, 0xc2ff);  // ld a,($c2ff)
-  I(0x561d, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x561e, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { I(0x561f, 3); if (hook_is(gb, 0x55e8, paletteThread_stop_hook)) { paletteThread_stop_hook(gb); return; } HANDOFF(0x55e8); } I(0x561f, 2);  // jr z,$55e8
-  I(0x5621, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  I(0x5624, 1); C = A;  // ld c,a
-  I(0x5625, 4); if (hook_is(gb, 0x5586, updateFadingPalettes_hook)) { updateFadingPalettes_hook(gb); return; } HANDOFF(0x5586);  // jp $5586
 }
 
 // 01:5ec2

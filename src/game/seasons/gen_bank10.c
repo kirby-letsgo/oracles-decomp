@@ -12,56 +12,6 @@ L_5ff6:
   RET(0x5ffb); return;  // ret
 }
 
-// 10:5ed0
-void s_checkAndSpawnMaple(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5ed0, 1); alu_xor(gb, A);  // xor a
-  I(0x5ed1, 4); mem_wr(gb, 0xcc3a, A);  // ld ($cc3a),a
-  I(0x5ed4, 4); A = mem_rd(gb, 0xcc9f);  // ld a,($cc9f)
-  I(0x5ed7, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5ed8); return; } I(0x5ed8, 2);  // ret nz
-  I(0x5ed9, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x5edc, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5edd); return; } I(0x5edd, 2);  // ret nz
-  I(0x5ede, 4); A = mem_rd(gb, 0xd100);  // ld a,($d100)
-  I(0x5ee1, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5ee2); return; } I(0x5ee2, 2);  // ret nz
-  I(0x5ee3, 4); A = mem_rd(gb, 0xc610);  // ld a,($c610)
-  I(0x5ee6, 2); alu_sub(gb, 0x0b);  // sub $0b
-  I(0x5ee8, 3); SET_HL(0x5f20);  // ld hl,$5f20
-  RST_PUSH(0x5eeb, 0x5eec);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x5eec, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5eed, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x5eee, 1); L = A;  // ld l,a
-L_5eef:
-  I(0x5eef, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  CALL(0x5ef2, checkFlag_hook, 0x0205, 0x5ef5);  // call $0205
-  if (!(F & FZ)) { RET_TAKEN(0x5ef5); return; } I(0x5ef5, 2);  // ret nz
-  I(0x5ef6, 2); A = 0x0f;  // ld a,$0f
-  CALL(0x5ef8, cpActiveRing_hook, 0x236b, 0x5efb);  // call $236b
-  I(0x5efb, 2); E = 0x1e;  // ld e,$1e
-  if (!(F & FZ)) { I(0x5efd, 3); goto L_5f01; } I(0x5efd, 2);  // jr nz,$5f01
-  I(0x5eff, 2); E = alu_srl(gb, E);  // srl e
-L_5f01:
-  I(0x5f01, 3); SET_HL(0xc63e);  // ld hl,$c63e
-  I(0x5f04, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5f05, 1); alu_cp(gb, E);  // cp e
-  if ((F & FC)) { RET_TAKEN(0x5f06); return; } I(0x5f06, 2);  // ret c
-  I(0x5f07, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5f09, 3); SET_HL(0xd100);  // ld hl,$d100
-  I(0x5f0c, 2); A = 0x01;  // ld a,$01
-  I(0x5f0e, 4); mem_wr(gb, 0xcc9f, A);  // ld ($cc9f),a
-  I(0x5f11, 4); mem_wr(gb, 0xcc3a, A);  // ld ($cc3a),a
-  I(0x5f14, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x5f15, 3); mem_wr(gb, HL, 0x0e);  // ld (hl),$0e
-  I(0x5f17, 2); L = 0x0b;  // ld l,$0b
-  I(0x5f19, 3); mem_wr(gb, HL, 0x18);  // ld (hl),$18
-  I(0x5f1b, 2); L = 0x0d;  // ld l,$0d
-  I(0x5f1d, 3); mem_wr(gb, HL, 0xb8);  // ld (hl),$b8
-  RET(0x5f1f); return;  // ret
-}
-
 // 10:5eef
 void s_checkAndSpawnMaple__startCheck(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

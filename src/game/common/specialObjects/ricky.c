@@ -114,49 +114,62 @@ void specialObjectCode_ricky_hook(GB *gb) {
 void rickyState0_hook(GB *gb) {
   BASE(rickyState0);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, companionCheckCanSpawn_hook, SYM(companionCheckCanSpawn), b_+3);
-  CYC(b_+3, b_+5); A = 0x06;
-  CALL_C(b_+5, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+8);
-  CYC(b_+8, b_+10); A = 0x02;
-  CYC(b_+10, b_+12); L = 0x08;
-  CYC(b_+12, b_+13); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+13, b_+14); mem_wr(gb, HL, A);
-  CYC(b_+14, b_+16); L = 0x39;
-  CYC(b_+16, b_+18); mem_wr(gb, HL, 0x10);
-  CYC(b_+18, b_+21); A = W8(wRickyState);
-  CYC(b_+21, b_+23); alu_bit(gb, 7, A);
-  if (!(F & FZ)) {
-    CYCT(b_+23, b_+25);
-    goto setAnimation17;
+  CALL_C(b_+O(0), companionCheckCanSpawn_hook, SYM(companionCheckCanSpawn), b_+OE(3));
+  CYC(b_+O(3), b_+OE(5)); A = 0x06;
+  CALL_C(b_+O(5), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+OE(8));
+  CYC(b_+O(8), b_+OE(10)); A = 0x02;
+  CYC(b_+O(10), b_+OE(12)); L = 0x08;
+  CYC(b_+O(12), b_+OE(13)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(13), b_+OE(14)); mem_wr(gb, HL, A);
+  CYC(b_+O(14), b_+OE(16)); L = 0x39;
+  CYC(b_+O(16), b_+OE(18)); mem_wr(gb, HL, 0x10);
+  CYC(b_+O(18), b_+OE(21)); A = W8(wRickyState);
+  if (game_seasons) {
+    CYC(b_+S(21), b_+S(23)); alu_and(gb, 0x80);
+    if (!(F & FZ)) {
+      CYCT(b_+S(23), b_+S(25));
+      goto setAnimation17;
+    }
+    CYC(b_+S(23), b_+S(25));
+  } else {
+    CYC(b_+21, b_+23); alu_bit(gb, 7, A);
+    if (!(F & FZ)) {
+      CYCT(b_+23, b_+25);
+      goto setAnimation17;
+    }
+    CYC(b_+23, b_+25);
+    CYC(b_+25, b_+27); C = 0x17;
+    CYC(b_+27, b_+29); alu_bit(gb, 6, A);
+    if (!(F & FZ)) {
+      CYCT(b_+29, b_+31);
+      goto canTalk;
+    }
+    CYC(b_+29, b_+31);
+    CYC(b_+31, b_+33); alu_and(gb, 0x20);
+    if (!(F & FZ)) {
+      CYCT(b_+33, b_+35);
+      goto setAnimation17;
+    }
+    CYC(b_+33, b_+35);
+    CYC(b_+35, b_+37); C = 0x00;
   }
-  CYC(b_+23, b_+25);
-  CYC(b_+25, b_+27); C = 0x17;
-  CYC(b_+27, b_+29); alu_bit(gb, 6, A);
-  if (!(F & FZ)) {
-    CYCT(b_+29, b_+31);
-    goto canTalk;
-  }
-  CYC(b_+29, b_+31);
-  CYC(b_+31, b_+33); alu_and(gb, 0x20);
-  if (!(F & FZ)) {
-    CYCT(b_+33, b_+35);
-    goto setAnimation17;
-  }
-  CYC(b_+33, b_+35);
-  CYC(b_+35, b_+37); C = 0x00;
 canTalk:
-  CYC(b_+37, b_+39); L = 0x04;
-  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x0a);
-  CYC(b_+41, b_+43); E = 0x3d;
-  CALL_C(b_+43, objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+46);
-  CYC(b_+46, b_+47); A = C;
-  CYC(b_+47, b_+49);
+  CYC(b_+O(37), b_+OE(39)); L = 0x04;
+  CYC(b_+O(39), b_+OE(41)); mem_wr(gb, HL, 0x0a);
+  CYC(b_+O(41), b_+OE(43)); E = 0x3d;
+  CALL_C(b_+O(43), objectAddToAButtonSensitiveObjectList_hook, SYM(objectAddToAButtonSensitiveObjectList), b_+OE(46));
+  if (game_seasons) {
+    CYC(b_+S(34), b_+S(36)); A = 0x00;
+  } else {
+    CYC(b_+46, b_+47); A = C;
+  }
+  CYC(b_+O(47), b_+OE(49));
   goto setAnimation;
 setAnimation17:
-  CYC(b_+49, b_+51); A = 0x17;
+  CYC(b_+O(49), b_+OE(51)); A = 0x17;
 setAnimation:
-  CALL_C(b_+51, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+54);
-  CYC(b_+54, b_+57); TAIL(objectSetVisiblec1);
+  CALL_C(b_+O(51), specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+OE(54));
+  CYC(b_+O(54), b_+OE(57)); TAIL(objectSetVisiblec1);
 }
 
 void rickyState1_hook(GB *gb) {

@@ -1,6 +1,8 @@
 #include "game/game.h"
 #include "game/gen.h"
 void s_checkWhetherToDisplaySeasonInSubscreen_hook(GB *gb);
+void s_seasonsFunc_332f_hook(GB *gb);
+void s_checkPirateShipMoved_hook(GB *gb);
 
 #undef CYC
 #undef CYCT
@@ -763,61 +765,71 @@ raft:
 void checkAndSpawnMaple_hook(GB *gb) {
   BASE(checkAndSpawnMaple);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, b_+4); W8(wIsMaplePresent) = A;
-  CYC(b_+4, b_+7); A = W8(wcc85);
-  CYC(b_+7, b_+8); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
-  CYC(b_+8, b_+9);
-  CYC(b_+9, b_+12); A = W8(wActiveGroup);
-  CYC(b_+12, b_+15); SET_HL(SYM(maplePastLocations));
-  CYC(b_+15, b_+16); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+16, b_+18); goto start_check; }
-  CYC(b_+16, b_+18);
-  CYC(b_+18, b_+19); A = alu_inc8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+19, b_+20); ret_effect(gb); return; }
-  CYC(b_+19, b_+20);
-  CYC(b_+20, b_+23); A = W8(w1Companion_enabled);
-  CYC(b_+23, b_+24); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+24, b_+25); ret_effect(gb); return; }
-  CYC(b_+24, b_+25);
-  CYC(b_+25, b_+28); A = W8(wAnimalCompanion);
-  CYC(b_+28, b_+29); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+29, b_+31); goto maple_table; }
-  CYC(b_+29, b_+31);
-  CYC(b_+31, b_+33); alu_sub(gb, 0x0b);
+  CYC(b_+O(0), b_+OE(1)); alu_xor(gb, A);
+  CYC(b_+O(1), b_+OE(4)); W8(wIsMaplePresent) = A;
+  CYC(b_+O(4), b_+OE(7)); A = W8(wcc85);
+  CYC(b_+O(7), b_+OE(8)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(8), b_+OE(9)); ret_effect(gb); return; }
+  CYC(b_+O(8), b_+OE(9));
+  CYC(b_+O(9), b_+OE(12)); A = W8(wActiveGroup);
+  if (game_seasons) {
+    CYC(b_+S(12), b_+S(13)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(13), b_+S(14)); ret_effect(gb); return; }
+    CYC(b_+S(13), b_+S(14));
+  } else {
+    CYC(b_+12, b_+15); SET_HL(SYM(maplePastLocations));
+    CYC(b_+15, b_+16); A = alu_dec8(gb, A);
+    if (F & FZ) { CYCT(b_+16, b_+18); goto start_check; }
+    CYC(b_+16, b_+18);
+    CYC(b_+18, b_+19); A = alu_inc8(gb, A);
+    if (!(F & FZ)) { CYCT(b_+19, b_+20); ret_effect(gb); return; }
+    CYC(b_+19, b_+20);
+  }
+  CYC(b_+O(20), b_+OE(23)); A = W8(w1Companion_enabled);
+  CYC(b_+O(23), b_+OE(24)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(24), b_+OE(25)); ret_effect(gb); return; }
+  CYC(b_+O(24), b_+OE(25));
+  CYC(b_+O(25), b_+OE(28)); A = W8(wAnimalCompanion);
+  if (game_seasons) {
+    CYC(b_+S(22), b_+S(24)); alu_sub(gb, 0x0b);
+  } else {
+    CYC(b_+28, b_+29); alu_or(gb, A);
+    if (F & FZ) { CYCT(b_+29, b_+31); goto maple_table; }
+    CYC(b_+29, b_+31);
+    CYC(b_+31, b_+33); alu_sub(gb, 0x0b);
+  }
 maple_table:
-  CYC(b_+33, b_+36); SET_HL(SYM(maplePresentLocationsTable));
-  CYC(b_+36, b_+37); add_double_index_to_hl(gb, b_+37);
-  CYC(b_+37, b_+38); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+38, b_+39); H = mem_rd(gb, HL);
-  CYC(b_+39, b_+40); L = A;
+  CYC(b_+O(33), b_+OE(36)); SET_HL(SYM(maplePresentLocationsTable));
+  CYC(b_+O(36), b_+OE(37)); add_double_index_to_hl(gb, b_+O(37));
+  CYC(b_+O(37), b_+OE(38)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(38), b_+OE(39)); H = mem_rd(gb, HL);
+  CYC(b_+O(39), b_+OE(40)); L = A;
 start_check:
-  CYC(b_+40, b_+43); A = W8(wActiveRoom);
-  CALL_C(b_+43, checkFlag_hook, SYM(checkFlag), b_+46);
-  if (!(F & FZ)) { CYCT(b_+46, b_+47); ret_effect(gb); return; }
-  CYC(b_+46, b_+47);
-  CYC(b_+47, b_+49); A = 0x0f;
-  CALL_C(b_+49, cpActiveRing_hook, SYM(cpActiveRing), b_+52);
-  CYC(b_+52, b_+54); E = 0x1e;
-  if (!(F & FZ)) CYCT(b_+54, b_+56);
-  else { CYC(b_+54, b_+56); CYC(b_+56, b_+58); E = alu_srl(gb, E); }
-  CYC(b_+58, b_+61); SET_HL(wMapleKillCounter);
-  CYC(b_+61, b_+62); A = mem_rd(gb, HL);
-  CYC(b_+62, b_+63); alu_cp(gb, E);
-  if (F & FC) { CYCT(b_+63, b_+64); ret_effect(gb); return; }
-  CYC(b_+63, b_+64); CYC(b_+64, b_+66); mem_wr(gb, HL, 0);
-  CYC(b_+66, b_+69); SET_HL(w1Companion);
-  CYC(b_+69, b_+71); A = 1;
-  CYC(b_+71, b_+74); W8(wcc85) = A;
-  CYC(b_+74, b_+77); W8(wIsMaplePresent) = A;
-  CYC(b_+77, b_+78); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+78, b_+80); mem_wr(gb, HL, 0x0e);
-  CYC(b_+80, b_+82); L = 0x0b;
-  CYC(b_+82, b_+84); mem_wr(gb, HL, 0x18);
-  CYC(b_+84, b_+86); L = 0x0d;
-  CYC(b_+86, b_+88); mem_wr(gb, HL, 0xb8);
-  CYC(b_+88, b_+89); ret_effect(gb);
+  CYC(b_+O(40), b_+OE(43)); A = W8(wActiveRoom);
+  CALL_C(b_+O(43), checkFlag_hook, SYM(checkFlag), b_+OE(46));
+  if (!(F & FZ)) { CYCT(b_+O(46), b_+OE(47)); ret_effect(gb); return; }
+  CYC(b_+O(46), b_+OE(47));
+  CYC(b_+O(47), b_+OE(49)); A = 0x0f;
+  CALL_C(b_+O(49), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(52));
+  CYC(b_+O(52), b_+OE(54)); E = 0x1e;
+  if (!(F & FZ)) CYCT(b_+O(54), b_+OE(56));
+  else { CYC(b_+O(54), b_+OE(56)); CYC(b_+O(56), b_+OE(58)); E = alu_srl(gb, E); }
+  CYC(b_+O(58), b_+OE(61)); SET_HL(wMapleKillCounter);
+  CYC(b_+O(61), b_+OE(62)); A = mem_rd(gb, HL);
+  CYC(b_+O(62), b_+OE(63)); alu_cp(gb, E);
+  if (F & FC) { CYCT(b_+O(63), b_+OE(64)); ret_effect(gb); return; }
+  CYC(b_+O(63), b_+OE(64)); CYC(b_+O(64), b_+OE(66)); mem_wr(gb, HL, 0);
+  CYC(b_+O(66), b_+OE(69)); SET_HL(w1Companion);
+  CYC(b_+O(69), b_+OE(71)); A = 1;
+  CYC(b_+O(71), b_+OE(74)); W8(wcc85) = A;
+  CYC(b_+O(74), b_+OE(77)); W8(wIsMaplePresent) = A;
+  CYC(b_+O(77), b_+OE(78)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(78), b_+OE(80)); mem_wr(gb, HL, 0x0e);
+  CYC(b_+O(80), b_+OE(82)); L = 0x0b;
+  CYC(b_+O(82), b_+OE(84)); mem_wr(gb, HL, 0x18);
+  CYC(b_+O(84), b_+OE(86)); L = 0x0d;
+  CYC(b_+O(86), b_+OE(88)); mem_wr(gb, HL, 0xb8);
+  CYC(b_+O(88), b_+OE(89)); ret_effect(gb);
 }
 
 void stub_02_77f4_hook(GB *gb) {
@@ -2924,85 +2936,111 @@ void runMapMenu_hook(GB *gb) {
 void mapMenu_state0_hook(GB *gb) {
   BASE(mapMenu_state0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); A = 0x04;
-  CYC(b_+2, b_+4); mem_wr(gb, IO_SVBK, A);
-  CALL_C(b_+4, loadMinimapDisplayRoom_hook, SYM(loadMinimapDisplayRoom), b_+7);
-  CYC(b_+7, b_+10); A = W8(wMapMenu_mode);
-  CYC(b_+10, b_+12); alu_add(gb, 0x0d);
-  CALL_C(b_+12, loadGfxHeader_hook, SYM(loadGfxHeader), b_+15);
-  CYC(b_+15, b_+18); A = W8(wMapMenu_mode);
-  CYC(b_+18, b_+20); alu_add(gb, 0x07);
-  CALL_C(b_+20, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+23);
-  CYC(b_+23, b_+26); A = W8(wMapMenu_mode);
-  CYC(b_+26, b_+28); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(b_+28, b_+30); goto dungeon; }
-  CYC(b_+28, b_+30);
-  CYC(b_+30, b_+31); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+31, b_+33); goto past; }
-  CYC(b_+31, b_+33);
-  CYC(b_+33, b_+36); A = W8(wAnimalCompanion);
-  CYC(b_+36, b_+38); alu_sub(gb, 0x0c);
-  if (!(F & FC)) CALL_C_CC(b_+38, mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+41);
-  else CYC(b_+38, b_+41);
-  CYC(b_+41, b_+44); A = mem_rd(gb, wGroup0RoomFlags + 0x13);
-  CYC(b_+44, b_+45); alu_rrca(gb);
-  CYC(b_+45, b_+47); A = 0x05;
-  if (F & FC) CALL_C_CC(b_+47, mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+50);
-  else CYC(b_+47, b_+50);
-past:
-  CYC(b_+50, b_+53); A = mem_rd(gb, wGroup1RoomFlags + 0x41);
-  CYC(b_+53, b_+54); alu_rrca(gb);
-  CYC(b_+54, b_+56); A = 0x06;
-  if (F & FC) CALL_C_CC(b_+56, mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+59);
-  else CYC(b_+56, b_+59);
-  CALL_C(b_+59, mapMenu_clearUnvisitedTiles_hook, SYM(mapMenu_clearUnvisitedTiles), b_+62);
-  CYC(b_+62, b_+65); A = W8(wMapMenu_currentRoom);
-  CYC(b_+65, b_+68); W8(wMapMenu_cursorIndex) = A;
-  CALL_C(b_+68, mapMenu_loadPopupData_hook, SYM(mapMenu_loadPopupData), b_+71);
-  CYC(b_+71, b_+73);
+  CYC(b_+O(0), b_+OE(2)); A = 0x04;
+  CYC(b_+O(2), b_+OE(4)); mem_wr(gb, IO_SVBK, A);
+  CALL_C(b_+O(4), loadMinimapDisplayRoom_hook, SYM(loadMinimapDisplayRoom), b_+OE(7));
+  CYC(b_+O(7), b_+OE(10)); A = W8(wMapMenu_mode);
+  CYC(b_+O(10), b_+OE(12)); alu_add(gb, 0x0d);
+  CALL_C(b_+O(12), loadGfxHeader_hook, SYM(loadGfxHeader), b_+OE(15));
+  CYC(b_+O(15), b_+OE(18)); A = W8(wMapMenu_mode);
+  CYC(b_+O(18), b_+OE(20)); alu_add(gb, 0x07);
+  CALL_C(b_+O(20), loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+OE(23));
+  CYC(b_+O(23), b_+OE(26)); A = W8(wMapMenu_mode);
+  CYC(b_+O(26), b_+OE(28)); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+O(28), b_+OE(30)); goto dungeon; }
+  CYC(b_+O(28), b_+OE(30));
+  CYC(b_+O(30), b_+OE(31)); alu_or(gb, A);
+  if (game_seasons) {
+    if (!(F & FZ)) { CYCT(b_+S(31), b_+S(33)); goto s_subrosia; }
+    CYC(b_+S(31), b_+S(33));
+    CYC(b_+S(33), b_+S(36)); A = W8(wAnimalCompanion);
+    CYC(b_+S(36), b_+S(38)); alu_sub(gb, 0x0c);
+    if (!(F & FC)) CALL_C_CC(b_+S(38), mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+S(41));
+    else CYC(b_+S(38), b_+S(41));
+    CYC(b_+S(41), b_+S(44)); A = mem_rd(gb, wGroup0RoomFlags + 0x81);
+    CYC(b_+S(44), b_+S(45)); alu_rlca(gb);
+    CYC(b_+S(45), b_+S(47)); A = 0x05;
+    if (F & FC) CALL_C_CC(b_+S(47), mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+S(50));
+    else CYC(b_+S(47), b_+S(50));
+    CALL_C(b_+S(50), s_checkPirateShipMoved_hook, SYM(checkPirateShipMoved), b_+S(53));
+    CYC(b_+S(53), b_+S(55)); A = 0x06;
+    if (!(F & FZ)) CALL_C_CC(b_+S(55), mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+S(58));
+    else CYC(b_+S(55), b_+S(58));
+    CYC(b_+S(58), b_+S(60));
+    goto s_done;
+s_subrosia:
+    CALL_C(b_+S(60), s_checkPirateShipMoved_hook, SYM(checkPirateShipMoved), b_+S(63));
+    CYC(b_+S(63), b_+S(65)); A = 0x07;
+    if (!(F & FZ)) CALL_C_CC(b_+S(65), mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+S(68));
+    else CYC(b_+S(65), b_+S(68));
+s_done:;
+  } else {
+    if (!(F & FZ)) { CYCT(b_+31, b_+33); goto past; }
+    CYC(b_+31, b_+33);
+    CYC(b_+33, b_+36); A = W8(wAnimalCompanion);
+    CYC(b_+36, b_+38); alu_sub(gb, 0x0c);
+    if (!(F & FC)) CALL_C_CC(b_+38, mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+41);
+    else CYC(b_+38, b_+41);
+    CYC(b_+41, b_+44); A = mem_rd(gb, wGroup0RoomFlags + 0x13);
+    CYC(b_+44, b_+45); alu_rrca(gb);
+    CYC(b_+45, b_+47); A = 0x05;
+    if (F & FC) CALL_C_CC(b_+47, mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+50);
+    else CYC(b_+47, b_+50);
+  past:
+    CYC(b_+50, b_+53); A = mem_rd(gb, wGroup1RoomFlags + 0x41);
+    CYC(b_+53, b_+54); alu_rrca(gb);
+    CYC(b_+54, b_+56); A = 0x06;
+    if (F & FC) CALL_C_CC(b_+56, mapMenu_performTileSubstitutions_hook, SYM(mapMenu_performTileSubstitutions), b_+59);
+    else CYC(b_+56, b_+59);
+  }
+  CALL_C(b_+O(59), mapMenu_clearUnvisitedTiles_hook, SYM(mapMenu_clearUnvisitedTiles), b_+OE(62));
+  CYC(b_+O(62), b_+OE(65)); A = W8(wMapMenu_currentRoom);
+  CYC(b_+O(65), b_+OE(68)); W8(wMapMenu_cursorIndex) = A;
+  CALL_C(b_+O(68), mapMenu_loadPopupData_hook, SYM(mapMenu_loadPopupData), b_+OE(71));
+  CYC(b_+O(71), b_+OE(73));
   goto common;
 dungeon:
-  CYC(b_+73, b_+76); A = W8(wTilesetFlags);
-  CYC(b_+76, b_+78); alu_and(gb, 0x20);
-  CYC(b_+78, b_+81); A = W8(wMinimapDungeonFloor);
-  if (!(F & FZ)) CYCT(b_+81, b_+83);
+  CYC(b_+O(73), b_+OE(76)); A = W8(wTilesetFlags);
+  CYC(b_+O(76), b_+OE(78)); alu_and(gb, 0x20);
+  CYC(b_+O(78), b_+OE(81)); A = W8(wMinimapDungeonFloor);
+  if (!(F & FZ)) CYCT(b_+O(81), b_+OE(83));
   else {
-    CYC(b_+81, b_+83);
-    CYC(b_+83, b_+86); A = W8(wDungeonFloor);
+    CYC(b_+O(81), b_+OE(83));
+    CYC(b_+O(83), b_+OE(86)); A = W8(wDungeonFloor);
   }
-  CYC(b_+86, b_+87); B = A;
-  CYC(b_+87, b_+90); A = W8(wDungeonNumFloors);
-  CYC(b_+90, b_+91); A = alu_dec8(gb, A);
-  CYC(b_+91, b_+92); alu_sub(gb, B);
-  CYC(b_+92, b_+95); W8(wMapMenu_floorIndex) = A;
-  CALL_C(b_+95, multiplyABy8_hook, SYM(multiplyABy8), b_+98);
-  CYC(b_+98, b_+101); A = W8(wMapMenu_floorIndex);
-  CYC(b_+101, b_+102); alu_add(gb, A);
-  CYC(b_+102, b_+103); alu_add(gb, C);
-  CYC(b_+103, b_+106); W8(wMapMenu_dungeonScrollY) = A;
-  CALL_C(b_+106, dungeonMap_calculateVisitedFloorsAndLinkPosition_hook, SYM(dungeonMap_calculateVisitedFloorsAndLinkPosition), b_+109);
-  CYC(b_+109, b_+112); A = W8(wDungeonIndex);
-  CYC(b_+112, b_+114); alu_add(gb, 0x10);
-  CALL_C(b_+114, loadGfxHeader_hook, SYM(loadGfxHeader), b_+117);
-  CALL_C(b_+117, dungeonMap_drawSmallKeyCount_hook, SYM(dungeonMap_drawSmallKeyCount), b_+120);
-  CALL_C(b_+120, dungeonMap_generateScrollableTilemap_hook, SYM(dungeonMap_generateScrollableTilemap), b_+123);
-  CALL_C(b_+123, dungeonMap_drawFloorList_hook, SYM(dungeonMap_drawFloorList), b_+126);
-  CALL_C(b_+126, dungeonMap_updateScroll_hook, SYM(dungeonMap_updateScroll), b_+129);
+  CYC(b_+O(86), b_+OE(87)); B = A;
+  CYC(b_+O(87), b_+OE(90)); A = W8(wDungeonNumFloors);
+  CYC(b_+O(90), b_+OE(91)); A = alu_dec8(gb, A);
+  CYC(b_+O(91), b_+OE(92)); alu_sub(gb, B);
+  CYC(b_+O(92), b_+OE(95)); W8(wMapMenu_floorIndex) = A;
+  CALL_C(b_+O(95), multiplyABy8_hook, SYM(multiplyABy8), b_+OE(98));
+  CYC(b_+O(98), b_+OE(101)); A = W8(wMapMenu_floorIndex);
+  CYC(b_+O(101), b_+OE(102)); alu_add(gb, A);
+  CYC(b_+O(102), b_+OE(103)); alu_add(gb, C);
+  CYC(b_+O(103), b_+OE(106)); W8(wMapMenu_dungeonScrollY) = A;
+  CALL_C(b_+O(106), dungeonMap_calculateVisitedFloorsAndLinkPosition_hook, SYM(dungeonMap_calculateVisitedFloorsAndLinkPosition), b_+OE(109));
+  CYC(b_+O(109), b_+OE(112)); A = W8(wDungeonIndex);
+  CYC(b_+O(112), b_+OE(114)); alu_add(gb, 0x10);
+  CALL_C(b_+O(114), loadGfxHeader_hook, SYM(loadGfxHeader), b_+OE(117));
+  CALL_C(b_+O(117), dungeonMap_drawSmallKeyCount_hook, SYM(dungeonMap_drawSmallKeyCount), b_+OE(120));
+  CALL_C(b_+O(120), dungeonMap_generateScrollableTilemap_hook, SYM(dungeonMap_generateScrollableTilemap), b_+OE(123));
+  CALL_C(b_+O(123), dungeonMap_drawFloorList_hook, SYM(dungeonMap_drawFloorList), b_+OE(126));
+  CALL_C(b_+O(126), dungeonMap_updateScroll_hook, SYM(dungeonMap_updateScroll), b_+OE(129));
 common:
-  CYC(b_+129, b_+130); alu_xor(gb, A);
-  CYC(b_+130, b_+132); mem_wr(gb, IO_SVBK, A);
-  CALL_C(b_+132, mapMenu_drawSprites_hook, SYM(mapMenu_drawSprites), b_+135);
-  CYC(b_+135, b_+136); alu_xor(gb, A);
-  CYC(b_+136, b_+138); H8(hCameraX) = A;
-  CYC(b_+138, b_+140); H8(hCameraY) = A;
-  CYC(b_+140, b_+143); W8(wScreenOffsetX) = A;
-  CYC(b_+143, b_+146); W8(wScreenOffsetY) = A;
-  CYC(b_+146, b_+149); SET_HL(wMenuActiveState);
-  CYC(b_+149, b_+150); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CALL_C(b_+150, mapMenu_copyTilemapToVram_hook, SYM(mapMenu_copyTilemapToVram), b_+153);
-  CALL_C(b_+153, fastFadeinFromWhite_hook, SYM(fastFadeinFromWhite), b_+156);
-  CYC(b_+156, b_+158); A = 0x07;
-  CYC(b_+158, b_+161);
+  CYC(b_+O(129), b_+OE(130)); alu_xor(gb, A);
+  CYC(b_+O(130), b_+OE(132)); mem_wr(gb, IO_SVBK, A);
+  CALL_C(b_+O(132), mapMenu_drawSprites_hook, SYM(mapMenu_drawSprites), b_+OE(135));
+  CYC(b_+O(135), b_+OE(136)); alu_xor(gb, A);
+  CYC(b_+O(136), b_+OE(138)); H8(hCameraX) = A;
+  CYC(b_+O(138), b_+OE(140)); H8(hCameraY) = A;
+  CYC(b_+O(140), b_+OE(143)); W8(wScreenOffsetX) = A;
+  CYC(b_+O(143), b_+OE(146)); W8(wScreenOffsetY) = A;
+  CYC(b_+O(146), b_+OE(149)); SET_HL(wMenuActiveState);
+  CYC(b_+O(149), b_+OE(150)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CALL_C(b_+O(150), mapMenu_copyTilemapToVram_hook, SYM(mapMenu_copyTilemapToVram), b_+OE(153));
+  CALL_C(b_+O(153), fastFadeinFromWhite_hook, SYM(fastFadeinFromWhite), b_+OE(156));
+  CYC(b_+O(156), b_+OE(158)); A = 0x07;
+  CYC(b_+O(158), b_+OE(161));
   TAIL(loadGfxRegisterStateIndex);
 }
 
@@ -3087,106 +3125,124 @@ void dungeonMap_calculateVisitedFloorsAndLinkPosition_hook(GB *gb) {
 void mapMenu_state1_hook(GB *gb) {
   BASE(mapMenu_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (F & FZ) CALL_C_CC(b_+4, mapMenu_state1__checkInput_hook, b_+10, b_+7);
-  else CYC(b_+4, b_+7);
-  CYC(b_+7, b_+10);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wPaletteThread_mode);
+  CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
+  if (F & FZ) CALL_C_CC(b_+O(4), mapMenu_state1__checkInput_hook, b_+O(10), b_+OE(7));
+  else CYC(b_+O(4), b_+OE(7));
+  CYC(b_+O(7), b_+OE(10));
   TAIL(mapMenu_drawSprites);
 }
 
 void mapMenu_state1__checkInput_hook(GB *gb) {
   BASE(mapMenu_state1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+10, b_+13); A = W8(wMapMenu_mode);
-  CYC(b_+13, b_+15); alu_cp(gb, 0x02);
-  if (!(F & FZ)) { CYCT(b_+15, b_+17); goto overworld; }
-  CYC(b_+15, b_+17);
-  CYC(b_+17, b_+20); A = W8(wKeysJustPressed);
-  CYC(b_+20, b_+22); alu_and(gb, 0x06);
+  CYC(b_+O(10), b_+OE(13)); A = W8(wMapMenu_mode);
+  CYC(b_+O(13), b_+OE(15)); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(b_+O(15), b_+OE(17)); goto overworld; }
+  CYC(b_+O(15), b_+OE(17));
+  CYC(b_+O(17), b_+OE(20)); A = W8(wKeysJustPressed);
+  CYC(b_+O(20), b_+OE(22)); alu_and(gb, 0x06);
   if (!(F & FZ)) {
-    CYCT(b_+22, b_+25);
+    CYCT(b_+O(22), b_+OE(25));
     TAIL(closeMenu);
   }
-  CYC(b_+22, b_+25);
-  CALL_C(b_+25, dungeonMap_updateCursorFlickerCounter_hook, SYM(dungeonMap_updateCursorFlickerCounter), b_+28);
-  CYC(b_+28, b_+31);
+  CYC(b_+O(22), b_+OE(25));
+  CALL_C(b_+O(25), dungeonMap_updateCursorFlickerCounter_hook, SYM(dungeonMap_updateCursorFlickerCounter), b_+OE(28));
+  CYC(b_+O(28), b_+OE(31));
   TAIL(dungeonMap_checkDirectionButtons);
 overworld:
-  CYC(b_+31, b_+34); A = W8(wMapMenu_varcbb4);
-  CYC(b_+34, b_+35); alu_or(gb, A);
-  if (F & FZ) CYCT(b_+35, b_+37);
+  CYC(b_+O(31), b_+OE(34)); A = W8(wMapMenu_varcbb4);
+  CYC(b_+O(34), b_+OE(35)); alu_or(gb, A);
+  if (F & FZ) CYCT(b_+O(35), b_+OE(37));
   else {
-    CYC(b_+35, b_+37);
-    CYC(b_+37, b_+38); A = alu_dec8(gb, A);
-    CYC(b_+38, b_+41); W8(wMapMenu_varcbb4) = A;
+    CYC(b_+O(35), b_+OE(37));
+    CYC(b_+O(37), b_+OE(38)); A = alu_dec8(gb, A);
+    CYC(b_+O(38), b_+OE(41)); W8(wMapMenu_varcbb4) = A;
   }
-  CALL_C(b_+41, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+44);
-  CYC(b_+44, b_+47); SET_HL(b_+124);
-  CALL_C(b_+47, getDirectionButtonOffsetFromHl_hook, SYM(getDirectionButtonOffsetFromHl), b_+50);
-  if (!(F & FC)) { CYCT(b_+50, b_+52); goto no_direction; }
-  CYC(b_+50, b_+52);
-  CYC(b_+52, b_+53); C = A;
-  CYC(b_+53, b_+56); D = 0xe0; E = 0x0e;
-  CYC(b_+56, b_+59); A = W8(wMapMenu_cursorIndex);
-  CYC(b_+59, b_+60); L = A;
-  CYC(b_+60, b_+62); alu_and(gb, 0xf0);
-  CYC(b_+62, b_+63); H = A;
-  CYC(b_+63, b_+64); A = L;
-  CYC(b_+64, b_+65); alu_xor(gb, H);
-  CYC(b_+65, b_+66); L = A;
-  CYC(b_+66, b_+68); C = alu_sra(gb, C);
-  if (F & FC) { CYCT(b_+68, b_+70); goto vertical; }
-  CYC(b_+68, b_+70);
-  CYC(b_+70, b_+71); A = L;
+  CALL_C(b_+O(41), retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+OE(44));
+  CYC(b_+O(44), b_+OE(47)); SET_HL(b_+O(124));
+  CALL_C(b_+O(47), getDirectionButtonOffsetFromHl_hook, SYM(getDirectionButtonOffsetFromHl), b_+OE(50));
+  if (!(F & FC)) { CYCT(b_+O(50), b_+OE(52)); goto no_direction; }
+  CYC(b_+O(50), b_+OE(52));
+  CYC(b_+O(52), b_+OE(53)); C = A;
+  if (game_seasons) {
+    CYC(b_+S(53), b_+S(56)); D = 0xf0; E = 0x10;
+    CYC(b_+S(56), b_+S(59)); A = W8(wMapMenu_mode);
+    CYC(b_+S(59), b_+S(60)); alu_rrca(gb);
+    if (!(F & FC)) CYCT(b_+S(60), b_+S(62));
+    else {
+      CYC(b_+S(60), b_+S(62));
+      CYC(b_+S(62), b_+S(65)); D = 0x70; E = 0x0b;
+    }
+  } else {
+    CYC(b_+53, b_+56); D = 0xe0; E = 0x0e;
+  }
+  CYC(b_+O(56), b_+OE(59)); A = W8(wMapMenu_cursorIndex);
+  CYC(b_+O(59), b_+OE(60)); L = A;
+  CYC(b_+O(60), b_+OE(62)); alu_and(gb, 0xf0);
+  CYC(b_+O(62), b_+OE(63)); H = A;
+  CYC(b_+O(63), b_+OE(64)); A = L;
+  CYC(b_+O(64), b_+OE(65)); alu_xor(gb, H);
+  CYC(b_+O(65), b_+OE(66)); L = A;
+  CYC(b_+O(66), b_+OE(68)); C = alu_sra(gb, C);
+  if (F & FC) { CYCT(b_+O(68), b_+OE(70)); goto vertical; }
+  CYC(b_+O(68), b_+OE(70));
+  CYC(b_+O(70), b_+OE(71)); A = L;
   for (;;) {
-    CYC(b_+71, b_+72); alu_add(gb, C);
-    CYC(b_+72, b_+74); alu_and(gb, 0x0f);
-    CYC(b_+74, b_+75); alu_cp(gb, E);
-    if (!(F & FC)) { CYCT(b_+75, b_+77); continue; }
-    CYC(b_+75, b_+77);
+    CYC(b_+O(71), b_+OE(72)); alu_add(gb, C);
+    CYC(b_+O(72), b_+OE(74)); alu_and(gb, 0x0f);
+    CYC(b_+O(74), b_+OE(75)); alu_cp(gb, E);
+    if (!(F & FC)) { CYCT(b_+O(75), b_+OE(77)); continue; }
+    CYC(b_+O(75), b_+OE(77));
     break;
   }
-  CYC(b_+77, b_+78); L = A;
-  CYC(b_+78, b_+80);
+  CYC(b_+O(77), b_+OE(78)); L = A;
+  CYC(b_+O(78), b_+OE(80));
   goto set_cursor;
 vertical:
-  CYC(b_+80, b_+81); A = H;
-  for (;;) {
-    CYC(b_+81, b_+82); alu_add(gb, C);
-    CYC(b_+82, b_+84); alu_and(gb, 0xf0);
-    CYC(b_+84, b_+85); alu_cp(gb, D);
-    if (!(F & FC)) { CYCT(b_+85, b_+87); continue; }
-    CYC(b_+85, b_+87);
-    break;
+  if (game_seasons) {
+    CYC(b_+S(89), b_+S(90)); A = H;
+    CYC(b_+S(90), b_+S(91)); alu_add(gb, C);
+    CYC(b_+S(91), b_+S(92)); alu_and(gb, D);
+    CYC(b_+S(92), b_+S(93)); H = A;
+  } else {
+    CYC(b_+80, b_+81); A = H;
+    for (;;) {
+      CYC(b_+81, b_+82); alu_add(gb, C);
+      CYC(b_+82, b_+84); alu_and(gb, 0xf0);
+      CYC(b_+84, b_+85); alu_cp(gb, D);
+      if (!(F & FC)) { CYCT(b_+85, b_+87); continue; }
+      CYC(b_+85, b_+87);
+      break;
+    }
+    CYC(b_+87, b_+88); H = A;
   }
-  CYC(b_+87, b_+88); H = A;
 set_cursor:
-  CYC(b_+88, b_+89); A = H;
-  CYC(b_+89, b_+90); alu_or(gb, L);
-  CYC(b_+90, b_+93); W8(wMapMenu_cursorIndex) = A;
-  CYC(b_+93, b_+95); A = 0x84;
-  CALL_C(b_+95, playSound_b00_hook, SYM(playSound_b00), b_+98);
-  CYC(b_+98, b_+101);
+  CYC(b_+O(88), b_+OE(89)); A = H;
+  CYC(b_+O(89), b_+OE(90)); alu_or(gb, L);
+  CYC(b_+O(90), b_+OE(93)); W8(wMapMenu_cursorIndex) = A;
+  CYC(b_+O(93), b_+OE(95)); A = 0x84;
+  CALL_C(b_+O(95), playSound_b00_hook, SYM(playSound_b00), b_+OE(98));
+  CYC(b_+O(98), b_+OE(101));
   TAIL(mapMenu_loadPopupData);
 no_direction:
-  CYC(b_+101, b_+104); A = W8(wKeysJustPressed);
-  CYC(b_+104, b_+106); alu_bit(gb, 0, A);
-  if (!(F & FZ)) { CYCT(b_+106, b_+108); goto show_room_text; }
-  CYC(b_+106, b_+108);
-  CYC(b_+108, b_+110); alu_and(gb, 0x06);
+  CYC(b_+O(101), b_+OE(104)); A = W8(wKeysJustPressed);
+  CYC(b_+O(104), b_+OE(106)); alu_bit(gb, 0, A);
+  if (!(F & FZ)) { CYCT(b_+O(106), b_+OE(108)); goto show_room_text; }
+  CYC(b_+O(106), b_+OE(108));
+  CYC(b_+O(108), b_+OE(110)); alu_and(gb, 0x06);
   if (!(F & FZ)) {
-    CYCT(b_+110, b_+113);
+    CYCT(b_+O(110), b_+OE(113));
     TAIL(closeMenu);
   }
-  CYC(b_+110, b_+113);
-  CYC(b_+113, b_+114); ret_effect(gb);
+  CYC(b_+O(110), b_+OE(113));
+  CYC(b_+O(113), b_+OE(114)); ret_effect(gb);
   return;
 show_room_text:
-  CALL_C(b_+114, mapGetRoomTextOrReturn_hook, SYM(mapGetRoomTextOrReturn), b_+117);
-  CYC(b_+117, b_+120); SET_HL(wSubmenuState);
-  CYC(b_+120, b_+121); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+121, b_+124);
+  CALL_C(b_+O(114), mapGetRoomTextOrReturn_hook, SYM(mapGetRoomTextOrReturn), b_+OE(117));
+  CYC(b_+O(117), b_+OE(120)); SET_HL(wSubmenuState);
+  CYC(b_+O(120), b_+OE(121)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(121), b_+OE(124));
   TAIL(showText);
 }
 
@@ -9058,39 +9114,43 @@ void inventorySubscreen0_drawCursor_hook(GB *gb) {
 
 void inventorySubmenu1_drawCursor_hook(GB *gb) {
   BASE(inventorySubmenu1_drawCursor);
-  CYC(b_+0, b_+3); A = W8(wInventorySubmenu1CursorPos);
-  CYC(b_+3, b_+4); E = A;
-  CYC(b_+4, b_+7); SET_HL(b_+51);
-  CYC(b_+7, b_+8); push_effect(gb, b_+8); add_a_to_hl(gb);
-  CYC(b_+8, b_+9); A = mem_rd(gb, HL);
-  CYC(b_+9, b_+11); alu_and(gb, 0xf0);
-  CYC(b_+11, b_+12); alu_rrca(gb);
-  CYC(b_+12, b_+13); B = A;
-  CYC(b_+13, b_+14); A = mem_rd(gb, HL);
-  CYC(b_+14, b_+16); alu_and(gb, 0x0f);
-  CYC(b_+16, b_+18); A = alu_swap(gb, A);
-  CYC(b_+18, b_+19); alu_rrca(gb);
-  CYC(b_+19, b_+20); C = A;
-  CYC(b_+20, b_+22); D = 2;
-  CYC(b_+22, b_+23); A = E;
-  CYC(b_+23, b_+25); alu_cp(gb, 4);
-  if (F & FZ) { CYCT(b_+25, b_+27); goto sprites; }
-  CYC(b_+25, b_+27); CYC(b_+27, b_+29); alu_cp(gb, 9);
-  if (F & FZ) { CYCT(b_+29, b_+31); goto sprites; }
-  CYC(b_+29, b_+31); CYC(b_+31, b_+33); alu_sub(gb, 0x0e);
-  if (F & FZ) { CYCT(b_+33, b_+35); goto sprites; }
-  CYC(b_+33, b_+35); CYC(b_+35, b_+36); D = alu_dec8(gb, D);
-  CYC(b_+36, b_+37); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+37, b_+39); goto sprites; }
-  CYC(b_+37, b_+39); CYC(b_+39, b_+40); D = alu_dec8(gb, D);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wInventorySubmenu1CursorPos);
+  CYC(b_+O(3), b_+OE(4)); E = A;
+  CYC(b_+O(4), b_+OE(7)); SET_HL(b_+O(51));
+  CYC(b_+O(7), b_+OE(8)); push_effect(gb, b_+OE(8)); add_a_to_hl(gb);
+  CYC(b_+O(8), b_+OE(9)); A = mem_rd(gb, HL);
+  CYC(b_+O(9), b_+OE(11)); alu_and(gb, 0xf0);
+  CYC(b_+O(11), b_+OE(12)); alu_rrca(gb);
+  CYC(b_+O(12), b_+OE(13)); B = A;
+  CYC(b_+O(13), b_+OE(14)); A = mem_rd(gb, HL);
+  CYC(b_+O(14), b_+OE(16)); alu_and(gb, 0x0f);
+  CYC(b_+O(16), b_+OE(18)); A = alu_swap(gb, A);
+  CYC(b_+O(18), b_+OE(19)); alu_rrca(gb);
+  CYC(b_+O(19), b_+OE(20)); C = A;
+  CYC(b_+O(20), b_+OE(22)); D = 2;
+  CYC(b_+O(22), b_+OE(23)); A = E;
+  CYC(b_+O(23), b_+OE(25)); alu_cp(gb, 4);
+  if (F & FZ) { CYCT(b_+O(25), b_+OE(27)); goto sprites; }
+  CYC(b_+O(25), b_+OE(27));
+  if (!game_seasons) {
+    CYC(b_+27, b_+29); alu_cp(gb, 9);
+    if (F & FZ) { CYCT(b_+29, b_+31); goto sprites; }
+    CYC(b_+29, b_+31);
+  }
+  CYC(b_+O(31), b_+OE(33)); alu_sub(gb, 0x0e);
+  if (F & FZ) { CYCT(b_+O(33), b_+OE(35)); goto sprites; }
+  CYC(b_+O(33), b_+OE(35)); CYC(b_+O(35), b_+OE(36)); D = alu_dec8(gb, D);
+  CYC(b_+O(36), b_+OE(37)); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+O(37), b_+OE(39)); goto sprites; }
+  CYC(b_+O(37), b_+OE(39)); CYC(b_+O(39), b_+OE(40)); D = alu_dec8(gb, D);
 sprites:
-  CYC(b_+40, b_+41); A = D;
-  CYC(b_+41, b_+44); SET_HL(b_+72);
-  CYC(b_+44, b_+45); add_double_index_to_hl(gb, b_+45);
-  CYC(b_+45, b_+46); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+46, b_+47); H = mem_rd(gb, HL);
-  CYC(b_+47, b_+48); L = A;
-  CYC(b_+48, b_+51); TAIL(addSpritesToOam_withOffset);
+  CYC(b_+O(40), b_+OE(41)); A = D;
+  CYC(b_+O(41), b_+OE(44)); SET_HL(b_+O(72));
+  CYC(b_+O(44), b_+OE(45)); add_double_index_to_hl(gb, b_+O(45));
+  CYC(b_+O(45), b_+OE(46)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(46), b_+OE(47)); H = mem_rd(gb, HL);
+  CYC(b_+O(47), b_+OE(48)); L = A;
+  CYC(b_+O(48), b_+OE(51)); TAIL(addSpritesToOam_withOffset);
 }
 
 void inventorySubmenu2_drawCursor_hook(GB *gb) {
@@ -10547,51 +10607,73 @@ void menuStateFadeOutOfMenu__afterCall_hook(GB *gb) {
 void reloadGraphicsOnExitMenu_body_hook(GB *gb) {
   BASE(reloadGraphicsOnExitMenu_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(wcbe1);
-  CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+4, b_+6); H8(hCameraY) = A;
-  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
-  CYC(b_+7, b_+9); H8(hCameraX) = A;
-  CYC(b_+9, b_+10); push_effect(gb, DE);
-  CALL_C(b_+10, disableLcd_hook, SYM(disableLcd), b_+13);
-  CYC(b_+13, b_+15); A = 0x04;
-  CYC(b_+15, b_+17); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+17, b_+20); SET_DE(0x8601);
-  CYC(b_+20, b_+23); SET_BC(0x1704);
-  CYC(b_+23, b_+26); SET_HL(w4SavedVramTiles);
-  CALL_C(b_+26, queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+29);
-  CYC(b_+29, b_+32); SET_HL(w4SavedOam);
-  CYC(b_+32, b_+35); SET_DE(wOam);
-  CYC(b_+35, b_+37); B = 0xa0;
-  CALL_C(b_+37, copyMemory_hook, SYM(copyMemory), b_+40);
-  CALL_C(b_+40, copyW4PaletteDataToW2TilesetBgPalettes_body_hook, SYM(copyW4PaletteDataToW2TilesetBgPalettes_body), b_+43);
-  CYC(b_+43, b_+46); SET_HL(wGfxRegs4);
-  CYC(b_+46, b_+49); SET_DE(wGfxRegs1);
-  CYC(b_+49, b_+51); B = 0x0c;
-  CALL_C(b_+51, copyMemory_hook, SYM(copyMemory), b_+54);
-  CALL_C(b_+54, loadCommonGraphics_body_hook, SYM(loadCommonGraphics_body), b_+57);
-  CALL_C(b_+57, reloadObjectGfx_b00_hook, SYM(reloadObjectGfx_b00), b_+60);
+  CYC(b_+O(0), b_+OE(3)); SET_HL(wcbe1);
+  CYC(b_+O(3), b_+OE(4)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(4), b_+OE(6)); H8(hCameraY) = A;
+  CYC(b_+O(6), b_+OE(7)); A = mem_rd(gb, HL);
+  CYC(b_+O(7), b_+OE(9)); H8(hCameraX) = A;
+  CYC(b_+O(9), b_+OE(10)); push_effect(gb, DE);
+  CALL_C(b_+O(10), disableLcd_hook, SYM(disableLcd), b_+OE(13));
+  CYC(b_+O(13), b_+OE(15)); A = 0x04;
+  CYC(b_+O(15), b_+OE(17)); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(17), b_+OE(20)); SET_DE(0x8601);
+  CYC(b_+O(20), b_+OE(23)); SET_BC(0x1704);
+  CYC(b_+O(23), b_+OE(26)); SET_HL(w4SavedVramTiles);
+  CALL_C(b_+O(26), queueDmaTransfer_hook, SYM(queueDmaTransfer), b_+OE(29));
+  CYC(b_+O(29), b_+OE(32)); SET_HL(w4SavedOam);
+  CYC(b_+O(32), b_+OE(35)); SET_DE(wOam);
+  CYC(b_+O(35), b_+OE(37)); B = 0xa0;
+  CALL_C(b_+O(37), copyMemory_hook, SYM(copyMemory), b_+OE(40));
+  CALL_C(b_+O(40), copyW4PaletteDataToW2TilesetBgPalettes_body_hook, SYM(copyW4PaletteDataToW2TilesetBgPalettes_body), b_+OE(43));
+  CYC(b_+O(43), b_+OE(46)); SET_HL(wGfxRegs4);
+  CYC(b_+O(46), b_+OE(49)); SET_DE(wGfxRegs1);
+  CYC(b_+O(49), b_+OE(51)); B = 0x0c;
+  CALL_C(b_+O(51), copyMemory_hook, SYM(copyMemory), b_+OE(54));
+  CALL_C(b_+O(54), loadCommonGraphics_body_hook, SYM(loadCommonGraphics_body), b_+OE(57));
+  CALL_C(b_+O(57), reloadObjectGfx_b00_hook, SYM(reloadObjectGfx_b00), b_+OE(60));
   reloadGraphicsOnExitMenu_body__afterCall_hook(gb);
 }
 
 void reloadGraphicsOnExitMenu_body__afterCall_hook(GB *gb) {
   BASE(reloadGraphicsOnExitMenu_body);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+60, loadTilesetData_hook, SYM(loadTilesetData), b_+63);
-  CALL_C(b_+63, loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+66);
-  CALL_C(b_+66, reloadTileMap_hook, SYM(reloadTileMap), b_+69);
-  CALL_C(b_+69, fastFadeinFromWhiteToRoom_hook, SYM(fastFadeinFromWhiteToRoom), b_+72);
-  CYC(b_+72, b_+75); A = W8(wExtraBgPaletteHeader);
-  CYC(b_+75, b_+76); alu_or(gb, A);
-  if (!(F & FZ)) CALL_C_CC(b_+76, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+79);
-  else CYC(b_+76, b_+79);
-  CYC(b_+79, b_+82); A = W8(wGfxRegs1_LCDC);
-  CYC(b_+82, b_+85); W8(wGfxRegsFinal_LCDC) = A;
-  CYC(b_+85, b_+87); mem_wr(gb, IO_LCDC, A);
-  CYC(b_+87, b_+88); SET_DE(pop_effect(gb));
-  CYC(b_+88, b_+91); SET_HL((SYM(mapMenu_loadPopupData__gotIcon) + 25));
-  CYC(b_+91, b_+93); E = 0x01;
-  CYC(b_+93, b_+96); TAIL(interBankCall);
+  CALL_C(b_+O(60), loadTilesetData_hook, SYM(loadTilesetData), b_+OE(63));
+  CALL_C(b_+O(63), loadTilesetGraphics_hook, SYM(loadTilesetGraphics), b_+OE(66));
+  CALL_C(b_+O(66), reloadTileMap_hook, SYM(reloadTileMap), b_+OE(69));
+  CALL_C(b_+O(69), fastFadeinFromWhiteToRoom_hook, SYM(fastFadeinFromWhiteToRoom), b_+OE(72));
+  CYC(b_+O(72), b_+OE(75)); A = W8(wExtraBgPaletteHeader);
+  CYC(b_+O(75), b_+OE(76)); alu_or(gb, A);
+  if (!(F & FZ)) CALL_C_CC(b_+O(76), loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+OE(79));
+  else CYC(b_+O(76), b_+OE(79));
+  if (game_seasons) {
+    CYC(b_+S(79), b_+S(82)); A = W8(wActiveGroup);
+    CYC(b_+S(82), b_+S(84)); alu_cp(gb, 0x07);
+    if (!(F & FZ)) CYCT(b_+S(84), b_+S(86));
+    else {
+      CYC(b_+S(84), b_+S(86));
+      CYC(b_+S(86), b_+S(89)); A = W8(wActiveRoom);
+      CYC(b_+S(89), b_+S(90)); A = alu_inc8(gb, A);
+      if (!(F & FZ)) CYCT(b_+S(90), b_+S(92));
+      else {
+        CYC(b_+S(90), b_+S(92));
+        CYC(b_+S(92), b_+S(93)); SET_DE(pop_effect(gb));
+        CYC(b_+S(93), b_+S(96)); TAIL_S(seasonsFunc_332f);
+      }
+    }
+    CYC(b_+S(96), b_+S(99)); A = W8(wGfxRegs1_LCDC);
+    CYC(b_+S(99), b_+S(102)); W8(wGfxRegsFinal_LCDC) = A;
+    CYC(b_+S(102), b_+S(104)); mem_wr(gb, IO_LCDC, A);
+    CYC(b_+S(104), b_+S(105)); SET_DE(pop_effect(gb));
+    CYC(b_+S(105), b_+S(106)); ret_effect(gb);
+  } else {
+    CYC(b_+79, b_+82); A = W8(wGfxRegs1_LCDC);
+    CYC(b_+82, b_+85); W8(wGfxRegsFinal_LCDC) = A;
+    CYC(b_+85, b_+87); mem_wr(gb, IO_LCDC, A);
+    CYC(b_+87, b_+88); SET_DE(pop_effect(gb));
+    CYC(b_+88, b_+91); SET_HL((SYM(mapMenu_loadPopupData__gotIcon) + 25));
+    CYC(b_+91, b_+93); E = 0x01;
+    CYC(b_+93, b_+96); TAIL(interBankCall);
+  }
 }
 
 void saveQuitMenu_state2_hook(GB *gb) {

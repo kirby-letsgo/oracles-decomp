@@ -1016,7 +1016,6 @@
 09:6559 s_unblockingD3Dam_hook -
 09:660e s_underwaterGashaSeed_hook -
 01:4808 s_applyPaletteFadeTransitionData -
-01:42cf s_checkDarkenRoom -
 01:6028 s_checkLinkCloseEnoughToWarpTileCenter__tileSolid L
 01:602a s_checkLinkCloseEnoughToWarpTileCenter__func_618f L
 01:7dec s_checkRoomPack -
@@ -1089,7 +1088,6 @@
 01:47dd s_getPaletteFadeTransitionData -
 01:5f53 s_initializeSeedTreeRefillData -
 01:489d s_makeActiveObjectFollowLink_b01 -
-01:5612 s_paletteFadeHandler06 -
 01:5ec2 s_screenTransitionEyePuzzle__up L
 01:5ecc s_screenTransitionEyePuzzle__rightOrLeft L
 01:5dd3 s_screenTransitionLostWoods_hook -
@@ -1209,7 +1207,6 @@
 11:58c7 s_parseObjectData__afterCall58c7 L
 11:58ca s_parseObjectData__afterCall58ca L
 10:5ff6 s_addRoomToEnemiesKilledList__found_b10 L
-10:5ed0 s_checkAndSpawnMaple -
 10:5eef s_checkAndSpawnMaple__startCheck L
 10:60a3 s_checkPositionValidForEnemySpawn__scrollingTransition L
 10:60ce s_checkPositionValidForEnemySpawn__fail L
@@ -2379,7 +2376,6 @@
 05:5fd6 s_checkLinkJumpingOffCliff__setSpeed140 L
 05:5fdb s_checkLinkJumpingOffCliff__checkCliffTile L
 05:5e74 s_checkLinkPushingAgainstTreeStump_hook -
-05:47fd s_companionCheckCanSpawn -
 05:482c s_companionCheckCanSpawn__canSpawn L
 05:48e6 s_companionCheckEnableTerrainEffects__label_05_067 L
 05:48ea s_companionCheckEnableTerrainEffects__enableTerrainEffects L
@@ -2389,7 +2385,6 @@
 05:4896 s_companionCheckMountingComplete__continue L
 05:48b5 s_companionCheckMountingComplete__nudgeLinkTowardCompanion L
 05:490a s_companionDecCounter1ToJumpDownCliff__animate L
-05:45bf s_companionDismountAndSavePosition -
 05:45d3 s_companionDismountAndSavePosition__moosh L
 05:45dc s_companionDismountAndSavePosition__ricky L
 05:45e4 s_companionDismountAndSavePosition__dimitri L
@@ -2398,7 +2393,6 @@
 05:4690 s_companionDragToCenterOfHole__adjustY L
 05:46a7 s_companionDragToCenterOfHole__return L
 05:45bc s_companionGotoHazardHandlingState__ret L
-05:46ab s_companionRespawn -
 05:46e0 s_companionRespawn__invalidPosition L
 05:46f2 s_companionRespawn__applyDamageAndSetState L
 05:4706 s_companionRespawn__setState L
@@ -2408,7 +2402,6 @@
 05:76c5 s_dimitriCheckAddToGrabbableObjectBuffer__ret L
 05:76d7 s_dimitriCheckCanBeHeldInDirection__diagonalMovement L
 05:76e4 s_dimitriCheckCanBeHeldInDirection__checkTile L
-05:72fe s_dimitriState0 -
 05:7327 s_dimitriState0__setAnimation L
 05:732c s_dimitriState0__setVisible L
 05:734a s_dimitriState1__onLand L
@@ -2440,7 +2433,6 @@
 05:753f s_dimitriUpdateMovement__setWaterStatus L
 05:7dc2 s_fixXYWithinDancingGrid_hook -
 05:7dcb s_fixXYWithinDancingGrid_helper_hook -
-05:40f1 s_func_410d -
 05:4112 s_func_410d__invalid L
 05:4113 s_func_410d__ridingRicky L
 05:4118 s_func_410d__ridingDimitri L
@@ -2481,9 +2473,7 @@
 05:58cb s_linkState01_sidescroll__notInWater L
 05:5938 s_linkState01_sidescroll__onIce L
 05:5956 s_linkState01_sidescroll__notOnIce L
-05:4edc s_linkState02 -
 05:4ef6 s_linkState02__substate0 L
-05:4ef9 s_linkState02__afterCall4ef9 L
 05:4f07 s_linkState02__parameter_drown L
 05:4f11 s_linkState02__parameter_fallDownHole L
 05:4f14 s_linkState02__parameter_fallDownHoleWithoutCentering L
@@ -2491,7 +2481,6 @@
 05:4f2d s_linkState02__substate1 L
 05:4f51 s_linkState02__respawn L
 05:4f67 s_linkState02__substate2 L
-05:4f99 s_linkState02__afterCall4f99 L
 05:4fa2 s_linkState02__substate3 L
 05:4fad s_linkState02__substate4 L
 05:4fbb s_linkState02__substate5 L
@@ -2529,7 +2518,6 @@
 05:50f2 s_linkState0c__substate0 L
 05:5109 s_linkState0c__substate2 L
 05:5122 s_linkState0c__substate1 L
-05:519a s_linkState0d -
 05:51ad s_linkState0d__substate0 L
 05:51ba s_linkState0d__substate2 L
 05:51e0 s_linkState0d__substate3 L
@@ -2554,7 +2542,6 @@
 05:5419 s_linkState11__substate0 L
 05:5435 s_linkState11__substate1 L
 05:5444 s_linkState11__substate2 L
-05:600a s_linkState12 -
 05:6016 s_linkState12__substate0 L
 05:6039 s_linkState12__willTransition L
 05:606b s_linkState12__substate1 L
@@ -2657,7 +2644,6 @@
 05:6868 s_mapleStateB__waitForText L
 05:6878 s_mapleStateB__substate1 L
 05:7aff s_mooshFunc_05_7aff_hook -
-05:7755 s_mooshState0 -
 05:7787 s_mooshState0__gotoCutsceneStateA L
 05:778f s_mooshState0__setAnimation L
 05:77e2 s_mooshState4__animate L
@@ -2694,7 +2680,6 @@
 05:7212 s_rickyCheckHopUpCliff__tryOneTileUp L
 05:7230 s_rickyCheckHopUpCliff__tryTwoTilesUp L
 05:724c s_rickyCheckHopUpCliff__canJumpUpCliff L
-05:6c94 s_rickyState0 -
 05:6cad s_rickyStateB__canTalkToRicky L
 05:6cba s_rickyStateB__setAnimation17 L
 05:6cbc s_rickyStateB__setAnimation L
@@ -2776,7 +2761,6 @@
 05:4ac2 s_warpTransition3__destInit L
 05:4ada s_warpTransition3__enterFromMiddleBottom L
 05:4b01 s_warpTransition3__enterFromBottom L
-05:4b5a s_warpTransition5_01 -
 05:4b76 s_warpTransition5_01__trampoline L
 05:4b83 s_warpTransition6 -
 05:4b8b s_warpTransition6_00_hook -
@@ -2796,7 +2780,6 @@
 05:4d14 s_warpTransition8__substate7 L
 05:4d49 s_warpTransition9__substate0 L
 05:4d62 s_warpTransition9__substate1 L
-05:4d6f s_warpTransitionB -
 05:4d79 s_warpTransitionB__warpVar0 L
 05:4d8b s_warpTransitionB__warpVar1 L
 05:4da2 s_warpTransitionB__warpVar2 L
@@ -3385,13 +3368,10 @@
 08:6e94 s_zelda_state1__faceLinkAndRunScript L
 08:6e97 s_zelda_state1__afterCall6e97 L
 08:6e9a s_zelda_state1__runSubid8 L
-04:5d94 s_applyAllTileSubstitutions -
-04:5dab s_applyAllTileSubstitutions__afterCall5dab L
 04:5fda s_applySingleTileChanges -
 04:5fee s_applySingleTileChanges__next L
 04:5ff6 s_applySingleTileChanges__match L
 04:5ffd s_applySingleTileChanges__notMatch L
-04:45d0 s_applyWarpDest_b04 -
 04:6cff s_checkIsTempleRemains_hook -
 04:65a2 s_checkPirateShipDocked_hook -
 04:6a99 s_copyRectangleFromTmpGfxBuffer__nextRow L
@@ -3404,7 +3384,6 @@
 04:46db s_findScreenEdgeWarpSource__skipRemainingBytes L
 04:46df s_findScreenEdgeWarpSource__pointerWarp L
 04:46e8 s_findScreenEdgeWarpSource__foundWarpSource L
-04:4662 s_findWarpSourceAndDest -
 04:4670 s_findWarpSourceAndDest__nextWarpSource L
 04:4681 s_findWarpSourceAndDest__skipRemainingBytes L
 04:4686 s_findWarpSourceAndDest__pointerWarp L
@@ -3414,7 +3393,6 @@
 04:6d36 s_getMoblinKeepScreenIndex_hook -
 04:6d17 s_getMoblinKeepSeasonsTilesetData_hook -
 04:6ce6 s_getTempleRemainsSeasonsTilesetData_hook -
-04:45f8 s_label_04_033 -
 04:4659 s_label_04_035_hook -
 04:465f s_label_04_036_hook -
 04:6778 s_label_04_291_hook -
@@ -4351,8 +4329,6 @@
 02:6312 s_dungeonMap_scrollingState0__moveUpOrDown L
 02:416a s_fileSelectMode1__mode1SubModes L
 02:422d s_fileSelectMode1__state3 L
-02:44ec s_fileSelectMode6__updateMode6 L
-02:4501 s_fileSelectMode6__mode2 L
 02:5e49 s_galeSeedMenu_state1__end L
 02:5e4c s_galeSeedMenu_state1__bPressed L
 02:5e55 s_galeSeedMenu_state1__aPressed L
@@ -4363,7 +4339,6 @@
 02:5763 s_inventoryMenuState2__subState2 L
 02:5790 s_inventoryMenuState2__buttonPressed L
 02:57a6 s_inventoryMenuState2__func_02_57f3 L
-02:5940 s_inventorySubmenu1_drawCursor -
 02:5127 s_loadCommonGraphics_body -
 02:5147 s_loadCommonGraphics_body__loadMoneyGraphic L
 02:5156 s_loadCommonGraphics_body__updateDisplayedMoney L
@@ -4383,14 +4358,10 @@
 02:5dc8 s_mapMenu_performTileSubstitutions__nextSubstitution L
 02:5de0 s_mapMenu_performTileSubstitutions__nextRow L
 02:5de1 s_mapMenu_performTileSubstitutions__nextTile L
-02:5ee3 s_mapMenu_state0 -
 02:5f04 s_mapMenu_state0__overworld L
 02:5f1f s_mapMenu_state0__subrosia L
-02:5f33 s_mapMenu_state0__afterCall5f33 L
 02:5f35 s_mapMenu_state0__dungeon L
 02:5f6d s_mapMenu_state0__commonCode L
-02:5f73 s_mapMenu_state0__afterCall5f73 L
-02:6020 s_mapMenu_state1__checkInput L
 02:6027 s_mapMenu_state1__dungeon L
 02:6035 s_mapMenu_state1__overworld L
 02:6065 s_mapMenu_state1__horizontalMove L
@@ -4411,9 +4382,6 @@
 02:6231 s_minimapPopupType_pirateShip_hook -
 02:620a s_minimapPopupType_shop -
 02:621b s_minimapPopupType_templeOfSeasons_hook -
-02:5092 s_reloadGraphicsOnExitMenu_body -
-02:50ce s_reloadGraphicsOnExitMenu_body__afterCall50ce L
-02:50d1 s_reloadGraphicsOnExitMenu_body__afterCall50d1 L
 39:478c s_getChannelVolume__affectedByMusicVolume L
 39:479b s_getChannelVolume__fullVolume L
 39:47a7 s_getChannelVolume__halfVolume L

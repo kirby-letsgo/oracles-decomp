@@ -39,3 +39,4 @@
 0f:75dd interactionCodecf__afterCall4b19
 0a:4b32 interactionCodeb7__afterCall48b5
 03:4071 setCpuToDoubleSpeed extern
+02:50ce reloadGraphicsOnExitMenu_body__afterCall

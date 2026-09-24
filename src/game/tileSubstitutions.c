@@ -28,53 +28,77 @@ static void tile_substitutions_add_double_index(GB *gb, uint16_t return_address)
 void applyAllTileSubstitutions_hook(GB *gb) {
   BASE(applyAllTileSubstitutions);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, replacePollutionWithWaterIfPollutionFixed_hook, SYM(replacePollutionWithWaterIfPollutionFixed), b_+3);
-  CALL_C(b_+3, applySingleTileChanges_hook, SYM(applySingleTileChanges), b_+6);
-  CALL_C(b_+6, applyStandardTileSubstitutions_hook, SYM(applyStandardTileSubstitutions), b_+9);
-  CALL_C(b_+9, replaceOpenedChest_hook, SYM(replaceOpenedChest), b_+12);
-  CYC(b_+12, b_+15); A = W8(wActiveGroup);
-  CYC(b_+15, b_+17); alu_and(gb, 0x06);
-  CYC(b_+17, b_+19); alu_cp(gb, 0x04);
-  if (!(F & FZ)) {
-    CYCT(b_+19, b_+21);
+  if (game_seasons) {
+    CALL_C(b_+S(0), applySingleTileChanges_hook, SYM(applySingleTileChanges), b_+S(3));
+    CALL_C(b_+S(3), applyStandardTileSubstitutions_hook, SYM(applyStandardTileSubstitutions), b_+S(6));
+    CALL_C(b_+S(6), replaceOpenedChest_hook, SYM(replaceOpenedChest), b_+S(9));
+    CYC(b_+S(9), b_+S(12)); A = W8(wActiveGroup);
+    CYC(b_+S(12), b_+S(14)); alu_cp(gb, 0x02);
+    if (F & FZ) {
+      CYCT(b_+S(14), b_+S(16));
+      CYC(b_+S(35), b_+S(37)); E = 0x03;
+      CYC(b_+S(37), b_+S(40)); TAIL(loadObjectGfxHeaderToSlot4);
+    }
+    CYC(b_+S(14), b_+S(16));
+    CYC(b_+S(16), b_+S(18)); alu_cp(gb, 0x04);
+    if (F & FC) {
+      CYC(b_+S(18), b_+S(20));
+      CALL_ROM(b_+S(20), SYM(loadSubrosiaObjectGfxHeader));
+      CYC(b_+S(23), b_+S(26)); TAIL(applyRoomSpecificTileChanges);
+    }
+    CYCT(b_+S(18), b_+S(20));
+    CALL_C(b_+S(26), replaceShutterForLinkEntering_hook, SYM(replaceShutterForLinkEntering), b_+S(29));
+    CALL_C(b_+S(29), replaceSwitchTiles_hook, SYM(replaceSwitchTiles), b_+S(32));
+    CYC(b_+S(32), b_+S(35)); TAIL(applyRoomSpecificTileChanges);
   } else {
-    CYC(b_+19, b_+21);
-    CALL_C(b_+21, replaceShutterForLinkEntering_hook, SYM(replaceShutterForLinkEntering), b_+24);
-    CALL_C(b_+24, replaceSwitchTiles_hook, SYM(replaceSwitchTiles), b_+27);
-    CALL_C(b_+27, replaceToggleBlocks_hook, SYM(replaceToggleBlocks), b_+30);
-    CALL_C(b_+30, replaceJabuTilesIfUnderwater_hook, SYM(replaceJabuTilesIfUnderwater), b_+33);
+    CALL_C(b_+0, replacePollutionWithWaterIfPollutionFixed_hook, SYM(replacePollutionWithWaterIfPollutionFixed), b_+3);
+    CALL_C(b_+3, applySingleTileChanges_hook, SYM(applySingleTileChanges), b_+6);
+    CALL_C(b_+6, applyStandardTileSubstitutions_hook, SYM(applyStandardTileSubstitutions), b_+9);
+    CALL_C(b_+9, replaceOpenedChest_hook, SYM(replaceOpenedChest), b_+12);
+    CYC(b_+12, b_+15); A = W8(wActiveGroup);
+    CYC(b_+15, b_+17); alu_and(gb, 0x06);
+    CYC(b_+17, b_+19); alu_cp(gb, 0x04);
+    if (!(F & FZ)) {
+      CYCT(b_+19, b_+21);
+    } else {
+      CYC(b_+19, b_+21);
+      CALL_C(b_+21, replaceShutterForLinkEntering_hook, SYM(replaceShutterForLinkEntering), b_+24);
+      CALL_C(b_+24, replaceSwitchTiles_hook, SYM(replaceSwitchTiles), b_+27);
+      CALL_C(b_+27, replaceToggleBlocks_hook, SYM(replaceToggleBlocks), b_+30);
+      CALL_C(b_+30, replaceJabuTilesIfUnderwater_hook, SYM(replaceJabuTilesIfUnderwater), b_+33);
+    }
+    CALL_C(b_+33, applyRoomSpecificTileChanges_hook, SYM(applyRoomSpecificTileChanges), b_+36);
+    CYC(b_+36, b_+39); A = W8(wActiveGroup);
+    CYC(b_+39, b_+41); alu_cp(gb, 0x02);
+    if (!(F & FC)) {
+      CYCT(b_+41, b_+42); ret_effect(gb);
+      return;
+    }
+    CYC(b_+41, b_+42);
+    CALL_C(b_+42, replaceBreakableTileOverPortal_hook, SYM(replaceBreakableTileOverPortal), b_+45);
+    CALL_C(b_+45, replaceBreakableTileOverLinkTimeWarpingIn_hook, SYM(replaceBreakableTileOverLinkTimeWarpingIn), b_+48);
+    CYC(b_+48, b_+51); A = W8(wLinkTimeWarpTile);
+    CYC(b_+51, b_+52); alu_or(gb, A);
+    if (F & FZ) {
+      CYCT(b_+52, b_+53); ret_effect(gb);
+      return;
+    }
+    CYC(b_+52, b_+53);
+    CYC(b_+53, b_+54); C = A;
+    CYC(b_+54, b_+55); C = alu_dec8(gb, C);
+    CYC(b_+55, b_+57); B = wRoomLayout >> 8;
+    CYC(b_+57, b_+58); A = mem_rd(gb, BC);
+    CYC(b_+58, b_+59); E = A;
+    CYC(b_+59, b_+62); SET_HL(SYM(timewarpReturnTileReplacementDict));
+    CALL_C(b_+62, lookupKey_hook, SYM(lookupKey), b_+65);
+    if (!(F & FC)) {
+      CYCT(b_+65, b_+66); ret_effect(gb);
+      return;
+    }
+    CYC(b_+65, b_+66);
+    CYC(b_+66, b_+67); mem_wr(gb, BC, A);
+    CYC(b_+67, b_+68); ret_effect(gb);
   }
-  CALL_C(b_+33, applyRoomSpecificTileChanges_hook, SYM(applyRoomSpecificTileChanges), b_+36);
-  CYC(b_+36, b_+39); A = W8(wActiveGroup);
-  CYC(b_+39, b_+41); alu_cp(gb, 0x02);
-  if (!(F & FC)) {
-    CYCT(b_+41, b_+42); ret_effect(gb);
-    return;
-  }
-  CYC(b_+41, b_+42);
-  CALL_C(b_+42, replaceBreakableTileOverPortal_hook, SYM(replaceBreakableTileOverPortal), b_+45);
-  CALL_C(b_+45, replaceBreakableTileOverLinkTimeWarpingIn_hook, SYM(replaceBreakableTileOverLinkTimeWarpingIn), b_+48);
-  CYC(b_+48, b_+51); A = W8(wLinkTimeWarpTile);
-  CYC(b_+51, b_+52); alu_or(gb, A);
-  if (F & FZ) {
-    CYCT(b_+52, b_+53); ret_effect(gb);
-    return;
-  }
-  CYC(b_+52, b_+53);
-  CYC(b_+53, b_+54); C = A;
-  CYC(b_+54, b_+55); C = alu_dec8(gb, C);
-  CYC(b_+55, b_+57); B = wRoomLayout >> 8;
-  CYC(b_+57, b_+58); A = mem_rd(gb, BC);
-  CYC(b_+58, b_+59); E = A;
-  CYC(b_+59, b_+62); SET_HL(SYM(timewarpReturnTileReplacementDict));
-  CALL_C(b_+62, lookupKey_hook, SYM(lookupKey), b_+65);
-  if (!(F & FC)) {
-    CYCT(b_+65, b_+66); ret_effect(gb);
-    return;
-  }
-  CYC(b_+65, b_+66);
-  CYC(b_+66, b_+67); mem_wr(gb, BC, A);
-  CYC(b_+67, b_+68); ret_effect(gb);
 }
 
 void replaceBreakableTileOverPortal_hook(GB *gb) {

@@ -238,7 +238,7 @@ void func_410d_hook(GB *gb) {
     else if (jt_ == b_+39) { goto dimitri; }
     else if (jt_ == b_+57) { goto moosh; }
     else if (jt_ == b_+155) { goto minecart; }
-    else if (jt_ == b_+196) { goto raft; }
+    else if (!game_seasons && jt_ == b_+196) { goto raft; }
     else { HANDOFF(HL); }
   } while (0);
 invalid:

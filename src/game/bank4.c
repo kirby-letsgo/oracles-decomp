@@ -1,6 +1,8 @@
 #include "game/game.h"
 #include "game/gen.h"
 
+void s_checkRoomPackAfterWarp_hook(GB *gb);
+
 #undef CYC
 #undef CYCT
 #define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
@@ -201,7 +203,7 @@ void b4VBlankFunction31_hook(GB *gb) {
   b4_vblank_function(gb, SYM(b4VBlankFunction31), 0x1f);
 }
 
-static void applyWarpDest_finish(GB *gb) {
+static void applyWarpDest_finish(GB *gb, uint16_t sp0_) {
   BASE(label_04_033);
   CYC(b_+20, b_+22); A = 0x0a;
   CYC(b_+22, b_+25); W8(wLinkForceState) = A;
@@ -226,7 +228,33 @@ static void applyWarpDest_finish(GB *gb) {
   CYC(b_+64, b_+66); alu_swap_a(gb);
   CYC(b_+66, b_+68); alu_or(gb, 0x08);
   CYC(b_+68, b_+69); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+69, b_+72); loadScreenMusicAndSetRoomPack_hook(gb);
+  if (game_seasons) {
+    CYC(b_+S(69), b_+S(72)); A = W8(wWarpDestGroup);
+    CYC(b_+S(72), b_+S(74)); alu_bit(gb, 6, A);
+    if (!(F & FZ)) { CYCT(b_+S(74), b_+S(76)); goto same_pack; }
+    CYC(b_+S(74), b_+S(76));
+    CYC(b_+S(76), b_+S(79)); A = W8(wActiveGroup);
+    CYC(b_+S(79), b_+S(80)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(80), b_+S(82)); goto same_pack; }
+    CYC(b_+S(80), b_+S(82));
+    CYC(b_+S(82), b_+S(84)); A = mem_rd(gb, hFF8B);
+    CYC(b_+S(84), b_+S(86)); alu_cp(gb, 0x03);
+    if (F & FC) { CYCT(b_+S(86), b_+S(88)); goto check_pack; }
+    CYC(b_+S(86), b_+S(88));
+    if (F & FZ) { CYCT(b_+S(88), b_+S(90)); goto same_pack; }
+    CYC(b_+S(88), b_+S(90));
+    CYC(b_+S(90), b_+S(93)); A = W8(wDungeonIndex);
+    CYC(b_+S(93), b_+S(95)); alu_cp(gb, 0xff);
+    if (F & FZ) { CYCT(b_+S(95), b_+S(97)); goto same_pack; }
+    CYC(b_+S(95), b_+S(97));
+check_pack:
+    CALL_C(b_+S(97), loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+S(100));
+    CYC(b_+S(100), b_+S(103)); TAIL_S(checkRoomPackAfterWarp);
+same_pack:
+    CYC(b_+S(103), b_+S(106)); loadScreenMusicAndSetRoomPack_hook(gb);
+  } else {
+    CYC(b_+69, b_+72); loadScreenMusicAndSetRoomPack_hook(gb);
+  }
 }
 
 void vblankRunBank4Function_b04_hook(GB *gb) {
@@ -249,6 +277,7 @@ void vblankRunBank4Function_b04_hook(GB *gb) {
 
 void label_04_033_hook(GB *gb) {
   BASE(label_04_033);
+  uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+1); C = A;
   CYC(b_+1, b_+3); B = 0x00;
   CYC(b_+3, b_+4); alu_add_hl(gb, BC);
@@ -261,7 +290,7 @@ void label_04_033_hook(GB *gb) {
   CYC(b_+14, b_+15); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+15, b_+17); alu_or(gb, 0x80);
   CYC(b_+17, b_+20); W8(wWarpTransition) = A;
-  applyWarpDest_finish(gb);
+  applyWarpDest_finish(gb, sp0_);
 }
 
 void label_04_032_hook(GB *gb) {
@@ -277,138 +306,161 @@ void label_04_032_hook(GB *gb) {
 
 void applyWarpDest_b04_hook(GB *gb) {
   BASE(applyWarpDest_b04);
+  uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+3); A = W8(wWarpDestGroup);
   CYC(b_+3, b_+5); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
     CYCT(b_+5, b_+7);
-    applyWarpDest_finish(gb);
+    applyWarpDest_finish(gb, sp0_);
     return;
   }
   CYC(b_+5, b_+7);
+  if (game_seasons) {
+    CYC(b_+S(7), b_+S(9)); alu_and(gb, 0x0f);
+    CYC(b_+S(9), b_+S(11)); alu_cp(gb, 0x02);
+    if (!(F & FZ)) { CYCT(b_+S(11), b_+S(13)); TAIL(label_04_032); }
+    CYC(b_+S(11), b_+S(13));
+    CYC(b_+S(13), b_+S(16)); SET_HL(SYM(warpDestTable));
+    CYC(b_+S(16), b_+S(17)); bank4_add_double_index_to_hl(gb, b_+S(17));
+    CYC(b_+S(17), b_+S(18)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+S(18), b_+S(19)); H = mem_rd(gb, HL);
+    CYC(b_+S(19), b_+S(20)); L = A;
+    CYC(b_+S(20), b_+S(23)); A = W8(wWarpDestRoom);
+    CYC(b_+S(23), b_+S(24)); B = A;
+    CYC(b_+S(24), b_+S(27)); A = W8(wc6e5);
+    CYC(b_+S(27), b_+S(28)); alu_add(gb, B);
+    CYC(b_+S(28), b_+S(30)); TAIL(label_04_033);
+  }
   TAIL(label_04_032);
 }
 
 void findWarpSourceAndDest_hook(GB *gb) {
   BASE(findWarpSourceAndDest);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = W8(wDisableWarps);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(b_+4, b_+7);
-    TAIL(setWarpDestDefault);
+  if (!game_seasons) {
+    CYC(b_+0, b_+3); A = W8(wDisableWarps);
+    CYC(b_+3, b_+4); alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+4, b_+7);
+      TAIL(setWarpDestDefault);
+    }
+    CYC(b_+4, b_+7);
   }
-  CYC(b_+4, b_+7);
-  CYC(b_+7, b_+10); A = W8(wActiveGroup);
-  CYC(b_+10, b_+13); SET_HL(SYM(warpSourcesTable));
-  CYC(b_+13, b_+14); bank4_add_double_index_to_hl(gb, b_+14);
-  CYC(b_+14, b_+15); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+15, b_+16); H = mem_rd(gb, HL);
-  CYC(b_+16, b_+17); L = A;
-  CYC(b_+17, b_+20); A = W8(wActiveRoom);
-  CYC(b_+20, b_+21); B = A;
+  CYC(b_+O(7), b_+OE(10)); A = W8(wActiveGroup);
+  CYC(b_+O(10), b_+OE(13)); SET_HL(SYM(warpSourcesTable));
+  CYC(b_+O(13), b_+OE(14)); bank4_add_double_index_to_hl(gb, b_+O(14));
+  CYC(b_+O(14), b_+OE(15)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(15), b_+OE(16)); H = mem_rd(gb, HL);
+  CYC(b_+O(16), b_+OE(17)); L = A;
+  CYC(b_+O(17), b_+OE(20)); A = W8(wActiveRoom);
+  CYC(b_+O(20), b_+OE(21)); B = A;
 
   for (;;) {
-    CYC(b_+21, b_+22); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+22, b_+24); alu_cp(gb, 0xff);
-    if (F & FZ) {
-      CYCT(b_+24, b_+26);
-      break;
+    CYC(b_+O(21), b_+OE(22)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    if (!game_seasons) {
+      CYC(b_+22, b_+24); alu_cp(gb, 0xff);
+      if (F & FZ) {
+        CYCT(b_+24, b_+26);
+        break;
+      }
+      CYC(b_+24, b_+26);
     }
-    CYC(b_+24, b_+26);
-    CYC(b_+26, b_+28); alu_bit(gb, 7, A);
+    CYC(b_+O(26), b_+OE(28)); alu_bit(gb, 7, A);
     if (!(F & FZ)) {
-      CYCT(b_+28, b_+30);
+      CYCT(b_+O(28), b_+OE(30));
       goto found;
     }
-    CYC(b_+28, b_+30);
-    CYC(b_+30, b_+32); alu_bit(gb, 6, A);
+    CYC(b_+O(28), b_+OE(30));
+    CYC(b_+O(30), b_+OE(32)); alu_bit(gb, 6, A);
     if (!(F & FZ)) {
-      CYCT(b_+32, b_+34);
-      CYC(b_+47, b_+48); A = mem_rd(gb, HL);
-      CYC(b_+48, b_+49); alu_cp(gb, B);
+      CYCT(b_+O(32), b_+OE(34));
+      CYC(b_+O(47), b_+OE(48)); A = mem_rd(gb, HL);
+      CYC(b_+O(48), b_+OE(49)); alu_cp(gb, B);
       if (!(F & FZ)) {
-        CYCT(b_+49, b_+51);
+        CYCT(b_+O(49), b_+OE(51));
         goto skip;
       }
-      CYC(b_+49, b_+51);
-      CYC(b_+51, b_+52); SET_HL(HL + 1);
-      CYC(b_+52, b_+53); A = mem_rd(gb, HL); SET_HL(HL + 1);
-      CYC(b_+53, b_+54); H = mem_rd(gb, HL);
-      CYC(b_+54, b_+55); L = A;
-      CYC(b_+55, b_+57); A = mem_rd(gb, hFF8D);
-      CYC(b_+57, b_+58); B = A;
-      CYC(b_+58, b_+60);
+      CYC(b_+O(49), b_+OE(51));
+      CYC(b_+O(51), b_+OE(52)); SET_HL(HL + 1);
+      CYC(b_+O(52), b_+OE(53)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+O(53), b_+OE(54)); H = mem_rd(gb, HL);
+      CYC(b_+O(54), b_+OE(55)); L = A;
+      CYC(b_+O(55), b_+OE(57)); A = mem_rd(gb, hFF8D);
+      CYC(b_+O(57), b_+OE(58)); B = A;
+      CYC(b_+O(58), b_+OE(60));
       continue;
     }
-    CYC(b_+32, b_+34);
-    CYC(b_+34, b_+36); alu_and(gb, 0x0f);
+    CYC(b_+O(32), b_+OE(34));
+    CYC(b_+O(34), b_+OE(36)); alu_and(gb, 0x0f);
     if (!(F & FZ)) {
-      CYCT(b_+36, b_+38);
+      CYCT(b_+O(36), b_+OE(38));
       goto skip;
     }
-    CYC(b_+36, b_+38);
-    CYC(b_+38, b_+39); A = mem_rd(gb, HL);
-    CYC(b_+39, b_+40); alu_cp(gb, B);
+    CYC(b_+O(36), b_+OE(38));
+    CYC(b_+O(38), b_+OE(39)); A = mem_rd(gb, HL);
+    CYC(b_+O(39), b_+OE(40)); alu_cp(gb, B);
     if (F & FZ) {
-      CYCT(b_+40, b_+42);
+      CYCT(b_+O(40), b_+OE(42));
       goto found;
     }
-    CYC(b_+40, b_+42);
+    CYC(b_+O(40), b_+OE(42));
 
 skip:
-    CYC(b_+42, b_+43); SET_HL(HL + 1);
-    CYC(b_+43, b_+44); SET_HL(HL + 1);
-    CYC(b_+44, b_+45); SET_HL(HL + 1);
-    CYC(b_+45, b_+47);
+    CYC(b_+O(42), b_+OE(43)); SET_HL(HL + 1);
+    CYC(b_+O(43), b_+OE(44)); SET_HL(HL + 1);
+    CYC(b_+O(44), b_+OE(45)); SET_HL(HL + 1);
+    CYC(b_+O(45), b_+OE(47));
   }
 
-  CYC(b_+81, b_+84); A = W8(wTilesetFlags);
-  CYC(b_+84, b_+86); alu_and(gb, 0x08);
-  if (F & FZ) {
-    CYCT(b_+86, b_+88);
-    TAIL(setWarpDestDefault);
+  if (!game_seasons) {
+    CYC(b_+81, b_+84); A = W8(wTilesetFlags);
+    CYC(b_+84, b_+86); alu_and(gb, 0x08);
+    if (F & FZ) {
+      CYCT(b_+86, b_+88);
+      TAIL(setWarpDestDefault);
+    }
+    CYC(b_+86, b_+88);
+    CYC(b_+88, b_+90); A = mem_rd(gb, hFF8C);
+    CYC(b_+90, b_+91); alu_rrca(gb);
+    CYC(b_+91, b_+93); B = 0x01;
+    if (!(F & FC)) {
+      CYCT(b_+93, b_+95);
+    } else {
+      CYC(b_+93, b_+95);
+      CYC(b_+95, b_+97); B = 0xff;
+    }
+    CYC(b_+97, b_+100); A = W8(wDungeonFloor);
+    CYC(b_+100, b_+101); alu_add(gb, B);
+    CYC(b_+101, b_+104); W8(wDungeonFloor) = A;
+    CALL_C(b_+104, getActiveRoomFromDungeonMapPosition_hook, SYM(getActiveRoomFromDungeonMapPosition), b_+107);
+    CYC(b_+107, b_+110); W8(wWarpDestRoom) = A;
+    CYC(b_+110, b_+112); A = mem_rd(gb, hFF8D);
+    CYC(b_+112, b_+115); W8(wWarpDestPos) = A;
+    CYC(b_+115, b_+118); A = W8(wActiveGroup);
+    CYC(b_+118, b_+120); alu_or(gb, 0x80);
+    CYC(b_+120, b_+123); W8(wWarpDestGroup) = A;
+    CYC(b_+123, b_+124); alu_xor(gb, A);
+    CYC(b_+124, b_+127); W8(wWarpTransition) = A;
+    CYC(b_+127, b_+129); A = 0x03;
+    CYC(b_+129, b_+132); W8(wWarpTransition2) = A;
+    CYC(b_+132, b_+134); A = 0x6e;
+    CYC(b_+134, b_+137); playSound_b00_hook(gb);
+    return;
   }
-  CYC(b_+86, b_+88);
-  CYC(b_+88, b_+90); A = mem_rd(gb, hFF8C);
-  CYC(b_+90, b_+91); alu_rrca(gb);
-  CYC(b_+91, b_+93); B = 0x01;
-  if (!(F & FC)) {
-    CYCT(b_+93, b_+95);
-  } else {
-    CYC(b_+93, b_+95);
-    CYC(b_+95, b_+97); B = 0xff;
-  }
-  CYC(b_+97, b_+100); A = W8(wDungeonFloor);
-  CYC(b_+100, b_+101); alu_add(gb, B);
-  CYC(b_+101, b_+104); W8(wDungeonFloor) = A;
-  CALL_C(b_+104, getActiveRoomFromDungeonMapPosition_hook, SYM(getActiveRoomFromDungeonMapPosition), b_+107);
-  CYC(b_+107, b_+110); W8(wWarpDestRoom) = A;
-  CYC(b_+110, b_+112); A = mem_rd(gb, hFF8D);
-  CYC(b_+112, b_+115); W8(wWarpDestPos) = A;
-  CYC(b_+115, b_+118); A = W8(wActiveGroup);
-  CYC(b_+118, b_+120); alu_or(gb, 0x80);
-  CYC(b_+120, b_+123); W8(wWarpDestGroup) = A;
-  CYC(b_+123, b_+124); alu_xor(gb, A);
-  CYC(b_+124, b_+127); W8(wWarpTransition) = A;
-  CYC(b_+127, b_+129); A = 0x03;
-  CYC(b_+129, b_+132); W8(wWarpTransition2) = A;
-  CYC(b_+132, b_+134); A = 0x6e;
-  CYC(b_+134, b_+137); playSound_b00_hook(gb);
-  return;
 
 found:
-  CYC(b_+60, b_+61); SET_HL(HL + 1);
-  CYC(b_+61, b_+62); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+62, b_+65); W8(wWarpDestRoom) = A;
-  CYC(b_+65, b_+66); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+66, b_+67); B = A;
-  CYC(b_+67, b_+69); alu_swap_a(gb);
-  CYC(b_+69, b_+71); alu_and(gb, 0x0f);
-  CYC(b_+71, b_+74); W8(wWarpDestGroup) = A;
-  CYC(b_+74, b_+75); A = B;
-  CYC(b_+75, b_+77); alu_and(gb, 0x0f);
-  CYC(b_+77, b_+80); W8(wWarpTransition) = A;
-  CYC(b_+80, b_+81); ret_effect(gb);
+  CYC(b_+O(60), b_+OE(61)); SET_HL(HL + 1);
+  CYC(b_+O(61), b_+OE(62)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(62), b_+OE(65)); W8(wWarpDestRoom) = A;
+  CYC(b_+O(65), b_+OE(66)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(66), b_+OE(67)); B = A;
+  CYC(b_+O(67), b_+OE(69)); alu_swap_a(gb);
+  CYC(b_+O(69), b_+OE(71)); alu_and(gb, 0x0f);
+  CYC(b_+O(71), b_+OE(74)); W8(wWarpDestGroup) = A;
+  CYC(b_+O(74), b_+OE(75)); A = B;
+  CYC(b_+O(75), b_+OE(77)); alu_and(gb, 0x0f);
+  CYC(b_+O(77), b_+OE(80)); W8(wWarpTransition) = A;
+  CYC(b_+O(80), b_+OE(81)); ret_effect(gb);
 }
 
 void setWarpDestDefault_hook(GB *gb) {
