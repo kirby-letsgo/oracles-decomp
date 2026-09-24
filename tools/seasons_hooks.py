@@ -45,9 +45,11 @@ def main():
         if verdict[n] == 'JT_ONLY':
             base = re.sub(r'_b[0-9a-f]{2}$', '', n)
             verdict[n] = 'IDENTICAL' if (base in safe_jt or n in safe_jt) and (base + '!') not in safe_jt and (n + '!') not in safe_jt else 'DIFFERENT'
+    const_resolved = set()
     if os.path.exists('src/hooks/seasons_ok.txt'):
         for l in open('src/hooks/seasons_ok.txt'):
             n = l.strip()
+            if n: const_resolved.add(n)
             if n and verdict.get(n) == 'SAME_SHAPE': verdict[n] = 'IDENTICAL'
     # hand-checked routines: per-game offsets and edited C (tools/ofsmap.py), or C that already
     # tells the games apart (seasons_ok_manual.txt, whatever routine_equiv says); a jump table
@@ -138,7 +140,9 @@ def main():
             try:
                 an, ash = A.normalized(a[0], a[1]); sn, ssh = S.normalized(s_[0], s_[1])
                 if an != sn and ash == ssh: an, sn = reconcile(an, sn, A, S)
-                if an != sn: v = 'DIFFERENT'; break
+                if an != sn:
+                    v = 'SAME_SHAPE' if [x[1].split(' ')[0] for x in an] == [x[1].split(' ')[0] for x in sn] else 'DIFFERENT'
+                    if v == 'DIFFERENT': break
             except Exception: v = 'DIFFERENT'; break
         local_cache[name] = v
         return v
@@ -214,6 +218,8 @@ def main():
                     cover = A.by_addr.get((a[0] if addr >= 0x4000 else 0, addr))
                     if not cover or cover == base: continue
                     v = label_verdict(cover.replace('@', '__'))
+                    # a call-only local whose constants differ: gameconst checked them in this hook's C
+                    if v == 'SAME_SHAPE' and fn.removesuffix('_hook') in const_resolved: v = 'IDENTICAL'
                     if v is not None and v != 'IDENTICAL': ok = False; why.setdefault(key, f'burns {base}+{n} in {cover} ({v})'); break
                     # b_+N must land on the same instruction in Seasons: the covering label has to sit
                     # at the same distance from the base in both games

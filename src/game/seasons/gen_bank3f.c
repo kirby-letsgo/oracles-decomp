@@ -2,34 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 3f:46e2
-void s_addTreasureToInventory__addToInventory(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_46e2:
-  I(0x46e2, 1); C = A;  // ld c,a
-  I(0x46e3, 3); SET_HL(0xc680);  // ld hl,$c680
-  I(0x46e6, 2); B = 0x12;  // ld b,$12
-L_46e8:
-  I(0x46e8, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x46e9, 1); alu_cp(gb, C);  // cp c
-  if ((F & FZ)) { I(0x46ea, 3); goto L_46f6; } I(0x46ea, 2);  // jr z,$46f6
-  I(0x46ec, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x46ed, 3); goto L_46e8; } I(0x46ed, 2);  // jr nz,$46e8
-  I(0x46ef, 1); B = alu_dec8(gb, B);  // dec b
-  I(0x46f0, 2); L = 0x80;  // ld l,$80
-L_46f2:
-  I(0x46f2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x46f3, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x46f4, 3); goto L_46f2; } I(0x46f4, 2);  // jr nz,$46f2
-L_46f6:
-  I(0x46f6, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x46f7, 2); mem_wr(gb, HL, C);  // ld (hl),c
-  I(0x46f8, 1); A = L;  // ld a,l
-  I(0x46f9, 2); alu_sub(gb, 0x82);  // sub $82
-  I(0x46fb, 2); alu_bit(gb, 7, B);  // bit 7,b
-  RET(0x46fd); return;  // ret
-}
-
 // 3f:46e8
 void s_addTreasureToInventory__nextItem(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -147,35 +119,6 @@ L_5073:
   I(0x5080, 1); L = alu_inc8(gb, L);  // inc l
   I(0x5081, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
   RET(0x5083); return;  // ret
-}
-
-// 3f:4795
-void s_checkItemDropAvailable_body(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4795, 4); A = mem_rd(gb, 0xc63a);  // ld a,($c63a)
-  I(0x4798, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4799, 1); A = C;  // ld a,c
-  if (!(F & FZ)) { I(0x479a, 3); goto L_47a2; } I(0x479a, 2);  // jr nz,$47a2
-  I(0x479c, 3); SET_HL(0x4865);  // ld hl,$4865
-  RST_PUSH(0x479f, 0x47a0);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x47a0, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x47a1, 1); C = A;  // ld c,a
-L_47a2:
-  I(0x47a2, 3); SET_HL(0x47fd);  // ld hl,$47fd
-  RST_PUSH(0x47a5, 0x47a6);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x47a6, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x47a7, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x47a8, 1); L = A;  // ld l,a
-  I(0x47a9, 2); H = 0xc6;  // ld h,$c6
-  I(0x47ab, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x47ac, 1); alu_and(gb, B);  // and b
-  if (!(F & FZ)) { RET_TAKEN(0x47ad); return; } I(0x47ad, 2);  // ret nz
-L_47ae:
-  I(0x47ae, 2); C = 0xff;  // ld c,$ff
-  RET(0x47b0); return;  // ret
 }
 
 // 3f:47ae
@@ -710,91 +653,6 @@ L_52e9:
   I(0x52f2, 4); mem_wr(gb, 0xcba1, A);  // ld ($cba1),a
   I(0x52f5, 1); alu_or(gb, H);  // or h
   RET(0x52f6); return;  // ret
-}
-
-// 3f:541a
-void s_func_53eb(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x541a, 1); H = D;  // ld h,d
-  I(0x541b, 2); L = 0xc1;  // ld l,$c1
-  I(0x541d, 3); alu_bit(gb, 5, mem_rd(gb, HL));  // bit 5,(hl)
-  if (!(F & FZ)) { I(0x541f, 3); goto L_5434; } I(0x541f, 2);  // jr nz,$5434
-  I(0x5421, 2); L = 0xea;  // ld l,$ea
-  I(0x5423, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5424, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5425); return; } I(0x5425, 2);  // ret z
-  I(0x5426, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  if (!(F & FZ)) { RET_TAKEN(0x5427); return; } I(0x5427, 2);  // ret nz
-  I(0x5428, 2); B = 0x00;  // ld b,$00
-  CALL(0x542a, s_func_53eb__func, 0x5443, 0x542d);  // call $5443
-  I(0x542d, 2); A = 0x89;  // ld a,$89
-  CALL(0x542f, playSound_b00_hook, 0x0c74, 0x5432);  // call $0c74
-  I(0x5432, 1); alu_xor(gb, A);  // xor a
-  RET(0x5433); return;  // ret
-L_5434:
-  I(0x5434, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 5)));  // res 5,(hl)
-  I(0x5436, 2); L = 0xea;  // ld l,$ea
-  I(0x5438, 3); mem_wr(gb, HL, 0x1e);  // ld (hl),$1e
-  I(0x543a, 2); L = 0xef;  // ld l,$ef
-  I(0x543c, 3); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CALL(0x543e, s_func_53eb__dmaHeartPieceDisplay, 0x54a8, 0x5441);  // call $54a8
-  I(0x5441, 2); B = 0xff;  // ld b,$ff
-L_5443:
-  I(0x5443, 4); A = mem_rd(gb, 0xc6a4);  // ld a,($c6a4)
-  I(0x5446, 1); alu_add(gb, B);  // add b
-  I(0x5447, 1); alu_add(gb, A);  // add a
-  PUSH(0x5448, AF);  // push af
-  I(0x5449, 2); alu_sub(gb, 0x08);  // sub $08
-  if (!(F & FZ)) { I(0x544b, 3); goto L_5457; } I(0x544b, 2);  // jr nz,$5457
-  I(0x544d, 4); mem_wr(gb, 0xc6a4, A);  // ld ($c6a4),a
-  I(0x5450, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5451, 4); mem_wr(gb, 0xcbea, A);  // ld ($cbea),a
-  I(0x5454, 4); mem_wr(gb, 0xd0ef, A);  // ld ($d0ef),a
-L_5457:
-  SET_AF(POP(0x5457));  // pop af
-  I(0x5458, 3); SET_HL(0x5494);  // ld hl,$5494
-  RST_PUSH(0x545b, 0x545c);  // rst $18 (addDoubleIndexToHl)
-  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
-  I(0x545c, 2); D = 0xd0;  // ld d,$d0
-  I(0x545e, 4); A = mem_rd(gb, 0xd0cc);  // ld a,($d0cc)
-  I(0x5461, 2); alu_add(gb, 0x11);  // add $11
-  I(0x5463, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5465, 1); C = A;  // ld c,a
-  I(0x5466, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5467, 2); alu_and(gb, 0x1f);  // and $1f
-  I(0x5469, 1); B = A;  // ld b,a
-  I(0x546a, 2); alu_add(gb, 0x20);  // add $20
-  I(0x546c, 1); E = A;  // ld e,a
-  I(0x546d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x546e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x546f, 1); A = B;  // ld a,b
-  I(0x5470, 2); alu_add(gb, 0x40);  // add $40
-  I(0x5472, 1); E = A;  // ld e,a
-  I(0x5473, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5474, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5475, 1); A = C;  // ld a,c
-  I(0x5476, 2); alu_add(gb, 0x20);  // add $20
-  I(0x5478, 1); E = A;  // ld e,a
-  I(0x5479, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x547a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x547b, 1); A = C;  // ld a,c
-  I(0x547c, 2); alu_add(gb, 0x40);  // add $40
-  I(0x547e, 1); E = A;  // ld e,a
-  I(0x547f, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5480, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5481, 2); D = 0xd1;  // ld d,$d1
-  I(0x5483, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5484, 2); alu_or(gb, 0x20);  // or $20
-  I(0x5486, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5487, 1); A = C;  // ld a,c
-  I(0x5488, 2); alu_add(gb, 0x20);  // add $20
-  I(0x548a, 1); E = A;  // ld e,a
-  I(0x548b, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x548c, 2); alu_or(gb, 0x20);  // or $20
-  I(0x548e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x548f, dmaTextboxMap_hook, 0x51a2, 0x5492);  // call $51a2
-  I(0x5492, 1); alu_or(gb, D);  // or d
-  RET(0x5493); return;  // ret
 }
 
 // 3f:5443

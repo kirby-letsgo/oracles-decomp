@@ -344,51 +344,83 @@ void setCutsceneIndexIfCutsceneTriggerSet_hook(GB *gb) {
 void checkDisplayEraOrSeasonInfo_hook(GB *gb) {
   BASE(checkDisplayEraOrSeasonInfo);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); A = 0x16;
-  CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
+  CYC(b_+O(0), b_+OE(2)); A = GV(0x16, 0x2f);
+  CALL_C(b_+O(2), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+OE(5));
   if (F & FZ) {
-    CYCT(b_+5, b_+7);
+    CYCT(b_+O(5), b_+OE(7));
   } else {
-    CYC(b_+5, b_+7);
-    CYC(b_+7, b_+9); A = 0x16;
-    CYC(b_+9, b_+12);
+    CYC(b_+O(5), b_+OE(7));
+    CYC(b_+O(7), b_+OE(9)); A = GV(0x16, 0x2f);
+    CYC(b_+O(9), b_+OE(12));
     TAIL(unsetGlobalFlag);
   }
-  CYC(b_+12, b_+15); A = mem_rd(gb, wSentBackByStrangeForce);
-  CYC(b_+15, b_+16); A = alu_dec8(gb, A);
-  if (F & FZ) {
-    CYCT(b_+16, b_+17); ret_effect(gb);
-    return;
+  if (game_seasons) {
+    CYC(b_+S(12), b_+S(15)); A = W8(wActiveGroup);
+    CYC(b_+S(15), b_+S(16)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(16), b_+S(17)); ret_effect(gb); return; }
+    CYC(b_+S(16), b_+S(17));
+  } else {
+    CYC(b_+12, b_+15); A = mem_rd(gb, wSentBackByStrangeForce);
+    CYC(b_+15, b_+16); A = alu_dec8(gb, A);
+    if (F & FZ) {
+      CYCT(b_+16, b_+17); ret_effect(gb);
+      return;
+    }
+    CYC(b_+16, b_+17);
+    CYC(b_+17, b_+20); A = mem_rd(gb, wTilesetFlags);
+    CYC(b_+20, b_+22); alu_bit(gb, 4, A);
+    if (!(F & FZ)) {
+      CYCT(b_+22, b_+23); ret_effect(gb);
+      return;
+    }
+    CYC(b_+22, b_+23);
+    CYC(b_+23, b_+25); alu_bit(gb, 0, A);
+    if (F & FZ) {
+      CYCT(b_+25, b_+26); ret_effect(gb);
+      return;
+    }
+    CYC(b_+25, b_+26);
   }
-  CYC(b_+16, b_+17);
-  CYC(b_+17, b_+20); A = mem_rd(gb, wTilesetFlags);
-  CYC(b_+20, b_+22); alu_bit(gb, 4, A);
+  CALL_C(b_+O(26), getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+OE(29));
   if (!(F & FZ)) {
-    CYCT(b_+22, b_+23); ret_effect(gb);
+    CYCT(b_+O(29), b_+OE(30)); ret_effect(gb);
     return;
   }
-  CYC(b_+22, b_+23);
-  CYC(b_+23, b_+25); alu_bit(gb, 0, A);
-  if (F & FZ) {
-    CYCT(b_+25, b_+26); ret_effect(gb);
-    return;
-  }
-  CYC(b_+25, b_+26);
-  CALL_C(b_+26, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+29);
-  if (!(F & FZ)) {
-    CYCT(b_+29, b_+30); ret_effect(gb);
-    return;
-  }
-  CYC(b_+29, b_+30);
-  CYC(b_+30, b_+32); mem_wr(gb, HL, 0xe0);
-  CYC(b_+32, b_+33); ret_effect(gb);
+  CYC(b_+O(29), b_+OE(30));
+  CYC(b_+O(30), b_+OE(32)); mem_wr(gb, HL, 0xe0);
+  CYC(b_+O(32), b_+OE(33)); ret_effect(gb);
 }
 
 void updateGrassAnimationModifier_hook(GB *gb) {
   BASE(updateGrassAnimationModifier);
-  CYC(b_+0, b_+2); A = 0x00;
-  CYC(b_+2, b_+5); mem_wr(gb, wGrassAnimationModifier, A);
-  CYC(b_+5, b_+6); ret_effect(gb);
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(3)); A = W8(wLoadingRoomPack);
+    CYC(b_+S(3), b_+S(4)); A = alu_inc8(gb, A);
+    CYC(b_+S(4), b_+S(6)); A = 0x00;
+    if (F & FZ) CYCT(b_+S(6), b_+S(8));
+    else {
+      CYC(b_+S(6), b_+S(8));
+      CYC(b_+S(8), b_+S(11)); A = W8(wRoomStateModifier);
+    }
+    CYC(b_+S(11), b_+S(12)); B = A;
+    CYC(b_+S(12), b_+S(15)); A = W8(wActiveGroup);
+    CYC(b_+S(15), b_+S(16)); alu_or(gb, A);
+    CYC(b_+S(16), b_+S(17)); A = B;
+    if (F & FZ) CYCT(b_+S(17), b_+S(19));
+    else {
+      CYC(b_+S(17), b_+S(19));
+      CYC(b_+S(19), b_+S(20)); alu_xor(gb, A);
+    }
+    CYC(b_+S(20), b_+S(23)); SET_HL(b_+S(29));
+    CYC(b_+S(23), b_+S(24)); bank1_add_a_to_hl_from_rst(gb, b_+S(24));
+    CYC(b_+S(24), b_+S(25)); A = mem_rd(gb, HL);
+    CYC(b_+S(25), b_+S(28)); mem_wr(gb, wGrassAnimationModifier, A);
+    CYC(b_+S(28), b_+S(29)); ret_effect(gb);
+  } else {
+    CYC(b_+0, b_+2); A = 0x00;
+    CYC(b_+2, b_+5); mem_wr(gb, wGrassAnimationModifier, A);
+    CYC(b_+5, b_+6); ret_effect(gb);
+  }
 }
 
 void loadDeathRespawnBufferPreset_hook(GB *gb) {
@@ -1231,13 +1263,14 @@ void updateSeedTreeRefillData_hook(GB *gb) {
 
 void checkSeedTreeRefillIndex__addRoom_hook(GB *gb) {
   BASE(checkSeedTreeRefillIndex);
-  CYC(b_+55, b_+56); A = B;
-  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
-  CYC(b_+57, b_+58); ret_effect(gb);
+  CYC(b_+O(55), b_+OE(56)); A = B;
+  CYC(b_+O(56), b_+OE(57)); mem_wr(gb, DE, A);
+  CYC(b_+O(57), b_+OE(58)); ret_effect(gb);
 }
 
 static void checkSeedTreeRefillIndex_finish(GB *gb, uint16_t sp0_) {
   BASE(checkSeedTreeRefillIndex);
+  AGES_ONLY();
   CYC(b_+85, b_+86); SET_DE(pop_effect(gb));
   CYC(b_+86, b_+87); L = E;
   CYC(b_+87, b_+88); H = D;
@@ -1250,97 +1283,156 @@ static void checkSeedTreeRefillIndex_finish(GB *gb, uint16_t sp0_) {
 void checkSeedTreeRefillIndex__treeScreen_hook(GB *gb) {
   BASE(checkSeedTreeRefillIndex);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+58, b_+59); push_effect(gb, HL);
-  CYC(b_+59, b_+60); push_effect(gb, DE);
-  CYC(b_+60, b_+62); C = 0x08;
-  for (;;) {
-    CYC(b_+62, b_+63); A = mem_rd(gb, DE);
-    CYC(b_+63, b_+64); alu_or(gb, A);
-    if (F & FZ) {
-      CYCT(b_+64, b_+66);
+  if (game_seasons) {
+    CYC(b_+S(46), b_+S(48)); C = 0x08;
+    for (;;) {
+      CYC(b_+S(48), b_+S(49)); A = mem_rd(gb, DE);
+      CYC(b_+S(49), b_+S(50)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(50), b_+S(52)); break; }
+      CYC(b_+S(50), b_+S(52));
+      CYC(b_+S(52), b_+S(53)); E = alu_inc8(gb, E);
+      CYC(b_+S(53), b_+S(54)); C = alu_dec8(gb, C);
+      if (!(F & FZ)) { CYCT(b_+S(54), b_+S(56)); continue; }
+      CYC(b_+S(54), b_+S(56));
+      CYC(b_+S(56), b_+S(57)); alu_or(gb, D);
       break;
     }
-    CYC(b_+64, b_+66);
-    CYC(b_+66, b_+67); E = alu_inc8(gb, E);
-    CYC(b_+67, b_+68); C = alu_dec8(gb, C);
-    if (!(F & FZ)) { CYCT(b_+68, b_+70); continue; }
-    CYC(b_+68, b_+70);
-    CYC(b_+70, b_+71); alu_or(gb, D);
-    break;
-  }
-  if (F & FZ) {
-    CYCT(b_+71, b_+73);
+    if (F & FZ) CYCT(b_+S(57), b_+S(59));
+    else {
+      CYC(b_+S(57), b_+S(59));
+      CYC(b_+S(59), b_+S(60)); A = B;
+      CYC(b_+S(60), b_+S(61)); A = alu_dec8(gb, A);
+      CYC(b_+S(61), b_+S(64)); SET_DE(SYM(bitTable));
+      CYC(b_+S(64), b_+S(65)); alu_add(gb, E);
+      CYC(b_+S(65), b_+S(66)); E = A;
+      CYC(b_+S(66), b_+S(67)); A = mem_rd(gb, DE);
+      CYC(b_+S(67), b_+S(68)); D = A;
+      CYC(b_+S(68), b_+S(71)); A = W8(wSeedTreeRefilledBitset);
+      CYC(b_+S(71), b_+S(72)); alu_or(gb, D);
+      CYC(b_+S(72), b_+S(75)); W8(wSeedTreeRefilledBitset) = A;
+    }
+    CYC(b_+S(75), b_+S(76)); push_effect(gb, HL);
+    CYC(b_+S(76), b_+S(77)); L = mem_rd(gb, HL);
+    CYC(b_+S(77), b_+S(79)); H = 0xdf;
+    CYC(b_+S(79), b_+S(81)); B = 0x08;
+    CALL_C(b_+S(81), clearMemory_hook, SYM(clearMemory), b_+S(84));
+    CYC(b_+S(84), b_+S(85)); SET_HL(pop_effect(gb));
+    CYC(b_+S(85), b_+S(86)); ret_effect(gb);
   } else {
-    CYC(b_+71, b_+73);
-    CYC(b_+73, b_+75); A = mem_rd(gb, hFF8D);
-    CYC(b_+75, b_+76); B = A;
-    CYC(b_+76, b_+78); A = 0x10;
-    CYC(b_+78, b_+79); alu_sub(gb, B);
-    CYC(b_+79, b_+82); SET_HL(wSeedTreeRefilledBitset);
-    CALL_C(b_+82, setFlag_hook, SYM(setFlag), b_+85);
+    CYC(b_+58, b_+59); push_effect(gb, HL);
+    CYC(b_+59, b_+60); push_effect(gb, DE);
+    CYC(b_+60, b_+62); C = 0x08;
+    for (;;) {
+      CYC(b_+62, b_+63); A = mem_rd(gb, DE);
+      CYC(b_+63, b_+64); alu_or(gb, A);
+      if (F & FZ) {
+        CYCT(b_+64, b_+66);
+        break;
+      }
+      CYC(b_+64, b_+66);
+      CYC(b_+66, b_+67); E = alu_inc8(gb, E);
+      CYC(b_+67, b_+68); C = alu_dec8(gb, C);
+      if (!(F & FZ)) { CYCT(b_+68, b_+70); continue; }
+      CYC(b_+68, b_+70);
+      CYC(b_+70, b_+71); alu_or(gb, D);
+      break;
+    }
+    if (F & FZ) {
+      CYCT(b_+71, b_+73);
+    } else {
+      CYC(b_+71, b_+73);
+      CYC(b_+73, b_+75); A = mem_rd(gb, hFF8D);
+      CYC(b_+75, b_+76); B = A;
+      CYC(b_+76, b_+78); A = 0x10;
+      CYC(b_+78, b_+79); alu_sub(gb, B);
+      CYC(b_+79, b_+82); SET_HL(wSeedTreeRefilledBitset);
+      CALL_C(b_+82, setFlag_hook, SYM(setFlag), b_+85);
+    }
+    checkSeedTreeRefillIndex_finish(gb, sp0_);
   }
-  checkSeedTreeRefillIndex_finish(gb, sp0_);
 }
 
 void checkSeedTreeRefillIndex_hook(GB *gb) {
   BASE(checkSeedTreeRefillIndex);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+1); A = B;
-  CYC(b_+1, b_+3); mem_wr(gb, hFF8D, A);
-  CYC(b_+3, b_+4); A = E;
-  CYC(b_+4, b_+6); E &= (uint8_t)~1;
-  CYC(b_+6, b_+8); alu_and(gb, 0x01);
-  CYC(b_+8, b_+9); B = A;
-  CYC(b_+9, b_+12); A = mem_rd(gb, wActiveGroup);
-  CYC(b_+12, b_+13); alu_cp(gb, B);
-  CYC(b_+13, b_+15); D = 0xd9;
-  if (!(F & FZ)) {
-    CYCT(b_+15, b_+17);
-  } else {
-    CYC(b_+15, b_+17);
-    CYC(b_+17, b_+20); A = mem_rd(gb, wActiveRoom);
-    CYC(b_+20, b_+21); alu_cp(gb, C);
+  CYC(b_+O(0), b_+OE(1)); A = B;
+  CYC(b_+O(1), b_+OE(3)); mem_wr(gb, hFF8D, A);
+  if (game_seasons) {
+    CYC(b_+S(3), b_+S(6)); A = mem_rd(gb, wActiveRoom);
+    CYC(b_+S(6), b_+S(7)); alu_cp(gb, C);
+    CYC(b_+S(7), b_+S(9)); D = 0xdf;
     if (F & FZ) {
-      CYCT(b_+21, b_+23);
+      CYCT(b_+S(9), b_+S(11));
       TAIL(checkSeedTreeRefillIndex__treeScreen);
     }
-    CYC(b_+21, b_+23);
-  }
-  CYC(b_+23, b_+25); A = mem_rd(gb, hFF8D);
-  CYC(b_+25, b_+26); B = A;
-  CYC(b_+26, b_+28); A = 0x10;
-  CYC(b_+28, b_+29); alu_sub(gb, B);
-  CYC(b_+29, b_+30); push_effect(gb, HL);
-  CYC(b_+30, b_+33); SET_HL(wSeedTreeRefilledBitset);
-  CALL_C(b_+33, checkFlag_hook, SYM(checkFlag), b_+36);
-  CYC(b_+36, b_+37); SET_HL(pop_effect(gb));
-  if (!(F & FZ)) {
-    CYCT(b_+37, b_+38); ret_effect(gb);
-    return;
-  }
-  CYC(b_+37, b_+38);
-  CYC(b_+38, b_+41); A = mem_rd(gb, wActiveRoom);
-  CYC(b_+41, b_+42); B = A;
-  CYC(b_+42, b_+44); C = 0x08;
-  for (;;) {
-    CYC(b_+44, b_+45); A = mem_rd(gb, DE);
-    CYC(b_+45, b_+46); alu_or(gb, A);
-    if (F & FZ) {
-      CYCT(b_+46, b_+48);
-      TAIL(checkSeedTreeRefillIndex__addRoom);
+    CYC(b_+S(9), b_+S(11));
+    CYC(b_+S(11), b_+S(13)); A = mem_rd(gb, hFF8D);
+    CYC(b_+S(13), b_+S(14)); A = alu_dec8(gb, A);
+    CYC(b_+S(14), b_+S(17)); SET_BC(SYM(bitTable));
+    CYC(b_+S(17), b_+S(18)); alu_add(gb, C);
+    CYC(b_+S(18), b_+S(19)); C = A;
+    CYC(b_+S(19), b_+S(20)); A = mem_rd(gb, BC);
+    CYC(b_+S(20), b_+S(21)); B = A;
+    CYC(b_+S(21), b_+S(24)); A = W8(wSeedTreeRefilledBitset);
+    CYC(b_+S(24), b_+S(25)); alu_and(gb, B);
+    if (!(F & FZ)) { CYCT(b_+S(25), b_+S(26)); ret_effect(gb); return; }
+    CYC(b_+S(25), b_+S(26));
+  } else {
+    CYC(b_+3, b_+4); A = E;
+    CYC(b_+4, b_+6); E &= (uint8_t)~1;
+    CYC(b_+6, b_+8); alu_and(gb, 0x01);
+    CYC(b_+8, b_+9); B = A;
+    CYC(b_+9, b_+12); A = mem_rd(gb, wActiveGroup);
+    CYC(b_+12, b_+13); alu_cp(gb, B);
+    CYC(b_+13, b_+15); D = 0xd9;
+    if (!(F & FZ)) {
+      CYCT(b_+15, b_+17);
+    } else {
+      CYC(b_+15, b_+17);
+      CYC(b_+17, b_+20); A = mem_rd(gb, wActiveRoom);
+      CYC(b_+20, b_+21); alu_cp(gb, C);
+      if (F & FZ) {
+        CYCT(b_+21, b_+23);
+        TAIL(checkSeedTreeRefillIndex__treeScreen);
+      }
+      CYC(b_+21, b_+23);
     }
-    CYC(b_+46, b_+48);
-    CYC(b_+48, b_+49); alu_cp(gb, B);
-    if (F & FZ) {
-      CYCT(b_+49, b_+50); ret_effect(gb);
+    CYC(b_+23, b_+25); A = mem_rd(gb, hFF8D);
+    CYC(b_+25, b_+26); B = A;
+    CYC(b_+26, b_+28); A = 0x10;
+    CYC(b_+28, b_+29); alu_sub(gb, B);
+    CYC(b_+29, b_+30); push_effect(gb, HL);
+    CYC(b_+30, b_+33); SET_HL(wSeedTreeRefilledBitset);
+    CALL_C(b_+33, checkFlag_hook, SYM(checkFlag), b_+36);
+    CYC(b_+36, b_+37); SET_HL(pop_effect(gb));
+    if (!(F & FZ)) {
+      CYCT(b_+37, b_+38); ret_effect(gb);
       return;
     }
-    CYC(b_+49, b_+50);
-    CYC(b_+50, b_+51); E = alu_inc8(gb, E);
-    CYC(b_+51, b_+52); C = alu_dec8(gb, C);
-    if (!(F & FZ)) { CYCT(b_+52, b_+54); continue; }
-    CYC(b_+52, b_+54);
-    CYC(b_+54, b_+55); ret_effect(gb);
+    CYC(b_+37, b_+38);
+  }
+  CYC(b_+O(38), b_+OE(41)); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+O(41), b_+OE(42)); B = A;
+  CYC(b_+O(42), b_+OE(44)); C = 0x08;
+  for (;;) {
+    CYC(b_+O(44), b_+OE(45)); A = mem_rd(gb, DE);
+    CYC(b_+O(45), b_+OE(46)); alu_or(gb, A);
+    if (F & FZ) {
+      CYCT(b_+O(46), b_+OE(48));
+      TAIL(checkSeedTreeRefillIndex__addRoom);
+    }
+    CYC(b_+O(46), b_+OE(48));
+    CYC(b_+O(48), b_+OE(49)); alu_cp(gb, B);
+    if (F & FZ) {
+      CYCT(b_+O(49), b_+OE(50)); ret_effect(gb);
+      return;
+    }
+    CYC(b_+O(49), b_+OE(50));
+    CYC(b_+O(50), b_+OE(51)); E = alu_inc8(gb, E);
+    CYC(b_+O(51), b_+OE(52)); C = alu_dec8(gb, C);
+    if (!(F & FZ)) { CYCT(b_+O(52), b_+OE(54)); continue; }
+    CYC(b_+O(52), b_+OE(54));
+    CYC(b_+O(54), b_+OE(55)); ret_effect(gb);
     return;
   }
 }

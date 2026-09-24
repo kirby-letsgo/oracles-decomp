@@ -14872,6 +14872,9 @@ enum {
   S_titlescreenMakuSeedSprite,
   S_titlescreenPressStartSprites,
   S_ecom_seasonsFunc_4446,
+  S_treeWarps,
+  S_itemSubmenu2EssencePositions,
+  S_table_5ae5,
   SYM_COUNT
 };
 enum {

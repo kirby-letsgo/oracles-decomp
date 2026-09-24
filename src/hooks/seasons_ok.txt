@@ -123,6 +123,7 @@ faroreCheckSecretValidity
 faroreGenerateGameTransferSecret
 fileSelectDrawLink
 fileSelectDrawLinkInOtherGame
+fileSelectMode6
 findFreeStaticObjectSlot
 findIndexInLoadedObjectGfx
 findUnusedIndexInLoadedObjectGfx
@@ -142,6 +143,7 @@ func_3211
 func_39_400c
 func_4553@getLinkWalkingAnimation
 func_49c9
+func_53eb@dmaHeartPieceDisplay
 gameCompleteDialog_markGameAsComplete
 gameLink_getFile1
 gameLink_getFile2
@@ -168,6 +170,7 @@ greatFairy_createPuff
 init
 initTextbox
 initializeChildOnGameStart
+initializeRoom
 insertBitsIntoSecretGenerationBuffer
 insertIndexIntoLoadedObjectGfx
 insertIndexIntoLoadedObjectGfx__object
@@ -188,7 +191,6 @@ interactionCodeda__state1
 interactionCodedf
 interactionCodee5__runState
 interactionFunc_3e6d
-interactionRunSimpleScript
 interactionSetAnimation
 interactiond9_markSecretAsTold
 interactiond9_state0
@@ -329,6 +331,7 @@ twinrova_state9
 twinrova_stateE
 updateAllObjects
 updateEnemy
+updateGrassAnimationModifier
 updateHeartRingCounter
 updateSpecialObjects@updateSpecialObject
 updateStatusBar_body@biggoronSword

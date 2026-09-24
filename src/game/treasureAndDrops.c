@@ -611,21 +611,35 @@ unavailable:
 void checkItemDropAvailable_body_hook(GB *gb) {
   BASE(checkItemDropAvailable_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); A = C;
-  CYC(b_+1, b_+4); SET_HL(SYM(itemDropAvailabilityTable));
-  CYC(b_+4, b_+5); treasure_add_double_index_to_hl_from_rst(gb, b_+5);
-  CYC(b_+5, b_+6); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+6, b_+7); B = mem_rd(gb, HL);
-  CYC(b_+7, b_+8); L = A;
-  CYC(b_+8, b_+10); H = 0xc6;
-  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
-  CYC(b_+11, b_+12); alu_and(gb, B);
-  if (!(F & FZ)) {
-    CYCT(b_+12, b_+13); ret_effect(gb); return;
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(3)); A = W8(wMinimapGroup);
+    CYC(b_+S(3), b_+S(4)); A = alu_dec8(gb, A);
+    CYC(b_+S(4), b_+S(5)); A = C;
+    if (!(F & FZ)) CYCT(b_+S(5), b_+S(7));
+    else {
+      CYC(b_+S(5), b_+S(7));
+      CYC(b_+S(7), b_+S(10)); SET_HL(SYM(subrosiaDropSet));
+      CYC(b_+S(10), b_+S(11)); treasure_add_index_to_hl_from_rst(gb, b_+S(11));
+      CYC(b_+S(11), b_+S(12)); A = mem_rd(gb, HL);
+      CYC(b_+S(12), b_+S(13)); C = A;
+    }
+  } else {
+    CYC(b_+0, b_+1); A = C;
   }
-  CYC(b_+12, b_+13);
-  CYC(b_+13, b_+15); C = 0xff;
-  CYC(b_+15, b_+16); ret_effect(gb);
+  CYC(b_+O(1), b_+OE(4)); SET_HL(SYM(itemDropAvailabilityTable));
+  CYC(b_+O(4), b_+OE(5)); treasure_add_double_index_to_hl_from_rst(gb, b_+OE(5));
+  CYC(b_+O(5), b_+OE(6)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(6), b_+OE(7)); B = mem_rd(gb, HL);
+  CYC(b_+O(7), b_+OE(8)); L = A;
+  CYC(b_+O(8), b_+OE(10)); H = 0xc6;
+  CYC(b_+O(10), b_+OE(11)); A = mem_rd(gb, HL);
+  CYC(b_+O(11), b_+OE(12)); alu_and(gb, B);
+  if (!(F & FZ)) {
+    CYCT(b_+O(12), b_+OE(13)); ret_effect(gb); return;
+  }
+  CYC(b_+O(12), b_+OE(13));
+  CYC(b_+O(13), b_+OE(15)); C = 0xff;
+  CYC(b_+O(15), b_+OE(16)); ret_effect(gb);
 }
 
 void giveTreasure_body__modeb_hook(GB *gb) {

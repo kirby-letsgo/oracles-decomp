@@ -4179,7 +4179,7 @@ L_4709:
   I(0x4711, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x4712, 1); A = alu_inc8(gb, A);  // inc a
   I(0x4713, 4); mem_wr(gb, 0xccc4, A);  // ld ($ccc4),a
-  CALL(0x4716, s_func_131f, 0x12dd, 0x4719);  // call $12dd
+  CALL(0x4716, func_131f_hook, 0x12dd, 0x4719);  // call $12dd
   I(0x4719, 2); A = 0x02;  // ld a,$02
   CALL(0x471b, loadGfxRegisterStateIndex_hook, 0x02ea, 0x471e);  // call $02ea
   I(0x471e, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)

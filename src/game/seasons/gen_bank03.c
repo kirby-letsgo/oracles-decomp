@@ -237,48 +237,6 @@ L_4f51:
   if (hook_is(gb, 0x4f54, s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1_hook)) { s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1_hook(gb); return; } HANDOFF(0x4f54);  // fallthrough
 }
 
-// 03:4d88
-void s_intro_titlescreen(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4d88, getRandomNumber_noPreserveVars_hook, 0x042f, 0x4d8b);  // call $042f
-  CALL(0x4d8b, s_intro_titlescreen__runState, 0x4da3, 0x4d8e);  // call $4da3
-L_4d8e:
-  CALL(0x4d8e, clearOam_hook, 0x047b, 0x4d91);  // call $047b
-  I(0x4d91, 3); SET_HL(0x4e1c);  // ld hl,$4e1c
-  CALL(0x4d94, addSpritesToOam_hook, 0x0d3a, 0x4d97);  // call $0d3a
-  I(0x4d97, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x4d9a, 2); alu_and(gb, 0x20);  // and $20
-  if (!(F & FZ)) { RET_TAKEN(0x4d9c); return; } I(0x4d9c, 2);  // ret nz
-  I(0x4d9d, 3); SET_HL(0x4e65);  // ld hl,$4e65
-  I(0x4da0, 4); if (hook_is(gb, 0x0d3a, addSpritesToOam_hook)) { addSpritesToOam_hook(gb); return; } HANDOFF(0x0d3a);  // jp $0d3a
-}
-
-// 03:4d8e
-void s_intro_titlescreen__afterCall4d8e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4d8e:
-  CALL(0x4d8e, clearOam_hook, 0x047b, 0x4d91);  // call $047b
-  I(0x4d91, 3); SET_HL(0x4e1c);  // ld hl,$4e1c
-  CALL(0x4d94, addSpritesToOam_hook, 0x0d3a, 0x4d97);  // call $0d3a
-  I(0x4d97, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x4d9a, 2); alu_and(gb, 0x20);  // and $20
-  if (!(F & FZ)) { RET_TAKEN(0x4d9c); return; } I(0x4d9c, 2);  // ret nz
-  I(0x4d9d, 3); SET_HL(0x4e65);  // ld hl,$4e65
-  I(0x4da0, 4); if (hook_is(gb, 0x0d3a, addSpritesToOam_hook)) { addSpritesToOam_hook(gb); return; } HANDOFF(0x0d3a);  // jp $0d3a
-}
-
-// 03:4da3
-void s_intro_titlescreen__runState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4da3:
-  I(0x4da3, 4); A = mem_rd(gb, 0xc2e7);  // ld a,($c2e7)
-  RST_PUSH(0x4da6, 0x4da7);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
 // 03:4091
 void s_oamDmaFunction(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

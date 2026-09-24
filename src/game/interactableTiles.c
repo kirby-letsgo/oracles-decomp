@@ -553,119 +553,127 @@ show_text:
 void nextToPushableBlock_hook(GB *gb) {
   BASE(nextToPushableBlock);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+3); A = W8(wTilesetFlags);
-  CYC(b_+3, b_+5); alu_and(gb, 0x40);
-  if (!(F & FZ)) {
-    CYCT(b_+5, b_+6); ret_effect(gb); return;
+  if (!game_seasons) {
+    CYC(b_+0, b_+3); A = W8(wTilesetFlags);
+    CYC(b_+3, b_+5); alu_and(gb, 0x40);
+    if (!(F & FZ)) {
+      CYCT(b_+5, b_+6); ret_effect(gb); return;
+    }
+    CYC(b_+5, b_+6);
   }
-  CYC(b_+5, b_+6);
-  CALL_C(b_+6, specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+9);
+  CALL_C(b_+O(6), specialObjectCheckPushingAgainstTile_hook, SYM(specialObjectCheckPushingAgainstTile), b_+OE(9));
   if (F & FZ) {
-    CYCT(b_+9, b_+12); TAIL(resetPushingAgainstTileCounter);
+    CYCT(b_+O(9), b_+OE(12)); TAIL(resetPushingAgainstTileCounter);
   }
-  CYC(b_+9, b_+12);
-  CALL_C(b_+12, decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+15);
+  CYC(b_+O(9), b_+OE(12));
+  CALL_C(b_+O(12), decPushingAgainstTileCounter_hook, SYM(decPushingAgainstTileCounter), b_+OE(15));
   if (!(F & FZ)) {
-    CYCT(b_+15, b_+16); ret_effect(gb); return;
+    CYCT(b_+O(15), b_+OE(16)); ret_effect(gb); return;
   }
-  CYC(b_+15, b_+16);
-  CYC(b_+16, b_+18); alu_bit(gb, 6, B);
+  CYC(b_+O(15), b_+OE(16));
+  CYC(b_+O(16), b_+OE(18)); alu_bit(gb, 6, B);
   if (F & FZ) {
-    CYCT(b_+18, b_+20); goto check_direction;
+    CYCT(b_+O(18), b_+OE(20)); goto check_direction;
   }
-  CYC(b_+18, b_+20);
-  CYC(b_+20, b_+22); A = 0x16;
-  CALL_C(b_+22, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+25);
-  CYC(b_+25, b_+27); A = 0x03;
+  CYC(b_+O(18), b_+OE(20));
+  CYC(b_+O(20), b_+OE(22)); A = 0x16;
+  CALL_C(b_+O(22), checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+OE(25));
+  CYC(b_+O(25), b_+OE(27)); A = 0x03;
   if (!(F & FC)) {
-    CYCT(b_+27, b_+30); TAIL(showInfoTextForTile);
+    CYCT(b_+O(27), b_+OE(30)); TAIL(showInfoTextForTile);
   }
-  CYC(b_+27, b_+30);
+  CYC(b_+O(27), b_+OE(30));
 
 check_direction:
-  CYC(b_+30, b_+32); alu_bit(gb, 7, B);
+  CYC(b_+O(30), b_+OE(32)); alu_bit(gb, 7, B);
   if (!(F & FZ)) {
-    CYCT(b_+32, b_+34); goto check_destination;
+    CYCT(b_+O(32), b_+OE(34)); goto check_destination;
   }
-  CYC(b_+32, b_+34);
-  CYC(b_+34, b_+35); A = B;
-  CYC(b_+35, b_+37); A = alu_swap(gb, A);
-  CYC(b_+37, b_+39); alu_and(gb, 0x03);
-  CYC(b_+39, b_+40); L = A;
-  CYC(b_+40, b_+43); A = W8(wLinkPushingDirection);
-  CYC(b_+43, b_+44); alu_cp(gb, L);
+  CYC(b_+O(32), b_+OE(34));
+  CYC(b_+O(34), b_+OE(35)); A = B;
+  CYC(b_+O(35), b_+OE(37)); A = alu_swap(gb, A);
+  CYC(b_+O(37), b_+OE(39)); alu_and(gb, 0x03);
+  CYC(b_+O(39), b_+OE(40)); L = A;
+  CYC(b_+O(40), b_+OE(43)); A = W8(wLinkPushingDirection);
+  CYC(b_+O(43), b_+OE(44)); alu_cp(gb, L);
   if (!(F & FZ)) {
-    CYCT(b_+44, b_+46); goto end;
+    CYCT(b_+O(44), b_+OE(46)); goto end;
   }
-  CYC(b_+44, b_+46);
+  CYC(b_+O(44), b_+OE(46));
 
 check_destination:
-  CALL_C(b_+46, checkTileAfterNext_hook, SYM(checkTileAfterNext), b_+49);
+  CALL_C(b_+O(46), checkTileAfterNext_hook, SYM(checkTileAfterNext), b_+OE(49));
   if (!(F & FC)) {
-    CYCT(b_+49, b_+51); goto end;
+    CYCT(b_+O(49), b_+OE(51)); goto end;
   }
-  CYC(b_+49, b_+51);
-  CYC(b_+51, b_+53); A = H8(hFF8B);
-  CYC(b_+53, b_+55); alu_cp(gb, 0xda);
-  if (F & FZ) {
-    CYCT(b_+55, b_+57); goto somaria_block;
+  CYC(b_+O(49), b_+OE(51));
+  if (!game_seasons) {
+    CYC(b_+51, b_+53); A = H8(hFF8B);
+    CYC(b_+53, b_+55); alu_cp(gb, 0xda);
+    if (F & FZ) {
+      CYCT(b_+55, b_+57); goto somaria_block;
+    }
+    CYC(b_+55, b_+57);
   }
-  CYC(b_+55, b_+57);
-  CYC(b_+57, b_+60); SET_HL(w1ReservedInteraction1_enabled);
-  CYC(b_+60, b_+61); A = mem_rd(gb, HL);
-  CYC(b_+61, b_+62); alu_or(gb, A);
+  CYC(b_+O(57), b_+OE(60)); SET_HL(w1ReservedInteraction1_enabled);
+  CYC(b_+O(60), b_+OE(61)); A = mem_rd(gb, HL);
+  CYC(b_+O(61), b_+OE(62)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+62, b_+64); goto end;
+    CYCT(b_+O(62), b_+OE(64)); goto end;
   }
-  CYC(b_+62, b_+64);
-  CYC(b_+64, b_+66); mem_wr(gb, HL, 0x01);
-  CYC(b_+66, b_+67); L = alu_inc8(gb, L);
-  CYC(b_+67, b_+69); mem_wr(gb, HL, 0x14);
-  CYC(b_+69, b_+72); A = W8(wLinkPushingDirection);
-  CYC(b_+72, b_+74); A = alu_swap(gb, A);
-  CYC(b_+74, b_+75); alu_rrca(gb);
-  CYC(b_+75, b_+77); L = 0x49;
-  CYC(b_+77, b_+78); mem_wr(gb, HL, A);
-  CYC(b_+78, b_+80); A = H8(hFF8D);
-  CYC(b_+80, b_+82); L = 0x70;
-  CYC(b_+82, b_+83); mem_wr(gb, HL, A);
-  CYC(b_+83, b_+85); L = 0x4b;
-  CALL_C(b_+85, setShortPosition_hook, SYM(setShortPosition), b_+88);
-  CYC(b_+88, b_+90); L = 0x4b;
-  CYC(b_+90, b_+91); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+91, b_+92); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  CYC(b_+92, b_+94); A = H8(hFF8B);
-  CYC(b_+94, b_+96); alu_cp(gb, 0xd9);
-  if (!(F & FZ)) {
-    CYCT(b_+96, b_+98); goto end;
+  CYC(b_+O(62), b_+OE(64));
+  CYC(b_+O(64), b_+OE(66)); mem_wr(gb, HL, 0x01);
+  CYC(b_+O(66), b_+OE(67)); L = alu_inc8(gb, L);
+  CYC(b_+O(67), b_+OE(69)); mem_wr(gb, HL, 0x14);
+  CYC(b_+O(69), b_+OE(72)); A = W8(wLinkPushingDirection);
+  CYC(b_+O(72), b_+OE(74)); A = alu_swap(gb, A);
+  CYC(b_+O(74), b_+OE(75)); alu_rrca(gb);
+  CYC(b_+O(75), b_+OE(77)); L = 0x49;
+  CYC(b_+O(77), b_+OE(78)); mem_wr(gb, HL, A);
+  CYC(b_+O(78), b_+OE(80)); A = H8(hFF8D);
+  CYC(b_+O(80), b_+OE(82)); L = 0x70;
+  CYC(b_+O(82), b_+OE(83)); mem_wr(gb, HL, A);
+  CYC(b_+O(83), b_+OE(85)); L = 0x4b;
+  CALL_C(b_+O(85), setShortPosition_hook, SYM(setShortPosition), b_+OE(88));
+  CYC(b_+O(88), b_+OE(90)); L = 0x4b;
+  CYC(b_+O(90), b_+OE(91)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(91), b_+OE(92)); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!game_seasons) {
+    CYC(b_+92, b_+94); A = H8(hFF8B);
+    CYC(b_+94, b_+96); alu_cp(gb, 0xd9);
+    if (!(F & FZ)) {
+      CYCT(b_+96, b_+98); goto end;
+    }
+    CYC(b_+96, b_+98);
+    CYC(b_+98, b_+101); A = W8(wTilesetFlags);
+    CYC(b_+101, b_+103); alu_and(gb, 0x01);
+    if (F & FZ) {
+      CYCT(b_+103, b_+105); goto end;
+    }
+    CYC(b_+103, b_+105);
+    CYC(b_+105, b_+108); W8(wDisabledObjects) = A;
   }
-  CYC(b_+96, b_+98);
-  CYC(b_+98, b_+101); A = W8(wTilesetFlags);
-  CYC(b_+101, b_+103); alu_and(gb, 0x01);
-  if (F & FZ) {
-    CYCT(b_+103, b_+105); goto end;
-  }
-  CYC(b_+103, b_+105);
-  CYC(b_+105, b_+108); W8(wDisabledObjects) = A;
   goto end;
 
+  if (!game_seasons) {
 somaria_block:
-  CYC(b_+112, b_+114); C = 0x18;
-  CALL_C(b_+114, findItemWithID_hook, SYM(findItemWithID), b_+117);
-  if (!(F & FZ)) {
-    CYCT(b_+117, b_+119); goto end;
+    CYC(b_+112, b_+114); C = 0x18;
+    CALL_C(b_+114, findItemWithID_hook, SYM(findItemWithID), b_+117);
+    if (!(F & FZ)) {
+      CYCT(b_+117, b_+119); goto end;
+    }
+    CYC(b_+117, b_+119);
+    CYC(b_+119, b_+121); L = 0x2f;
+    CYC(b_+121, b_+123); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
+    CYC(b_+123, b_+126); A = W8(wLinkPushingDirection);
+    CYC(b_+126, b_+128); L = 0x08;
+    CYC(b_+128, b_+129); mem_wr(gb, HL, A);
+    CYC(b_+129, b_+131);
   }
-  CYC(b_+117, b_+119);
-  CYC(b_+119, b_+121); L = 0x2f;
-  CYC(b_+121, b_+123); mem_wr(gb, HL, mem_rd(gb, HL) | 0x01);
-  CYC(b_+123, b_+126); A = W8(wLinkPushingDirection);
-  CYC(b_+126, b_+128); L = 0x08;
-  CYC(b_+128, b_+129); mem_wr(gb, HL, A);
-  CYC(b_+129, b_+131);
 
 end:
-  CYC(b_+108, b_+109); alu_xor(gb, A);
-  CYC(b_+109, b_+112); TAIL(resetPushingAgainstTileCounter);
+  CYC(b_+O(108), b_+OE(109)); alu_xor(gb, A);
+  CYC(b_+O(109), b_+OE(112)); TAIL(resetPushingAgainstTileCounter);
 }
 
 void nextToKeyBlock_hook(GB *gb) {

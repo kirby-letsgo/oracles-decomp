@@ -7222,9 +7222,9 @@ void generateVramTilesWithRoomChanges_hook(GB *gb) {
 
 static void simple_script_run_command(GB *gb, uint16_t sp0_) {
   BASE(interactionRunSimpleScript);
-  CYC(b_+44, b_+45); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+45, b_+46); push_effect(gb, HL);
-  CYC(b_+46, b_+47); push_effect(gb, simpleScriptCommandTable);
+  CYC(b_+O(44), b_+OE(45)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(45), b_+OE(46)); push_effect(gb, HL);
+  CYC(b_+O(46), b_+OE(47)); push_effect(gb, simpleScriptCommandTable);
   CYC(0x0000, 0x0001); alu_add(gb, A);
   CYC(0x0001, 0x0002); SET_HL(pop_effect(gb));
   CYC(0x0002, 0x0004); alu_add(gb, L); L = A;
@@ -7235,63 +7235,130 @@ static void simple_script_run_command(GB *gb, uint16_t sp0_) {
   L = A;
   CYC(0x0009, 0x000b);
   do { uint16_t jt_ = (HL);
-    if (jt_ == b_+57) {
-    CYC(b_+57, b_+58); SET_HL(pop_effect(gb));
-    CYC(b_+58, b_+59);
+    if (jt_ == b_+O(57)) {
+    CYC(b_+O(57), b_+OE(58)); SET_HL(pop_effect(gb));
+    CYC(b_+O(58), b_+OE(59));
     break;
     }
-    else if (jt_ == b_+59) {
-    CYC(b_+59, b_+60); SET_HL(pop_effect(gb));
-    CYC(b_+60, b_+61); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    else if (jt_ == b_+O(59)) {
+    CYC(b_+O(59), b_+OE(60)); SET_HL(pop_effect(gb));
+    CYC(b_+O(60), b_+OE(61)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     E = INTERACTION_BASE + OBJ_COUNTER1;
-    CYC(b_+61, b_+64); mem_wr(gb, DE, A);
+    CYC(b_+O(61), b_+OE(64)); mem_wr(gb, DE, A);
     alu_xor(gb, A);
-    CYC(b_+64, b_+66);
+    CYC(b_+O(64), b_+OE(66));
     break;
     }
-    else if (jt_ == b_+66) {
+    else if (jt_ == b_+O(66)) {
 {
-    CYC(b_+66, b_+67); SET_HL(pop_effect(gb));
-    CYC(b_+67, b_+68); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(66), b_+OE(67)); SET_HL(pop_effect(gb));
+    CYC(b_+O(67), b_+OE(68)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     uint16_t hl = HL;
-    CYC(b_+68, b_+69);
-    CALL_ROM(b_+69, ROM_playSound);
+    CYC(b_+O(68), b_+OE(69));
+    CALL_ROM(b_+O(69), ROM_playSound);
     SET_HL(hl);
-    CYC(b_+72, b_+74);
+    CYC(b_+O(72), b_+OE(74));
     break;
   }
     }
-    else if (jt_ == b_+74) {
+    else if (jt_ == b_+O(74)) {
 {
-    CYC(b_+74, b_+75); SET_HL(pop_effect(gb));
-    CYC(b_+75, b_+76); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(74), b_+OE(75)); SET_HL(pop_effect(gb));
+    CYC(b_+O(75), b_+OE(76)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     C = A;
-    CYC(b_+76, b_+77); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(76), b_+OE(77)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     uint16_t hl = HL;
-    CYC(b_+77, b_+82);
+    CYC(b_+O(77), b_+OE(82));
     set_tile(gb);
     SET_HL(hl);
     alu_scf(gb);
-    CYC(b_+82, b_+85);
+    CYC(b_+O(82), b_+OE(85));
     break;
   }
     }
+    else if (game_seasons && jt_ == b_+S(111)) {
+      CYC(b_+S(111), b_+S(112)); SET_HL(pop_effect(gb));
+      CYC(b_+S(112), b_+S(113)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(113), b_+S(114)); B = A;
+      CYC(b_+S(114), b_+S(115)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(115), b_+S(116)); C = A;
+      CYC(b_+S(116), b_+S(117)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(117), b_+S(119)); H8(hFF8B) = A;
+      uint16_t hl = HL;
+      CYC(b_+S(119), b_+S(120));
+      for (;;) {
+        uint16_t bc = BC;
+        CYC(b_+S(120), b_+S(121));
+        CYC(b_+S(121), b_+S(123)); A = H8(hFF8B);
+        CYC(b_+S(123), b_+S(126));
+        set_tile(gb);
+        SET_BC(bc);
+        CYC(b_+S(126), b_+S(127));
+        CYC(b_+S(127), b_+S(128)); C = alu_inc8(gb, C);
+        CYC(b_+S(128), b_+S(129)); B = alu_dec8(gb, B);
+        if (!(F & FZ)) { CYCT(b_+S(129), b_+S(131)); continue; }
+        CYC(b_+S(129), b_+S(131));
+        break;
+      }
+      SET_HL(hl);
+      alu_scf(gb);
+      CYC(b_+S(131), b_+S(134));
+      break;
+    }
+    else if (game_seasons && jt_ == b_+S(134)) {
+      CYC(b_+S(134), b_+S(135)); SET_HL(pop_effect(gb));
+      CYC(b_+S(135), b_+S(136)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(136), b_+S(137)); B = A;
+      CYC(b_+S(137), b_+S(138)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(138), b_+S(140)); H8(hFF8C) = A;
+      CYC(b_+S(140), b_+S(141)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(141), b_+S(143)); H8(hFF8E) = A;
+      CYC(b_+S(143), b_+S(144)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(144), b_+S(146)); H8(hFF8D) = A;
+      uint16_t hl = HL;
+      CYC(b_+S(146), b_+S(147));
+      for (;;) {
+        uint16_t bc = BC;
+        CYC(b_+S(147), b_+S(148));
+        CYC(b_+S(148), b_+S(150)); B = (uint8_t)(wRoomLayout >> 8);
+        CYC(b_+S(150), b_+S(152)); A = H8(hFF8C);
+        CYC(b_+S(152), b_+S(153)); C = A;
+        CYC(b_+S(153), b_+S(154)); A = mem_rd(gb, BC);
+        CYC(b_+S(154), b_+S(156)); H8(hFF8F) = A;
+        CYC(b_+S(156), b_+S(158)); A = H8(hFF8D);
+        CYC(b_+S(158), b_+S(161));
+        set_interleaved_tile(gb, sp0_);
+        CYC(b_+S(161), b_+S(164)); SET_HL(hFF8C);
+        CYC(b_+S(164), b_+S(165)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+        SET_BC(bc);
+        CYC(b_+S(165), b_+S(166));
+        CYC(b_+S(166), b_+S(167)); B = alu_dec8(gb, B);
+        if (!(F & FZ)) { CYCT(b_+S(167), b_+S(169)); continue; }
+        CYC(b_+S(167), b_+S(169));
+        break;
+      }
+      SET_HL(hl);
+      alu_scf(gb);
+      CYC(b_+S(169), b_+S(172));
+      break;
+    }
+    else if (game_seasons && jt_ != b_+O(85)) { HANDOFF(jt_); }
     else {
 {
-    CYC(b_+85, b_+86); SET_HL(pop_effect(gb));
-    CYC(b_+86, b_+87); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+87, b_+89); H8(hFF8C) = A;
-    CYC(b_+89, b_+90); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+90, b_+92); H8(hFF8F) = A;
-    CYC(b_+92, b_+93); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+93, b_+95); H8(hFF8E) = A;
-    CYC(b_+95, b_+96); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(85), b_+OE(86)); SET_HL(pop_effect(gb));
+    CYC(b_+O(86), b_+OE(87)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(87), b_+OE(89)); H8(hFF8C) = A;
+    CYC(b_+O(89), b_+OE(90)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(90), b_+OE(92)); H8(hFF8F) = A;
+    CYC(b_+O(92), b_+OE(93)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(93), b_+OE(95)); H8(hFF8E) = A;
+    CYC(b_+O(95), b_+OE(96)); A = mem_rd(gb, HL); SET_HL(HL + 1);
     uint16_t hl = HL;
-    CYC(b_+96, b_+100);
+    CYC(b_+O(96), b_+OE(100));
     set_interleaved_tile(gb, sp0_);
     SET_HL(hl);
     alu_scf(gb);
-    CYC(b_+100, b_+103);
+    CYC(b_+O(100), b_+OE(103));
     break;
   }
     }
@@ -7301,29 +7368,29 @@ static void simple_script_run_command(GB *gb, uint16_t sp0_) {
 void interactionRunSimpleScript_hook(GB *gb) {
   BASE(interactionRunSimpleScript);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  bank_push(gb, b_+0, GV(0x0c, 0x14));
+  bank_push(gb, b_+O(0), GV(0x0c, 0x14));
   H = D;
   L = 0x58;
-  CYC(b_+10, b_+14); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+14, b_+15); H = mem_rd(gb, HL);
+  CYC(b_+O(10), b_+OE(14)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(14), b_+OE(15)); H = mem_rd(gb, HL);
   L = A;
-  CYC(b_+15, b_+16);
+  CYC(b_+O(15), b_+OE(16));
   for (;;) {
-    CYC(b_+16, b_+17); A = mem_rd(gb, HL);
+    CYC(b_+O(16), b_+OE(17)); A = mem_rd(gb, HL);
     alu_or(gb, A);
     if (F & FZ) {
-      CYCT(b_+17, b_+20);
-      bank_pop(gb, b_+36);
+      CYCT(b_+O(17), b_+OE(20));
+      bank_pop(gb, b_+O(36));
       alu_scf(gb);
-      CYC(b_+42, b_+44);
+      CYC(b_+O(42), b_+OE(44));
       break;
     }
-    CYC(b_+17, b_+20);
-    CYC(b_+20, b_+23);
+    CYC(b_+O(17), b_+OE(20));
+    CYC(b_+O(20), b_+OE(23));
     simple_script_run_command(gb, sp0_);
-    if (F & FC) { CYCT(b_+23, b_+25); continue; }
-    CYC(b_+23, b_+25);
-    CYC(b_+25, b_+28);
+    if (F & FC) { CYCT(b_+O(23), b_+OE(25)); continue; }
+    CYC(b_+O(23), b_+OE(25));
+    CYC(b_+O(25), b_+OE(28));
     E = 0x58;
     A = L;
     CYC(SYM(interactionSetSimpleScript), (SYM(interactionSetSimpleScript) + 4)); mem_wr(gb, DE, A);
@@ -7331,9 +7398,9 @@ void interactionRunSimpleScript_hook(GB *gb) {
     A = H;
     CYC((SYM(interactionSetSimpleScript) + 4), (SYM(interactionSetSimpleScript) + 7)); mem_wr(gb, DE, A);
     CYC((SYM(interactionSetSimpleScript) + 7), (SYM(interactionSetSimpleScript) + 8));
-    bank_pop(gb, b_+28);
+    bank_pop(gb, b_+O(28));
     alu_xor(gb, A);
-    CYC(b_+34, b_+36);
+    CYC(b_+O(34), b_+OE(36));
     break;
   }
   ret_effect(gb);
@@ -8259,44 +8326,49 @@ void func_131f_hook(GB *gb) {
   BASE(func_131f);
   uint16_t sp0_ = gb->sp;
   alu_xor(gb, A);
-  CYC(b_+0, b_+4); W8(wScreenOffsetY) = A;
-  CYC(b_+4, b_+7); W8(wScreenOffsetX) = A;
-  bank_push(gb, b_+7, 0x01);
-  CALL_ROM(b_+17, ROM_b01_initializeRoomBoundaryAndLoadAnimations);
-  CALL_ROM(b_+20, ROM_b01_setScreenTransitionState02);
-  CALL_ROM(b_+23, ROM_loadTilesetAndRoomLayout);
-  CYC(b_+26, b_+29); A = W8(wcddf);
-  alu_or(gb, A);
-  if (F & FZ) {
-    CYCT(b_+29, b_+32);
-    CYC(b_+55, b_+58);
+  CYC(b_+O(0), b_+OE(4)); W8(wScreenOffsetY) = A;
+  CYC(b_+O(4), b_+OE(7)); W8(wScreenOffsetX) = A;
+  bank_push(gb, b_+O(7), 0x01);
+  CALL_ROM(b_+O(17), ROM_b01_initializeRoomBoundaryAndLoadAnimations);
+  CALL_ROM(b_+O(20), ROM_b01_setScreenTransitionState02);
+  CALL_ROM(b_+O(23), ROM_loadTilesetAndRoomLayout);
+  bool special_gfx = false;
+  if (!game_seasons) {
+    CYC(b_+26, b_+29); A = W8(wcddf);
+    alu_or(gb, A);
+    if (F & FZ) CYCT(b_+29, b_+32);
+    else {
+      CYC(b_+29, b_+32);
+      SET_HL(ROM_b04_func_04_6ed1);
+      E = 0x04;
+      CYC(b_+32, b_+37);
+      CALL_ROM(b_+37, ROM_interBankCall);
+      SET_HL(ROM_b04_func_04_6f31);
+      E = 0x04;
+      CYC(b_+40, b_+45);
+      CALL_ROM(b_+45, ROM_interBankCall);
+      A = 0x30;
+      CYC(b_+48, b_+53);
+      load_gfx_header(gb, SYM(loadUncompressedGfxHeader), uncmpGfxHeaderTable_bank01, false);
+      CYC(b_+53, b_+55);
+      special_gfx = true;
+    }
+  }
+  if (!special_gfx) {
+    CYC(b_+O(55), b_+OE(58));
     load_room_collisions(gb);
-    CYC(b_+58, b_+61);
+    CYC(b_+O(58), b_+OE(61));
     generate_vram_tiles_with_room_changes(gb, sp0_);
     A = 0x10;
-    CYC(b_+61, b_+66);
+    CYC(b_+O(61), b_+OE(66));
     load_gfx_header(gb, SYM(loadUncompressedGfxHeader), uncmpGfxHeaderTable_bank01, false);
-  } else {
-    CYC(b_+29, b_+32);
-    SET_HL(ROM_b04_func_04_6ed1);
-    E = 0x04;
-    CYC(b_+32, b_+37);
-    CALL_ROM(b_+37, ROM_interBankCall);
-    SET_HL(ROM_b04_func_04_6f31);
-    E = 0x04;
-    CYC(b_+40, b_+45);
-    CALL_ROM(b_+45, ROM_interBankCall);
-    A = 0x30;
-    CYC(b_+48, b_+53);
-    load_gfx_header(gb, SYM(loadUncompressedGfxHeader), uncmpGfxHeaderTable_bank01, false);
-    CYC(b_+53, b_+55);
   }
-  CYC(b_+66, b_+69); A = W8(wTilesetPalette);
-  CYC(b_+69, b_+72); W8(wLoadedTilesetPalette) = A;
-  CYC(b_+72, b_+75); A = W8(wTilesetUniqueGfx);
-  CYC(b_+75, b_+78); W8(wLoadedTilesetUniqueGfx) = A;
-  bank_pop(gb, b_+78);
-  CYC(b_+84, b_+85);
+  CYC(b_+O(66), b_+OE(69)); A = W8(wTilesetPalette);
+  CYC(b_+O(69), b_+OE(72)); W8(wLoadedTilesetPalette) = A;
+  CYC(b_+O(72), b_+OE(75)); A = W8(wTilesetUniqueGfx);
+  CYC(b_+O(75), b_+OE(78)); W8(wLoadedTilesetUniqueGfx) = A;
+  bank_pop(gb, b_+O(78));
+  CYC(b_+O(84), b_+OE(85));
   ret_effect(gb);
 }
 
@@ -8724,42 +8796,55 @@ void clearAllItemsAndPutLinkOnGround_hook(GB *gb) {
   BASE(clearAllItemsAndPutLinkOnGround);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   uint16_t de = DE;
-  CYC(b_+0, b_+1);
-  CALL_ROM(b_+1, ROM_clearAllParentItems);
-  CALL_ROM(b_+4, ROM_dropLinkHeldItem);
+  CYC(b_+O(0), b_+OE(1));
+  CALL_ROM(b_+O(1), ROM_clearAllParentItems);
+  CALL_ROM(b_+O(4), ROM_dropLinkHeldItem);
   alu_xor(gb, A);
-  CYC(b_+7, b_+11); W8(wIsSeedShooterInUse) = A;
+  CYC(b_+O(7), b_+OE(11)); W8(wIsSeedShooterInUse) = A;
   SET_DE(w1WeaponItem);
-  CYC(b_+11, b_+14);
+  CYC(b_+O(11), b_+OE(14));
   for (;;) {
     H = D;
-    L = 0x01;
-    CYC(b_+14, b_+18); A = mem_rd(gb, HL);
-    alu_cp(gb, 0x18);
-    if (!(F & FZ)) {
-      CYCT(b_+18, b_+22);
+    if (game_seasons) {
       L = E;
       B = 0x40;
-      CYC(b_+34, b_+37);
-      CALL_ROM(b_+37, ROM_clearMemory);
+      CYC(b_+S(14), b_+S(18));
+      CALL_ROM(b_+S(18), ROM_clearMemory);
+      D = alu_inc8(gb, D);
+      A = D;
+      alu_cp(gb, 0xe0);
+      if (F & FC) { CYCT(b_+S(21), b_+S(27)); continue; }
+      CYC(b_+S(21), b_+S(27));
+      break;
     } else {
-      CYC(b_+18, b_+22);
-      L = 0x2f;
-      CYC(b_+22, b_+26); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
-      CYC(b_+26, b_+28); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
-      L = 0x1a;
-      CYC(b_+28, b_+32); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
-      CYCT(b_+32, b_+34);
+      L = 0x01;
+      CYC(b_+14, b_+18); A = mem_rd(gb, HL);
+      alu_cp(gb, 0x18);
+      if (!(F & FZ)) {
+        CYCT(b_+18, b_+22);
+        L = E;
+        B = 0x40;
+        CYC(b_+34, b_+37);
+        CALL_ROM(b_+37, ROM_clearMemory);
+      } else {
+        CYC(b_+18, b_+22);
+        L = 0x2f;
+        CYC(b_+22, b_+26); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+        CYC(b_+26, b_+28); mem_wr(gb, HL, mem_rd(gb, HL) | 0x10);
+        L = 0x1a;
+        CYC(b_+28, b_+32); mem_wr(gb, HL, mem_rd(gb, HL) & 0x7f);
+        CYCT(b_+32, b_+34);
+      }
+      D = alu_inc8(gb, D);
+      A = D;
+      alu_cp(gb, 0xe0);
+      if (F & FC) { CYCT(b_+40, b_+46); continue; }
+      CYC(b_+40, b_+46);
+      break;
     }
-    D = alu_inc8(gb, D);
-    A = D;
-    alu_cp(gb, 0xe0);
-    if (F & FC) { CYCT(b_+40, b_+46); continue; }
-    CYC(b_+40, b_+46);
-    break;
   }
   SET_DE(de);
-  CYC(b_+46, b_+50);
+  CYC(b_+O(46), b_+OE(50));
   HANDOFF(ROM_putLinkOnGround);
 }
 
@@ -9986,31 +10071,40 @@ void updateInteractionsAndDrawAllSprites_hook(GB *gb) {
 void func_3539_hook(GB *gb) {
   BASE(func_3539);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); A = H8(hRomBank);
-  CYC(b_+2, b_+3); push_effect(gb, AF);
-  switch_bank(gb, b_+3, 0x05);
-  CALL_C(b_+10, updateSpecialObjects_hook, SYM(updateSpecialObjects), b_+13);
-  switch_bank(gb, b_+13, 0x07);
-  CALL_C(b_+20, updateItems_hook, SYM(updateItems), b_+23);
-  switch_bank(gb, b_+23, 0x00);
-  CALL_ROM(b_+30, ROM_updateEnemies);
-  switch_bank(gb, b_+33, 0x11);
-  CALL_ROM(b_+40, ROM_b11_updateParts);
-  switch_bank(gb, b_+43, 0x00);
-  CALL_ROM(b_+50, ROM_updateInteractions);
-  switch_bank(gb, b_+53, 0x07);
-  CALL_C(b_+60, updateItemsPost_hook, SYM(updateItemsPost), b_+63);
-  switch_bank(gb, b_+63, 0x00);
-  CYC(b_+70, b_+73);
+  CYC(b_+O(0), b_+OE(2)); A = H8(hRomBank);
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, AF);
+  switch_bank(gb, b_+O(3), 0x05);
+  CALL_C(b_+O(10), updateSpecialObjects_hook, SYM(updateSpecialObjects), b_+OE(13));
+  if (game_seasons) {
+    switch_bank(gb, b_+S(13), 0x00);
+    CALL_ROM(b_+S(20), ROM_updateEnemies);
+    switch_bank(gb, b_+S(23), 0x00);
+    CALL_ROM(b_+S(30), ROM_updateInteractions);
+    switch_bank(gb, b_+S(33), 0x00);
+    CYC(b_+S(40), b_+S(43));
+  } else {
+    switch_bank(gb, b_+13, GV(0x07, 0x00));
+    CALL_C(b_+20, updateItems_hook, SYM(updateItems), b_+23);
+    switch_bank(gb, b_+23, 0x00);
+    CALL_ROM(b_+30, ROM_updateEnemies);
+    switch_bank(gb, b_+33, GV(0x11, 0x00));
+    CALL_ROM(b_+40, ROM_b11_updateParts);
+    switch_bank(gb, b_+43, 0x00);
+    CALL_ROM(b_+50, ROM_updateInteractions);
+    switch_bank(gb, b_+53, 0x07);
+    CALL_C(b_+60, updateItemsPost_hook, SYM(updateItemsPost), b_+63);
+    switch_bank(gb, b_+63, 0x00);
+    CYC(b_+70, b_+73);
+  }
   load_link_and_companion_animation_frame_hook(gb);
-  switch_bank(gb, b_+73, 0x04);
-  CALL_ROM(b_+80, ROM_b04_updateAnimations);
+  switch_bank(gb, b_+O(73), 0x04);
+  CALL_ROM(b_+O(80), ROM_b04_updateAnimations);
   alu_xor(gb, A);
-  CYC(b_+83, b_+87); W8(wc4b6) = A;
-  CYC(b_+87, b_+88); SET_AF(pop_effect(gb));
-  CYC(b_+88, b_+90); H8(hRomBank) = A;
-  CYC(b_+90, b_+93); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+93, b_+94);
+  CYC(b_+O(83), b_+OE(87)); W8(wc4b6) = A;
+  CYC(b_+O(87), b_+OE(88)); SET_AF(pop_effect(gb));
+  CYC(b_+O(88), b_+OE(90)); H8(hRomBank) = A;
+  CYC(b_+O(90), b_+OE(93)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(93), b_+OE(94));
   ret_effect(gb);
 }
 
@@ -10230,44 +10324,59 @@ static void inter_bank_call(GB *gb, uint16_t a, uint8_t bank, uint16_t target) {
 
 void initializeRoom_hook(GB *gb) {
   BASE(initializeRoom);
-  inter_bank_call(gb, b_+0, 0x01, ROM_b01_clearSolidObjectPositions);
-  CYC(b_+8, b_+11); A = W8(wSentBackByStrangeForce);
-  A = alu_dec8(gb, A);
-  if (F & FZ) {
-    CYC(b_+11, b_+14);
-    B = 0x7c;
-    CYC(b_+14, b_+19);
-    TAIL(objectCreateInteractionWithSubid00);
+  if (game_seasons) {
+    CALL_ROM(b_+S(0), ROM_refreshObjectGfx);
+    bank_push(gb, b_+S(3), 0x10);
+    CALL_ROM(b_+S(13), ROM_b02_loadRememberedCompanion);
+    CALL_ROM(b_+S(16), ROM_b02_checkAndSpawnMaple);
+    CALL_ROM(b_+S(19), SYM(updateRosaDateStatus));
+    switch_bank(gb, b_+S(22), 0x11);
+    CALL_ROM(b_+S(29), ROM_b12_parseObjectData);
+    switch_bank(gb, b_+S(32), 0x15);
+    CALL_ROM(b_+S(39), ROM_b16_parseStaticObjects);
+    bank_pop(gb, b_+S(42));
+    CYC(b_+S(48), b_+S(49));
+    ret_effect(gb);
+  } else {
+    inter_bank_call(gb, b_+0, 0x01, ROM_b01_clearSolidObjectPositions);
+    CYC(b_+8, b_+11); A = W8(wSentBackByStrangeForce);
+    A = alu_dec8(gb, A);
+    if (F & FZ) {
+      CYC(b_+11, b_+14);
+      B = 0x7c;
+      CYC(b_+14, b_+19);
+      TAIL(objectCreateInteractionWithSubid00);
+    }
+    CYCT(b_+11, b_+14);
+    inter_bank_call(gb, b_+19, 0x02, ROM_b02_calculateRoomStateModifier);
+    CALL_ROM(b_+27, ROM_refreshObjectGfx);
+    inter_bank_call(gb, b_+30, 0x12, ROM_b12_runRoomSpecificCode);
+    inter_bank_call(gb, b_+38, 0x02, ROM_b02_createSeaEffectsPartIfApplicable);
+    inter_bank_call(gb, b_+46, 0x01, ROM_b01_checkLoadPirateShip);
+    bank_push(gb, b_+54, 0x02);
+    CALL_ROM(b_+64, ROM_checkSpawnTimeportalInteraction);
+    CYC(b_+67, b_+70); A = W8(wcc05);
+    alu_bit(gb, 2, A);
+    CYC(b_+70, b_+72);
+    if (!(F & FZ)) CALL_ROM_CC(b_+72, ROM_b02_loadRememberedCompanion);
+    else CYC(b_+72, b_+75);
+    CYC(b_+75, b_+78); A = W8(wcc05);
+    alu_bit(gb, 3, A);
+    CYC(b_+78, b_+80);
+    if (!(F & FZ)) CALL_ROM_CC(b_+80, ROM_b02_checkAndSpawnMaple);
+    else CYC(b_+80, b_+83);
+    switch_bank(gb, b_+83, 0x12);
+    CYC(b_+90, b_+93); A = W8(wcc05);
+    alu_bit(gb, 0, A);
+    CYC(b_+93, b_+95);
+    if (!(F & FZ)) CALL_ROM_CC(b_+95, ROM_b12_parseObjectData);
+    else CYC(b_+95, b_+98);
+    switch_bank(gb, b_+98, 0x16);
+    CALL_ROM(b_+105, ROM_b16_parseStaticObjects);
+    bank_pop(gb, b_+108);
+    CYC(b_+114, b_+115);
+    ret_effect(gb);
   }
-  CYCT(b_+11, b_+14);
-  inter_bank_call(gb, b_+19, 0x02, ROM_b02_calculateRoomStateModifier);
-  CALL_ROM(b_+27, ROM_refreshObjectGfx);
-  inter_bank_call(gb, b_+30, 0x12, ROM_b12_runRoomSpecificCode);
-  inter_bank_call(gb, b_+38, 0x02, ROM_b02_createSeaEffectsPartIfApplicable);
-  inter_bank_call(gb, b_+46, 0x01, ROM_b01_checkLoadPirateShip);
-  bank_push(gb, b_+54, 0x02);
-  CALL_ROM(b_+64, ROM_checkSpawnTimeportalInteraction);
-  CYC(b_+67, b_+70); A = W8(wcc05);
-  alu_bit(gb, 2, A);
-  CYC(b_+70, b_+72);
-  if (!(F & FZ)) CALL_ROM_CC(b_+72, ROM_b02_loadRememberedCompanion);
-  else CYC(b_+72, b_+75);
-  CYC(b_+75, b_+78); A = W8(wcc05);
-  alu_bit(gb, 3, A);
-  CYC(b_+78, b_+80);
-  if (!(F & FZ)) CALL_ROM_CC(b_+80, ROM_b02_checkAndSpawnMaple);
-  else CYC(b_+80, b_+83);
-  switch_bank(gb, b_+83, 0x12);
-  CYC(b_+90, b_+93); A = W8(wcc05);
-  alu_bit(gb, 0, A);
-  CYC(b_+93, b_+95);
-  if (!(F & FZ)) CALL_ROM_CC(b_+95, ROM_b12_parseObjectData);
-  else CYC(b_+95, b_+98);
-  switch_bank(gb, b_+98, 0x16);
-  CALL_ROM(b_+105, ROM_b16_parseStaticObjects);
-  bank_pop(gb, b_+108);
-  CYC(b_+114, b_+115);
-  ret_effect(gb);
 }
 
 void loadStaticObjects_hook(GB *gb) {

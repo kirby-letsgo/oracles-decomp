@@ -1458,26 +1458,31 @@ void getTreeWarpDataForRoom_hook(GB *gb) {
 
 void getWarpTreeData_hook(GB *gb) {
   BASE(getWarpTreeData);
-  CYC(b_+0, b_+1); push_effect(gb, AF);
-  CYC(b_+1, b_+4); SET_HL(SYM(pastTreeWarps));
-  CYC(b_+4, b_+7); A = W8(wTilesetFlags);
-  CYC(b_+7, b_+8); alu_rlca(gb);
-  if (F & FC) { CYCT(b_+8, b_+10); getWarpTreeData__ret_hook(gb); return; }
-  CYC(b_+8, b_+10);
-  CYC(b_+10, b_+13); SET_HL(SYM(presentTreeWarps));
-  CYC(b_+13, b_+16); A = mem_rd(gb, (wGroup0RoomFlags + 172));
-  CYC(b_+16, b_+17); alu_rlca(gb);
-  if (F & FC) { CYCT(b_+17, b_+19); getWarpTreeData__ret_hook(gb); return; }
-  CYC(b_+17, b_+19);
-  CYC(b_+19, b_+21); A = 3;
-  CYC(b_+21, b_+22); push_effect(gb, b_+22); add_a_to_hl(gb);
+  CYC(b_+O(0), b_+OE(1)); push_effect(gb, AF);
+  if (game_seasons) {
+    CYC(b_+S(1), b_+S(4)); SET_HL(SYM(treeWarps));
+    TAIL(getWarpTreeData__ret);
+  } else {
+    CYC(b_+1, b_+4); SET_HL(SYM(pastTreeWarps));
+    CYC(b_+4, b_+7); A = W8(wTilesetFlags);
+    CYC(b_+7, b_+8); alu_rlca(gb);
+    if (F & FC) { CYCT(b_+8, b_+10); getWarpTreeData__ret_hook(gb); return; }
+    CYC(b_+8, b_+10);
+    CYC(b_+10, b_+13); SET_HL(SYM(presentTreeWarps));
+    CYC(b_+13, b_+16); A = mem_rd(gb, (wGroup0RoomFlags + 172));
+    CYC(b_+16, b_+17); alu_rlca(gb);
+    if (F & FC) { CYCT(b_+17, b_+19); getWarpTreeData__ret_hook(gb); return; }
+    CYC(b_+17, b_+19);
+    CYC(b_+19, b_+21); A = 3;
+    CYC(b_+21, b_+22); push_effect(gb, b_+22); add_a_to_hl(gb);
+  }
   TAIL(getWarpTreeData__ret);
 }
 
 void getWarpTreeData__ret_hook(GB *gb) {
   BASE(getWarpTreeData);
-  CYC(b_+22, b_+23); SET_AF(pop_effect(gb));
-  CYC(b_+23, b_+24); ret_effect(gb);
+  CYC(b_+O(22), b_+OE(23)); SET_AF(pop_effect(gb));
+  CYC(b_+O(23), b_+OE(24)); ret_effect(gb);
 }
 
 void mapMenu_drawTimePortal_hook(GB *gb) {
@@ -1510,53 +1515,63 @@ void mapMenu_drawTimePortal_hook(GB *gb) {
 
 void mapMenu_clearUnvisitedTiles_hook(GB *gb) {
   BASE(mapMenu_clearUnvisitedTiles);
-  CYC(b_+0, b_+2); A = 4;
-  CYC(b_+2, b_+4); hram_wr(gb, 0x70, A);
-  CYC(b_+4, b_+7); SET_DE(0x0e0e);
-  CYC(b_+7, b_+10); SET_HL(w1ReservedInteraction0_var03);
-  CYC(b_+10, b_+12); B = 0;
+  CYC(b_+O(0), b_+OE(2)); A = 4;
+  CYC(b_+O(2), b_+OE(4)); hram_wr(gb, 0x70, A);
+  CYC(b_+O(4), b_+OE(7)); SET_DE(GV(0x0e0e, 0x1010));
+  CYC(b_+O(7), b_+OE(10)); SET_HL(w4TileMap + GV(0x43, 0x22));
+  if (game_seasons) {
+    CYC(b_+S(10), b_+S(13)); A = W8(wMapMenu_mode);
+    CYC(b_+S(13), b_+S(14)); alu_rrca(gb);
+    if (!(F & FC)) CYCT(b_+S(14), b_+S(16));
+    else {
+      CYC(b_+S(14), b_+S(16));
+      CYC(b_+S(16), b_+S(19)); SET_DE(0x080b);
+      CYC(b_+S(19), b_+S(22)); SET_HL(w4TileMap + 0xa4);
+    }
+  }
+  CYC(b_+O(10), b_+OE(12)); B = 0;
   TAIL(mapMenu_clearUnvisitedTiles__rowLoop);
 }
 
 void mapMenu_clearUnvisitedTiles__rowLoop_hook(GB *gb) {
   BASE(mapMenu_clearUnvisitedTiles);
-  CYC(b_+12, b_+14); C = 0;
-  CYC(b_+14, b_+15); push_effect(gb, DE);
+  CYC(b_+O(12), b_+OE(14)); C = 0;
+  CYC(b_+O(14), b_+OE(15)); push_effect(gb, DE);
   TAIL(mapMenu_clearUnvisitedTiles__columnLoop);
 }
 
 void mapMenu_clearUnvisitedTiles__columnLoop_hook(GB *gb) {
   BASE(mapMenu_clearUnvisitedTiles);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+15, b_+16); A = B;
-  CYC(b_+16, b_+18); A = alu_swap(gb, A);
-  CYC(b_+18, b_+19); alu_add(gb, C);
-  CALL_C(b_+19, mapMenu_checkRoomVisited_hook, SYM(mapMenu_checkRoomVisited), b_+22);
-  if (!(F & FZ)) { CYCT(b_+22, b_+24); mapMenu_clearUnvisitedTiles__nextTile_hook(gb); return; }
-  CYC(b_+22, b_+24);
-  CYC(b_+24, b_+26); mem_wr(gb, HL, 4);
-  CYC(b_+26, b_+28); H = (uint8_t)(H | (1 << 2));
-  CYC(b_+28, b_+30); mem_wr(gb, HL, 0x0a);
-  CYC(b_+30, b_+32); H = (uint8_t)(H & ~(1 << 2));
+  CYC(b_+O(15), b_+OE(16)); A = B;
+  CYC(b_+O(16), b_+OE(18)); A = alu_swap(gb, A);
+  CYC(b_+O(18), b_+OE(19)); alu_add(gb, C);
+  CALL_C(b_+O(19), mapMenu_checkRoomVisited_hook, SYM(mapMenu_checkRoomVisited), b_+OE(22));
+  if (!(F & FZ)) { CYCT(b_+O(22), b_+OE(24)); mapMenu_clearUnvisitedTiles__nextTile_hook(gb); return; }
+  CYC(b_+O(22), b_+OE(24));
+  CYC(b_+O(24), b_+OE(26)); mem_wr(gb, HL, 4);
+  CYC(b_+O(26), b_+OE(28)); H = (uint8_t)(H | (1 << 2));
+  CYC(b_+O(28), b_+OE(30)); mem_wr(gb, HL, 0x0a);
+  CYC(b_+O(30), b_+OE(32)); H = (uint8_t)(H & ~(1 << 2));
   TAIL(mapMenu_clearUnvisitedTiles__nextTile);
 }
 
 void mapMenu_clearUnvisitedTiles__nextTile_hook(GB *gb) {
   BASE(mapMenu_clearUnvisitedTiles);
-  CYC(b_+32, b_+33); SET_HL(HL + 1);
-  CYC(b_+33, b_+34); C = alu_inc8(gb, C);
-  CYC(b_+34, b_+35); E = alu_dec8(gb, E);
-  if (!(F & FZ)) { CYCT(b_+35, b_+37); mapMenu_clearUnvisitedTiles__columnLoop_hook(gb); return; }
-  CYC(b_+35, b_+37);
-  CYC(b_+37, b_+38); SET_DE(pop_effect(gb));
-  CYC(b_+38, b_+40); A = 0x20;
-  CYC(b_+40, b_+41); alu_sub(gb, E);
-  CYC(b_+41, b_+42); push_effect(gb, b_+42); add_a_to_hl(gb);
-  CYC(b_+42, b_+43); B = alu_inc8(gb, B);
-  CYC(b_+43, b_+44); D = alu_dec8(gb, D);
-  if (!(F & FZ)) { CYCT(b_+44, b_+46); mapMenu_clearUnvisitedTiles__rowLoop_hook(gb); return; }
-  CYC(b_+44, b_+46);
-  CYC(b_+46, b_+47); ret_effect(gb);
+  CYC(b_+O(32), b_+OE(33)); SET_HL(HL + 1);
+  CYC(b_+O(33), b_+OE(34)); C = alu_inc8(gb, C);
+  CYC(b_+O(34), b_+OE(35)); E = alu_dec8(gb, E);
+  if (!(F & FZ)) { CYCT(b_+O(35), b_+OE(37)); mapMenu_clearUnvisitedTiles__columnLoop_hook(gb); return; }
+  CYC(b_+O(35), b_+OE(37));
+  CYC(b_+O(37), b_+OE(38)); SET_DE(pop_effect(gb));
+  CYC(b_+O(38), b_+OE(40)); A = 0x20;
+  CYC(b_+O(40), b_+OE(41)); alu_sub(gb, E);
+  CYC(b_+O(41), b_+OE(42)); push_effect(gb, b_+OE(42)); add_a_to_hl(gb);
+  CYC(b_+O(42), b_+OE(43)); B = alu_inc8(gb, B);
+  CYC(b_+O(43), b_+OE(44)); D = alu_dec8(gb, D);
+  if (!(F & FZ)) { CYCT(b_+O(44), b_+OE(46)); mapMenu_clearUnvisitedTiles__rowLoop_hook(gb); return; }
+  CYC(b_+O(44), b_+OE(46));
+  CYC(b_+O(46), b_+OE(47)); ret_effect(gb);
 }
 
 void checkMoblinsKeepDestroyed_hook(GB *gb) {
@@ -3210,28 +3225,28 @@ void mapGetRoomTextOrReturn_hook(GB *gb) {
 void mapGetRoomText_hook(GB *gb) {
   BASE(mapGetRoomText);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, mapGetRoomIndexWithoutUnusedColumns_hook, SYM(mapGetRoomIndexWithoutUnusedColumns), b_+3);
-  CYC(b_+3, b_+6); SET_HL(SYM(presentMapTextIndices));
-  if (!(F & FC)) CYCT(b_+6, b_+8);
+  CALL_C(b_+O(0), mapGetRoomIndexWithoutUnusedColumns_hook, SYM(mapGetRoomIndexWithoutUnusedColumns), b_+OE(3));
+  CYC(b_+O(3), b_+OE(6)); SET_HL(SYM(presentMapTextIndices));
+  if (!(F & FC)) CYCT(b_+O(6), b_+OE(8));
   else {
-    CYC(b_+6, b_+8);
-    CYC(b_+8, b_+11); SET_HL(SYM(pastMapTextIndices));
+    CYC(b_+O(6), b_+OE(8));
+    CYC(b_+O(8), b_+OE(11)); SET_HL(SYM(pastMapTextIndices));
   }
-  CYC(b_+11, b_+13); B = 0x03;
-  CYC(b_+13, b_+14); push_effect(gb, b_+14); add_a_to_hl(gb);
-  CYC(b_+14, b_+15); C = mem_rd(gb, HL);
-  CYC(b_+15, b_+17); alu_bit(gb, 7, C);
-  if (F & FZ) { CYCT(b_+17, b_+18); ret_effect(gb); return; }
-  CYC(b_+17, b_+18);
-  CYC(b_+18, b_+19); A = C;
-  CYC(b_+19, b_+21); alu_and(gb, 0x07);
-  CYC(b_+21, b_+22); push_effect(gb, b_+22);
+  CYC(b_+O(11), b_+OE(13)); B = 0x03;
+  CYC(b_+O(13), b_+OE(14)); push_effect(gb, b_+OE(14)); add_a_to_hl(gb);
+  CYC(b_+O(14), b_+OE(15)); C = mem_rd(gb, HL);
+  CYC(b_+O(15), b_+OE(17)); alu_bit(gb, 7, C);
+  if (F & FZ) { CYCT(b_+O(17), b_+OE(18)); ret_effect(gb); return; }
+  CYC(b_+O(17), b_+OE(18));
+  CYC(b_+O(18), b_+OE(19)); A = C;
+  CYC(b_+O(19), b_+OE(21)); alu_and(gb, 0x07);
+  CYC(b_+O(21), b_+OE(22)); push_effect(gb, b_+OE(22));
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == b_+32) { mapGetRoomText__specialCode0_hook(gb); return; }
-    else if (jt_ == b_+61) { mapGetRoomText__specialCode1_hook(gb); return; }
-    else if (jt_ == b_+81) { mapGetRoomText__specialCode2_hook(gb); return; }
-    else if (jt_ == b_+89) { mapGetRoomText__specialCode3_hook(gb); return; }
-    else if (jt_ == b_+98) { mapGetRoomText__specialCode4_hook(gb); return; }
+    if (jt_ == b_+O(32)) { mapGetRoomText__specialCode0_hook(gb); return; }
+    else if (jt_ == b_+O(61)) { mapGetRoomText__specialCode1_hook(gb); return; }
+    else if (jt_ == b_+O(81)) { mapGetRoomText__specialCode2_hook(gb); return; }
+    else if (jt_ == b_+O(89)) { mapGetRoomText__specialCode3_hook(gb); return; }
+    else if (jt_ == b_+O(98)) { mapGetRoomText__specialCode4_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -3239,102 +3254,115 @@ void mapGetRoomText_hook(GB *gb) {
 void mapGetRoomText__specialCode0_hook(GB *gb) {
   BASE(mapGetRoomText);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+32, b_+33); push_effect(gb, DE);
-  CYC(b_+33, b_+36); A = W8(wTilesetFlags);
-  CYC(b_+36, b_+37); alu_rlca(gb);
-  CYC(b_+37, b_+40); SET_DE(wMakuMapTextPresent);
-  CYC(b_+40, b_+42); C = 0x23;
-  CYC(b_+42, b_+44); A = 0x3e;
-  if (!(F & FC)) CYCT(b_+44, b_+46);
-  else {
-    CYC(b_+44, b_+46);
-    CYC(b_+46, b_+47); E = alu_inc8(gb, E);
-    CYC(b_+47, b_+48); C = alu_inc8(gb, C);
-    CYC(b_+48, b_+49); A = alu_inc8(gb, A);
+  if (game_seasons) {
+    CYC(b_+S(32), b_+S(34)); A = 0x18;
+    CALL_C(b_+S(34), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+S(37));
+    CYC(b_+S(37), b_+S(39)); C = 0x17;
+    if (F & FZ) { CYCT(b_+S(39), b_+S(40)); ret_effect(gb); return; }
+    CYC(b_+S(39), b_+S(40));
+    CYC(b_+S(40), b_+S(43)); A = W8(wMakuMapTextPresent);
+    CYC(b_+S(43), b_+S(44)); C = A;
+    CYC(b_+S(44), b_+S(46)); B = 0x17;
+    CYC(b_+S(46), b_+S(47)); ret_effect(gb);
+  } else {
+    CYC(b_+32, b_+33); push_effect(gb, DE);
+    CYC(b_+33, b_+36); A = W8(wTilesetFlags);
+    CYC(b_+36, b_+37); alu_rlca(gb);
+    CYC(b_+37, b_+40); SET_DE(wMakuMapTextPresent);
+    CYC(b_+40, b_+42); C = 0x23;
+    CYC(b_+42, b_+44); A = 0x3e;
+    if (!(F & FC)) CYCT(b_+44, b_+46);
+    else {
+      CYC(b_+44, b_+46);
+      CYC(b_+46, b_+47); E = alu_inc8(gb, E);
+      CYC(b_+47, b_+48); C = alu_inc8(gb, C);
+      CYC(b_+48, b_+49); A = alu_inc8(gb, A);
+    }
+    CALL_C(b_+49, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+52);
+    CYC(b_+52, b_+53); L = E;
+    CYC(b_+53, b_+54); H = D;
+    CYC(b_+54, b_+55); SET_DE(pop_effect(gb));
+    if (F & FZ) { CYCT(b_+55, b_+56); ret_effect(gb); return; }
+    CYC(b_+55, b_+56);
+    CYC(b_+56, b_+57); A = mem_rd(gb, HL);
+    CYC(b_+57, b_+58); C = A;
+    CYC(b_+58, b_+60); B = 0x05;
+    CYC(b_+60, b_+61); ret_effect(gb);
   }
-  CALL_C(b_+49, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+52);
-  CYC(b_+52, b_+53); L = E;
-  CYC(b_+53, b_+54); H = D;
-  CYC(b_+54, b_+55); SET_DE(pop_effect(gb));
-  if (F & FZ) { CYCT(b_+55, b_+56); ret_effect(gb); return; }
-  CYC(b_+55, b_+56);
-  CYC(b_+56, b_+57); A = mem_rd(gb, HL);
-  CYC(b_+57, b_+58); C = A;
-  CYC(b_+58, b_+60); B = 0x05;
-  CYC(b_+60, b_+61); ret_effect(gb);
 }
 
 void mapGetRoomText__specialCode1_hook(GB *gb) {
   BASE(mapGetRoomText);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+61, b_+62); A = C;
-  CYC(b_+62, b_+63); alu_add(gb, A);
-  CYC(b_+63, b_+65); A = alu_swap(gb, A);
-  CYC(b_+65, b_+67); alu_and(gb, 0x0f);
-  CYC(b_+67, b_+68); C = A;
-  CALL_C(b_+68, mapGetRoomText__checkDungeonEntered_hook, SYM(mapGetRoomText__checkDungeonEntered), b_+71);
+  CYC(b_+O(61), b_+OE(62)); A = C;
+  CYC(b_+O(62), b_+OE(63)); alu_add(gb, A);
+  CYC(b_+O(63), b_+OE(65)); A = alu_swap(gb, A);
+  CYC(b_+O(65), b_+OE(67)); alu_and(gb, 0x0f);
+  CYC(b_+O(67), b_+OE(68)); C = A;
+  CALL_C(b_+O(68), mapGetRoomText__checkDungeonEntered_hook, SYM(mapGetRoomText__checkDungeonEntered), b_+OE(71));
   if (!(F & FZ)) {
-    CYCT(b_+71, b_+73);
-    CYC(b_+78, b_+80); B = 0x02;
-    CYC(b_+80, b_+81); ret_effect(gb);
+    CYCT(b_+O(71), b_+OE(73));
+    CYC(b_+O(78), b_+OE(80)); B = 0x02;
+    CYC(b_+O(80), b_+OE(81)); ret_effect(gb);
     return;
   }
-  CYC(b_+71, b_+73);
-  CYC(b_+73, b_+74); A = mem_rd(gb, HL);
-  CYC(b_+74, b_+76); alu_and(gb, 0x7f);
-  CYC(b_+76, b_+77); C = A;
-  CYC(b_+77, b_+78); ret_effect(gb);
+  CYC(b_+O(71), b_+OE(73));
+  CYC(b_+O(73), b_+OE(74)); A = mem_rd(gb, HL);
+  CYC(b_+O(74), b_+OE(76)); alu_and(gb, 0x7f);
+  CYC(b_+O(76), b_+OE(77)); C = A;
+  CYC(b_+O(77), b_+OE(78)); ret_effect(gb);
 }
 
 void mapGetRoomText__specialCode2_hook(GB *gb) {
   BASE(mapGetRoomText);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+81, checkMoblinsKeepDestroyed_hook, SYM(checkMoblinsKeepDestroyed), b_+84);
-  CYC(b_+84, b_+86); C = GV(0x17, 0x0b);
-  if (!(F & FZ)) { CYCT(b_+86, b_+87); ret_effect(gb); return; }
-  CYC(b_+86, b_+87);
-  CYC(b_+87, b_+88); C = alu_inc8(gb, C);
-  CYC(b_+88, b_+89); ret_effect(gb);
+  CALL_C(b_+O(81), checkMoblinsKeepDestroyed_hook, SYM(checkMoblinsKeepDestroyed), b_+OE(84));
+  CYC(b_+O(84), b_+OE(86)); C = GV(0x17, 0x0b);
+  if (!(F & FZ)) { CYCT(b_+O(86), b_+OE(87)); ret_effect(gb); return; }
+  CYC(b_+O(86), b_+OE(87));
+  CYC(b_+O(87), b_+OE(88)); C = alu_inc8(gb, C);
+  CYC(b_+O(88), b_+OE(89)); ret_effect(gb);
 }
 
 void mapGetRoomText__specialCode3_hook(GB *gb) {
   BASE(mapGetRoomText);
-  CYC(b_+89, b_+92); A = W8(wAnimalCompanion);
-  CYC(b_+92, b_+94); alu_sub(gb, 0x0b);
-  CYC(b_+94, b_+96); alu_add(gb, GV(0x2d, 0x08));
-  CYC(b_+96, b_+97); C = A;
-  CYC(b_+97, b_+98); ret_effect(gb);
+  CYC(b_+O(89), b_+OE(92)); A = W8(wAnimalCompanion);
+  CYC(b_+O(92), b_+OE(94)); alu_sub(gb, 0x0b);
+  CYC(b_+O(94), b_+OE(96)); alu_add(gb, GV(0x2d, 0x08));
+  CYC(b_+O(96), b_+OE(97)); C = A;
+  CYC(b_+O(97), b_+OE(98)); ret_effect(gb);
 }
 
 void mapGetRoomText__specialCode4_hook(GB *gb) {
   BASE(mapGetRoomText);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+98, checkAdvanceShopVisited_hook, SYM(checkAdvanceShopVisited), b_+101);
-  CYC(b_+101, b_+103); C = 0x26;
-  if (F & FZ) { CYCT(b_+103, b_+104); ret_effect(gb); return; }
-  CYC(b_+103, b_+104);
-  CYC(b_+104, b_+105); C = alu_dec8(gb, C);
-  CYC(b_+105, b_+106); ret_effect(gb);
+  CALL_C(b_+O(98), checkAdvanceShopVisited_hook, SYM(checkAdvanceShopVisited), b_+OE(101));
+  CYC(b_+O(101), b_+OE(103)); C = GV(0x26, 0x21);
+  if (F & FZ) { CYCT(b_+O(103), b_+OE(104)); ret_effect(gb); return; }
+  CYC(b_+O(103), b_+OE(104));
+  if (game_seasons) { CYC(b_+S(90), b_+S(92)); C = 0x2c; }
+  else { CYC(b_+O(104), b_+OE(105)); C = alu_dec8(gb, C); }
+  CYC(b_+O(105), b_+OE(106)); ret_effect(gb);
 }
 
 void mapGetRoomText__checkDungeonEntered_hook(GB *gb) {
   BASE(mapGetRoomText);
-  CYC(b_+106, b_+107); push_effect(gb, DE);
-  CYC(b_+107, b_+110); SET_HL(SYM(mapMenu_dungeonEntranceText));
-  CYC(b_+110, b_+111); add_double_index_to_hl(gb, b_+111);
-  CYC(b_+111, b_+112); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+112, b_+113); E = A;
-  CYC(b_+113, b_+115); alu_bit(gb, 7, mem_rd(gb, HL));
-  CYC(b_+115, b_+117); D = 0xc9;
-  if (!(F & FZ)) CYCT(b_+117, b_+119);
+  CYC(b_+O(106), b_+OE(107)); push_effect(gb, DE);
+  CYC(b_+O(107), b_+OE(110)); SET_HL(SYM(mapMenu_dungeonEntranceText));
+  CYC(b_+O(110), b_+OE(111)); add_double_index_to_hl(gb, b_+O(111));
+  CYC(b_+O(111), b_+OE(112)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(112), b_+OE(113)); E = A;
+  CYC(b_+O(113), b_+OE(115)); alu_bit(gb, 7, mem_rd(gb, HL));
+  CYC(b_+O(115), b_+OE(117)); D = 0xc9;
+  if (!(F & FZ)) CYCT(b_+O(117), b_+OE(119));
   else {
-    CYC(b_+117, b_+119);
-    CYC(b_+119, b_+120); D = alu_inc8(gb, D);
+    CYC(b_+O(117), b_+OE(119));
+    CYC(b_+O(119), b_+OE(120)); D = alu_inc8(gb, D);
   }
-  CYC(b_+120, b_+121); A = mem_rd(gb, DE);
-  CYC(b_+121, b_+123); alu_bit(gb, 4, A);
-  CYC(b_+123, b_+124); SET_DE(pop_effect(gb));
-  CYC(b_+124, b_+125); ret_effect(gb);
+  CYC(b_+O(120), b_+OE(121)); A = mem_rd(gb, DE);
+  CYC(b_+O(121), b_+OE(123)); alu_bit(gb, 4, A);
+  CYC(b_+O(123), b_+OE(124)); SET_DE(pop_effect(gb));
+  CYC(b_+O(124), b_+OE(125)); ret_effect(gb);
 }
 
 void getFileDisplayVariableAddress_hook(GB *gb) {
@@ -5199,88 +5227,90 @@ void drawItemTilesOnStatusBar__drawItem_hook(GB *gb) {
 
 void drawTreasureExtraTiles_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  CYC(b_+0, b_+2); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(b_+2, b_+3); ret_effect(gb); return; }
-  CYC(b_+2, b_+3);
-  CYC(b_+3, b_+4); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+4, b_+6); drawTreasureExtraTiles__val01_hook(gb); return; }
-  CYC(b_+4, b_+6);
-  CYC(b_+6, b_+7); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+7, b_+9); drawTreasureExtraTiles__val02_hook(gb); return; }
-  CYC(b_+7, b_+9);
-  CYC(b_+9, b_+10); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+10, b_+12); drawTreasureExtraTiles__val03_hook(gb); return; }
-  CYC(b_+10, b_+12);
-  CYC(b_+12, b_+13); A = alu_dec8(gb, A);
-  if (F & FZ) { CYCT(b_+13, b_+15); drawTreasureExtraTiles__val04_hook(gb); return; }
-  CYC(b_+13, b_+15);
-  CYC(b_+15, b_+17); TAIL(drawTreasureExtraTiles__val00);
+  CYC(b_+O(0), b_+OE(2)); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+O(2), b_+OE(3)); ret_effect(gb); return; }
+  CYC(b_+O(2), b_+OE(3));
+  CYC(b_+O(3), b_+OE(4)); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+O(4), b_+OE(6)); drawTreasureExtraTiles__val01_hook(gb); return; }
+  CYC(b_+O(4), b_+OE(6));
+  CYC(b_+O(6), b_+OE(7)); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+O(7), b_+OE(9)); TAIL(drawTreasureExtraTiles__val02); }
+  CYC(b_+O(7), b_+OE(9));
+  CYC(b_+O(9), b_+OE(10)); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+O(10), b_+OE(12)); TAIL(drawTreasureExtraTiles__val03); }
+  CYC(b_+O(10), b_+OE(12));
+  CYC(b_+O(12), b_+OE(13)); A = alu_dec8(gb, A);
+  if (F & FZ) { CYCT(b_+O(13), b_+OE(15)); drawTreasureExtraTiles__val04_hook(gb); return; }
+  CYC(b_+O(13), b_+OE(15));
+  CYC(b_+O(15), b_+OE(17)); TAIL(drawTreasureExtraTiles__val00);
 }
 
 void drawTreasureExtraTiles__val04_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  CYC(b_+17, b_+18); E = alu_inc8(gb, E);
-  CYC(b_+18, b_+19); A = B;
-  CYC(b_+19, b_+21); alu_and(gb, 0x0f);
-  CYC(b_+21, b_+23); alu_add(gb, 0x10);
-  CYC(b_+23, b_+24); mem_wr(gb, DE, A);
-  CYC(b_+24, b_+26); D |= 0x04;
-  CYC(b_+26, b_+27); A = C;
-  CYC(b_+27, b_+28); mem_wr(gb, DE, A);
-  CYC(b_+28, b_+29); E = alu_dec8(gb, E);
-  CYC(b_+29, b_+30); mem_wr(gb, DE, A);
-  CYC(b_+30, b_+32); D &= ~0x04;
-  CYC(b_+32, b_+34); A = 0x1b;
-  CYC(b_+34, b_+35); mem_wr(gb, DE, A);
-  CYC(b_+35, b_+36); ret_effect(gb);
+  CYC(b_+O(17), b_+OE(18)); E = alu_inc8(gb, E);
+  CYC(b_+O(18), b_+OE(19)); A = B;
+  CYC(b_+O(19), b_+OE(21)); alu_and(gb, 0x0f);
+  CYC(b_+O(21), b_+OE(23)); alu_add(gb, 0x10);
+  CYC(b_+O(23), b_+OE(24)); mem_wr(gb, DE, A);
+  CYC(b_+O(24), b_+OE(26)); D |= 0x04;
+  CYC(b_+O(26), b_+OE(27)); A = C;
+  CYC(b_+O(27), b_+OE(28)); mem_wr(gb, DE, A);
+  CYC(b_+O(28), b_+OE(29)); E = alu_dec8(gb, E);
+  CYC(b_+O(29), b_+OE(30)); mem_wr(gb, DE, A);
+  CYC(b_+O(30), b_+OE(32)); D &= ~0x04;
+  CYC(b_+O(32), b_+OE(34)); A = 0x1b;
+  CYC(b_+O(34), b_+OE(35)); mem_wr(gb, DE, A);
+  CYC(b_+O(35), b_+OE(36)); ret_effect(gb);
 }
 
 void drawTreasureExtraTiles__val01_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  CYC(b_+36, b_+37); E = alu_inc8(gb, E);
-  CYC(b_+37, b_+38); A = B;
-  CYC(b_+38, b_+40); alu_and(gb, 0x0f);
-  CYC(b_+40, b_+42); alu_add(gb, 0x10);
-  CYC(b_+42, b_+43); mem_wr(gb, DE, A);
-  CYC(b_+43, b_+45); D |= 0x04;
-  CYC(b_+45, b_+46); A = C;
-  CYC(b_+46, b_+47); mem_wr(gb, DE, A);
-  CYC(b_+47, b_+48); E = alu_dec8(gb, E);
-  CYC(b_+48, b_+49); mem_wr(gb, DE, A);
-  CYC(b_+49, b_+51); D &= ~0x04;
-  CYC(b_+51, b_+52); A = B;
-  CYC(b_+52, b_+54); A = alu_swap(gb, A);
-  CYC(b_+54, b_+56); alu_and(gb, 0x0f);
-  CYC(b_+56, b_+58); alu_add(gb, 0x10);
-  CYC(b_+58, b_+59); mem_wr(gb, DE, A);
-  CYC(b_+59, b_+60); ret_effect(gb);
+  CYC(b_+O(36), b_+OE(37)); E = alu_inc8(gb, E);
+  CYC(b_+O(37), b_+OE(38)); A = B;
+  CYC(b_+O(38), b_+OE(40)); alu_and(gb, 0x0f);
+  CYC(b_+O(40), b_+OE(42)); alu_add(gb, 0x10);
+  CYC(b_+O(42), b_+OE(43)); mem_wr(gb, DE, A);
+  CYC(b_+O(43), b_+OE(45)); D |= 0x04;
+  CYC(b_+O(45), b_+OE(46)); A = C;
+  CYC(b_+O(46), b_+OE(47)); mem_wr(gb, DE, A);
+  CYC(b_+O(47), b_+OE(48)); E = alu_dec8(gb, E);
+  CYC(b_+O(48), b_+OE(49)); mem_wr(gb, DE, A);
+  CYC(b_+O(49), b_+OE(51)); D &= ~0x04;
+  CYC(b_+O(51), b_+OE(52)); A = B;
+  CYC(b_+O(52), b_+OE(54)); A = alu_swap(gb, A);
+  CYC(b_+O(54), b_+OE(56)); alu_and(gb, 0x0f);
+  CYC(b_+O(56), b_+OE(58)); alu_add(gb, 0x10);
+  CYC(b_+O(58), b_+OE(59)); mem_wr(gb, DE, A);
+  CYC(b_+O(59), b_+OE(60)); ret_effect(gb);
 }
 
 void drawTreasureExtraTiles__val00_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  CYC(b_+60, b_+61); E = alu_inc8(gb, E);
-  CYC(b_+61, b_+62); A = B;
-  CYC(b_+62, b_+64); alu_and(gb, 0x0f);
-  CYC(b_+64, b_+66); alu_add(gb, 0x10);
-  CYC(b_+66, b_+67); mem_wr(gb, DE, A);
-  CYC(b_+67, b_+69); D |= 0x04;
-  CYC(b_+69, b_+70); A = C;
-  CYC(b_+70, b_+71); mem_wr(gb, DE, A);
-  CYC(b_+71, b_+72); E = alu_dec8(gb, E);
-  CYC(b_+72, b_+73); mem_wr(gb, DE, A);
-  CYC(b_+73, b_+75); D &= ~0x04;
-  CYC(b_+75, b_+77); A = 0x1a;
-  CYC(b_+77, b_+78); mem_wr(gb, DE, A);
-  CYC(b_+78, b_+79); ret_effect(gb);
+  CYC(b_+O(60), b_+OE(61)); E = alu_inc8(gb, E);
+  CYC(b_+O(61), b_+OE(62)); A = B;
+  CYC(b_+O(62), b_+OE(64)); alu_and(gb, 0x0f);
+  CYC(b_+O(64), b_+OE(66)); alu_add(gb, 0x10);
+  CYC(b_+O(66), b_+OE(67)); mem_wr(gb, DE, A);
+  CYC(b_+O(67), b_+OE(69)); D |= 0x04;
+  CYC(b_+O(69), b_+OE(70)); A = C;
+  CYC(b_+O(70), b_+OE(71)); mem_wr(gb, DE, A);
+  CYC(b_+O(71), b_+OE(72)); E = alu_dec8(gb, E);
+  CYC(b_+O(72), b_+OE(73)); mem_wr(gb, DE, A);
+  CYC(b_+O(73), b_+OE(75)); D &= ~0x04;
+  CYC(b_+O(75), b_+OE(77)); A = 0x1a;
+  CYC(b_+O(77), b_+OE(78)); mem_wr(gb, DE, A);
+  CYC(b_+O(78), b_+OE(79)); ret_effect(gb);
 }
 
 void drawTreasureExtraTiles__val03_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
+  AGES_ONLY();
   CYC(b_+79, b_+80); ret_effect(gb);
 }
 
 void drawTreasureExtraTiles__val02_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
+  AGES_ONLY();
   CYC(b_+80, b_+81); H = D;
   CYC(b_+81, b_+82); L = E;
   CYC(b_+82, b_+83); A = C;
@@ -5310,6 +5340,7 @@ void drawTreasureExtraTiles__val02_hook(GB *gb) {
 
 void drawTreasureExtraTiles__val02__drawOnInventory_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
+  AGES_ONLY();
   CYC(b_+117, b_+119); A = 0x1f;
   CYC(b_+119, b_+120); mem_wr(gb, HL, A); SET_HL(HL - 1);
   CYC(b_+120, b_+122); mem_wr(gb, HL, 0x1d);
@@ -5330,11 +5361,11 @@ void drawTreasureExtraTiles__val02__drawOnInventory_hook(GB *gb) {
 
 void drawTreasureExtraTiles__drawTile_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  CYC(b_+142, b_+143); mem_wr(gb, HL, B);
-  CYC(b_+143, b_+145); H |= 0x04;
-  CYC(b_+145, b_+146); mem_wr(gb, HL, C);
-  CYC(b_+146, b_+148); H &= ~0x04;
-  CYC(b_+148, b_+149); ret_effect(gb);
+  CYC(b_+O(142), b_+OE(143)); mem_wr(gb, HL, B);
+  CYC(b_+O(143), b_+OE(145)); H |= 0x04;
+  CYC(b_+O(145), b_+OE(146)); mem_wr(gb, HL, C);
+  CYC(b_+O(146), b_+OE(148)); H &= ~0x04;
+  CYC(b_+O(148), b_+OE(149)); ret_effect(gb);
 }
 
 void fileSelectDrawHeartDisplay_hook(GB *gb) {
@@ -5720,266 +5751,277 @@ void func_02_55b2__subScreen2_hook(GB *gb) {
 void inventoryMenuState1_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = W8(wPaletteThread_mode);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
-  CYC(b_+4, b_+5);
-  CYC(b_+5, b_+8); A = W8(wKeysJustPressed);
-  CYC(b_+8, b_+10); alu_bit(gb, 3, A);
-  if (!(F & FZ)) { CYCT(b_+10, b_+13); closeMenu_hook(gb); return; }
-  CYC(b_+10, b_+13);
-  CYC(b_+13, b_+15); alu_bit(gb, 2, A);
-  CYC(b_+15, b_+17); A = 0x03;
-  if (!(F & FZ)) { CYCT(b_+17, b_+19); inventoryMenuState1__func_02_5606_hook(gb); return; }
-  CYC(b_+17, b_+19);
-  CYC(b_+19, b_+22); A = W8(wInventorySubmenu);
-  CYC(b_+22, b_+23); push_effect(gb, b_+23);
+  CYC(b_+O(0), b_+OE(3)); A = W8(wPaletteThread_mode);
+  CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(4), b_+OE(5)); ret_effect(gb); return; }
+  CYC(b_+O(4), b_+OE(5));
+  CYC(b_+O(5), b_+OE(8)); A = W8(wKeysJustPressed);
+  CYC(b_+O(8), b_+OE(10)); alu_bit(gb, 3, A);
+  if (!(F & FZ)) { CYCT(b_+O(10), b_+OE(13)); closeMenu_hook(gb); return; }
+  CYC(b_+O(10), b_+OE(13));
+  CYC(b_+O(13), b_+OE(15)); alu_bit(gb, 2, A);
+  CYC(b_+O(15), b_+OE(17)); A = 0x03;
+  if (!(F & FZ)) { CYCT(b_+O(17), b_+OE(19)); inventoryMenuState1__func_02_5606_hook(gb); return; }
+  CYC(b_+O(17), b_+OE(19));
+  CYC(b_+O(19), b_+OE(22)); A = W8(wInventorySubmenu);
+  CYC(b_+O(22), b_+OE(23)); push_effect(gb, b_+OE(23));
   do { uint16_t jt_ = (function_caller_jump_table(gb));
-    if (jt_ == b_+36) { inventoryMenuState1__subscreen0_hook(gb); return; }
-    else if (jt_ == b_+217) { inventoryMenuState1__subscreen1_hook(gb); return; }
-    else if (jt_ == b_+274) { inventoryMenuState1__subscreen2_hook(gb); return; }
+    if (jt_ == b_+O(36)) { inventoryMenuState1__subscreen0_hook(gb); return; }
+    else if (jt_ == b_+O(217)) { inventoryMenuState1__subscreen1_hook(gb); return; }
+    else if (jt_ == b_+O(274)) { inventoryMenuState1__subscreen2_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
 
 void inventoryMenuState1__func_02_5606_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+29, b_+32); SET_HL(wMenuActiveState);
-  CYC(b_+32, b_+33); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+33, b_+35); mem_wr(gb, HL, 0);
-  CYC(b_+35, b_+36); ret_effect(gb);
+  CYC(b_+O(29), b_+OE(32)); SET_HL(wMenuActiveState);
+  CYC(b_+O(32), b_+OE(33)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(33), b_+OE(35)); mem_wr(gb, HL, 0);
+  CYC(b_+O(35), b_+OE(36)); ret_effect(gb);
 }
 
 void inventoryMenuState1__subscreen0_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+36, b_+39); A = W8(wKeysJustPressed);
-  CYC(b_+39, b_+40); C = A;
-  CYC(b_+40, b_+42); A = (uint8_t)wInventoryB;
-  CYC(b_+42, b_+44); alu_bit(gb, 1, C);
-  if (!(F & FZ)) { CYCT(b_+44, b_+46); inventoryMenuState1__aOrB_hook(gb); return; }
-  CYC(b_+44, b_+46);
-  CYC(b_+46, b_+47); A = alu_inc8(gb, A);
-  CYC(b_+47, b_+49); alu_bit(gb, 0, C);
-  if (!(F & FZ)) { CYCT(b_+49, b_+51); inventoryMenuState1__aOrB_hook(gb); return; }
-  CYC(b_+49, b_+51);
-  CALL_C(b_+51, inventorySubscreen0CheckDirectionButtons_hook, SYM(inventorySubscreen0CheckDirectionButtons), b_+54);
-  CYC(b_+54, b_+57); A = W8(wInventorySubmenu0CursorPos);
-  CYC(b_+57, b_+60); SET_HL(wInventoryStorage);
-  CYC(b_+60, b_+61); push_effect(gb, b_+61); add_a_to_hl(gb);
-  CYC(b_+61, b_+62); A = mem_rd(gb, HL);
-  CALL_C(b_+62, loadTreasureDisplayData_b00_hook, SYM(loadTreasureDisplayData_b00), b_+65);
-  CYC(b_+65, b_+67); A = 0x06;
-  CYC(b_+67, b_+68); push_effect(gb, b_+68); add_a_to_hl(gb);
-  CYC(b_+68, b_+69); A = mem_rd(gb, HL);
-  CALL_C(b_+69, showItemText2_hook, SYM(showItemText2), b_+72);
-  CYC(b_+72, b_+75); TAIL(inventorySubscreen0_drawCursor);
+  CYC(b_+O(36), b_+OE(39)); A = W8(wKeysJustPressed);
+  CYC(b_+O(39), b_+OE(40)); C = A;
+  CYC(b_+O(40), b_+OE(42)); A = (uint8_t)wInventoryB;
+  CYC(b_+O(42), b_+OE(44)); alu_bit(gb, 1, C);
+  if (!(F & FZ)) { CYCT(b_+O(44), b_+OE(46)); inventoryMenuState1__aOrB_hook(gb); return; }
+  CYC(b_+O(44), b_+OE(46));
+  CYC(b_+O(46), b_+OE(47)); A = alu_inc8(gb, A);
+  CYC(b_+O(47), b_+OE(49)); alu_bit(gb, 0, C);
+  if (!(F & FZ)) { CYCT(b_+O(49), b_+OE(51)); inventoryMenuState1__aOrB_hook(gb); return; }
+  CYC(b_+O(49), b_+OE(51));
+  CALL_C(b_+O(51), inventorySubscreen0CheckDirectionButtons_hook, SYM(inventorySubscreen0CheckDirectionButtons), b_+OE(54));
+  CYC(b_+O(54), b_+OE(57)); A = W8(wInventorySubmenu0CursorPos);
+  CYC(b_+O(57), b_+OE(60)); SET_HL(wInventoryStorage);
+  CYC(b_+O(60), b_+OE(61)); push_effect(gb, b_+OE(61)); add_a_to_hl(gb);
+  CYC(b_+O(61), b_+OE(62)); A = mem_rd(gb, HL);
+  CALL_C(b_+O(62), loadTreasureDisplayData_b00_hook, SYM(loadTreasureDisplayData_b00), b_+OE(65));
+  CYC(b_+O(65), b_+OE(67)); A = 0x06;
+  CYC(b_+O(67), b_+OE(68)); push_effect(gb, b_+OE(68)); add_a_to_hl(gb);
+  CYC(b_+O(68), b_+OE(69)); A = mem_rd(gb, HL);
+  CALL_C(b_+O(69), showItemText2_hook, SYM(showItemText2), b_+OE(72));
+  CYC(b_+O(72), b_+OE(75)); TAIL(inventorySubscreen0_drawCursor);
 }
 
 void inventoryMenuState1__aOrB_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+75, b_+78); W8(wInventory_cbb6) = A;
-  CYC(b_+78, b_+81); A = W8(wInventorySubmenu0CursorPos);
-  CYC(b_+81, b_+84); SET_HL(wInventoryStorage);
-  CYC(b_+84, b_+85); push_effect(gb, b_+85); add_a_to_hl(gb);
-  CYC(b_+85, b_+86); A = mem_rd(gb, HL);
-  CYC(b_+86, b_+89); W8(wInventory_selectedItem) = A;
-  CYC(b_+89, b_+91); C = 0x1f;
-  CYC(b_+91, b_+93); alu_cp(gb, 0x19);
-  if (F & FZ) { CYCT(b_+93, b_+95); inventoryMenuState1__hasSubmenu_hook(gb); return; }
-  CYC(b_+93, b_+95);
-  CYC(b_+95, b_+97); alu_cp(gb, 0x0f);
-  if (F & FZ) { CYCT(b_+97, b_+99); inventoryMenuState1__hasSubmenu_hook(gb); return; }
-  CYC(b_+97, b_+99);
-  CYC(b_+99, b_+101); alu_cp(gb, 0x11);
-  if (!(F & FZ)) { CYCT(b_+101, b_+103); inventoryMenuState1__finalizeEquip_hook(gb); return; }
-  CYC(b_+101, b_+103);
-  CYC(b_+103, b_+105); C = 0xe0;
+  CYC(b_+O(75), b_+OE(78)); W8(wInventory_cbb6) = A;
+  CYC(b_+O(78), b_+OE(81)); A = W8(wInventorySubmenu0CursorPos);
+  CYC(b_+O(81), b_+OE(84)); SET_HL(wInventoryStorage);
+  CYC(b_+O(84), b_+OE(85)); push_effect(gb, b_+OE(85)); add_a_to_hl(gb);
+  CYC(b_+O(85), b_+OE(86)); A = mem_rd(gb, HL);
+  CYC(b_+O(86), b_+OE(89)); W8(wInventory_selectedItem) = A;
+  CYC(b_+O(89), b_+OE(91)); C = 0x1f;
+  CYC(b_+O(91), b_+OE(93)); alu_cp(gb, 0x19);
+  if (F & FZ) { CYCT(b_+O(93), b_+OE(95)); inventoryMenuState1__hasSubmenu_hook(gb); return; }
+  CYC(b_+O(93), b_+OE(95));
+  CYC(b_+O(95), b_+OE(97)); alu_cp(gb, GV(0x0f, 0x13));
+  if (!game_seasons) {
+    if (F & FZ) { CYCT(b_+97, b_+99); inventoryMenuState1__hasSubmenu_hook(gb); return; }
+    CYC(b_+97, b_+99);
+    CYC(b_+99, b_+101); alu_cp(gb, 0x11);
+  }
+  if (!(F & FZ)) { CYCT(b_+O(101), b_+OE(103)); inventoryMenuState1__finalizeEquip_hook(gb); return; }
+  CYC(b_+O(101), b_+OE(103));
+  if (!game_seasons) { CYC(b_+103, b_+105); C = 0xe0; }
   TAIL(inventoryMenuState1__hasSubmenu);
 }
 
 void inventoryMenuState1__hasSubmenu_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+105, b_+108); A = mem_rd(gb, wObtainedTreasureFlags + 4);
-  CYC(b_+108, b_+109); alu_and(gb, C);
-  CALL_C(b_+109, getNumSetBits_hook, SYM(getNumSetBits), b_+112);
-  CYC(b_+112, b_+115); W8(wInventory_cbb8) = A;
-  CYC(b_+115, b_+117); alu_cp(gb, 0x02);
-  CYC(b_+117, b_+119); A = 0x02;
-  if (!(F & FC)) { CYCT(b_+119, b_+122); inventoryMenuState1__func_02_5606_hook(gb); return; }
-  CYC(b_+119, b_+122);
+  CYC(b_+O(105), b_+OE(108)); A = mem_rd(gb, wObtainedTreasureFlags + 4);
+  CYC(b_+O(108), b_+OE(109)); alu_and(gb, C);
+  CALL_C(b_+O(109), getNumSetBits_hook, SYM(getNumSetBits), b_+OE(112));
+  CYC(b_+O(112), b_+OE(115)); W8(wInventory_cbb8) = A;
+  CYC(b_+O(115), b_+OE(117)); alu_cp(gb, 0x02);
+  CYC(b_+O(117), b_+OE(119)); A = 0x02;
+  if (!(F & FC)) { CYCT(b_+O(119), b_+OE(122)); inventoryMenuState1__func_02_5606_hook(gb); return; }
+  CYC(b_+O(119), b_+OE(122));
   TAIL(inventoryMenuState1__finalizeEquip);
 }
 
 void inventoryMenuState1__finalizeEquip_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+122, inventoryMenuState1__equipItem_hook, b_+144, b_+125);
-  CALL_C(b_+125, inventorySubscreen0_drawStoredItems_hook, SYM(inventorySubscreen0_drawStoredItems), b_+128);
-  CALL_C(b_+128, inventorySubscreen0_drawCursor_hook, SYM(inventorySubscreen0_drawCursor), b_+131);
-  CYC(b_+131, b_+133); A = 0x56;
-  CALL_C(b_+133, playSound_b00_hook, SYM(playSound_b00), b_+136);
-  CYC(b_+136, b_+138); A = 0x01;
-  CALL_C(b_+138, inventoryMenuState1__func_02_5606_hook, b_+29, b_+141);
-  CYC(b_+141, b_+144); TAIL(func_02_55b2);
+  CALL_C(b_+O(122), inventoryMenuState1__equipItem_hook, b_+O(144), b_+OE(125));
+  CALL_C(b_+O(125), inventorySubscreen0_drawStoredItems_hook, SYM(inventorySubscreen0_drawStoredItems), b_+OE(128));
+  CALL_C(b_+O(128), inventorySubscreen0_drawCursor_hook, SYM(inventorySubscreen0_drawCursor), b_+OE(131));
+  CYC(b_+O(131), b_+OE(133)); A = 0x56;
+  CALL_C(b_+O(133), playSound_b00_hook, SYM(playSound_b00), b_+OE(136));
+  CYC(b_+O(136), b_+OE(138)); A = 0x01;
+  CALL_C(b_+O(138), inventoryMenuState1__func_02_5606_hook, b_+O(29), b_+OE(141));
+  CYC(b_+O(141), b_+OE(144)); TAIL(func_02_55b2);
 }
 
 void inventoryMenuState1__equipItem_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+144, b_+146); D = (uint8_t)(wInventoryStorage >> 8);
-  CYC(b_+146, b_+147); H = D;
-  CYC(b_+147, b_+150); A = W8(wInventory_cbb6);
-  CYC(b_+150, b_+151); E = A;
-  CYC(b_+151, b_+154); A = W8(wInventorySubmenu0CursorPos);
-  CYC(b_+154, b_+156); alu_add(gb, (uint8_t)wInventoryStorage);
-  CYC(b_+156, b_+157); L = A;
-  CYC(b_+157, b_+159); B = 0x0c;
-  CYC(b_+159, b_+160); A = mem_rd(gb, HL);
-  CYC(b_+160, b_+161); alu_cp(gb, B);
-  if (F & FZ) { CYCT(b_+161, b_+163); inventoryMenuState1__equipItem__equipBiggoron_hook(gb); return; }
-  CYC(b_+161, b_+163);
-  CYC(b_+163, b_+164); A = mem_rd(gb, DE);
-  CYC(b_+164, b_+165); alu_cp(gb, B);
-  if (!(F & FZ)) { CYCT(b_+165, b_+167); inventoryMenuState1__equipItem__swapItems_hook(gb); return; }
-  CYC(b_+165, b_+167);
+  CYC(b_+O(144), b_+OE(146)); D = (uint8_t)(wInventoryStorage >> 8);
+  CYC(b_+O(146), b_+OE(147)); H = D;
+  CYC(b_+O(147), b_+OE(150)); A = W8(wInventory_cbb6);
+  CYC(b_+O(150), b_+OE(151)); E = A;
+  CYC(b_+O(151), b_+OE(154)); A = W8(wInventorySubmenu0CursorPos);
+  CYC(b_+O(154), b_+OE(156)); alu_add(gb, (uint8_t)wInventoryStorage);
+  CYC(b_+O(156), b_+OE(157)); L = A;
+  CYC(b_+O(157), b_+OE(159)); B = 0x0c;
+  CYC(b_+O(159), b_+OE(160)); A = mem_rd(gb, HL);
+  CYC(b_+O(160), b_+OE(161)); alu_cp(gb, B);
+  if (F & FZ) { CYCT(b_+O(161), b_+OE(163)); inventoryMenuState1__equipItem__equipBiggoron_hook(gb); return; }
+  CYC(b_+O(161), b_+OE(163));
+  CYC(b_+O(163), b_+OE(164)); A = mem_rd(gb, DE);
+  CYC(b_+O(164), b_+OE(165)); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(b_+O(165), b_+OE(167)); inventoryMenuState1__equipItem__swapItems_hook(gb); return; }
+  CYC(b_+O(165), b_+OE(167));
   TAIL(inventoryMenuState1__equipItem__unequipBiggoron);
 }
 
 void inventoryMenuState1__equipItem__unequipBiggoron_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+167, b_+168); C = L;
-  CYC(b_+168, b_+170); L = (uint8_t)wInventoryB;
-  CYC(b_+170, b_+171); alu_xor(gb, A);
-  CYC(b_+171, b_+172); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+172, b_+173); mem_wr(gb, HL, A);
-  CYC(b_+173, b_+174); L = C;
-  CYC(b_+174, b_+175); A = B;
-  CYC(b_+175, b_+176); mem_wr(gb, DE, A);
+  CYC(b_+O(167), b_+OE(168)); C = L;
+  CYC(b_+O(168), b_+OE(170)); L = (uint8_t)wInventoryB;
+  CYC(b_+O(170), b_+OE(171)); alu_xor(gb, A);
+  CYC(b_+O(171), b_+OE(172)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(172), b_+OE(173)); mem_wr(gb, HL, A);
+  CYC(b_+O(173), b_+OE(174)); L = C;
+  CYC(b_+O(174), b_+OE(175)); A = B;
+  CYC(b_+O(175), b_+OE(176)); mem_wr(gb, DE, A);
   TAIL(inventoryMenuState1__equipItem__swapItems);
 }
 
 void inventoryMenuState1__equipItem__swapItems_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+176, b_+177); A = mem_rd(gb, DE);
-  CYC(b_+177, b_+178); C = A;
-  CYC(b_+178, b_+179); A = mem_rd(gb, HL);
-  CYC(b_+179, b_+180); mem_wr(gb, DE, A);
-  CYC(b_+180, b_+181); mem_wr(gb, HL, C);
-  CYC(b_+181, b_+182); ret_effect(gb);
+  CYC(b_+O(176), b_+OE(177)); A = mem_rd(gb, DE);
+  CYC(b_+O(177), b_+OE(178)); C = A;
+  CYC(b_+O(178), b_+OE(179)); A = mem_rd(gb, HL);
+  CYC(b_+O(179), b_+OE(180)); mem_wr(gb, DE, A);
+  CYC(b_+O(180), b_+OE(181)); mem_wr(gb, HL, C);
+  CYC(b_+O(181), b_+OE(182)); ret_effect(gb);
 }
 
 void inventoryMenuState1__equipItem__equipBiggoron_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+182, b_+184); mem_wr(gb, HL, 0);
-  CALL_C(b_+184, inventoryMenuState1__equipItem__swapItems_hook, b_+176, b_+187);
-  CYC(b_+187, b_+190); A = W8(wInventoryB);
-  CALL_C(b_+190, inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook, b_+205, b_+193);
-  CYC(b_+193, b_+196); A = W8(wInventoryA);
-  CALL_C(b_+196, inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook, b_+205, b_+199);
-  CYC(b_+199, b_+201); L = (uint8_t)wInventoryB;
-  CYC(b_+201, b_+202); mem_wr(gb, HL, B);
-  CYC(b_+202, b_+203); L = alu_inc8(gb, L);
-  CYC(b_+203, b_+204); mem_wr(gb, HL, B);
-  CYC(b_+204, b_+205); ret_effect(gb);
+  CYC(b_+O(182), b_+OE(184)); mem_wr(gb, HL, 0);
+  CALL_C(b_+O(184), inventoryMenuState1__equipItem__swapItems_hook, b_+O(176), b_+OE(187));
+  CYC(b_+O(187), b_+OE(190)); A = W8(wInventoryB);
+  CALL_C(b_+O(190), inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook, b_+O(205), b_+OE(193));
+  CYC(b_+O(193), b_+OE(196)); A = W8(wInventoryA);
+  CALL_C(b_+O(196), inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook, b_+O(205), b_+OE(199));
+  CYC(b_+O(199), b_+OE(201)); L = (uint8_t)wInventoryB;
+  CYC(b_+O(201), b_+OE(202)); mem_wr(gb, HL, B);
+  CYC(b_+O(202), b_+OE(203)); L = alu_inc8(gb, L);
+  CYC(b_+O(203), b_+OE(204)); mem_wr(gb, HL, B);
+  CYC(b_+O(204), b_+OE(205)); ret_effect(gb);
 }
 
 void inventoryMenuState1__equipItem__putItemInFirstBlankSlot_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+205, b_+206); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+206, b_+207); ret_effect(gb); return; }
-  CYC(b_+206, b_+207);
-  CYC(b_+207, b_+208); C = A;
-  CYC(b_+208, b_+210); L = (uint8_t)wInventoryStorage;
+  CYC(b_+O(205), b_+OE(206)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(206), b_+OE(207)); ret_effect(gb); return; }
+  CYC(b_+O(206), b_+OE(207));
+  CYC(b_+O(207), b_+OE(208)); C = A;
+  CYC(b_+O(208), b_+OE(210)); L = (uint8_t)wInventoryStorage;
   do {
-    CYC(b_+210, b_+211); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+211, b_+212); alu_or(gb, A);
-    if (!(F & FZ)) CYCT(b_+212, b_+214); else CYC(b_+212, b_+214);
+    CYC(b_+O(210), b_+OE(211)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(211), b_+OE(212)); alu_or(gb, A);
+    if (!(F & FZ)) CYCT(b_+O(212), b_+OE(214)); else CYC(b_+O(212), b_+OE(214));
   } while (!(F & FZ));
-  CYC(b_+214, b_+215); L = alu_dec8(gb, L);
-  CYC(b_+215, b_+216); mem_wr(gb, HL, C);
-  CYC(b_+216, b_+217); ret_effect(gb);
+  CYC(b_+O(214), b_+OE(215)); L = alu_dec8(gb, L);
+  CYC(b_+O(215), b_+OE(216)); mem_wr(gb, HL, C);
+  CYC(b_+O(216), b_+OE(217)); ret_effect(gb);
 }
 
 void inventoryMenuState1__subscreen1_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+217, b_+220); A = W8(wKeysJustPressed);
-  CYC(b_+220, b_+222); alu_bit(gb, 0, A);
+  CYC(b_+O(217), b_+OE(220)); A = W8(wKeysJustPressed);
+  CYC(b_+O(220), b_+OE(222)); alu_bit(gb, 0, A);
   if (!(F & FZ)) {
-    CYCT(b_+222, b_+224);
-    CALL_C(b_+229, inventoryMenuState1__checkEquipRing_hook, b_+244, b_+232);
+    CYCT(b_+O(222), b_+OE(224));
+    CALL_C(b_+O(229), inventoryMenuState1__checkEquipRing_hook, b_+O(244), b_+OE(232));
   } else {
-    CYC(b_+222, b_+224);
-    CALL_C(b_+224, inventorySubmenu1CheckDirectionButtons_hook, SYM(inventorySubmenu1CheckDirectionButtons), b_+227);
-    CYC(b_+227, b_+229);
+    CYC(b_+O(222), b_+OE(224));
+    CALL_C(b_+O(224), inventorySubmenu1CheckDirectionButtons_hook, SYM(inventorySubmenu1CheckDirectionButtons), b_+OE(227));
+    CYC(b_+O(227), b_+OE(229));
   }
-  CALL_C(b_+232, inventorySubmenu1_drawCursor_hook, SYM(inventorySubmenu1_drawCursor), b_+235);
-  CYC(b_+235, b_+238); A = W8(wInventorySubmenu1CursorPos);
-  CALL_C(b_+238, showItemText1_hook, SYM(showItemText1), b_+241);
-  CYC(b_+241, b_+244); TAIL(drawEquippedSpriteForActiveRing);
+  CALL_C(b_+O(232), inventorySubmenu1_drawCursor_hook, SYM(inventorySubmenu1_drawCursor), b_+OE(235));
+  CYC(b_+O(235), b_+OE(238)); A = W8(wInventorySubmenu1CursorPos);
+  CALL_C(b_+O(238), showItemText1_hook, SYM(showItemText1), b_+OE(241));
+  CYC(b_+O(241), b_+OE(244)); TAIL(drawEquippedSpriteForActiveRing);
 }
 
 void inventoryMenuState1__checkEquipRing_hook(GB *gb) {
   BASE(inventoryMenuState1);
-  CYC(b_+244, b_+247); A = W8(wInventorySubmenu1CursorPos);
-  CYC(b_+247, b_+249); alu_sub(gb, 0x10);
-  if (F & FC) { CYCT(b_+249, b_+250); ret_effect(gb); return; }
-  CYC(b_+249, b_+250);
-  CYC(b_+250, b_+253); SET_HL(wActiveRing);
-  CYC(b_+253, b_+254); C = mem_rd(gb, HL);
-  CYC(b_+254, b_+256); L = (uint8_t)wRingBoxContents;
-  CYC(b_+256, b_+257); push_effect(gb, b_+257); add_a_to_hl(gb);
-  CYC(b_+257, b_+258); A = mem_rd(gb, HL);
-  CYC(b_+258, b_+259); alu_cp(gb, C);
-  if (!(F & FZ)) { CYCT(b_+259, b_+261); goto set_ring; }
-  CYC(b_+259, b_+261);
-  CYC(b_+261, b_+263); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(b_+263, b_+264); ret_effect(gb); return; }
-  CYC(b_+263, b_+264);
-  CYC(b_+264, b_+266); A = 0xff;
+  CYC(b_+O(244), b_+OE(247)); A = W8(wInventorySubmenu1CursorPos);
+  CYC(b_+O(247), b_+OE(249)); alu_sub(gb, 0x10);
+  if (F & FC) { CYCT(b_+O(249), b_+OE(250)); ret_effect(gb); return; }
+  CYC(b_+O(249), b_+OE(250));
+  if (game_seasons) {
+    CYC(b_+S(244), b_+S(245)); B = A;
+    CYC(b_+S(245), b_+S(248)); A = W8(wInBoxingMatch);
+    CYC(b_+S(248), b_+S(249)); alu_or(gb, A);
+    CYC(b_+S(249), b_+S(251)); A = 0x5a;
+    if (!(F & FZ)) { CYCT(b_+S(251), b_+S(254)); TAIL(playSound_b00); }
+    CYC(b_+S(251), b_+S(254));
+    CYC(b_+S(254), b_+S(255)); A = B;
+  }
+  CYC(b_+O(250), b_+OE(253)); SET_HL(wActiveRing);
+  CYC(b_+O(253), b_+OE(254)); C = mem_rd(gb, HL);
+  CYC(b_+O(254), b_+OE(256)); L = (uint8_t)wRingBoxContents;
+  CYC(b_+O(256), b_+OE(257)); push_effect(gb, b_+OE(257)); add_a_to_hl(gb);
+  CYC(b_+O(257), b_+OE(258)); A = mem_rd(gb, HL);
+  CYC(b_+O(258), b_+OE(259)); alu_cp(gb, C);
+  if (!(F & FZ)) { CYCT(b_+O(259), b_+OE(261)); goto set_ring; }
+  CYC(b_+O(259), b_+OE(261));
+  CYC(b_+O(261), b_+OE(263)); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+O(263), b_+OE(264)); ret_effect(gb); return; }
+  CYC(b_+O(263), b_+OE(264));
+  CYC(b_+O(264), b_+OE(266)); A = 0xff;
 set_ring:
-  CYC(b_+266, b_+269); W8(wActiveRing) = A;
-  CYC(b_+269, b_+271); A = 0x56;
-  CYC(b_+271, b_+274); TAIL(playSound_b00);
+  CYC(b_+O(266), b_+OE(269)); W8(wActiveRing) = A;
+  CYC(b_+O(269), b_+OE(271)); A = 0x56;
+  CYC(b_+O(271), b_+OE(274)); TAIL(playSound_b00);
 }
 
 void inventoryMenuState1__subscreen2_hook(GB *gb) {
   BASE(inventoryMenuState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+274, b_+277); A = W8(wKeysJustPressed);
-  CYC(b_+277, b_+279); alu_and(gb, 0x01);
-  if (F & FZ) { CYCT(b_+279, b_+281); goto check_direction; }
-  CYC(b_+279, b_+281);
-  CYC(b_+281, b_+284); A = W8(wInventorySubmenu2CursorPos);
-  CYC(b_+284, b_+285); alu_rlca(gb);
-  if (!(F & FC)) { CYCT(b_+285, b_+287); goto check_direction; }
-  CYC(b_+285, b_+287);
-  CYC(b_+287, b_+290); A = W8(wInventory_submenu2CursorPos2);
-  CYC(b_+290, b_+292); alu_cp(gb, 0x02);
-  if (!(F & FZ)) { CYCT(b_+292, b_+294); goto check_direction; }
-  CYC(b_+292, b_+294);
-  CYC(b_+294, b_+295); A = alu_inc8(gb, A);
-  CYC(b_+295, b_+298); W8(wOpenedMenuType) = A;
-  CYC(b_+298, b_+300); A = 0x56;
-  CALL_C(b_+300, playSound_b00_hook, SYM(playSound_b00), b_+303);
-  CYC(b_+303, b_+306); SET_HL(wInventory);
-  CYC(b_+306, b_+308); B = 0x10;
-  CYC(b_+308, b_+311); clearMemory_hook(gb);
+  CYC(b_+O(274), b_+OE(277)); A = W8(wKeysJustPressed);
+  CYC(b_+O(277), b_+OE(279)); alu_and(gb, 0x01);
+  if (F & FZ) { CYCT(b_+O(279), b_+OE(281)); goto check_direction; }
+  CYC(b_+O(279), b_+OE(281));
+  CYC(b_+O(281), b_+OE(284)); A = W8(wInventorySubmenu2CursorPos);
+  CYC(b_+O(284), b_+OE(285)); alu_rlca(gb);
+  if (!(F & FC)) { CYCT(b_+O(285), b_+OE(287)); goto check_direction; }
+  CYC(b_+O(285), b_+OE(287));
+  CYC(b_+O(287), b_+OE(290)); A = W8(wInventory_submenu2CursorPos2);
+  CYC(b_+O(290), b_+OE(292)); alu_cp(gb, 0x02);
+  if (!(F & FZ)) { CYCT(b_+O(292), b_+OE(294)); goto check_direction; }
+  CYC(b_+O(292), b_+OE(294));
+  CYC(b_+O(294), b_+OE(295)); A = alu_inc8(gb, A);
+  CYC(b_+O(295), b_+OE(298)); W8(wOpenedMenuType) = A;
+  CYC(b_+O(298), b_+OE(300)); A = 0x56;
+  CALL_C(b_+O(300), playSound_b00_hook, SYM(playSound_b00), b_+OE(303));
+  CYC(b_+O(303), b_+OE(306)); SET_HL(wInventory);
+  CYC(b_+O(306), b_+OE(308)); B = 0x10;
+  CYC(b_+O(308), b_+OE(311)); clearMemory_hook(gb);
   return;
 check_direction:
-  CALL_C(b_+311, inventorySubmenu2CheckDirectionButtons_hook, SYM(inventorySubmenu2CheckDirectionButtons), b_+314);
-  CYC(b_+314, b_+317); A = W8(wInventorySubmenu2CursorPos);
-  CYC(b_+317, b_+319); alu_bit(gb, 7, A);
-  if (F & FZ) CYCT(b_+319, b_+321);
+  CALL_C(b_+O(311), inventorySubmenu2CheckDirectionButtons_hook, SYM(inventorySubmenu2CheckDirectionButtons), b_+OE(314));
+  CYC(b_+O(314), b_+OE(317)); A = W8(wInventorySubmenu2CursorPos);
+  CYC(b_+O(317), b_+OE(319)); alu_bit(gb, 7, A);
+  if (F & FZ) CYCT(b_+O(319), b_+OE(321));
   else {
-    CYC(b_+319, b_+321);
-    CYC(b_+321, b_+324); A = W8(wInventory_submenu2CursorPos2);
-    CYC(b_+324, b_+326); alu_add(gb, 0x08);
+    CYC(b_+O(319), b_+OE(321));
+    CYC(b_+O(321), b_+OE(324)); A = W8(wInventory_submenu2CursorPos2);
+    CYC(b_+O(324), b_+OE(326)); alu_add(gb, 0x08);
   }
-  CALL_C(b_+326, showItemText1_hook, SYM(showItemText1), b_+329);
-  CYC(b_+329, b_+332); TAIL(inventorySubmenu2_drawCursor);
+  CALL_C(b_+O(326), showItemText1_hook, SYM(showItemText1), b_+OE(329));
+  CYC(b_+O(329), b_+OE(332)); TAIL(inventorySubmenu2_drawCursor);
 }
 
 void runRingMenu_hook(GB *gb) {
@@ -8901,56 +8943,70 @@ result:
 void inventorySubmenu2CheckDirectionButtons_hook(GB *gb) {
   BASE(inventorySubmenu2CheckDirectionButtons);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(b_+44);
-  CALL_C(b_+3, getDirectionButtonOffsetFromHl_hook, SYM(getDirectionButtonOffsetFromHl), b_+6);
-  if (!(F & FC)) { CYCT(b_+6, b_+7); ret_effect(gb); return; }
-  CYC(b_+6, b_+7); CYC(b_+7, b_+10); SET_HL(wInventorySubmenu2CursorPos);
-  CYC(b_+10, b_+11); C = A;
-  CYC(b_+11, b_+13); alu_cp(gb, 0x80);
-  if (!(F & FZ)) { CYCT(b_+13, b_+15); inventorySubmenu2CheckDirectionButtons__upOrDown_hook(gb); return; }
-  CYC(b_+13, b_+15); TAIL(inventorySubmenu2CheckDirectionButtons__leftOrRight);
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(2)); E = 0x80;
+    CALL_C(b_+S(2), s_checkWhetherToDisplaySeasonInSubscreen_hook, SYM(checkWhetherToDisplaySeasonInSubscreen), b_+S(5));
+    if (F & FZ) CYCT(b_+S(5), b_+S(7));
+    else {
+      CYC(b_+S(5), b_+S(7));
+      CYC(b_+S(7), b_+S(9)); E = 0;
+    }
+  }
+  CYC(b_+O(0), b_+OE(3)); SET_HL(b_+O(44));
+  CALL_C(b_+O(3), getDirectionButtonOffsetFromHl_hook, SYM(getDirectionButtonOffsetFromHl), b_+OE(6));
+  if (!(F & FC)) { CYCT(b_+O(6), b_+OE(7)); ret_effect(gb); return; }
+  CYC(b_+O(6), b_+OE(7)); CYC(b_+O(7), b_+OE(10)); SET_HL(wInventorySubmenu2CursorPos);
+  CYC(b_+O(10), b_+OE(11)); C = A;
+  CYC(b_+O(11), b_+OE(13)); alu_cp(gb, 0x80);
+  if (!(F & FZ)) { CYCT(b_+O(13), b_+OE(15)); inventorySubmenu2CheckDirectionButtons__upOrDown_hook(gb); return; }
+  CYC(b_+O(13), b_+OE(15)); TAIL(inventorySubmenu2CheckDirectionButtons__leftOrRight);
 }
 
 void inventorySubmenu2CheckDirectionButtons__leftOrRight_hook(GB *gb) {
   BASE(inventorySubmenu2CheckDirectionButtons);
-  CYC(b_+15, b_+16); alu_xor(gb, mem_rd(gb, HL));
-  CYC(b_+16, b_+18);
-  CYC(b_+38, b_+39); mem_wr(gb, HL, A);
-  CYC(b_+39, b_+41); A = 0x84;
-  CYC(b_+41, b_+44); TAIL(playSound_b00);
+  CYC(b_+O(15), b_+OE(16)); alu_xor(gb, mem_rd(gb, HL));
+  CYC(b_+O(16), b_+OE(18));
+  CYC(b_+O(38), b_+OE(39)); mem_wr(gb, HL, A);
+  CYC(b_+O(39), b_+OE(41)); A = 0x84;
+  CYC(b_+O(41), b_+OE(44)); TAIL(playSound_b00);
 }
 
 void inventorySubmenu2CheckDirectionButtons__upOrDown_hook(GB *gb) {
   BASE(inventorySubmenu2CheckDirectionButtons);
-  CYC(b_+18, b_+20); alu_bit(gb, 7, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+20, b_+22); inventorySubmenu2CheckDirectionButtons__upOrDown__leftSide_hook(gb); return; }
-  CYC(b_+20, b_+22); TAIL(inventorySubmenu2CheckDirectionButtons__upOrDown__rightSide);
+  CYC(b_+O(18), b_+OE(20)); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(20), b_+OE(22)); inventorySubmenu2CheckDirectionButtons__upOrDown__leftSide_hook(gb); return; }
+  CYC(b_+O(20), b_+OE(22)); TAIL(inventorySubmenu2CheckDirectionButtons__upOrDown__rightSide);
 }
 
 void inventorySubmenu2CheckDirectionButtons__upOrDown__rightSide_hook(GB *gb) {
   BASE(inventorySubmenu2CheckDirectionButtons);
-  CYC(b_+22, b_+25); SET_HL(wInventory_submenu2CursorPos2);
-  CYC(b_+25, b_+26); A = mem_rd(gb, HL);
+  CYC(b_+O(22), b_+OE(25)); SET_HL(wInventory_submenu2CursorPos2);
+  CYC(b_+O(25), b_+OE(26)); A = mem_rd(gb, HL);
   do {
-    CYC(b_+26, b_+27); alu_add(gb, C);
-    CYC(b_+27, b_+29); alu_and(gb, 3);
-    CYC(b_+29, b_+31); alu_cp(gb, 3);
-    if (!(F & FC)) { CYCT(b_+31, b_+33); continue; }
-    CYC(b_+31, b_+33); break;
+    CYC(b_+O(26), b_+OE(27)); alu_add(gb, C);
+    CYC(b_+O(27), b_+OE(29)); alu_and(gb, 3);
+    if (game_seasons) {
+      CYC(b_+S(38), b_+S(39)); alu_cp(gb, E);
+      if (F & FZ) { CYCT(b_+S(39), b_+S(41)); continue; }
+      CYC(b_+S(39), b_+S(41));
+    }
+    CYC(b_+O(29), b_+OE(31)); alu_cp(gb, 3);
+    if (!(F & FC)) { CYCT(b_+O(31), b_+OE(33)); continue; }
+    CYC(b_+O(31), b_+OE(33)); break;
   } while (true);
-  CYC(b_+33, b_+35);
-  CYC(b_+38, b_+39); mem_wr(gb, HL, A);
-  CYC(b_+39, b_+41); A = 0x84;
-  CYC(b_+41, b_+44); TAIL(playSound_b00);
+  CYC(b_+O(33), b_+OE(35));
+  CYC(b_+O(38), b_+OE(39)); mem_wr(gb, HL, A);
+  CYC(b_+O(39), b_+OE(41)); A = 0x84;
+  CYC(b_+O(41), b_+OE(44)); TAIL(playSound_b00);
 }
 
 void inventorySubmenu2CheckDirectionButtons__upOrDown__leftSide_hook(GB *gb) {
   BASE(inventorySubmenu2CheckDirectionButtons);
-  CYC(b_+35, b_+36); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+36, b_+38); alu_and(gb, 7);
-  CYC(b_+38, b_+39); mem_wr(gb, HL, A);
-  CYC(b_+39, b_+41); A = 0x84;
-  CYC(b_+41, b_+44); TAIL(playSound_b00);
+  CYC(b_+O(35), b_+OE(36)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+O(36), b_+OE(38)); alu_and(gb, 7);
+  CYC(b_+O(38), b_+OE(39)); mem_wr(gb, HL, A);
+  CYC(b_+O(39), b_+OE(41)); A = 0x84;
+  CYC(b_+O(41), b_+OE(44)); TAIL(playSound_b00);
 }
 
 void func_02_5938_hook(GB *gb) {
@@ -9063,102 +9119,109 @@ draw:
 void func_02_5a35_hook(GB *gb) {
   BASE(func_02_5a35);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_DE(0x0500);
-  CALL_C(b_+3, cpInventorySelectedItemToHarp_hook, SYM(cpInventorySelectedItemToHarp), b_+6);
-  if (!(F & FZ)) { CYCT(b_+6, b_+8); goto selected; }
-  CYC(b_+6, b_+8);
-  CYC(b_+8, b_+11); SET_DE(0x0305);
-selected:
-  CYC(b_+11, b_+12); B = D;
-  CYC(b_+12, b_+14); D = 0;
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(3)); SET_DE(0x0500);
+  } else {
+    CYC(b_+0, b_+3); SET_DE(0x0500);
+    CALL_C(b_+3, cpInventorySelectedItemToHarp_hook, SYM(cpInventorySelectedItemToHarp), b_+6);
+    if (!(F & FZ)) CYCT(b_+6, b_+8);
+    else {
+      CYC(b_+6, b_+8);
+      CYC(b_+8, b_+11); SET_DE(0x0305);
+    }
+  }
+  CYC(b_+O(11), b_+OE(12)); B = D;
+  CYC(b_+O(12), b_+OE(14)); D = 0;
   TAIL(func_02_5a35__next);
 }
 
 void func_02_5a35__next_hook(GB *gb) {
   BASE(func_02_5a35);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+14, b_+15); push_effect(gb, BC);
-  CYC(b_+15, b_+16); A = E;
-  CYC(b_+16, b_+19); SET_HL(wObtainedTreasureFlags + 4);
-  CALL_C(b_+19, checkFlag_hook, SYM(checkFlag), b_+22);
+  CYC(b_+O(14), b_+OE(15)); push_effect(gb, BC);
+  CYC(b_+O(15), b_+OE(16)); A = E;
+  CYC(b_+O(16), b_+OE(19)); SET_HL(wObtainedTreasureFlags + 4);
+  CALL_C(b_+O(19), checkFlag_hook, SYM(checkFlag), b_+OE(22));
   if (F & FZ) {
-    CYCT(b_+22, b_+24);
+    CYCT(b_+O(22), b_+OE(24));
     TAIL(func_02_5a35__dontHaveSubItem);
   }
-  CYC(b_+22, b_+24);
-  CYC(b_+24, b_+25); push_effect(gb, DE);
-  CYC(b_+25, b_+26); A = D;
-  CALL_C(b_+26, func_02_5afc_hook, SYM(func_02_5afc), b_+29);
-  CYC(b_+29, b_+30); A = E;
-  CYC(b_+30, b_+33); SET_HL(SYM(seedAndHarpSpriteTable));
-  CYC(b_+33, b_+34); push_effect(gb, b_+34); add_a_to_hl(gb);
-  CYC(b_+34, b_+35); A = mem_rd(gb, HL);
-  CYC(b_+35, b_+36); push_effect(gb, b_+36); add_a_to_hl(gb);
-  CALL_C(b_+36, addSpritesToOam_withOffset_hook, SYM(addSpritesToOam_withOffset), b_+39);
-  CYC(b_+39, b_+40); SET_DE(pop_effect(gb));
-  CYC(b_+40, b_+41); A = E;
-  CYC(b_+41, b_+43); alu_cp(gb, 0x05);
-  if (!(F & FC)) {
-    CYCT(b_+43, b_+45);
-    TAIL(func_02_5a35__seedOnlyCodeDone);
+  CYC(b_+O(22), b_+OE(24));
+  CYC(b_+O(24), b_+OE(25)); push_effect(gb, DE);
+  CYC(b_+O(25), b_+OE(26)); A = D;
+  CALL_C(b_+O(26), func_02_5afc_hook, SYM(func_02_5afc), b_+OE(29));
+  CYC(b_+O(29), b_+OE(30)); A = E;
+  CYC(b_+O(30), b_+OE(33)); SET_HL(SYM(seedAndHarpSpriteTable));
+  CYC(b_+O(33), b_+OE(34)); push_effect(gb, b_+OE(34)); add_a_to_hl(gb);
+  CYC(b_+O(34), b_+OE(35)); A = mem_rd(gb, HL);
+  CYC(b_+O(35), b_+OE(36)); push_effect(gb, b_+OE(36)); add_a_to_hl(gb);
+  CALL_C(b_+O(36), addSpritesToOam_withOffset_hook, SYM(addSpritesToOam_withOffset), b_+OE(39));
+  CYC(b_+O(39), b_+OE(40)); SET_DE(pop_effect(gb));
+  if (!game_seasons) {
+    CYC(b_+40, b_+41); A = E;
+    CYC(b_+41, b_+43); alu_cp(gb, 0x05);
+    if (!(F & FC)) {
+      CYCT(b_+43, b_+45);
+      TAIL(func_02_5a35__seedOnlyCodeDone);
+    }
+    CYC(b_+43, b_+45);
   }
-  CYC(b_+43, b_+45);
-  CYC(b_+45, b_+46); A = E;
-  CYC(b_+46, b_+49); SET_HL(wNumEmberSeeds);
-  CYC(b_+49, b_+50); push_effect(gb, b_+50); add_a_to_hl(gb);
-  CYC(b_+50, b_+51); B = mem_rd(gb, HL);
-  CYC(b_+51, b_+54); A = W8(wInventory_cbb8);
-  CYC(b_+54, b_+57); SET_HL((SYM(seedAndHarpSpriteTable__sprite7) + 5));
-  CYC(b_+57, b_+58); add_double_index_to_hl(gb, b_+58);
-  CYC(b_+58, b_+59); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+59, b_+60); H = mem_rd(gb, HL);
-  CYC(b_+60, b_+61); L = A;
-  CYC(b_+61, b_+62); A = D;
-  CYC(b_+62, b_+63); push_effect(gb, b_+63); add_a_to_hl(gb);
-  CYC(b_+63, b_+64); C = mem_rd(gb, HL);
-  CYC(b_+64, b_+67); SET_HL(w4TileMap + 0xc0);
-  CYC(b_+67, b_+70); A = W8(wInventorySubmenu0CursorPos);
-  CYC(b_+70, b_+72); alu_cp(gb, 0x08);
-  if (!(F & FC)) CYCT(b_+72, b_+74);
+  CYC(b_+O(45), b_+OE(46)); A = E;
+  CYC(b_+O(46), b_+OE(49)); SET_HL(wNumEmberSeeds);
+  CYC(b_+O(49), b_+OE(50)); push_effect(gb, b_+OE(50)); add_a_to_hl(gb);
+  CYC(b_+O(50), b_+OE(51)); B = mem_rd(gb, HL);
+  CYC(b_+O(51), b_+OE(54)); A = W8(wInventory_cbb8);
+  CYC(b_+O(54), b_+OE(57)); SET_HL(SYM(table_5ae5) - 4);
+  CYC(b_+O(57), b_+OE(58)); add_double_index_to_hl(gb, b_+O(58));
+  CYC(b_+O(58), b_+OE(59)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(59), b_+OE(60)); H = mem_rd(gb, HL);
+  CYC(b_+O(60), b_+OE(61)); L = A;
+  CYC(b_+O(61), b_+OE(62)); A = D;
+  CYC(b_+O(62), b_+OE(63)); push_effect(gb, b_+OE(63)); add_a_to_hl(gb);
+  CYC(b_+O(63), b_+OE(64)); C = mem_rd(gb, HL);
+  CYC(b_+O(64), b_+OE(67)); SET_HL(w4TileMap + 0xc0);
+  CYC(b_+O(67), b_+OE(70)); A = W8(wInventorySubmenu0CursorPos);
+  CYC(b_+O(70), b_+OE(72)); alu_cp(gb, 0x08);
+  if (!(F & FC)) CYCT(b_+O(72), b_+OE(74));
   else {
-    CYC(b_+72, b_+74);
-    CYC(b_+74, b_+77); SET_HL(w4TileMap + 0x160);
+    CYC(b_+O(72), b_+OE(74));
+    CYC(b_+O(74), b_+OE(77)); SET_HL(w4TileMap + 0x160);
   }
-  CYC(b_+77, b_+78); A = C;
-  CYC(b_+78, b_+79); push_effect(gb, b_+79); add_a_to_hl(gb);
-  CYC(b_+79, b_+80); A = B;
-  CYC(b_+80, b_+82); alu_and(gb, 0xf0);
-  CYC(b_+82, b_+84); A = alu_swap(gb, A);
-  CYC(b_+84, b_+86); alu_add(gb, 0x20);
-  CYC(b_+86, b_+87); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+87, b_+88); A = B;
-  CYC(b_+88, b_+90); alu_and(gb, 0x0f);
-  CYC(b_+90, b_+92); alu_add(gb, 0x20);
-  CYC(b_+92, b_+93); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(77), b_+OE(78)); A = C;
+  CYC(b_+O(78), b_+OE(79)); push_effect(gb, b_+OE(79)); add_a_to_hl(gb);
+  CYC(b_+O(79), b_+OE(80)); A = B;
+  CYC(b_+O(80), b_+OE(82)); alu_and(gb, 0xf0);
+  CYC(b_+O(82), b_+OE(84)); A = alu_swap(gb, A);
+  CYC(b_+O(84), b_+OE(86)); alu_add(gb, GV(0x20, 0x10));
+  CYC(b_+O(86), b_+OE(87)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(87), b_+OE(88)); A = B;
+  CYC(b_+O(88), b_+OE(90)); alu_and(gb, 0x0f);
+  CYC(b_+O(90), b_+OE(92)); alu_add(gb, GV(0x20, 0x10));
+  CYC(b_+O(92), b_+OE(93)); mem_wr(gb, HL, A); SET_HL(HL - 1);
   TAIL(func_02_5a35__seedOnlyCodeDone);
 }
 
 void func_02_5a35__seedOnlyCodeDone_hook(GB *gb) {
   BASE(func_02_5a35);
-  CYC(b_+93, b_+94); D = alu_inc8(gb, D);
+  CYC(b_+O(93), b_+OE(94)); D = alu_inc8(gb, D);
   TAIL(func_02_5a35__dontHaveSubItem);
 }
 
 void func_02_5a35__dontHaveSubItem_hook(GB *gb) {
   BASE(func_02_5a35);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+94, b_+95); E = alu_inc8(gb, E);
-  CYC(b_+95, b_+96); SET_BC(pop_effect(gb));
-  CYC(b_+96, b_+97); B = alu_dec8(gb, B);
+  CYC(b_+O(94), b_+OE(95)); E = alu_inc8(gb, E);
+  CYC(b_+O(95), b_+OE(96)); SET_BC(pop_effect(gb));
+  CYC(b_+O(96), b_+OE(97)); B = alu_dec8(gb, B);
   if (!(F & FZ)) {
-    CYCT(b_+97, b_+99);
+    CYCT(b_+O(97), b_+OE(99));
     TAIL(func_02_5a35__next);
   }
-  CYC(b_+97, b_+99);
-  CYC(b_+99, b_+102); A = W8(wTmpcbb5);
-  CALL_C(b_+102, func_02_5afc_hook, SYM(func_02_5afc), b_+105);
-  CYC(b_+105, b_+108); SET_HL(b_+111);
-  CYC(b_+108, b_+111); TAIL(addSpritesToOam_withOffset);
+  CYC(b_+O(97), b_+OE(99));
+  CYC(b_+O(99), b_+OE(102)); A = W8(wTmpcbb5);
+  CALL_C(b_+O(102), func_02_5afc_hook, SYM(func_02_5afc), b_+OE(105));
+  CYC(b_+O(105), b_+OE(108)); SET_HL(b_+O(111));
+  CYC(b_+O(108), b_+OE(111)); TAIL(addSpritesToOam_withOffset);
 }
 
 void cpInventorySelectedItemToHarp_hook(GB *gb) {
@@ -9435,67 +9498,67 @@ void inventorySubscreen1_drawTreasures__getAddressToDrawTreasureAt_hook(GB *gb) 
 void inventorySubscreen2_drawTreasures_hook(GB *gb) {
   BASE(inventorySubscreen2_drawTreasures);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(SYM(itemSubmenu2TextIndices));
-  CYC(b_+3, b_+6); SET_DE(w4SubscreenTextIndices);
-  CYC(b_+6, b_+8); B = 0x0b;
-  CALL_C(b_+8, copyMemory_hook, SYM(copyMemory), b_+11);
-  CYC(b_+11, b_+13); B = 0x08;
+  CYC(b_+O(0), b_+OE(3)); SET_HL(SYM(itemSubmenu2TextIndices));
+  CYC(b_+O(3), b_+OE(6)); SET_DE(w4SubscreenTextIndices);
+  CYC(b_+O(6), b_+OE(8)); B = 0x0b;
+  CALL_C(b_+O(8), copyMemory_hook, SYM(copyMemory), b_+OE(11));
+  CYC(b_+O(11), b_+OE(13)); B = 0x08;
   TAIL(inventorySubscreen2_drawTreasures__drawEssence);
 }
 
 void inventorySubscreen2_drawTreasures__drawEssence_hook(GB *gb) {
   BASE(inventorySubscreen2_drawTreasures);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+13, b_+14); A = B;
-  CYC(b_+14, b_+15); A = alu_dec8(gb, A);
-  CYC(b_+15, b_+18); SET_HL(wEssencesObtained);
-  CALL_C(b_+18, checkFlag_hook, SYM(checkFlag), b_+21);
+  CYC(b_+O(13), b_+OE(14)); A = B;
+  CYC(b_+O(14), b_+OE(15)); A = alu_dec8(gb, A);
+  CYC(b_+O(15), b_+OE(18)); SET_HL(wEssencesObtained);
+  CALL_C(b_+O(18), checkFlag_hook, SYM(checkFlag), b_+OE(21));
   if (!(F & FZ)) {
-    CYCT(b_+21, b_+23);
+    CYCT(b_+O(21), b_+OE(23));
     TAIL(inventorySubscreen2_drawTreasures__nextEssence);
   }
-  CYC(b_+21, b_+23);
-  CYC(b_+23, b_+24); push_effect(gb, BC);
-  CYC(b_+24, b_+25); A = B;
-  CYC(b_+25, b_+28); SET_HL(b_+117);
-  CYC(b_+28, b_+29); add_double_index_to_hl(gb, b_+29);
-  CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+30, b_+31); H = mem_rd(gb, HL);
-  CYC(b_+31, b_+32); L = A;
-  CYC(b_+32, b_+35); SET_BC(0x0202);
-  CYC(b_+35, b_+38); SET_DE(0x0007);
-  CALL_C(b_+38, fillRectangleInTilemap_hook, SYM(fillRectangleInTilemap), b_+41);
-  CYC(b_+41, b_+42); SET_BC(pop_effect(gb));
-  CYC(b_+42, b_+43); A = B;
-  CYC(b_+43, b_+46); SET_HL(w4SubscreenTextIndices - 1);
-  CYC(b_+46, b_+47); push_effect(gb, b_+47); add_a_to_hl(gb);
-  CYC(b_+47, b_+49); mem_wr(gb, HL, 0);
+  CYC(b_+O(21), b_+OE(23));
+  CYC(b_+O(23), b_+OE(24)); push_effect(gb, BC);
+  CYC(b_+O(24), b_+OE(25)); A = B;
+  CYC(b_+O(25), b_+OE(28)); SET_HL(SYM(itemSubmenu2EssencePositions) - 2);
+  CYC(b_+O(28), b_+OE(29)); add_double_index_to_hl(gb, b_+O(29));
+  CYC(b_+O(29), b_+OE(30)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(30), b_+OE(31)); H = mem_rd(gb, HL);
+  CYC(b_+O(31), b_+OE(32)); L = A;
+  CYC(b_+O(32), b_+OE(35)); SET_BC(0x0202);
+  CYC(b_+O(35), b_+OE(38)); SET_DE(0x0007);
+  CALL_C(b_+O(38), fillRectangleInTilemap_hook, SYM(fillRectangleInTilemap), b_+OE(41));
+  CYC(b_+O(41), b_+OE(42)); SET_BC(pop_effect(gb));
+  CYC(b_+O(42), b_+OE(43)); A = B;
+  CYC(b_+O(43), b_+OE(46)); SET_HL(w4SubscreenTextIndices - 1);
+  CYC(b_+O(46), b_+OE(47)); push_effect(gb, b_+OE(47)); add_a_to_hl(gb);
+  CYC(b_+O(47), b_+OE(49)); mem_wr(gb, HL, 0);
   TAIL(inventorySubscreen2_drawTreasures__nextEssence);
 }
 
 void inventorySubscreen2_drawTreasures__nextEssence_hook(GB *gb) {
   BASE(inventorySubscreen2_drawTreasures);
-  CYC(b_+49, b_+50); B = alu_dec8(gb, B);
+  CYC(b_+O(49), b_+OE(50)); B = alu_dec8(gb, B);
   if (!(F & FZ)) {
-    CYCT(b_+50, b_+52);
+    CYCT(b_+O(50), b_+OE(52));
     TAIL(inventorySubscreen2_drawTreasures__drawEssence);
   }
-  CYC(b_+50, b_+52);
-  CYC(b_+52, b_+55); A = W8(wNumHeartPieces);
-  CYC(b_+55, b_+56); C = A;
-  CYC(b_+56, b_+59); SET_HL(w4SubscreenTextIndices + 9);
-  CYC(b_+59, b_+60); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+60, b_+61); mem_wr(gb, HL, A);
-  CYC(b_+61, b_+62); A = C;
-  CYC(b_+62, b_+63); alu_or(gb, A);
+  CYC(b_+O(50), b_+OE(52));
+  CYC(b_+O(52), b_+OE(55)); A = W8(wNumHeartPieces);
+  CYC(b_+O(55), b_+OE(56)); C = A;
+  CYC(b_+O(56), b_+OE(59)); SET_HL(w4SubscreenTextIndices + 9);
+  CYC(b_+O(59), b_+OE(60)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+O(60), b_+OE(61)); mem_wr(gb, HL, A);
+  CYC(b_+O(61), b_+OE(62)); A = C;
+  CYC(b_+O(62), b_+OE(63)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+63, b_+65);
+    CYCT(b_+O(63), b_+OE(65));
     TAIL(inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece);
   }
-  CYC(b_+63, b_+65);
-  CYC(b_+65, b_+67); alu_add(gb, 0x10);
-  CYC(b_+67, b_+70); mem_wr(gb, w4TileMap + 0x14f, A);
-  CYC(b_+70, b_+73); SET_HL(SYM(itemSubmenu2HeartPieceDisplayData));
+  CYC(b_+O(63), b_+OE(65));
+  CYC(b_+O(65), b_+OE(67)); alu_add(gb, 0x10);
+  CYC(b_+O(67), b_+OE(70)); mem_wr(gb, w4TileMap + 0x14f, A);
+  CYC(b_+O(70), b_+OE(73)); SET_HL(SYM(itemSubmenu2HeartPieceDisplayData));
   TAIL(inventorySubscreen2_drawTreasures__nextQuarterHeart);
 }
 
@@ -9503,14 +9566,14 @@ void inventorySubscreen2_drawTreasures__nextQuarterHeart_hook(GB *gb) {
   BASE(inventorySubscreen2_drawTreasures);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   do {
-    CYC(b_+73, b_+74); push_effect(gb, BC);
-    CYC(b_+74, b_+75); A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+75, b_+78); SET_DE(w4TileMap + 0xce);
-    CALL_C(b_+78, addAToDe_hook, 0x0068, b_+81);
-    CALL_C(b_+81, drawTreasureDisplayDataToBg_hook, SYM(drawTreasureDisplayDataToBg), b_+84);
-    CYC(b_+84, b_+85); SET_BC(pop_effect(gb));
-    CYC(b_+85, b_+86); C = alu_dec8(gb, C);
-    if (!(F & FZ)) CYCT(b_+86, b_+88); else CYC(b_+86, b_+88);
+    CYC(b_+O(73), b_+OE(74)); push_effect(gb, BC);
+    CYC(b_+O(74), b_+OE(75)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+O(75), b_+OE(78)); SET_DE(w4TileMap + 0xce);
+    CALL_C(b_+O(78), addAToDe_hook, 0x0068, b_+OE(81));
+    CALL_C(b_+O(81), drawTreasureDisplayDataToBg_hook, SYM(drawTreasureDisplayDataToBg), b_+OE(84));
+    CYC(b_+O(84), b_+OE(85)); SET_BC(pop_effect(gb));
+    CYC(b_+O(85), b_+OE(86)); C = alu_dec8(gb, C);
+    if (!(F & FZ)) CYCT(b_+O(86), b_+OE(88)); else CYC(b_+O(86), b_+OE(88));
   } while (!(F & FZ));
   TAIL(inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece);
 }
@@ -9518,23 +9581,44 @@ void inventorySubscreen2_drawTreasures__nextQuarterHeart_hook(GB *gb) {
 void inventorySubscreen2_drawTreasures__doneUpdatingHeartPiece_hook(GB *gb) {
   BASE(inventorySubscreen2_drawTreasures);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+88, b_+91); A = W8(wTilesetFlags);
-  CYC(b_+91, b_+93); alu_and(gb, 0x80);
-  CYC(b_+93, b_+94); alu_rlca(gb);
-  CYC(b_+94, b_+95); C = A;
-  CYC(b_+95, b_+98); SET_HL(w4SubscreenTextIndices + 8);
-  CYC(b_+98, b_+99); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+99, b_+100); mem_wr(gb, HL, A);
-  CYC(b_+100, b_+101); A = C;
-  CYC(b_+101, b_+102); alu_add(gb, A);
-  CYC(b_+102, b_+103); alu_add(gb, A);
-  CYC(b_+103, b_+104); alu_add(gb, C);
-  CYC(b_+104, b_+107); SET_HL(SYM(itemSubmenu2BlurbDisplayData));
-  CYC(b_+107, b_+108); add_double_index_to_hl(gb, b_+108);
-  CYC(b_+108, b_+111); SET_DE(w4TileMap + 0x6e);
-  CALL_C(b_+111, drawTreasureDisplayDataToBg_hook, SYM(drawTreasureDisplayDataToBg), b_+114);
-  CYC(b_+114, b_+116); E = 0x70;
-  CYC(b_+116, b_+119); TAIL(drawTreasureDisplayDataToBg);
+  if (game_seasons) {
+    CALL_C(b_+S(88), s_checkWhetherToDisplaySeasonInSubscreen_hook, SYM(checkWhetherToDisplaySeasonInSubscreen), b_+S(91));
+    CYC(b_+S(91), b_+S(94)); SET_HL(w4TileMap + 0x4d);
+    CYC(b_+S(94), b_+S(97)); SET_BC(0x0406);
+    if (!(F & FZ)) { CYCT(b_+S(97), b_+S(100)); TAIL(fillRectangleInTileMapWithMenuBlock); }
+    CYC(b_+S(97), b_+S(100));
+    CYC(b_+S(100), b_+S(103)); A = W8(wMinimapGroup);
+    CYC(b_+S(103), b_+S(105)); alu_sub(gb, 0x02);
+    if (F & FZ) CYCT(b_+S(105), b_+S(107));
+    else {
+      CYC(b_+S(105), b_+S(107));
+      CYC(b_+S(107), b_+S(110)); A = W8(wLoadingRoomPack);
+      CYC(b_+S(110), b_+S(111)); A = alu_inc8(gb, A);
+      if (F & FZ) CYCT(b_+S(111), b_+S(113));
+      else {
+        CYC(b_+S(111), b_+S(113));
+        CYC(b_+S(113), b_+S(116)); A = W8(wRoomStateModifier);
+      }
+    }
+  } else {
+    CYC(b_+88, b_+91); A = W8(wTilesetFlags);
+    CYC(b_+91, b_+93); alu_and(gb, 0x80);
+    CYC(b_+93, b_+94); alu_rlca(gb);
+  }
+  CYC(b_+O(94), b_+OE(95)); C = A;
+  CYC(b_+O(95), b_+OE(98)); SET_HL(w4SubscreenTextIndices + 8);
+  CYC(b_+O(98), b_+OE(99)); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+O(99), b_+OE(100)); mem_wr(gb, HL, A);
+  CYC(b_+O(100), b_+OE(101)); A = C;
+  CYC(b_+O(101), b_+OE(102)); alu_add(gb, A);
+  CYC(b_+O(102), b_+OE(103)); alu_add(gb, A);
+  CYC(b_+O(103), b_+OE(104)); alu_add(gb, C);
+  CYC(b_+O(104), b_+OE(107)); SET_HL(SYM(itemSubmenu2BlurbDisplayData));
+  CYC(b_+O(107), b_+OE(108)); add_double_index_to_hl(gb, b_+O(108));
+  CYC(b_+O(108), b_+OE(111)); SET_DE(w4TileMap + 0x6e);
+  CALL_C(b_+O(111), drawTreasureDisplayDataToBg_hook, SYM(drawTreasureDisplayDataToBg), b_+OE(114));
+  CYC(b_+O(114), b_+OE(116)); E = 0x70;
+  CYC(b_+O(116), b_+OE(119)); TAIL(drawTreasureDisplayDataToBg);
 }
 
 void getRingBoxCapacity_hook(GB *gb) {
@@ -9667,71 +9751,71 @@ void drawTreasureDisplayDataToBg__writeTileHlpr_hook(GB *gb) {
 void inventoryMenuDrawSprites_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, inventoryMenuDrawHarpSprites_hook, SYM(inventoryMenuDrawHarpSprites), b_+3);
-  CYC(b_+3, b_+5); A = 0x36;
-  CALL_C(b_+5, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+8);
-  if (!(F & FC)) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
-  CYC(b_+8, b_+9);
-  CYC(b_+9, b_+12); SET_BC(0x2068);
-  CYC(b_+12, b_+15); A = W8(wMenuActiveState);
-  CYC(b_+15, b_+17); alu_cp(gb, 0x03);
+  if (!game_seasons) CALL_C(b_+0, inventoryMenuDrawHarpSprites_hook, SYM(inventoryMenuDrawHarpSprites), b_+3);
+  CYC(b_+O(3), b_+OE(5)); A = 0x36;
+  CALL_C(b_+O(5), checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+OE(8));
+  if (!(F & FC)) { CYCT(b_+O(8), b_+OE(9)); ret_effect(gb); return; }
+  CYC(b_+O(8), b_+OE(9));
+  CYC(b_+O(9), b_+OE(12)); SET_BC(0x2068);
+  CYC(b_+O(12), b_+OE(15)); A = W8(wMenuActiveState);
+  CYC(b_+O(15), b_+OE(17)); alu_cp(gb, 0x03);
   if (F & FZ) {
-    CYCT(b_+17, b_+19);
+    CYCT(b_+O(17), b_+OE(19));
     TAIL(inventoryMenuDrawSprites__menuScrolling);
   }
-  CYC(b_+17, b_+19);
+  CYC(b_+O(17), b_+OE(19));
   TAIL(inventoryMenuDrawSprites__drawIfOnSubscreen1);
 }
 
 void inventoryMenuDrawSprites__drawIfOnSubscreen1_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
-  CYC(b_+19, b_+22); A = W8(wInventorySubmenu);
-  CYC(b_+22, b_+23); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+23, b_+24); ret_effect(gb); return; }
-  CYC(b_+23, b_+24);
-  CYC(b_+24, b_+26);
+  CYC(b_+O(19), b_+OE(22)); A = W8(wInventorySubmenu);
+  CYC(b_+O(22), b_+OE(23)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(23), b_+OE(24)); ret_effect(gb); return; }
+  CYC(b_+O(23), b_+OE(24));
+  CYC(b_+O(24), b_+OE(26));
   TAIL(inventoryMenuDrawSprites__drawSprite);
 }
 
 void inventoryMenuDrawSprites__menuScrolling_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
-  CYC(b_+26, b_+29); A = W8(wSubmenuState);
-  CYC(b_+29, b_+30); alu_or(gb, A);
+  CYC(b_+O(26), b_+OE(29)); A = W8(wSubmenuState);
+  CYC(b_+O(29), b_+OE(30)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+30, b_+32);
+    CYCT(b_+O(30), b_+OE(32));
     TAIL(inventoryMenuDrawSprites__drawIfOnSubscreen1);
   }
-  CYC(b_+30, b_+32);
-  CYC(b_+32, b_+35); A = W8(wInventorySubmenu);
-  CYC(b_+35, b_+36); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+36, b_+37); ret_effect(gb); return; }
-  CYC(b_+36, b_+37);
-  CYC(b_+37, b_+38); A = alu_dec8(gb, A);
+  CYC(b_+O(30), b_+OE(32));
+  CYC(b_+O(32), b_+OE(35)); A = W8(wInventorySubmenu);
+  CYC(b_+O(35), b_+OE(36)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(36), b_+OE(37)); ret_effect(gb); return; }
+  CYC(b_+O(36), b_+OE(37));
+  CYC(b_+O(37), b_+OE(38)); A = alu_dec8(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+38, b_+40);
-    CYC(b_+47, b_+50); A = W8(wGfxRegs2_SCX);
-    CYC(b_+50, b_+51); alu_cpl(gb);
-    CYC(b_+51, b_+52); A = alu_inc8(gb, A);
+    CYCT(b_+O(38), b_+OE(40));
+    CYC(b_+O(47), b_+OE(50)); A = W8(wGfxRegs2_SCX);
+    CYC(b_+O(50), b_+OE(51)); alu_cpl(gb);
+    CYC(b_+O(51), b_+OE(52)); A = alu_inc8(gb, A);
   } else {
-    CYC(b_+38, b_+40);
-    CYC(b_+40, b_+43); A = W8(wGfxRegs2_WINX);
-    CYC(b_+43, b_+45); alu_sub(gb, 0x07);
-    CYC(b_+45, b_+47);
+    CYC(b_+O(38), b_+OE(40));
+    CYC(b_+O(40), b_+OE(43)); A = W8(wGfxRegs2_WINX);
+    CYC(b_+O(43), b_+OE(45)); alu_sub(gb, 0x07);
+    CYC(b_+O(45), b_+OE(47));
   }
   TAIL(inventoryMenuDrawSprites__drawSpriteWithXOffset);
 }
 
 void inventoryMenuDrawSprites__drawSpriteWithXOffset_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
-  CYC(b_+52, b_+53); alu_add(gb, C);
-  CYC(b_+53, b_+54); C = A;
+  CYC(b_+O(52), b_+OE(53)); alu_add(gb, C);
+  CYC(b_+O(53), b_+OE(54)); C = A;
   TAIL(inventoryMenuDrawSprites__drawSprite);
 }
 
 void inventoryMenuDrawSprites__drawSprite_hook(GB *gb) {
   BASE(inventoryMenuDrawSprites);
-  CYC(b_+54, b_+57); SET_HL(GV(b_+60, 0x5d5f));
-  CYC(b_+57, b_+60); TAIL(addSpritesToOam_withOffset);
+  CYC(b_+O(54), b_+OE(57)); SET_HL(b_+O(60));
+  CYC(b_+O(57), b_+OE(60)); TAIL(addSpritesToOam_withOffset);
 }
 
 void inventoryMenuDrawHarpSprites_hook(GB *gb) {
@@ -10104,7 +10188,7 @@ void fileSelectMode6__mode2_hook(GB *gb) {
   } else {
     CYC(b_+51, b_+53);
     CYC(b_+53, b_+56); A = mem_rd(gb, wTmpcec0 + 5);
-    CYC(b_+56, b_+57); A = alu_dec8(gb, A);
+    CYC(b_+56, b_+57); if (game_seasons) alu_or(gb, A); else A = alu_dec8(gb, A);
     if (F & FZ) {
       CYCT(b_+57, b_+60); fileSelect_printError_hook(gb);
       return;

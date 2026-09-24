@@ -70,24 +70,6 @@ L_42e9:
   I(0x42f2, 4); if (hook_is(gb, 0x31d4, darkenRoom_hook)) { darkenRoom_hook(gb); return; } HANDOFF(0x31d4);  // jp $31d4
 }
 
-// 01:5c65
-void s_checkDisplayEraOrSeasonInfo(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5c65, 2); A = 0x2f;  // ld a,$2f
-  CALL(0x5c67, checkGlobalFlag_hook, 0x30c7, 0x5c6a);  // call $30c7
-  if ((F & FZ)) { I(0x5c6a, 3); goto L_5c71; } I(0x5c6a, 2);  // jr z,$5c71
-  I(0x5c6c, 2); A = 0x2f;  // ld a,$2f
-  I(0x5c6e, 4); if (hook_is(gb, 0x30d3, unsetGlobalFlag_hook)) { unsetGlobalFlag_hook(gb); return; } HANDOFF(0x30d3);  // jp $30d3
-L_5c71:
-  I(0x5c71, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x5c74, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5c75); return; } I(0x5c75, 2);  // ret nz
-  CALL(0x5c76, getFreeInteractionSlot_hook, 0x3ac6, 0x5c79);  // call $3ac6
-  if (!(F & FZ)) { RET_TAKEN(0x5c79); return; } I(0x5c79, 2);  // ret nz
-  I(0x5c7a, 3); mem_wr(gb, HL, 0xe0);  // ld (hl),$e0
-  RET(0x5c7c); return;  // ret
-}
-
 // 01:6028
 void s_checkLinkCloseEnoughToWarpTileCenter__tileSolid(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -136,118 +118,6 @@ L_7df4:
   I(0x7e06, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x7e07, 3); if (hook_is(gb, 0x7e2c, s_setHoronVillageSeason_hook)) { s_setHoronVillageSeason_hook(gb); return; } HANDOFF(0x7e2c); } I(0x7e07, 2);  // jr z,$7e2c
   if (hook_is(gb, 0x7e09, s_determineSeasonForRoomPack_hook)) { s_determineSeasonForRoomPack_hook(gb); return; } HANDOFF(0x7e09);  // fallthrough
-}
-
-// 01:5efd
-void s_checkSeedTreeRefillIndex(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5efd, 1); A = B;  // ld a,b
-  I(0x5efe, 3); mem_wr(gb, 0xff8d, A);  // ldh ($ff8d),a
-  I(0x5f00, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x5f03, 1); alu_cp(gb, C);  // cp c
-  I(0x5f04, 2); D = 0xdf;  // ld d,$df
-  if ((F & FZ)) { I(0x5f06, 3); goto L_5f2b; } I(0x5f06, 2);  // jr z,$5f2b
-  I(0x5f08, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x5f0a, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5f0b, 3); SET_BC(0x00f8);  // ld bc,$00f8
-  I(0x5f0e, 1); alu_add(gb, C);  // add c
-  I(0x5f0f, 1); C = A;  // ld c,a
-  I(0x5f10, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x5f11, 1); B = A;  // ld b,a
-  I(0x5f12, 4); A = mem_rd(gb, 0xcc69);  // ld a,($cc69)
-  I(0x5f15, 1); alu_and(gb, B);  // and b
-  if (!(F & FZ)) { RET_TAKEN(0x5f16); return; } I(0x5f16, 2);  // ret nz
-  I(0x5f17, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x5f1a, 1); B = A;  // ld b,a
-  I(0x5f1b, 2); C = 0x08;  // ld c,$08
-L_5f1d:
-  I(0x5f1d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5f1e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5f1f, 3); goto L_5f28; } I(0x5f1f, 2);  // jr z,$5f28
-  I(0x5f21, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { RET_TAKEN(0x5f22); return; } I(0x5f22, 2);  // ret z
-  I(0x5f23, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5f24, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x5f25, 3); goto L_5f1d; } I(0x5f25, 2);  // jr nz,$5f1d
-  RET(0x5f27); return;  // ret
-L_5f28:
-  I(0x5f28, 1); A = B;  // ld a,b
-  I(0x5f29, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x5f2a); return;  // ret
-L_5f2b:
-  I(0x5f2b, 2); C = 0x08;  // ld c,$08
-L_5f2d:
-  I(0x5f2d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5f2e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5f2f, 3); goto L_5f36; } I(0x5f2f, 2);  // jr z,$5f36
-  I(0x5f31, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5f32, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x5f33, 3); goto L_5f2d; } I(0x5f33, 2);  // jr nz,$5f2d
-  I(0x5f35, 1); alu_or(gb, D);  // or d
-L_5f36:
-  if ((F & FZ)) { I(0x5f36, 3); goto L_5f48; } I(0x5f36, 2);  // jr z,$5f48
-  I(0x5f38, 1); A = B;  // ld a,b
-  I(0x5f39, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5f3a, 3); SET_DE(0x00f8);  // ld de,$00f8
-  I(0x5f3d, 1); alu_add(gb, E);  // add e
-  I(0x5f3e, 1); E = A;  // ld e,a
-  I(0x5f3f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5f40, 1); D = A;  // ld d,a
-  I(0x5f41, 4); A = mem_rd(gb, 0xcc69);  // ld a,($cc69)
-  I(0x5f44, 1); alu_or(gb, D);  // or d
-  I(0x5f45, 4); mem_wr(gb, 0xcc69, A);  // ld ($cc69),a
-L_5f48:
-  PUSH(0x5f48, HL);  // push hl
-  I(0x5f49, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x5f4a, 2); H = 0xdf;  // ld h,$df
-  I(0x5f4c, 2); B = 0x08;  // ld b,$08
-  CALL(0x5f4e, clearMemory_hook, 0x044b, 0x5f51);  // call $044b
-  SET_HL(POP(0x5f51));  // pop hl
-  RET(0x5f52); return;  // ret
-}
-
-// 01:5f28
-void s_checkSeedTreeRefillIndex__addRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5f28:
-  I(0x5f28, 1); A = B;  // ld a,b
-  I(0x5f29, 2); mem_wr(gb, DE, A);  // ld (de),a
-  RET(0x5f2a); return;  // ret
-}
-
-// 01:5f2b
-void s_checkSeedTreeRefillIndex__treeScreen(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5f2b:
-  I(0x5f2b, 2); C = 0x08;  // ld c,$08
-L_5f2d:
-  I(0x5f2d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5f2e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x5f2f, 3); goto L_5f36; } I(0x5f2f, 2);  // jr z,$5f36
-  I(0x5f31, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x5f32, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x5f33, 3); goto L_5f2d; } I(0x5f33, 2);  // jr nz,$5f2d
-  I(0x5f35, 1); alu_or(gb, D);  // or d
-L_5f36:
-  if ((F & FZ)) { I(0x5f36, 3); goto L_5f48; } I(0x5f36, 2);  // jr z,$5f48
-  I(0x5f38, 1); A = B;  // ld a,b
-  I(0x5f39, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5f3a, 3); SET_DE(0x00f8);  // ld de,$00f8
-  I(0x5f3d, 1); alu_add(gb, E);  // add e
-  I(0x5f3e, 1); E = A;  // ld e,a
-  I(0x5f3f, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5f40, 1); D = A;  // ld d,a
-  I(0x5f41, 4); A = mem_rd(gb, 0xcc69);  // ld a,($cc69)
-  I(0x5f44, 1); alu_or(gb, D);  // or d
-  I(0x5f45, 4); mem_wr(gb, 0xcc69, A);  // ld ($cc69),a
-L_5f48:
-  PUSH(0x5f48, HL);  // push hl
-  I(0x5f49, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x5f4a, 2); H = 0xdf;  // ld h,$df
-  I(0x5f4c, 2); B = 0x08;  // ld b,$08
-  CALL(0x5f4e, clearMemory_hook, 0x044b, 0x5f51);  // call $044b
-  SET_HL(POP(0x5f51));  // pop hl
-  RET(0x5f52); return;  // ret
 }
 
 // 01:6065
@@ -359,7 +229,7 @@ L_596f:
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
-  I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
+  I(0x597d, 4); if (hook_is(gb, 0x5cec, updateGrassAnimationModifier_hook)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5cec);  // jp $5cec
 }
 
 // 01:5956
@@ -384,7 +254,7 @@ L_596f:
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
-  I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
+  I(0x597d, 4); if (hook_is(gb, 0x5cec, updateGrassAnimationModifier_hook)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5cec);  // jp $5cec
 }
 
 // 01:5959
@@ -407,7 +277,7 @@ L_596f:
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
-  I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
+  I(0x597d, 4); if (hook_is(gb, 0x5cec, updateGrassAnimationModifier_hook)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5cec);  // jp $5cec
 }
 
 // 01:595c
@@ -428,7 +298,7 @@ L_596f:
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
-  I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
+  I(0x597d, 4); if (hook_is(gb, 0x5cec, updateGrassAnimationModifier_hook)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5cec);  // jp $5cec
 }
 
 // 01:596f
@@ -440,7 +310,7 @@ L_596f:
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
   CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
-  I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
+  I(0x597d, 4); if (hook_is(gb, 0x5cec, updateGrassAnimationModifier_hook)) { updateGrassAnimationModifier_hook(gb); return; } HANDOFF(0x5cec);  // jp $5cec
 }
 
 // 01:59e6
@@ -480,7 +350,7 @@ L_5aab:
   CALL(0x5ac6, loadTilesetData_hook, 0x381a, 0x5ac9);  // call $381a
 L_5ac9:
   CALL(0x5ac9, loadTilesetGraphics_hook, 0x3737, 0x5acc);  // call $3737
-  CALL(0x5acc, s_func_131f, 0x12dd, 0x5acf);  // call $12dd
+  CALL(0x5acc, func_131f_hook, 0x12dd, 0x5acf);  // call $12dd
 L_5acf:
   I(0x5acf, 3); SET_DE(0xd00b);  // ld de,$d00b
   CALL(0x5ad2, getShortPositionFromDE_hook, 0x2059, 0x5ad5);  // call $2059
@@ -493,7 +363,7 @@ void s_cutscene04__afterCall5ac9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5ac9:
   CALL(0x5ac9, loadTilesetGraphics_hook, 0x3737, 0x5acc);  // call $3737
-  CALL(0x5acc, s_func_131f, 0x12dd, 0x5acf);  // call $12dd
+  CALL(0x5acc, func_131f_hook, 0x12dd, 0x5acf);  // call $12dd
 L_5acf:
   I(0x5acf, 3); SET_DE(0xd00b);  // ld de,$d00b
   CALL(0x5ad2, getShortPositionFromDE_hook, 0x2059, 0x5ad5);  // call $2059
@@ -1477,7 +1347,7 @@ L_4c0f:
   CALL(0x4c2d, loadTilesetData_hook, 0x381a, 0x4c30);  // call $381a
   CALL(0x4c30, loadTilesetGraphics_hook, 0x3737, 0x4c33);  // call $3737
   CALL(0x4c33, loadDungeonLayout_hook, 0x2cfd, 0x4c36);  // call $2cfd
-  CALL(0x4c36, s_func_131f, 0x12dd, 0x4c39);  // call $12dd
+  CALL(0x4c36, func_131f_hook, 0x12dd, 0x4c39);  // call $12dd
   CALL(0x4c39, clearEnemiesKilledList_b00_hook, 0x30d9, 0x4c3c);  // call $30d9
   CALL(0x4c3c, func_5c6b_hook, 0x5a58, 0x4c3f);  // call $5a58
   s_cutscene15__state1__substate2__afterCall4ca4(gb); return;  // fallthrough
@@ -1730,30 +1600,5 @@ void s_updateActiveRoom__gotRoom(GB *gb) {
 L_5d7d:
   I(0x5d7d, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
   I(0x5d80, 4); if (hook_is(gb, 0x2d24, setVisitedRoomFlag_hook)) { setVisitedRoomFlag_hook(gb); return; } HANDOFF(0x2d24);  // jp $2d24
-}
-
-// 01:5cec
-void s_updateGrassAnimationModifier(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5cec, 4); A = mem_rd(gb, 0xcc61);  // ld a,($cc61)
-  I(0x5cef, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x5cf0, 2); A = 0x00;  // ld a,$00
-  if ((F & FZ)) { I(0x5cf2, 3); goto L_5cf7; } I(0x5cf2, 2);  // jr z,$5cf7
-  I(0x5cf4, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-L_5cf7:
-  I(0x5cf7, 1); B = A;  // ld b,a
-  I(0x5cf8, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x5cfb, 1); alu_or(gb, A);  // or a
-  I(0x5cfc, 1); A = B;  // ld a,b
-  if ((F & FZ)) { I(0x5cfd, 3); goto L_5d00; } I(0x5cfd, 2);  // jr z,$5d00
-  I(0x5cff, 1); alu_xor(gb, A);  // xor a
-L_5d00:
-  I(0x5d00, 3); SET_HL(0x5d09);  // ld hl,$5d09
-  RST_PUSH(0x5d03, 0x5d04);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5d04, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5d05, 4); mem_wr(gb, 0xcc52, A);  // ld ($cc52),a
-  RET(0x5d08); return;  // ret
 }
 

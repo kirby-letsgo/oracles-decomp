@@ -707,8 +707,8 @@ void intro_japaneseOnlyScreen_hook(GB *gb) {
 void intro_titlescreen__runState_hook(GB *gb) {
   BASE(intro_titlescreen);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+31, b_+34); A = mem_rd(gb, wThreadStateBuffer + 7);
-  CYC(b_+34, b_+35); push_effect(gb, b_+35);
+  CYC(b_+O(31), b_+OE(34)); A = mem_rd(gb, wThreadStateBuffer + 7);
+  CYC(b_+O(34), b_+OE(35)); push_effect(gb, b_+OE(35));
   do { uint16_t jt_ = (intro_jumpTable(gb));
     if (jt_ == SYM(intro_titlescreen_state0)) {
       TAIL(intro_titlescreen_state0);
@@ -732,22 +732,33 @@ void intro_titlescreen__runState_hook(GB *gb) {
 void intro_titlescreen_hook(GB *gb) {
   BASE(intro_titlescreen);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
-  CALL_C(b_+3, intro_titlescreen__runState_hook, b_+31, b_+6);
-  CALL_C(b_+6, clearOam_hook, SYM(clearOam), b_+9);
-  CYC(b_+9, b_+12); SET_HL((SYM(endgameCutsceneHandler_20__func_5953) + 10));
-  CYC(b_+12, b_+14); E = 0x3f;
-  CALL_C(b_+14, addSpritesFromBankToOam_hook, SYM(addSpritesFromBankToOam), b_+17);
-  CYC(b_+17, b_+20); A = mem_rd(gb, wTmpcbb3);
-  CYC(b_+20, b_+22); alu_and(gb, 0x20);
-  if (!(F & FZ)) {
-    CYCT(b_+22, b_+23); ret_effect(gb);
-    return;
+  CALL_C(b_+O(0), getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+OE(3));
+  CALL_C(b_+O(3), intro_titlescreen__runState_hook, b_+O(31), b_+OE(6));
+  CALL_C(b_+O(6), clearOam_hook, SYM(clearOam), b_+OE(9));
+  if (game_seasons) {
+    CYC(b_+S(9), b_+S(12)); SET_HL(SYM(titlescreenMakuSeedSprite));
+    CALL_C(b_+S(12), addSpritesToOam_hook, SYM(addSpritesToOam), b_+S(15));
+    CYC(b_+S(15), b_+S(18)); A = mem_rd(gb, wTmpcbb3);
+    CYC(b_+S(18), b_+S(20)); alu_and(gb, 0x20);
+    if (!(F & FZ)) { CYCT(b_+S(20), b_+S(21)); ret_effect(gb); return; }
+    CYC(b_+S(20), b_+S(21));
+    CYC(b_+S(21), b_+S(24)); SET_HL(SYM(titlescreenPressStartSprites));
+    CYC(b_+S(24), b_+S(27)); TAIL(addSpritesToOam);
+  } else {
+    CYC(b_+9, b_+12); SET_HL((SYM(endgameCutsceneHandler_20__func_5953) + 10));
+    CYC(b_+12, b_+14); E = 0x3f;
+    CALL_C(b_+14, addSpritesFromBankToOam_hook, SYM(addSpritesFromBankToOam), b_+17);
+    CYC(b_+17, b_+20); A = mem_rd(gb, wTmpcbb3);
+    CYC(b_+20, b_+22); alu_and(gb, 0x20);
+    if (!(F & FZ)) {
+      CYCT(b_+22, b_+23); ret_effect(gb);
+      return;
+    }
+    CYC(b_+22, b_+23);
+    CYC(b_+23, b_+26); SET_HL((SYM(endgameCutsceneHandler_20__func_5995) + 21));
+    CYC(b_+26, b_+28); E = 0x3f;
+    CYC(b_+28, b_+31); TAIL(addSpritesFromBankToOam);
   }
-  CYC(b_+22, b_+23);
-  CYC(b_+23, b_+26); SET_HL((SYM(endgameCutsceneHandler_20__func_5995) + 21));
-  CYC(b_+26, b_+28); E = 0x3f;
-  CYC(b_+28, b_+31); TAIL(addSpritesFromBankToOam);
 }
 
 void intro_titlescreen_state0_hook(GB *gb) {

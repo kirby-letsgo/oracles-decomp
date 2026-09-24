@@ -140,10 +140,15 @@ UNNAMED = re.compile(r'^(_label_[0-9a-f]{2}_\d+|label_[0-9a-f]{2}_\d+)$')
 def seasons_code(lines):
     """For each C source line, the part that runs under Seasons: text inside
     `if (!game_seasons) { ... }` blocks, the else branch of `if (game_seasons) { ... } else {`,
-    and one-line `if (!game_seasons) ...;` / `!game_seasons && ...` conditions is blanked."""
-    out, ages_depth, seasons_depth = [], 0, 0
+    one-line `if (!game_seasons) ...;` / `!game_seasons && ...` conditions and the rest of a
+    function that opens with `AGES_ONLY();` is blanked."""
+    out, ages_depth, seasons_depth, ages_fn = [], 0, 0, False
     for line in lines:
         code = line.split('//')[0]
+        if 'AGES_ONLY();' in code: ages_fn = True
+        if ages_fn:
+            if line.startswith('}'): ages_fn = False
+            out.append(''); continue
         keep = ''
         if ages_depth:
             j = 0

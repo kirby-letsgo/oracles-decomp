@@ -53,3 +53,7 @@ companionCheckEnableTerrainEffects   # Seasons tile checks written out from +26
 npcFaceLinkAndAnimate   # Seasons calls seasonsFunc_2678 where Ages reads var37
 scriptFunc_jump   # Seasons body written out (script_jump_seasons)
 scriptFunc_jump_scf
+func_53eb@dmaHeartPieceDisplay   # same DMA source words in both ROMs (the symbolizer names them differently)
+fileSelectMode6   # Seasons tests the byte with or a where Ages decrements it
+initializeRoom   # Seasons body written out
+updateGrassAnimationModifier   # Seasons body written out
