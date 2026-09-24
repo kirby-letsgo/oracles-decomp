@@ -1199,73 +1199,12 @@ L_4d4f:
   RET(0x4d55); return;  // ret
 }
 
-// 15:4d56
-void s_interactionCodee5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4d56, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
-  I(0x4d59, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4d5a, 3); goto L_4d66; } I(0x4d5a, 2);  // jr nz,$4d66
-  I(0x4d5c, 2); A = 0x02;  // ld a,$02
-  I(0x4d5e, 4); mem_wr(gb, 0xcbac, A);  // ld ($cbac),a
-  I(0x4d61, 2); A = 0x08;  // ld a,$08
-  I(0x4d63, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-L_4d66:
-  CALL(0x4d66, s_interactionCodee5__runState, 0x4d6c, 0x4d69);  // call $4d6c
-L_4d69:
-  I(0x4d69, 4); if (hook_is(gb, 0x229b, objectSetPriorityRelativeToLink_withTerrainEffects_hook)) { objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; } HANDOFF(0x229b);  // jp $229b
-}
-
 // 15:4d66
 void s_interactionCodee5__doneTextFlagSetup(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4d66:
-  CALL(0x4d66, s_interactionCodee5__runState, 0x4d6c, 0x4d69);  // call $4d6c
-L_4d69:
+  CALL(0x4d66, interactionCodee5__runState_hook, 0x4d6c, 0x4d69);  // call $4d6c
   I(0x4d69, 4); if (hook_is(gb, 0x229b, objectSetPriorityRelativeToLink_withTerrainEffects_hook)) { objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; } HANDOFF(0x229b);  // jp $229b
-}
-
-// 15:4d69
-void s_interactionCodee5__afterCall4d69(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4d69:
-  I(0x4d69, 4); if (hook_is(gb, 0x229b, objectSetPriorityRelativeToLink_withTerrainEffects_hook)) { objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; } HANDOFF(0x229b);  // jp $229b
-}
-
-// 15:4d6c
-void s_interactionCodee5__runState(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4d6c:
-  I(0x4d6c, 2); E = 0x44;  // ld e,$44
-  I(0x4d6e, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x4d6f, 0x4d70);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x4d74: goto L_4d74; case 0x4da0: goto L_4da0; default: HANDOFF(HL); }
-L_4d74:
-  CALL(0x4d74, interactionInitGraphics_hook, 0x15e9, 0x4d77);  // call $15e9
-  I(0x4d77, 2); A = 0x30;  // ld a,$30
-  CALL(0x4d79, interactionSetHighTextIndex_hook, 0x24f5, 0x4d7c);  // call $24f5
-  CALL(0x4d7c, interactionSetAlwaysUpdateBit_hook, 0x26ac, 0x4d7f);  // call $26ac
-  CALL(0x4d7f, interactionIncState_hook, 0x239b, 0x4d82);  // call $239b
-  I(0x4d82, 2); A = 0x06;  // ld a,$06
-  CALL(0x4d84, objectSetCollideRadius_hook, 0x248d, 0x4d87);  // call $248d
-  I(0x4d87, 2); E = 0x42;  // ld e,$42
-  I(0x4d89, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4d8a, 3); SET_HL(0x4b48);  // ld hl,$4b48
-  I(0x4d8d, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x4d8e, 3); goto L_4d98; } I(0x4d8e, 2);  // jr z,$4d98
-  I(0x4d90, 2); E = 0x5c;  // ld e,$5c
-  I(0x4d92, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4d93, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4d94, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4d95, 3); SET_HL(0x4b39);  // ld hl,$4b39
-L_4d98:
-  CALL(0x4d98, interactionSetScript_hook, 0x24fe, 0x4d9b);  // call $24fe
-  I(0x4d9b, 2); E = 0x71;  // ld e,$71
-  I(0x4d9d, 4); if (hook_is(gb, 0x1af2, objectAddToAButtonSensitiveObjectList_hook)) { objectAddToAButtonSensitiveObjectList_hook(gb); return; } HANDOFF(0x1af2);  // jp $1af2
-L_4da0:
-  I(0x4da0, 4); if (hook_is(gb, 0x250c, interactionRunScript_hook)) { interactionRunScript_hook(gb); return; } HANDOFF(0x250c);  // jp $250c
 }
 
 // 15:4d74

@@ -4,6 +4,21 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-24, Seasons 4 (DIFFERENT shared routines under Seasons, object code) batch 1: 19
+  routines mapped with `ofsmap.py --apply` plus per-game blocks (satchel, bomb and bracelet
+  parents, sword, boomerang parent and item, bracelet item, seedItemState1, galeSeedTryToWarpLink,
+  itemUpdateThrowingVertically, parentItemLoadAnimationAndIncState, itemDrop, hardhat beetle,
+  moldorm, pincer stateA, essence subid 1, objectOscillateZ_body, shopkeeperState0 and
+  GotoState1). interactionCode46's state chain is guarded with `hook_is`; locals whose only
+  differences were already GV (vasu, ringHelpBook, switch, sidescroll platform/conveyor, fairy
+  sparkles, sparkle bc) are listed in `seasons_ok_manual.txt`. Eligible hooks 3,698 -> 3,731.
+  Idioms new here: a jump-table target whose first instruction is per-game is spelled
+  `b_+(game_seasons ? S(n) : m)`; a shared routine calls a Seasons-only hook by declaring
+  `s_<label>_hook` in the file; a block that Seasons labels as its own routine keeps identity
+  offsets as `S(n)` (itemUpdateThrowingVertically's gravity tail). A `call`ed jump table whose
+  fallback would return into the middle of the routine uses `asm_call(gb, HL, b_+ret)` and
+  continues in C (interactionCode46: the native build has no entry at +6). Step 0 before it: the
+  audit_jumptables triage (bc4ec6a).
 - 2026-09-24, Seasons milestone 3 complete (worktree `m5-step0`): every one of the 1,279 ranked
   Seasons-only routines is hand-written C. 1,277 are hooks in `src/hooks/rewritten_seasons.txt`
   (1,420 entries in all); `wRamFunction` and `setCpuToDoubleSpeed` were already hand-written

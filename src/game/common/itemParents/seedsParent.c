@@ -65,63 +65,65 @@ void clearSelfIfNoSeeds_hook(GB *gb) {
 void parentItemCode_satchel_hook(GB *gb) {
   BASE(parentItemCode_satchel);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = 0x04;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+OE(2)); E = 0x04;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (seeds_parent_jump_table(gb));
-    if (jt_ == b_+8) { goto state0; }
+    if (jt_ == b_+O(8)) { goto state0; }
     else if (jt_ == SYM(parentItemGenericState1) && hook_is(gb, SYM(parentItemGenericState1), parentItemGenericState1_hook)) { parentItemGenericState1_hook(gb); return; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
 state0:
-  CYC(b_+8, b_+11); A = W8(w1Companion_id);
-  CYC(b_+11, b_+13); alu_cp(gb, 0x13);
-  if (F & FZ) { CYCT(b_+13, b_+16); TAIL(clearParentItem); }
-  CYC(b_+13, b_+16);
-  CALL_C(b_+16, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+19);
-  if (!(F & FZ)) { CYCT(b_+19, b_+22); TAIL(clearParentItem); }
-  CYC(b_+19, b_+22);
-  CYC(b_+22, b_+25); A = W8(wLinkSwimmingState);
-  CYC(b_+25, b_+26); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+26, b_+29); TAIL(clearParentItem); }
-  CYC(b_+26, b_+29);
-  CALL_C(b_+29, clearSelfIfNoSeeds_hook, SYM(clearSelfIfNoSeeds), b_+32);
-  CYC(b_+32, b_+33); A = B;
-  CYC(b_+33, b_+35); alu_cp(gb, 0x22);
-  if (F & FZ) { CYCT(b_+35, b_+37); goto pegasus; }
-  CYC(b_+35, b_+37);
-  CYC(b_+37, b_+38); push_effect(gb, BC);
-  CALL_C(b_+38, parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+41);
-  CYC(b_+41, b_+42); SET_BC(pop_effect(gb));
-  CYC(b_+42, b_+43); push_effect(gb, BC);
-  CYC(b_+43, b_+45); C = 0x00;
-  CYC(b_+45, b_+47); E = 0x01;
-  CALL_C(b_+47, itemCreateChildWithID_hook, SYM(itemCreateChildWithID), b_+50);
-  CYC(b_+50, b_+51); SET_BC(pop_effect(gb));
-  if (F & FC) { CYCT(b_+51, b_+54); TAIL(clearParentItem); }
-  CYC(b_+51, b_+54);
-  CYC(b_+54, b_+55); A = B;
-  CYC(b_+55, b_+58); TAIL(decNumActiveSeeds);
+  if (!game_seasons) {
+    CYC(b_+8, b_+11); A = W8(w1Companion_id);
+    CYC(b_+11, b_+13); alu_cp(gb, 0x13);
+    if (F & FZ) { CYCT(b_+13, b_+16); TAIL(clearParentItem); }
+    CYC(b_+13, b_+16);
+    CALL_C(b_+16, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+19);
+    if (!(F & FZ)) { CYCT(b_+19, b_+22); TAIL(clearParentItem); }
+    CYC(b_+19, b_+22);
+  }
+  CYC(b_+O(22), b_+OE(25)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(25), b_+OE(26)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(26), b_+OE(29)); TAIL(clearParentItem); }
+  CYC(b_+O(26), b_+OE(29));
+  CALL_C(b_+O(29), clearSelfIfNoSeeds_hook, SYM(clearSelfIfNoSeeds), b_+OE(32));
+  CYC(b_+O(32), b_+OE(33)); A = B;
+  CYC(b_+O(33), b_+OE(35)); alu_cp(gb, 0x22);
+  if (F & FZ) { CYCT(b_+O(35), b_+OE(37)); goto pegasus; }
+  CYC(b_+O(35), b_+OE(37));
+  CYC(b_+O(37), b_+OE(38)); push_effect(gb, BC);
+  CALL_C(b_+O(38), parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+OE(41));
+  CYC(b_+O(41), b_+OE(42)); SET_BC(pop_effect(gb));
+  CYC(b_+O(42), b_+OE(43)); push_effect(gb, BC);
+  CYC(b_+O(43), b_+OE(45)); C = 0x00;
+  CYC(b_+O(45), b_+OE(47)); E = 0x01;
+  CALL_C(b_+O(47), itemCreateChildWithID_hook, SYM(itemCreateChildWithID), b_+OE(50));
+  CYC(b_+O(50), b_+OE(51)); SET_BC(pop_effect(gb));
+  if (F & FC) { CYCT(b_+O(51), b_+OE(54)); TAIL(clearParentItem); }
+  CYC(b_+O(51), b_+OE(54));
+  CYC(b_+O(54), b_+OE(55)); A = B;
+  CYC(b_+O(55), b_+OE(58)); TAIL(decNumActiveSeeds);
 
 pegasus:
-  CYC(b_+58, b_+61); SET_HL(wPegasusSeedCounter);
-  CYC(b_+61, b_+62); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+62, b_+63); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+63, b_+65); goto clear; }
-  CYC(b_+63, b_+65);
-  CYC(b_+65, b_+67); A = 0x03;
-  CYC(b_+67, b_+68); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+68, b_+70); mem_wr(gb, HL, 0xc0);
-  CYC(b_+70, b_+71); A = B;
-  CALL_C(b_+71, decNumActiveSeeds_hook, SYM(decNumActiveSeeds), b_+74);
-  CYC(b_+74, b_+77); SET_HL(w1ReservedItemF);
-  CYC(b_+77, b_+79); A = 0x03;
-  CYC(b_+79, b_+80); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+80, b_+82); mem_wr(gb, HL, 0x1a);
+  CYC(b_+O(58), b_+OE(61)); SET_HL(wPegasusSeedCounter);
+  CYC(b_+O(61), b_+OE(62)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(62), b_+OE(63)); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(63), b_+OE(65)); goto clear; }
+  CYC(b_+O(63), b_+OE(65));
+  CYC(b_+O(65), b_+OE(67)); A = 0x03;
+  CYC(b_+O(67), b_+OE(68)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(68), b_+OE(70)); mem_wr(gb, HL, 0xc0);
+  CYC(b_+O(70), b_+OE(71)); A = B;
+  CALL_C(b_+O(71), decNumActiveSeeds_hook, SYM(decNumActiveSeeds), b_+OE(74));
+  CYC(b_+O(74), b_+OE(77)); SET_HL(w1ReservedItemF);
+  CYC(b_+O(77), b_+OE(79)); A = 0x03;
+  CYC(b_+O(79), b_+OE(80)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(80), b_+OE(82)); mem_wr(gb, HL, 0x1a);
 
 clear:
-  CYC(b_+82, b_+85); TAIL(clearParentItem);
+  CYC(b_+O(82), b_+OE(85)); TAIL(clearParentItem);
 }
 
 void parentItemCode_slingshot_hook(GB *gb) {

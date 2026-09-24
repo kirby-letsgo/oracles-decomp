@@ -62,13 +62,13 @@ void interactionCode46_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+13); push_effect(gb, b_+13); SET_HL(shopkeeper_jump_table(gb));
   do { uint16_t jt_ = (HL);
-    if (jt_ == SYM(shopkeeperState0)) { shopkeeperState0_hook(gb); break; }
-    else if (jt_ == SYM(shopkeeperState1)) { shopkeeperState1_hook(gb); break; }
-    else if (jt_ == SYM(shopkeeperState2)) { shopkeeperState2_hook(gb); break; }
-    else if (jt_ == SYM(shopkeeperState3)) { shopkeeperState3_hook(gb); break; }
-    else if (jt_ == SYM(shopkeeperState5)) { shopkeeperState5_hook(gb); break; }
-    else if (jt_ == SYM(shopkeeperState6)) { shopkeeperState6_hook(gb); break; }
-    else { hook_continue(gb, HL, gb->sp); return; }
+    if (jt_ == SYM(shopkeeperState0) && hook_is(gb, SYM(shopkeeperState0), shopkeeperState0_hook)) { shopkeeperState0_hook(gb); break; }
+    else if (jt_ == SYM(shopkeeperState1) && hook_is(gb, SYM(shopkeeperState1), shopkeeperState1_hook)) { shopkeeperState1_hook(gb); break; }
+    else if (jt_ == SYM(shopkeeperState2) && hook_is(gb, SYM(shopkeeperState2), shopkeeperState2_hook)) { shopkeeperState2_hook(gb); break; }
+    else if (jt_ == SYM(shopkeeperState3) && hook_is(gb, SYM(shopkeeperState3), shopkeeperState3_hook)) { shopkeeperState3_hook(gb); break; }
+    else if (jt_ == SYM(shopkeeperState5) && hook_is(gb, SYM(shopkeeperState5), shopkeeperState5_hook)) { shopkeeperState5_hook(gb); break; }
+    else if (jt_ == SYM(shopkeeperState6) && hook_is(gb, SYM(shopkeeperState6), shopkeeperState6_hook)) { shopkeeperState6_hook(gb); break; }
+    else { asm_call(gb, HL, b_+6); break; }
   } while (0);
   CYC(b_+6, b_+9); TAIL(interactionAnimateAsNpc);
 }
@@ -211,21 +211,38 @@ L_4185:
 void shopkeeperGotoState1_hook(GB *gb) {
   BASE(shopkeeperGotoState1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); E = 0x44;
-  CYC(b_+2, b_+4); A = 1;
-  CYC(b_+4, b_+5); mem_wr(gb, DE, A);
-  CYC(b_+5, b_+8); SET_BC(0x0614);
-  CALL_C(b_+8, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+11);
-  CYC(b_+11, b_+13); E = 0x42;
-  CYC(b_+13, b_+14); A = mem_rd(gb, DE);
-  CYC(b_+14, b_+15); alu_or(gb, A);
-  CYC(b_+15, b_+17); A = 3;
-  if (F & FZ) { CYCT(b_+17, b_+19); goto L_41a6; } CYC(b_+17, b_+19);
-  CYC(b_+19, b_+21); A = 1;
+  CYC(b_+O(0), b_+OE(2)); E = 0x44;
+  CYC(b_+O(2), b_+OE(4)); A = 1;
+  CYC(b_+O(4), b_+OE(5)); mem_wr(gb, DE, A);
+  if (!game_seasons) {
+    CYC(b_+5, b_+8); SET_BC(0x0614);
+    CALL_C(b_+8, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+11);
+    CYC(b_+11, b_+13); E = 0x42;
+    CYC(b_+13, b_+14); A = mem_rd(gb, DE);
+    CYC(b_+14, b_+15); alu_or(gb, A);
+    CYC(b_+15, b_+17); A = 3;
+    if (F & FZ) { CYCT(b_+17, b_+19); goto L_41a6; } CYC(b_+17, b_+19);
+  } else {
+    CYC(b_+S(5), b_+S(8)); SET_HL(w1Link_xh);
+    CYC(b_+S(8), b_+S(10)); E = 0x4d;
+    CYC(b_+S(10), b_+S(11)); A = mem_rd(gb, DE);
+    CYC(b_+S(11), b_+S(12)); alu_cp(gb, mem_rd(gb, HL));
+    if (!(F & FC)) {
+      CYCT(b_+S(12), b_+S(14));
+      CYC(b_+S(22), b_+S(24)); A = 0x06;
+      CALL_C(b_+S(24), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+S(27));
+    } else {
+      CYC(b_+S(12), b_+S(14));
+      CYC(b_+S(14), b_+S(17)); SET_BC(0x0614);
+      CALL_C(b_+S(17), objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+S(20));
+      CYC(b_+S(20), b_+S(22));
+    }
+  }
+  CYC(b_+O(19), b_+OE(21)); A = 1;
 L_41a6:
-  CALL_C(b_+21, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+24);
-  CYC(b_+24, b_+26); E = 0x71;
-  CYC(b_+26, b_+29); TAIL(objectAddToAButtonSensitiveObjectList);
+  CALL_C(b_+O(21), interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+OE(24));
+  CYC(b_+O(24), b_+OE(26)); E = 0x71;
+  CYC(b_+O(26), b_+OE(29)); TAIL(objectAddToAButtonSensitiveObjectList);
 }
 
 void shopkeeperState5_hook(GB *gb) {
@@ -447,39 +464,51 @@ void shopkeeperTurnToFaceLink_hook(GB *gb) {
 void shopkeeperState0_hook(GB *gb) {
   BASE(shopkeeperState0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+2); A = 1;
-  CYC(b_+2, b_+3); mem_wr(gb, DE, A);
-  CYC(b_+3, b_+5); E = 0x40;
-  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
-  CYC(b_+6, b_+8); alu_or(gb, 0x80);
-  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
-  CYC(b_+9, b_+11); A = 0x80;
-  CYC(b_+11, b_+14); mem_wr(gb, wcca2, A);
-  CALL_C(b_+14, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+17);
-  CYC(b_+17, b_+19); E = 0x49;
-  CYC(b_+19, b_+21); A = 4;
-  CYC(b_+21, b_+22); mem_wr(gb, DE, A);
-  CYC(b_+22, b_+25); SET_BC(0x0614);
-  CALL_C(b_+25, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+28);
-  CYC(b_+28, b_+30); L = 0x42;
-  CYC(b_+30, b_+31); A = mem_rd(gb, HL);
-  CYC(b_+31, b_+33); alu_cp(gb, 1);
-  if (!(F & FZ)) { CYCT(b_+33, b_+35); goto L_405f; } CYC(b_+33, b_+35);
-  CYC(b_+35, b_+38); A = mem_rd(gb, wBoughtShopItems1);
-  CYC(b_+38, b_+40); alu_and(gb, 0x0f);
-  CYC(b_+40, b_+42); alu_cp(gb, 0x0f);
-  if (!(F & FZ)) { CYCT(b_+42, b_+44); goto L_405f; } CYC(b_+42, b_+44);
-  CYC(b_+44, b_+46); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+  CYC(b_+O(0), b_+OE(2)); A = 1;
+  CYC(b_+O(2), b_+OE(3)); mem_wr(gb, DE, A);
+  CYC(b_+O(3), b_+OE(5)); E = 0x40;
+  CYC(b_+O(5), b_+OE(6)); A = mem_rd(gb, DE);
+  CYC(b_+O(6), b_+OE(8)); alu_or(gb, 0x80);
+  CYC(b_+O(8), b_+OE(9)); mem_wr(gb, DE, A);
+  CYC(b_+O(9), b_+OE(11)); A = 0x80;
+  CYC(b_+O(11), b_+OE(14)); mem_wr(gb, wcca2, A);
+  CALL_C(b_+O(14), interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+OE(17));
+  CYC(b_+O(17), b_+OE(19)); E = 0x49;
+  CYC(b_+O(19), b_+OE(21)); A = 4;
+  CYC(b_+O(21), b_+OE(22)); mem_wr(gb, DE, A);
+  CYC(b_+O(22), b_+OE(25)); SET_BC(0x0614);
+  CALL_C(b_+O(25), objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+OE(28));
+  CYC(b_+O(28), b_+OE(30)); L = 0x42;
+  CYC(b_+O(30), b_+OE(31)); A = mem_rd(gb, HL);
+  CYC(b_+O(31), b_+OE(33)); alu_cp(gb, 1);
+  if (!(F & FZ)) { CYCT(b_+O(33), b_+OE(35)); goto L_405f; } CYC(b_+O(33), b_+OE(35));
+  CYC(b_+O(35), b_+OE(38)); A = mem_rd(gb, wBoughtShopItems1);
+  CYC(b_+O(38), b_+OE(40)); alu_and(gb, 0x0f);
+  CYC(b_+O(40), b_+OE(42)); alu_cp(gb, 0x0f);
+  if (!(F & FZ)) { CYCT(b_+O(42), b_+OE(44)); goto L_405f; } CYC(b_+O(42), b_+OE(44));
+  CYC(b_+O(44), b_+OE(46)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
 L_405f:
-  CYC(b_+46, b_+48); E = 0x42;
-  CYC(b_+48, b_+49); A = mem_rd(gb, DE);
-  CYC(b_+49, b_+50); alu_or(gb, A);
-  CYC(b_+50, b_+52); A = 3;
-  if (F & FZ) CALL_C_CC(b_+52, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+55); else CYC(b_+52, b_+55);
-  CYC(b_+55, b_+57); A = 0x0e;
-  CALL_C(b_+57, interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+60);
-  CYC(b_+60, b_+62); E = 0x71;
-  CYC(b_+62, b_+65); TAIL(objectAddToAButtonSensitiveObjectList);
+  if (!game_seasons) {
+    CYC(b_+46, b_+48); E = 0x42;
+    CYC(b_+48, b_+49); A = mem_rd(gb, DE);
+    CYC(b_+49, b_+50); alu_or(gb, A);
+    CYC(b_+50, b_+52); A = 3;
+    if (F & FZ) CALL_C_CC(b_+52, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+55); else CYC(b_+52, b_+55);
+  } else {
+    CYC(b_+S(46), b_+S(48)); A = 0x53;
+    CALL_C(b_+S(48), checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+S(51));
+    if (!(F & FC)) CYCT(b_+S(51), b_+S(53));
+    else {
+      CYC(b_+S(51), b_+S(53));
+      CYC(b_+S(53), b_+S(55)); E = 0x7e;
+      CYC(b_+S(55), b_+S(57)); A = 1;
+      CYC(b_+S(57), b_+S(58)); mem_wr(gb, DE, A);
+    }
+  }
+  CYC(b_+O(55), b_+OE(57)); A = 0x0e;
+  CALL_C(b_+O(57), interactionSetHighTextIndex_hook, SYM(interactionSetHighTextIndex), b_+OE(60));
+  CYC(b_+O(60), b_+OE(62)); E = 0x71;
+  CYC(b_+O(62), b_+OE(65)); TAIL(objectAddToAButtonSensitiveObjectList);
 }
 
 void shopkeeperState1_hook(GB *gb) {

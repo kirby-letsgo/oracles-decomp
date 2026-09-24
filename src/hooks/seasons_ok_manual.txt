@@ -51,3 +51,35 @@ interactionCodeac@checkUpdateState
 spawnBridge   # Seasons stores the registers to other fields
 companionCheckEnableTerrainEffects   # Seasons tile checks written out from +26
 npcFaceLinkAndAnimate   # Seasons calls seasonsFunc_2678 where Ages reads var37
+interactionCode46@runState   # table entry 4 is shopkeeperState3 in Ages, shopkeeperState4 in Seasons; the guarded chain hands state4 to the interpreter
+interactionCode50@createSparkle0   # identical bytes; seasons.sym names the shared tail @createInteraction as its own label
+interactionCode89@updateState   # every differing operand is already GV (scripts, GLOBALFLAG_FINISHEDGAME); TX_3030 is the same literal
+interactionCodea1@updateSubid   # script table address carried as GV
+interactionCodea2@updateState   # script table address carried as GV
+interactionCodee5@state0   # both text table addresses carried as GV
+partCode05@updateTile   # TILEINDEX_OVERWORLD_SWITCH_ON carried as GV(0x9f, 0xb0)
+interac11_subid01@interac11_updateSparkle   # ld bc,$7858 is the same literal in both ROMs
+interactionCodea1@state0To7   # inside @updateSubid: same GV script table
+interactionCodea2@state0To7   # inside @updateState: same GV script table
+interactionCode50@createSparkle1   # identical bytes (see @createSparkle0)
+interactionCode50@createSparkle2
+interactionCode89@state0   # inside @updateState: same GVs
+partCode05@flipOverworldSwitch   # inside @updateTile: same GV
+interactionCode89@state0@initVasu   # inside @updateState: same GVs
+interactionCode89@blueSnakeErrorCondition   # vasu locals: script addresses and GLOBALFLAG_FINISHEDGAME are GV, TX_3030 is one literal
+interactionCode89@label_0a_036
+interactionCode89@loadLinkedScript
+interactionCode89@loadPrelinkedScript
+interactionCode89@setBlueSnakeExitScript
+interactionCode89@setScriptAndGotoState4
+interactionCode89@state0@initSnake
+interactionCode89@state1
+interactionCode89@state2
+interactionCode89@state3
+interactionCode89@state4
+interactionCode89@state5
+interactionCode89@state5Substate0
+interactionCode89@state5Substate1
+interactionCode89@state5Substate2
+interactionCode89@state5Substate3
+interactionCode89@state5Substate4

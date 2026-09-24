@@ -1688,13 +1688,19 @@
 06:49f5 clearParentItemH_hook -
 06:4a4e parentItemCode_foolsOre_hook -
 06:4a6b parentItemCode_punch_hook -
+06:4aa1 parentItemCode_sword_hook -
+06:4d6d parentItemCode_satchel_hook -
 06:4db4 clearSelfIfNoSeeds_hook -
 06:4dc7 parentItemGenericState1_hook -
 06:4dd1 parentItemCode_shovel_hook -
+06:4e0f parentItemCode_boomerang_hook -
 06:4e89 parentItemCode_bombchu_hook -
+06:4ea7 parentItemCode_bomb_hook -
 06:4eed tryPickupBombs_hook -
 06:4f13 makeLinkPickupObjectH_hook -
+06:4f26 parentItemCode_bracelet_hook -
 06:52d0 checkNoOtherParentItemsInUse_hook -
+06:52e2 parentItemLoadAnimationAndIncState_hook -
 06:5326 itemCreateChildIfDoesntExistAlready_hook -
 06:5328 itemCreateChildAndDeleteOnFailure_hook -
 06:532f itemCreateChild_hook -
@@ -1840,6 +1846,7 @@
 07:4a37 itemMergeZPositionIfSidescrollingArea_hook -
 07:4a4a itemUpdateSpeedZAndCheckHazards_hook -
 07:4a6b bombPullTowardPoint_hook -
+07:4a8d itemUpdateThrowingVertically_hook -
 07:4b24 itemUpdateThrowingVerticallyAndCheckHazards_hook -
 07:4b69 objectCreateClinkInteraction_hook -
 07:4b6e cpRelatedObject1ID_hook -
@@ -1847,6 +1854,7 @@
 07:4b7d itemCheckCanPassSolidTile_hook -
 07:4ba7 checkTileIsPassableFromDirection_hook -
 07:4bdf itemUpdateConveyorBelt_hook -
+07:4d3c seedItemState1_hook -
 07:4e6a seedItemDelete_hook -
 07:4e7b seedItemState3_hook -
 07:4e8b emberSeedBurn_hook -
@@ -1855,6 +1863,7 @@
 07:4edd scentSeedSmell_hook -
 07:4f0f galeSeedUpdateAnimationAndCounter_hook -
 07:4f23 galeSeedUpdateAnimation_hook -
+07:4f36 galeSeedTryToWarpLink_hook -
 07:4fea itemCode2b_hook -
 07:5031 itemCode0d_hook -
 07:510f bombchuUpdateVelocity_hook -
@@ -1880,6 +1889,7 @@
 07:548d bombResetAnimationAndSetVisiblec1_hook -
 07:5494 explosionCheckAndApplyLinkCollision_hook -
 07:54db explosionTryToBreakNextTile_hook -
+07:553a itemCode06_hook -
 07:5642 itemCheckWithinRangeOfLink_hook -
 07:5655 itemCode2a_hook -
 07:5a8c itemCode28_hook -
@@ -1905,6 +1915,7 @@
 07:5f1c tryBreakTileWithSword_hook -
 07:5fb7 itemCalculateSwordDamage_hook -
 07:6010 itemMimicBgTile_hook -
+07:6048 itemCode16_hook -
 07:6109 braceletCheckBreakable_hook -
 07:6112 braceletCheckDeleteSelfWhileThrowing_hook -
 07:613a bombUpdateThrowingLaterally_hook -
@@ -1920,10 +1931,13 @@
 08:4548 interactionCode18_hook -
 08:457e interactionCode1c_hook -
 08:479a checkReloadShopItemTiles_hook -
+08:47b0 interactionCode46_hook -
+08:47cb shopkeeperState0_hook -
 08:48a5 shopkeeperState6_hook -
 08:48c8 shopkeeperState2_hook -
 08:490d shopkeeperLoadScript_hook -
 08:4915 shopkeeperPromptChestGame_hook -
+08:496e shopkeeperGotoState1_hook -
 08:4993 shopkeeperState5_hook -
 08:4a33 shopkeeperGetItemPrice_hook -
 08:4a48 shopkeeperCloseOpenedChest_hook -
@@ -1950,6 +1964,8 @@
 08:4f32 introSpriteRunSubid04_hook -
 08:4f4e introSpriteRunSubid08_hook -
 08:4f5d introSpriteSetChildRelatedObject1ToSelf_hook -
+08:4f64 interactionCode50_hook -
+08:50f6 objectOscillateZ_body_hook -
 08:5115 interactionCode56_hook -
 08:52d4 interactionCode20_hook -
 08:56b5 interactionCode36_hook -
@@ -1982,9 +1998,11 @@
 09:47bf spinner_subid02_hook -
 09:47fa spinner_updateLinkPosition_hook -
 09:4813 spinner_setLinkRelativePosition_hook -
+09:4b79 interaction7f_subid01_hook -
 09:4ba3 interaction7f_subid02_hook -
 09:65e5 spawnBridge_hook -
 09:6d3d companionScript_delete_hook -
+0a:4000 interactionCode89_hook -
 0a:41e7 interactionCode91_hook -
 0a:42a8 interactionCode98_hook -
 0a:42b0 interactionCode98__state0_hook -
@@ -2023,7 +2041,9 @@
 0a:4b9e interactionCodec7__createObject_hook -
 0a:4bca interactionCodec7__ret_hook -
 0a:4bcd interactionCodec7__spawnObjectType_hook -
+0a:6075 interactionCodea1_hook -
 0a:6122 movingPlatform_stateC_hook -
+0a:6129 interactionCodea2_hook -
 0a:61d6 interactionCodea3_hook -
 0a:624c sidescrollingPlatformCommon_hook -
 0a:62a8 sidescrollPlatform_checkLinkSquished_hook -
@@ -2752,11 +2772,14 @@
 0d:5e17 gel_stateD_hook -
 0d:5e58 gel_beginHop_hook -
 0d:5e72 gel_setAngleAwayFromLink_hook -
+0d:5e80 enemyCode45_hook -
 0d:5ea9 pincer_state_uninitialized_hook -
 0d:5eb0 pincer_state1_hook -
 0d:5edc pincer_state_stub_hook -
+0d:5edd pincer_head_hook -
 0d:5eef pincer_head_state8_hook -
 0d:5efd pincer_head_state9_hook -
+0d:5f0b pincer_head_stateA_hook -
 0d:5f35 pincer_head_stateB_hook -
 0d:5f4b pincer_head_stateC_hook -
 0d:5f52 pincer_head_stateD_hook -
@@ -2775,11 +2798,13 @@
 0d:6082 ballAndChain_stateA_hook -
 0d:60a9 ballAndChain_spawnSpikedBall_hook -
 0d:60ca ballAndChain_setDefaultState_hook -
+0d:60cf enemyCode4d_hook -
 0d:6104 enemyCode4e_hook -
 0d:612a armMimic_uninitialized_hook -
 0d:613c armMimic_state_switchHook_hook -
 0d:6148 armMimic_state_stub_hook -
 0d:6149 armMimic_state8_hook -
+0d:616c enemyCode4f_hook -
 0d:61de moldorm_state_uninitialized_hook -
 0d:61f1 moldorm_state1_hook -
 0d:6222 moldorm_state_stub_hook -
@@ -3183,6 +3208,10 @@
 10:40cf partCommon_updateSpeedAndDeleteWhenCounter1Is0_hook -
 10:40e0 partCommon_setPositionOffsetAndRadiusFromAngle_hook -
 10:410e partCommon_incSubstate_hook -
+10:4113 partCode01_hook -
+10:4206 partCode01__getRelatedObj1ID_hook -
+10:4219 partCode01__checkCollidedWithLink_hook -
+10:4223 partCode01__linkCollectedItem_hook -
 10:429b itemDrop_initGfx_hook -
 10:42d0 itemDrop_countdownToDisappear_hook -
 10:42f5 itemDrop_initSpeed_hook -
@@ -3198,6 +3227,7 @@
 10:4499 partCode02_hook -
 10:44de partCode03_hook -
 10:4524 partCode04_hook -
+10:4558 partCode05_hook -
 10:45a8 partCode06_hook -
 10:469a partCode07_hook -
 10:4700 partCode08_hook -
@@ -3422,6 +3452,8 @@
 15:4cb6 interactionCodee2__centerOnTileAndGetDirectionToFace_hook -
 15:4cb9 interactionCodee2__getDirectionToFace_hook -
 15:4ce6 interactionCodee2__spawnChild_hook -
+15:4d56 interactionCodee5_hook -
+15:4d6c interactionCodee5__runState_hook -
 15:4e35 parseStaticObjects_hook -
 15:4ea4 loadStaticObjects_body_hook -
 15:5850 bipin_showText_subid1To9_hook -
@@ -3696,3 +3728,4 @@
 3f:5917 textControlCodeC_2_hook -
 3f:59b7 interactionCode11_hook -
 3f:59c1 interac11_subid00_hook -
+3f:5a7a interac11_subid01_hook -

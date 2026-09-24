@@ -669,38 +669,6 @@ L_4b31:
   I(0x4b56, 4); if (hook_is(gb, 0x3076, clearStaticObjects_hook)) { clearStaticObjects_hook(gb); return; } HANDOFF(0x3076);  // jp $3076
 }
 
-// 09:4b79
-void s_interaction7f_subid01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x4b79, checkInteractionState_hook, 0x23b9, 0x4b7c);  // call $23b9
-  if (!(F & FZ)) { I(0x4b7c, 4); if (hook_is(gb, 0x261d, objectPreventLinkFromPassing_hook)) { objectPreventLinkFromPassing_hook(gb); return; } HANDOFF(0x261d); } I(0x4b7c, 3);  // jp nz,$261d
-  I(0x4b7f, 2); A = 0x01;  // ld a,$01
-  I(0x4b81, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x4b82, 3); SET_BC(0x060a);  // ld bc,$060a
-  CALL(0x4b85, objectSetCollideRadii_hook, 0x2495, 0x4b88);  // call $2495
-  CALL(0x4b88, objectGetTileAtPosition_hook, 0x1432, 0x4b8b);  // call $1432
-  I(0x4b8b, 1); H = alu_dec8(gb, H);  // dec h
-  I(0x4b8c, 3); mem_wr(gb, HL, 0x0f);  // ld (hl),$0f
-  I(0x4b8e, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
-  I(0x4b91, 2); alu_cp(gb, 0x06);  // cp $06
-  if (!(F & FZ)) { I(0x4b93, 3); goto L_4b9d; } I(0x4b93, 2);  // jr nz,$4b9d
-  I(0x4b95, 3); SET_HL(0xce24);  // ld hl,$ce24
-  I(0x4b98, 3); mem_wr(gb, HL, 0x05);  // ld (hl),$05
-  I(0x4b9a, 1); L = alu_inc8(gb, L);  // inc l
-  I(0x4b9b, 3); mem_wr(gb, HL, 0x0a);  // ld (hl),$0a
-L_4b9d:
-  CALL(0x4b9d, interactionInitGraphics_hook, 0x15e9, 0x4ba0);  // call $15e9
-L_4ba0:
-  I(0x4ba0, 4); if (hook_is(gb, 0x1e30, objectSetVisible83_hook)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e30);  // jp $1e30
-}
-
-// 09:4ba0
-void s_interaction7f_subid01__afterCall4ba0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4ba0:
-  I(0x4ba0, 4); if (hook_is(gb, 0x1e30, objectSetVisible83_hook)) { objectSetVisible83_hook(gb); return; } HANDOFF(0x1e30);  // jp $1e30
-}
-
 // 09:4ba8
 void s_interaction7f_subid02__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

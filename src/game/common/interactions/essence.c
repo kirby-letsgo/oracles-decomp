@@ -53,18 +53,30 @@ static void interaction7f_subid00_addDoubleIndexToHl_from_rst(GB *gb, uint16_t r
 void interaction7f_subid01_hook(GB *gb) {
   BASE(interaction7f_subid01);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, checkInteractionState_hook, SYM(checkInteractionState), b_+3);
-  if (!(F & FZ)) { CYCT(b_+3, b_+6); objectPreventLinkFromPassing_hook(gb); return; } // jp nz
-  CYC(b_+3, b_+6);
-  CYC(b_+6, b_+8); A = 0x01;
-  CYC(b_+8, b_+9); mem_wr(gb, DE, A);
-  CYC(b_+9, b_+12); SET_BC(0x060a);
-  CALL_C(b_+12, objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+15);
-  CALL_C(b_+15, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+18);
-  CYC(b_+18, b_+19); H = alu_dec8(gb, H);
-  CYC(b_+19, b_+21); mem_wr(gb, HL, 0x0f);
-  CALL_C(b_+21, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+24);
-  CYC(b_+24, b_+27); TAIL(objectSetVisible83); // jp
+  CALL_C(b_+O(0), checkInteractionState_hook, SYM(checkInteractionState), b_+OE(3));
+  if (!(F & FZ)) { CYCT(b_+O(3), b_+OE(6)); objectPreventLinkFromPassing_hook(gb); return; } // jp nz
+  CYC(b_+O(3), b_+OE(6));
+  CYC(b_+O(6), b_+OE(8)); A = 0x01;
+  CYC(b_+O(8), b_+OE(9)); mem_wr(gb, DE, A);
+  CYC(b_+O(9), b_+OE(12)); SET_BC(0x060a);
+  CALL_C(b_+O(12), objectSetCollideRadii_hook, SYM(objectSetCollideRadii), b_+OE(15));
+  CALL_C(b_+O(15), objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+OE(18));
+  CYC(b_+O(18), b_+OE(19)); H = alu_dec8(gb, H);
+  CYC(b_+O(19), b_+OE(21)); mem_wr(gb, HL, 0x0f);
+  if (game_seasons) {
+    CYC(b_+S(21), b_+S(24)); A = W8(wDungeonIndex);
+    CYC(b_+S(24), b_+S(26)); alu_cp(gb, 0x06);
+    if (!(F & FZ)) CYCT(b_+S(26), b_+S(28));
+    else {
+      CYC(b_+S(26), b_+S(28));
+      CYC(b_+S(28), b_+S(31)); SET_HL(wRoomCollisions + 0x24);
+      CYC(b_+S(31), b_+S(33)); mem_wr(gb, HL, 0x05);
+      CYC(b_+S(33), b_+S(34)); L = alu_inc8(gb, L);
+      CYC(b_+S(34), b_+S(36)); mem_wr(gb, HL, 0x0a);
+    }
+  }
+  CALL_C(b_+O(21), interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+OE(24));
+  CYC(b_+O(24), b_+OE(27)); TAIL(objectSetVisible83); // jp
 }
 
 // interaction7f_subid02@copyEssencePosition: reached by one genuine call, from @state1's

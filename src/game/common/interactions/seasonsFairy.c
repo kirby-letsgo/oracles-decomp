@@ -8,18 +8,18 @@
 
 void objectOscillateZ_body_hook(GB *gb) {
   BASE(objectOscillateZ_body);
-  CYC(b_+0, b_+3); A = mem_rd(gb, wFrameCounter);
-  CYC(b_+3, b_+5); alu_and(gb, 0x07);
+  CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+O(3), b_+OE(5)); alu_and(gb, 0x07);
   if (!(F & FZ)) {
-    CYCT(b_+5, b_+6); ret_effect(gb); return;
+    CYCT(b_+O(5), b_+OE(6)); ret_effect(gb); return;
   }
-  CYC(b_+5, b_+6);
-  CYC(b_+6, b_+9); A = mem_rd(gb, wFrameCounter);
-  CYC(b_+9, b_+11); alu_and(gb, 0x38);
-  CYC(b_+11, b_+13); A = alu_swap(gb, A);
-  CYC(b_+13, b_+14); alu_rlca(gb);
-  CYC(b_+14, b_+17); SET_HL(b_+27);
-  CYC(b_+17, b_+18); push_effect(gb, b_+18);
+  CYC(b_+O(5), b_+OE(6));
+  CYC(b_+O(6), b_+OE(9)); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+O(9), b_+OE(11)); alu_and(gb, 0x38);
+  CYC(b_+O(11), b_+OE(13)); A = alu_swap(gb, A);
+  CYC(b_+O(13), b_+OE(14)); alu_rlca(gb);
+  CYC(b_+O(14), b_+OE(17)); SET_HL(b_+O(27));
+  CYC(b_+O(17), b_+OE(18)); push_effect(gb, b_+OE(18));
   burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
   burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
   if (!(F & FC)) {
@@ -29,13 +29,18 @@ void objectOscillateZ_body_hook(GB *gb) {
     burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
     burn_rom(gb, 0x00, 0x0014, 0x0015, false); ret_effect(gb);
   }
-  CYC(b_+18, b_+20); A = mem_rd(gb, hActiveObjectType);
-  CYC(b_+20, b_+22); alu_add(gb, 0x0f);
-  CYC(b_+22, b_+23); E = A;
-  CYC(b_+23, b_+24); A = mem_rd(gb, DE);
-  CYC(b_+24, b_+25); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+25, b_+26); mem_wr(gb, DE, A);
-  CYC(b_+26, b_+27); ret_effect(gb);
+  if (!game_seasons) {
+    CYC(b_+18, b_+20); A = mem_rd(gb, hActiveObjectType);
+    CYC(b_+20, b_+22); alu_add(gb, 0x0f);
+    CYC(b_+22, b_+23); E = A;
+    CYC(b_+23, b_+24); A = mem_rd(gb, DE);
+    CYC(b_+24, b_+25); alu_add(gb, mem_rd(gb, HL));
+  } else {
+    CYC(b_+S(18), b_+S(20)); E = 0x4f;
+    CYC(b_+S(20), b_+S(21)); A = mem_rd(gb, HL);
+  }
+  CYC(b_+O(25), b_+OE(26)); mem_wr(gb, DE, A);
+  CYC(b_+O(26), b_+OE(27)); ret_effect(gb);
 }
 
 static uint16_t seasonsFairyJumpTable(GB *gb) {

@@ -60,37 +60,6 @@ L_6cbb:
   RET(0x6cc6); return;  // ret
 }
 
-// 0a:4000
-void s_interactionCode89(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4000, 4); A = mem_rd(gb, 0xcba0);  // ld a,($cba0)
-  I(0x4003, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4004, 3); goto L_4010; } I(0x4004, 2);  // jr nz,$4010
-  I(0x4006, 2); A = 0x02;  // ld a,$02
-  I(0x4008, 4); mem_wr(gb, 0xcbac, A);  // ld ($cbac),a
-  I(0x400b, 2); A = 0x08;  // ld a,$08
-  I(0x400d, 4); mem_wr(gb, 0xcbae, A);  // ld ($cbae),a
-L_4010:
-  CALL(0x4010, s_interactionCode89__updateState, 0x401d, 0x4013);  // call $401d
-L_4013:
-  I(0x4013, 2); E = 0x42;  // ld e,$42
-  I(0x4015, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4016, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4017, 4); if (hook_is(gb, 0x229b, objectSetPriorityRelativeToLink_withTerrainEffects_hook)) { objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; } HANDOFF(0x229b); } I(0x4017, 3);  // jp nz,$229b
-  I(0x401a, 4); if (hook_is(gb, 0x2689, interactionPushLinkAwayAndUpdateDrawPriority_hook)) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; } HANDOFF(0x2689);  // jp $2689
-}
-
-// 0a:4013
-void s_interactionCode89__afterCall4013(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4013:
-  I(0x4013, 2); E = 0x42;  // ld e,$42
-  I(0x4015, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4016, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x4017, 4); if (hook_is(gb, 0x229b, objectSetPriorityRelativeToLink_withTerrainEffects_hook)) { objectSetPriorityRelativeToLink_withTerrainEffects_hook(gb); return; } HANDOFF(0x229b); } I(0x4017, 3);  // jp nz,$229b
-  I(0x401a, 4); if (hook_is(gb, 0x2689, interactionPushLinkAwayAndUpdateDrawPriority_hook)) { interactionPushLinkAwayAndUpdateDrawPriority_hook(gb); return; } HANDOFF(0x2689);  // jp $2689
-}
-
 // 0a:401d
 void s_interactionCode89__updateState(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7419,22 +7388,6 @@ L_5878:
   I(0x5878, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
-// 0a:6075
-void s_interactionCodea1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6075, sidescrollPlatform_checkLinkOnPlatform_hook, 0x6358, 0x6078);  // call $6358
-  CALL(0x6078, s_interactionCodea1__updateSubid, 0x607e, 0x607b);  // call $607e
-L_607b:
-  I(0x607b, 4); if (hook_is(gb, 0x624c, sidescrollingPlatformCommon_hook)) { sidescrollingPlatformCommon_hook(gb); return; } HANDOFF(0x624c);  // jp $624c
-}
-
-// 0a:607b
-void s_interactionCodea1__afterCall607b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_607b:
-  I(0x607b, 4); if (hook_is(gb, 0x624c, sidescrollingPlatformCommon_hook)) { sidescrollingPlatformCommon_hook(gb); return; } HANDOFF(0x624c);  // jp $624c
-}
-
 // 0a:607e
 void s_interactionCodea1__updateSubid(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -7643,24 +7596,6 @@ L_611d:
   I(0x611d, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x611e, 2); mem_wr(gb, HL, A);  // ld (hl),a
   I(0x611f, 4); if (hook_is(gb, 0x63d5, sidescrollPlatformFunc_5bfc_hook)) { sidescrollPlatformFunc_5bfc_hook(gb); return; } HANDOFF(0x63d5);  // jp $63d5
-}
-
-// 0a:6129
-void s_interactionCodea2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6129, interactionAnimate_hook, 0x25b8, 0x612c);  // call $25b8
-  CALL(0x612c, sidescrollPlatform_checkLinkOnPlatform_hook, 0x6358, 0x612f);  // call $6358
-  if (!(F & FZ)) { CALL(0x612f, sidescrollPlatform_updateLinkKnockbackForConveyor_hook, 0x638d, 0x6132); } else I(0x612f, 3);  // call nz,$638d
-  CALL(0x6132, s_interactionCodea2__updateState, 0x6138, 0x6135);  // call $6138
-L_6135:
-  I(0x6135, 4); if (hook_is(gb, 0x624c, sidescrollingPlatformCommon_hook)) { sidescrollingPlatformCommon_hook(gb); return; } HANDOFF(0x624c);  // jp $624c
-}
-
-// 0a:6135
-void s_interactionCodea2__afterCall6135(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6135:
-  I(0x6135, 4); if (hook_is(gb, 0x624c, sidescrollingPlatformCommon_hook)) { sidescrollingPlatformCommon_hook(gb); return; } HANDOFF(0x624c);  // jp $624c
 }
 
 // 0a:6138
