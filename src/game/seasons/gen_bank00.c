@@ -2031,46 +2031,6 @@ L_363f:
   RET(0x364e); return;  // ret
 }
 
-// 00:1670
-void s_loadObjectGfx(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x1670, 1); D = B;  // ld d,b
-  I(0x1671, 2); E = 0x00;  // ld e,$00
-  I(0x1673, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  s_loadObjectGfx2(gb); return;  // fallthrough
-}
-
-// 00:1674
-void s_loadObjectGfx2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x1674, 1); C = A;  // ld c,a
-  I(0x1675, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x1676, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x1677, 2); alu_and(gb, 0x7f);  // and $7f
-  I(0x1679, 1); H = A;  // ld h,a
-  PUSH(0x167a, DE);  // push de
-  I(0x167b, 4); A = mem_rd(gb, 0xcc06);  // ld a,($cc06)
-  I(0x167e, 2); alu_xor(gb, 0xff);  // xor $ff
-  I(0x1680, 4); mem_wr(gb, 0xcc06, A);  // ld ($cc06),a
-  I(0x1683, 3); SET_DE(0xdc04);  // ld de,$dc04
-  if (!(F & FZ)) { I(0x1686, 3); goto L_168b; } I(0x1686, 2);  // jr nz,$168b
-  I(0x1688, 3); SET_DE(0xde04);  // ld de,$de04
-L_168b:
-  PUSH(0x168b, DE);  // push de
-  I(0x168c, 2); B = 0x1f;  // ld b,$1f
-  CALL(0x168e, decompressGraphics_hook, 0x064e, 0x1691);  // call $064e
-  SET_HL(POP(0x1691));  // pop hl
-  SET_DE(POP(0x1692));  // pop de
-  I(0x1693, 2); C = 0x04;  // ld c,$04
-  I(0x1695, 2); A = 0x01;  // ld a,$01
-  I(0x1697, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x1699, 2); A = 0x3f;  // ld a,$3f
-  I(0x169b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x169d, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x16a0, 2); B = 0x1f;  // ld b,$1f
-  I(0x16a2, 4); if (hook_is(gb, 0x0566, queueDmaTransfer_hook)) { queueDmaTransfer_hook(gb); return; } HANDOFF(0x0566);  // jp $0566
-}
-
 // 00:1584
 void s_loadRoomCollisions__blankDataAroundCollisions(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3193,32 +3153,6 @@ void s_roomTileChangesAfterLoad02(GB *gb) {
   I(0x365d, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x365f, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   RET(0x3662); return;  // ret
-}
-
-// 00:2582
-void s_scriptFunc_jump(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x2582, 1); alu_xor(gb, A);  // xor a
-  I(0x2583, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x2584, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x2585, 1); L = A;  // ld l,a
-  I(0x2586, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
-  I(0x2588, 1); D = A;  // ld d,a
-  RET(0x2589); return;  // ret
-}
-
-// 00:257f
-void s_scriptFunc_jump_scf(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x257f, 1); alu_scf(gb);  // scf
-  I(0x2580, 3); goto L_2583;  // jr $2583
-L_2583:
-  I(0x2583, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x2584, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x2585, 1); L = A;  // ld l,a
-  I(0x2586, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
-  I(0x2588, 1); D = A;  // ld d,a
-  RET(0x2589); return;  // ret
 }
 
 // 00:0c1e

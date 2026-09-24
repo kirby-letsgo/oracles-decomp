@@ -2,22 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 0b:4435
-void s_scriptCmd_df(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4435));  // pop hl
-  I(0x4436, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4437, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CALL(0x4438, checkTreasureObtained_hook, 0x1717, 0x443b);  // call $1717
-  I(0x443b, 4); mem_wr(gb, 0xcfc1, A);  // ld ($cfc1),a
-  if (!(F & FC)) { I(0x443e, 3); goto L_4443; } I(0x443e, 2);  // jr nc,$4443
-  I(0x4440, 4); s_scriptFunc_jump(gb); return;  // jp $2582
-L_4443:
-  I(0x4443, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4444, 2); SET_HL(HL + 1);  // inc hl
-  RET(0x4445); return;  // ret
-}
-
 // 0b:419d
 void s_scriptCmd_jump(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -26,96 +10,6 @@ void s_scriptCmd_jump(GB *gb) {
   I(0x419f, 1); H = A;  // ld h,a
   I(0x41a0, 1); alu_scf(gb);  // scf
   RET(0x41a1); return;  // ret
-}
-
-// 0b:449b
-void s_scriptCmd_jumpIfCBA5Eq(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_449b;
-L_4497:
-  I(0x4497, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4498, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
-L_449b:
-  SET_HL(POP(0x449b));  // pop hl
-  I(0x449c, 2); SET_HL(HL + 1);  // inc hl
-  I(0x449d, 4); A = mem_rd(gb, 0xcba5);  // ld a,($cba5)
-  I(0x44a0, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x44a1, 3); goto L_4497; } I(0x44a1, 2);  // jr z,$4497
-  I(0x44a3, 4); if (hook_is(gb, 0x258a, scriptFunc_add3ToHl_scf_hook)) { scriptFunc_add3ToHl_scf_hook(gb); return; } HANDOFF(0x258a);  // jp $258a
-}
-
-// 0b:4562
-void s_scriptCmd_jumpIfGlobalFlagSet(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4562));  // pop hl
-  I(0x4563, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4564, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  PUSH(0x4565, HL);  // push hl
-  CALL(0x4566, checkGlobalFlag_hook, 0x30c7, 0x4569);  // call $30c7
-  SET_HL(POP(0x4569));  // pop hl
-  if ((F & FZ)) { I(0x456a, 3); goto L_456f; } I(0x456a, 2);  // jr z,$456f
-  I(0x456c, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
-L_456f:
-  I(0x456f, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4570, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4571, 1); alu_scf(gb);  // scf
-  RET(0x4572); return;  // ret
-}
-
-// 0b:43a0
-void s_scriptCmd_jumpIfInteractionByteEq(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_43a0;
-L_4398:
-  I(0x4398, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { I(0x4399, 4); if (hook_is(gb, 0x258a, scriptFunc_add3ToHl_scf_hook)) { scriptFunc_add3ToHl_scf_hook(gb); return; } HANDOFF(0x258a); } I(0x4399, 3);  // jp nz,$258a
-  I(0x439c, 2); SET_HL(HL + 1);  // inc hl
-  I(0x439d, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
-L_43a0:
-  SET_HL(POP(0x43a0));  // pop hl
-  I(0x43a1, 2); SET_HL(HL + 1);  // inc hl
-  I(0x43a2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43a3, 1); E = A;  // ld e,a
-  I(0x43a4, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x43a5, 3); goto L_4398;  // jr $4398
-}
-
-// 0b:4391
-void s_scriptCmd_jumpIfMemoryEq(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4391));  // pop hl
-  I(0x4392, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4393, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x4394, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4395, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  I(0x4396, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4397, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x4398, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if (!(F & FZ)) { I(0x4399, 4); if (hook_is(gb, 0x258a, scriptFunc_add3ToHl_scf_hook)) { scriptFunc_add3ToHl_scf_hook(gb); return; } HANDOFF(0x258a); } I(0x4399, 3);  // jp nz,$258a
-  I(0x439c, 2); SET_HL(HL + 1);  // inc hl
-  I(0x439d, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
-}
-
-// 0b:43a7
-void s_scriptCmd_jumpIfRoomFlagSet(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x43a7));  // pop hl
-  I(0x43a8, 2); SET_HL(HL + 1);  // inc hl
-  I(0x43a9, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x43aa, 1); B = A;  // ld b,a
-  PUSH(0x43ab, HL);  // push hl
-  CALL(0x43ac, getThisRoomFlags_hook, 0x1956, 0x43af);  // call $1956
-  I(0x43af, 1); alu_and(gb, B);  // and b
-  if (!(F & FZ)) { I(0x43b0, 3); goto L_43b7; } I(0x43b0, 2);  // jr nz,$43b7
-L_43b2:
-  SET_HL(POP(0x43b2));  // pop hl
-  I(0x43b3, 2); SET_HL(HL + 1);  // inc hl
-  I(0x43b4, 2); SET_HL(HL + 1);  // inc hl
-  I(0x43b5, 1); alu_scf(gb);  // scf
-  RET(0x43b6); return;  // ret
-L_43b7:
-  SET_HL(POP(0x43b7));  // pop hl
-  I(0x43b8, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
 }
 
 // 0b:43b2
@@ -134,29 +28,7 @@ void s_scriptCmd_jumpIfRoomFlagSet__flagset(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_43b7:
   SET_HL(POP(0x43b7));  // pop hl
-  I(0x43b8, 4); s_scriptFunc_jump_scf(gb); return;  // jp $257f
-}
-
-// 0b:4446
-void s_scriptCmd_jumpIfSomething(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  SET_HL(POP(0x4446));  // pop hl
-  I(0x4447, 2); SET_HL(HL + 1);  // inc hl
-  I(0x4448, 2); A = 0x41;  // ld a,$41
-  CALL(0x444a, checkTreasureObtained_hook, 0x1717, 0x444d);  // call $1717
-  if (!(F & FC)) { I(0x444d, 3); goto L_4458; } I(0x444d, 2);  // jr nc,$4458
-  I(0x444f, 1); B = A;  // ld b,a
-  I(0x4450, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4451, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x4452, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x4453, 3); goto L_4459; } I(0x4453, 2);  // jr nz,$4459
-  I(0x4455, 4); s_scriptFunc_jump(gb); return;  // jp $2582
-L_4458:
-  I(0x4458, 2); SET_HL(HL + 1);  // inc hl
-L_4459:
-  I(0x4459, 2); SET_HL(HL + 1);  // inc hl
-  I(0x445a, 2); SET_HL(HL + 1);  // inc hl
-  RET(0x445b); return;  // ret
+  I(0x43b8, 4); if (hook_is(gb, 0x257f, scriptFunc_jump_scf_hook)) { scriptFunc_jump_scf_hook(gb); return; } HANDOFF(0x257f);  // jp $257f
 }
 
 // 0b:457a

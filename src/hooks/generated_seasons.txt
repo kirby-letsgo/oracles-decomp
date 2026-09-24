@@ -203,6 +203,8 @@
 00:1632 loadObjectGfxHeaderToSlot4_hook H
 00:1646 loadTreeGfx_hook H
 00:165b loadWeaponGfx_b00_hook -
+00:1670 loadObjectGfx_hook -
+00:1674 loadObjectGfx2_hook -
 00:16a5 loadTreasureDisplayData_b00_hook -
 00:16ba decideItemDrop_hook -
 00:16d2 checkItemDropAvailable_hook -
@@ -399,6 +401,8 @@
 00:2550 scriptCmd_asmCallWithParam_hook -
 00:256b _scriptCmd_asmRetFunc_hook -
 00:2577 _scriptFunc_setupAsmCall_hook -
+00:257f scriptFunc_jump_scf_hook -
+00:2582 scriptFunc_jump_hook -
 00:258a scriptFunc_add3ToHl_scf_hook -
 00:258b scriptFunc_add3ToHl_hook -
 00:258f scriptCmd_loadScript_hook -
@@ -745,7 +749,14 @@
 01:5775 checkLockBG7Color3ToBlack__thing0_hook -
 01:5776 paletteThread_decCounter_hook -
 01:5782 func_593a_hook -
+01:578d checkUpdateDungeonMinimap_hook -
+01:579c checkUpdateDungeonMinimap__setMinimapRoom_hook -
 01:57b1 runGameLogic_hook -
+01:57bd initializeGame_hook -
+01:57d6 initializeGame__notGbaMode_hook -
+01:57f3 initializeGame__fixRespawnForGbc_hook -
+01:5847 initializeGame__resetHealth_hook -
+01:5888 initializeGame__summonLinkCutscene_hook -
 01:5892 loadingRoom_hook -
 01:58a3 func_5a60_hook -
 01:58ea func_5a60__afterCall5aad_hook -
@@ -760,6 +771,9 @@
 01:5a61 func_5c6b__afterCall5c74_hook -
 01:5a6f setEnteredWarpPosition_hook -
 01:5a9d cutscene05_hook -
+01:5adb func_5cfe_hook -
+01:5b45 func_5cfe__clearCompanion_hook -
+01:5b49 func_5cfe__end_hook -
 01:5bb5 func_5d31_hook -
 01:5bb8 func_5d31__afterCall5d34_hook -
 01:5bc5 func_5d41_hook -
@@ -770,6 +784,8 @@
 01:5c7d triggerFadeoutTransition_hook -
 01:5c85 applyWarpTransition2_hook -
 01:5cb4 setCutsceneIndexIfCutsceneTriggerSet_hook -
+01:5cc4 checkPlayRoomMusic_hook -
+01:5ce3 checkPlayRoomMusic__setMusic_hook -
 01:5d0d loadDeathRespawnBufferPreset_hook -
 01:5d46 calculateRoomEdge_hook -
 01:5d59 updateActiveRoom_hook -
@@ -2141,6 +2157,9 @@
 0b:436c scriptCmd_playSound_hook -
 0b:4375 scriptCmd_updateLinkLocalRespawnPosition_hook -
 0b:437b scriptCmd_jumpIfLinkVariableNe_hook -
+0b:4391 scriptCmd_jumpIfMemoryEq_hook -
+0b:43a0 scriptCmd_jumpIfInteractionByteEq_hook -
+0b:43a7 scriptCmd_jumpIfRoomFlagSet_hook -
 0b:43bb scriptCmd_orRoomFlags_hook -
 0b:43c7 scriptCmd_checkSomething_hook -
 0b:43d1 scriptCmd_showLoadedText_hook -
@@ -2148,12 +2167,15 @@
 0b:43e9 scriptCmd_setMusic_hook -
 0b:43fc scriptCmd_orMemory_hook -
 0b:4408 scriptCmd_spawnItem_hook -
+0b:4435 scriptCmd_df_hook -
+0b:4446 scriptCmd_jumpIfSomething_hook -
 0b:445c scriptCmd_setLinkCantMove_hook -
 0b:4463 scriptCmd_checkCounter2Zero_hook -
 0b:446b scriptCmd_setTile_hook -
 0b:4477 scriptCmd_setTileHere_hook -
 0b:447e scriptCmd_callScript_hook -
 0b:448e scriptCmd_ret_hook -
+0b:449b scriptCmd_jumpIfCBA5Eq_hook -
 0b:44a6 scriptCmd_jumpRandom_hook -
 0b:44b2 scriptCmd_jumpTable_hook -
 0b:44bb scriptCmd_jumpIfMemorySet_hook -
@@ -2169,6 +2191,7 @@
 0b:453e scriptCmd_checkRupeeDisplayUpdated_hook -
 0b:4552 scriptCmd_checkNotCollidedWithLink_ignoreZ_hook -
 0b:455c scriptCmd_createPuff_hook -
+0b:4562 scriptCmd_jumpIfGlobalFlagSet_hook -
 0b:4573 scriptCmd_setOrUnsetGlobalFlag_hook -
 0b:458a scriptCmd_initNpcHitbox_hook -
 0b:459e scriptCmd_moveNpcUp_hook -

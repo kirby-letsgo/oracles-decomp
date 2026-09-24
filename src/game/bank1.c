@@ -2912,7 +2912,7 @@ void screen_transition_state2_body_hook(GB *gb) {
     else if (!game_seasons && jt_ == b_+185) { goto done_boundary_checks; }
     else if (jt_ == b_+O(209)) { goto start_transition; }
   } while (0);
-  if (entry == b_+O(0)) {
+  if (entry == b_) {
     CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wLinkInAir);
     CYC(b_+O(3), b_+OE(4)); alu_add(gb, A);
     if (F & FC) { CYCT(b_+O(4), b_+OE(6)); goto check_direction; }
@@ -2923,7 +2923,7 @@ void screen_transition_state2_body_hook(GB *gb) {
     CYC(b_+O(10), b_+OE(13)); mem_wr(gb, wScreenTransitionDelay, A);
   }
 check_direction:
-  if (entry == b_+O(0)) {
+  if (entry == b_) {
     CYC(b_+O(13), b_+OE(16)); A = mem_rd(gb, wScreenTransitionDirection);
     CYC(b_+O(16), b_+OE(18)); alu_bit(gb, 7, A);
     if (!(F & FZ)) {
@@ -4550,33 +4550,47 @@ void getFirstDungeonLayoutAddress_hook(GB *gb) {
 
 static void check_update_dungeon_minimap(GB *gb, uint16_t entry) {
   BASE(checkUpdateDungeonMinimap);
-  if (entry == b_+0) {
-    CYC(b_+0, b_+3); A = W8(wTilesetFlags);
-    CYC(b_+3, b_+5); alu_bit(gb, 4, A);
-    if (!(F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
-    CYC(b_+5, b_+6);
-    CYC(b_+6, b_+8); alu_bit(gb, 5, A);
-    if (!(F & FZ)) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
-    CYC(b_+8, b_+9);
-    CYC(b_+9, b_+11); alu_bit(gb, 0, A);
-    if (!(F & FZ)) { CYCT(b_+11, b_+13); goto set_minimap_room; }
-    CYC(b_+11, b_+13);
-    CYC(b_+13, b_+15); alu_bit(gb, 3, A);
-    if (F & FZ) { CYCT(b_+15, b_+16); ret_effect(gb); return; }
-    CYC(b_+15, b_+16);
+  if (entry == b_) {
+    if (game_seasons) {      // Seasons: groups 0-2 always, else only inside dungeons
+      CYC(b_+S(0), b_+S(3)); A = W8(wActiveGroup);
+      CYC(b_+S(3), b_+S(5)); alu_cp(gb, 0x03);
+      if (F & FC) { CYCT(b_+S(5), b_+S(7)); goto set_minimap_room; }
+      CYC(b_+S(5), b_+S(7));
+      CYC(b_+S(7), b_+S(9)); alu_bit(gb, 1, A);
+      if (!(F & FZ)) { CYCT(b_+S(9), b_+S(10)); ret_effect(gb); return; }
+      CYC(b_+S(9), b_+S(10));
+      CYC(b_+S(10), b_+S(13)); A = W8(wDungeonIndex);
+      CYC(b_+S(13), b_+S(14)); A = alu_inc8(gb, A);
+      if (F & FZ) { CYCT(b_+S(14), b_+S(15)); ret_effect(gb); return; }
+      CYC(b_+S(14), b_+S(15));
+    } else {
+      CYC(b_+0, b_+3); A = W8(wTilesetFlags);
+      CYC(b_+3, b_+5); alu_bit(gb, 4, A);
+      if (!(F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+      CYC(b_+5, b_+6);
+      CYC(b_+6, b_+8); alu_bit(gb, 5, A);
+      if (!(F & FZ)) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
+      CYC(b_+8, b_+9);
+      CYC(b_+9, b_+11); alu_bit(gb, 0, A);
+      if (!(F & FZ)) { CYCT(b_+11, b_+13); goto set_minimap_room; }
+      CYC(b_+11, b_+13);
+      CYC(b_+13, b_+15); alu_bit(gb, 3, A);
+      if (F & FZ) { CYCT(b_+15, b_+16); ret_effect(gb); return; }
+      CYC(b_+15, b_+16);
+    }
   }
 set_minimap_room:
-  CYC(b_+16, b_+19); SET_HL(wMinimapDungeonFloor);
-  CYC(b_+19, b_+22); A = W8(wDungeonFloor);
-  CYC(b_+22, b_+23); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+23, b_+26); A = W8(wDungeonMapPosition);
-  CYC(b_+26, b_+27); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+27, b_+30); A = W8(wActiveRoom);
-  CYC(b_+30, b_+31); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+31, b_+34); A = W8(wActiveGroup);
-  CYC(b_+34, b_+35); C = mem_rd(gb, HL);
-  CYC(b_+35, b_+36); mem_wr(gb, HL, A);
-  CYC(b_+36, b_+37); ret_effect(gb);
+  CYC(b_+O(16), b_+OE(19)); SET_HL(wMinimapDungeonFloor);
+  CYC(b_+O(19), b_+OE(22)); A = W8(wDungeonFloor);
+  CYC(b_+O(22), b_+OE(23)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(23), b_+OE(26)); A = W8(wDungeonMapPosition);
+  CYC(b_+O(26), b_+OE(27)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(27), b_+OE(30)); A = W8(wActiveRoom);
+  CYC(b_+O(30), b_+OE(31)); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+O(31), b_+OE(34)); A = W8(wActiveGroup);
+  CYC(b_+O(34), b_+OE(35)); C = mem_rd(gb, HL);
+  CYC(b_+O(35), b_+OE(36)); mem_wr(gb, HL, A);
+  CYC(b_+O(36), b_+OE(37)); ret_effect(gb);
 }
 
 void checkUpdateDungeonMinimap_hook(GB *gb) { check_update_dungeon_minimap(gb, SYM(checkUpdateDungeonMinimap)); }
@@ -4603,38 +4617,62 @@ void checkBrightenRoom_hook(GB *gb) {
 
 static void check_play_room_music(GB *gb, uint16_t entry, uint16_t sp0_) {
   BASE(checkPlayRoomMusic);
-  if (entry == b_+0) {
-    CYC(b_+0, b_+2); A = 0x0a;
-    CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
-    if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
-    CYC(b_+5, b_+6);
-    CYC(b_+6, b_+9); A = W8(wActiveMusic);
-    CYC(b_+9, b_+10); alu_or(gb, A);
-    if (F & FZ) { CYCT(b_+10, b_+11); ret_effect(gb); return; }
-    CYC(b_+10, b_+11);
-    CYC(b_+11, b_+14); A = W8(wActiveMusic2);
-    CYC(b_+14, b_+16); alu_cp(gb, 0x24);
-    if (!(F & FZ)) { CYCT(b_+16, b_+18); goto load_music; }
-    CYC(b_+16, b_+18);
-    CYC(b_+18, b_+21); A = W8(wActiveGroup);
-    CYC(b_+21, b_+22); alu_or(gb, A);
-    if (!(F & FZ)) { CYCT(b_+22, b_+24); goto load_music; }
-    CYC(b_+22, b_+24);
-    CYC(b_+24, b_+27); A = mem_rd(gb, wGroup0RoomFlags + 3);
-    CYC(b_+27, b_+29); alu_bit(gb, 0, A);
-    if (!(F & FZ)) { CYCT(b_+29, b_+31); goto load_music; }
-    CYC(b_+29, b_+31);
-    CYC(b_+31, b_+33); A = 0x1f;
-    CYC(b_+33, b_+36); W8(wActiveMusic2) = A;
-load_music:
-    CYC(b_+36, b_+39); A = W8(wActiveMusic2);
+  if (entry == b_) {
+    if (game_seasons) {      // Seasons: once global flag $0b is set, music $28 plays as $27
+      CYC(b_+S(0), b_+S(2)); A = 0x0a;
+      CALL_C(b_+S(2), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+S(5));
+      if (F & FZ) { CYCT(b_+S(5), b_+S(6)); ret_effect(gb); return; }
+      CYC(b_+S(5), b_+S(6));
+      CYC(b_+S(6), b_+S(8)); A = 0x0b;
+      CALL_C(b_+S(8), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+S(11));
+      if (F & FZ) { CYCT(b_+S(11), b_+S(13)); goto seasons_music; }
+      CYC(b_+S(11), b_+S(13));
+      CYC(b_+S(13), b_+S(16)); A = W8(wActiveMusic2);
+      CYC(b_+S(16), b_+S(18)); alu_cp(gb, 0x28);
+      if (!(F & FZ)) { CYCT(b_+S(18), b_+S(20)); goto seasons_music; }
+      CYC(b_+S(18), b_+S(20));
+      CYC(b_+S(20), b_+S(21)); A = alu_dec8(gb, A);
+      CYC(b_+S(21), b_+S(23)); goto compare;
+  seasons_music:
+      CYC(b_+S(23), b_+S(26)); A = W8(wActiveMusic);
+      CYC(b_+S(26), b_+S(27)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(27), b_+S(28)); ret_effect(gb); return; }
+      CYC(b_+S(27), b_+S(28));
+      CYC(b_+S(28), b_+S(31)); A = W8(wActiveMusic2);
+    } else {
+      CYC(b_+0, b_+2); A = 0x0a;
+      CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
+      if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
+      CYC(b_+5, b_+6);
+      CYC(b_+6, b_+9); A = W8(wActiveMusic);
+      CYC(b_+9, b_+10); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+10, b_+11); ret_effect(gb); return; }
+      CYC(b_+10, b_+11);
+      CYC(b_+11, b_+14); A = W8(wActiveMusic2);
+      CYC(b_+14, b_+16); alu_cp(gb, 0x24);
+      if (!(F & FZ)) { CYCT(b_+16, b_+18); goto load_music; }
+      CYC(b_+16, b_+18);
+      CYC(b_+18, b_+21); A = W8(wActiveGroup);
+      CYC(b_+21, b_+22); alu_or(gb, A);
+      if (!(F & FZ)) { CYCT(b_+22, b_+24); goto load_music; }
+      CYC(b_+22, b_+24);
+      CYC(b_+24, b_+27); A = mem_rd(gb, wGroup0RoomFlags + 3);
+      CYC(b_+27, b_+29); alu_bit(gb, 0, A);
+      if (!(F & FZ)) { CYCT(b_+29, b_+31); goto load_music; }
+      CYC(b_+29, b_+31);
+      CYC(b_+31, b_+33); A = 0x1f;
+      CYC(b_+33, b_+36); W8(wActiveMusic2) = A;
+  load_music:
+      CYC(b_+36, b_+39); A = W8(wActiveMusic2);
+    }
   }
-  CYC(b_+39, b_+42); SET_HL(wActiveMusic);
-  CYC(b_+42, b_+43); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+43, b_+44); ret_effect(gb); return; }
-  CYC(b_+43, b_+44);
-  CYC(b_+44, b_+45); mem_wr(gb, HL, A);
-  CYC(b_+45, b_+48); playSound_b00_hook(gb);
+compare:
+  CYC(b_+O(39), b_+OE(42)); SET_HL(wActiveMusic);
+  CYC(b_+O(42), b_+OE(43)); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(43), b_+OE(44)); ret_effect(gb); return; }
+  CYC(b_+O(43), b_+OE(44));
+  CYC(b_+O(44), b_+OE(45)); mem_wr(gb, HL, A);
+  CYC(b_+O(45), b_+OE(48)); TAIL(playSound_b00);
 }
 
 void checkPlayRoomMusic_hook(GB *gb) { uint16_t sp0_ = gb->sp; check_play_room_music(gb, SYM(checkPlayRoomMusic), sp0_); }
@@ -4651,43 +4689,111 @@ void func_593a_hook(GB *gb) {
 
 static void func_5cfe(GB *gb, uint16_t entry, uint16_t sp0_) {
   BASE(func_5cfe);
-  if (entry == b_+42) goto clear_companion;
-  if (entry == b_+46) goto end;
-  if (entry == b_+0) {
-    CYC(b_+0, b_+3); A = W8(wcc4c);
-    CYC(b_+3, b_+4); alu_or(gb, A);
-    if (F & FZ) { CYCT(b_+4, b_+6); goto body; }
-    CYC(b_+4, b_+6);
-    CYC(b_+6, b_+9); A = mem_rd(gb, w1Companion_enabled);
-    CYC(b_+9, b_+10); alu_or(gb, A);
-    if (F & FZ) { CYCT(b_+10, b_+12); goto clear_companion; }
-    CYC(b_+10, b_+12);
-    CYC(b_+12, b_+15); A = mem_rd(gb, w1Companion_id);
-    CYC(b_+15, b_+17); alu_cp(gb, 0x0a);
-    if (F & FZ) { CYCT(b_+17, b_+19); goto clear_companion; }
-    CYC(b_+17, b_+19);
-    CYC(b_+19, b_+21); alu_cp(gb, 0x0e);
-    if (F & FZ) { CYCT(b_+21, b_+23); goto clear_companion; }
-    CYC(b_+21, b_+23);
+  if (entry == b_+O(42)) goto clear_companion;
+  if (entry == b_+O(46)) goto end;
+  if (entry == b_) {
+    if (game_seasons) {
+      // Seasons remembers where to put the companion: at tile $20's spot in the room, moved up a
+      // row unless the tiles around it are blank
+      CYC(b_+S(0), b_+S(3)); A = W8(wcc4c);
+      CYC(b_+S(3), b_+S(4)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(4), b_+S(6)); goto body; }
+      CYC(b_+S(4), b_+S(6));
+      CYC(b_+S(6), b_+S(8)); A = 0x20;
+      CALL_C(b_+S(8), findTileInRoom_hook, SYM(findTileInRoom), b_+S(11));
+      if (!(F & FZ)) { CYCT(b_+S(11), b_+S(13)); goto clear_companion; }
+      CYC(b_+S(11), b_+S(13));
+      CYC(b_+S(13), b_+S(15)); H = 0xce;
+      CYC(b_+S(15), b_+S(16)); L = alu_dec8(gb, L);
+      CYC(b_+S(16), b_+S(17)); A = mem_rd(gb, HL);
+      CYC(b_+S(17), b_+S(18)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(18), b_+S(20)); goto seasons_position; }
+      CYC(b_+S(18), b_+S(20));
+      CYC(b_+S(20), b_+S(21)); L = alu_inc8(gb, L);
+      CYC(b_+S(21), b_+S(22)); L = alu_inc8(gb, L);
+      CYC(b_+S(22), b_+S(23)); A = mem_rd(gb, HL);
+      CYC(b_+S(23), b_+S(24)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(24), b_+S(26)); goto seasons_position; }
+      CYC(b_+S(24), b_+S(26));
+      CYC(b_+S(26), b_+S(28)); A = 0x0f;
+      CYC(b_+S(28), b_+S(29)); alu_add(gb, L);
+      CYC(b_+S(29), b_+S(30)); L = A;
+      CYC(b_+S(30), b_+S(31)); A = mem_rd(gb, HL);
+      CYC(b_+S(31), b_+S(32)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(32), b_+S(34)); goto seasons_position; }
+      CYC(b_+S(32), b_+S(34));
+      CYC(b_+S(34), b_+S(35)); A = L;
+      CYC(b_+S(35), b_+S(37)); alu_sub(gb, 0x20);
+      CYC(b_+S(37), b_+S(38)); L = A;
+  seasons_position:
+      CYC(b_+S(38), b_+S(39)); C = L;
+      CALL_C(b_+S(39), convertShortToLongPosition_paramC_hook, SYM(convertShortToLongPosition_paramC), b_+S(42));
+      CYC(b_+S(42), b_+S(43)); A = B;
+      CYC(b_+S(43), b_+S(46)); W8(wRememberedCompanionY) = A;
+      CYC(b_+S(46), b_+S(47)); A = C;
+      CYC(b_+S(47), b_+S(50)); W8(wRememberedCompanionX) = A;
+      CYC(b_+S(50), b_+S(53)); A = mem_rd(gb, w1Companion_enabled);
+      CYC(b_+S(53), b_+S(54)); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+S(54), b_+S(56)); goto clear_companion; }
+      CYC(b_+S(54), b_+S(56));
+      CYC(b_+S(56), b_+S(59)); A = mem_rd(gb, w1Companion_id);
+      CYC(b_+S(59), b_+S(61)); alu_cp(gb, 0x0a);
+      if (F & FZ) { CYCT(b_+S(61), b_+S(63)); goto clear_companion; }
+      CYC(b_+S(61), b_+S(63));
+      CYC(b_+S(63), b_+S(65)); alu_cp(gb, 0x0e);
+      if (F & FZ) { CYCT(b_+S(65), b_+S(67)); goto clear_companion; }
+      CYC(b_+S(65), b_+S(67));
+      CYC(b_+S(67), b_+S(70)); SET_HL(w1Companion + 0x04);
+      CYC(b_+S(70), b_+S(71)); alu_xor(gb, A);
+      CYC(b_+S(71), b_+S(72)); mem_wr(gb, HL, A);
+      CYC(b_+S(72), b_+S(74)); L = 0x03;
+      CYC(b_+S(74), b_+S(75)); mem_wr(gb, HL, A);
+      CYC(b_+S(75), b_+S(76)); A = B;
+      CYC(b_+S(76), b_+S(78)); L = 0x0b;
+      CYC(b_+S(78), b_+S(79)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+      CYC(b_+S(79), b_+S(80)); L = alu_inc8(gb, L);
+      CYC(b_+S(80), b_+S(81)); A = C;
+      CYC(b_+S(81), b_+S(82)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+      CYC(b_+S(82), b_+S(83)); L = alu_inc8(gb, L);
+      CYC(b_+S(83), b_+S(84)); alu_xor(gb, A);
+      CYC(b_+S(84), b_+S(85)); mem_wr(gb, HL, A);
+      CYC(b_+S(85), b_+S(87)); goto end;
+    } else {
+      CYC(b_+0, b_+3); A = W8(wcc4c);
+      CYC(b_+3, b_+4); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+4, b_+6); goto body; }
+      CYC(b_+4, b_+6);
+      CYC(b_+6, b_+9); A = mem_rd(gb, w1Companion_enabled);
+      CYC(b_+9, b_+10); alu_or(gb, A);
+      if (F & FZ) { CYCT(b_+10, b_+12); goto clear_companion; }
+      CYC(b_+10, b_+12);
+      CYC(b_+12, b_+15); A = mem_rd(gb, w1Companion_id);
+      CYC(b_+15, b_+17); alu_cp(gb, 0x0a);
+      if (F & FZ) { CYCT(b_+17, b_+19); goto clear_companion; }
+      CYC(b_+17, b_+19);
+      CYC(b_+19, b_+21); alu_cp(gb, 0x0e);
+      if (F & FZ) { CYCT(b_+21, b_+23); goto clear_companion; }
+      CYC(b_+21, b_+23);
+    }
   }
 body:
-  CALL_C(b_+23, func_4493_hook, SYM(func_4493), b_+26);
-  CYC(b_+26, b_+29); A = W8(wLinkGrabState2);
-  CYC(b_+29, b_+31); alu_and(gb, 0xf0);
-  CYC(b_+31, b_+33); alu_cp(gb, 0x40);
-  if (F & FZ) { CYCT(b_+33, b_+35); goto end; }
-  CYC(b_+33, b_+35);
-  CYC(b_+35, b_+38); A = W8(wLinkObjectIndex);
-  CYC(b_+38, b_+40); alu_bit(gb, 0, A);
-  if (!(F & FZ)) { CYCT(b_+40, b_+42); goto end; }
-  CYC(b_+40, b_+42);
+  CALL_C(b_+O(23), func_4493_hook, SYM(func_4493), b_+OE(26));
+  CYC(b_+O(26), b_+OE(29)); A = W8(wLinkGrabState2);
+  CYC(b_+O(29), b_+OE(31)); alu_and(gb, 0xf0);
+  CYC(b_+O(31), b_+OE(33)); alu_cp(gb, 0x40);
+  if (F & FZ) { CYCT(b_+O(33), b_+OE(35)); goto end; }
+  CYC(b_+O(33), b_+OE(35));
+  CYC(b_+O(35), b_+OE(38)); A = W8(wLinkObjectIndex);
+  CYC(b_+O(38), b_+OE(40)); alu_bit(gb, 0, A);
+  if (!(F & FZ)) { CYCT(b_+O(40), b_+OE(42)); goto end; }
+  CYC(b_+O(40), b_+OE(42));
 clear_companion:
-  CYC(b_+42, b_+43); alu_xor(gb, A);
-  CYC(b_+43, b_+46); W8(wRememberedCompanionId) = A;
+  CYC(b_+O(42), b_+OE(43)); alu_xor(gb, A);
+  CYC(b_+O(43), b_+OE(46)); W8(wRememberedCompanionId) = A;
 end:
-  CYC(b_+46, b_+47); alu_xor(gb, A);
-  CYC(b_+47, b_+50); W8(wcc4c) = A;
-  CYC(b_+50, b_+51); ret_effect(gb);
+  CYC(b_+O(46), b_+OE(47)); alu_xor(gb, A);
+  CYC(b_+O(47), b_+OE(50)); W8(wcc4c) = A;
+  CYC(b_+O(50), b_+OE(51)); ret_effect(gb);
 }
 
 void func_5cfe_hook(GB *gb) { uint16_t sp0_ = gb->sp; func_5cfe(gb, SYM(func_5cfe), sp0_); }
@@ -4801,134 +4907,140 @@ void runGameLogic_hook(GB *gb) {
 
 static void initialize_game(GB *gb, uint16_t entry, uint16_t sp0_) {
   BASE(initializeGame);
-  if (entry == b_+25) goto not_gba_mode;
-  if (entry == b_+54) goto fix_respawn;
-  if (entry == b_+138) goto reset_health;
-  if (entry == b_+207) goto summon_link;
+  if (entry == b_+O(25)) goto not_gba_mode;
+  if (entry == b_+O(54)) goto fix_respawn;
+  if (entry == b_+O(138)) goto reset_health;
+  if (entry == b_+O(207)) goto summon_link;
 
-  CYC(b_+0, b_+3); SET_HL(wOamEnd);
-  CYC(b_+3, b_+6); SET_BC(0x0460);
-  CALL_C(b_+6, clearMemoryBc_hook, SYM(clearMemoryBc), b_+9);
-  CALL_C(b_+9, clearScreenVariablesAndWramBank1_hook, SYM(clearScreenVariablesAndWramBank1), b_+12);
-  CALL_C(b_+12, initializeSeedTreeRefillData_hook, SYM(initializeSeedTreeRefillData), b_+15);
-  CYC(b_+15, b_+17); A = 0x0f;
-  CALL_C(b_+17, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+20);
-  CYC(b_+20, b_+22); A = H8(hGameboyType);
-  CYC(b_+22, b_+23); alu_rlca(gb);
-  if (F & FC) { CYCT(b_+23, b_+25); goto load_respawn; }
-  CYC(b_+23, b_+25);
+  CYC(b_+O(0), b_+OE(3)); SET_HL(wOamEnd);
+  CYC(b_+O(3), b_+OE(6)); SET_BC(0x0460);
+  CALL_C(b_+O(6), clearMemoryBc_hook, SYM(clearMemoryBc), b_+OE(9));
+  CALL_C(b_+O(9), clearScreenVariablesAndWramBank1_hook, SYM(clearScreenVariablesAndWramBank1), b_+OE(12));
+  CALL_C(b_+O(12), initializeSeedTreeRefillData_hook, SYM(initializeSeedTreeRefillData), b_+OE(15));
+  CYC(b_+O(15), b_+OE(17)); A = 0x0f;
+  CALL_C(b_+O(17), loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+OE(20));
+  CYC(b_+O(20), b_+OE(22)); A = H8(hGameboyType);
+  CYC(b_+O(22), b_+OE(23)); alu_rlca(gb);
+  if (F & FC) { CYCT(b_+O(23), b_+OE(25)); goto load_respawn; }
+  CYC(b_+O(23), b_+OE(25));
 
 not_gba_mode:
-  CYC(b_+25, b_+28); SET_HL(wDeathRespawnBuffer);
-  CYC(b_+28, b_+29); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+29, b_+30); L = mem_rd(gb, HL);
-  CYC(b_+30, b_+31); H = A;
-  CYC(b_+31, b_+34); SET_BC(0x03fe);
-  CALL_C(b_+34, compareHlToBc_hook, SYM(compareHlToBc), b_+37);
-  if (F & FZ) { CYCT(b_+37, b_+39); goto fix_respawn; }
-  CYC(b_+37, b_+39);
-  CYC(b_+39, b_+42); SET_BC(0x0158);
-  CALL_C(b_+42, compareHlToBc_hook, SYM(compareHlToBc), b_+45);
-  if (!(F & FZ)) { CYCT(b_+45, b_+47); goto load_respawn; }
-  CYC(b_+45, b_+47);
-  CYC(b_+47, b_+50); A = W8(wDeathRespawnBuffer_x);
-  CYC(b_+50, b_+52); alu_cp(gb, 0x40);
-  if (F & FC) { CYCT(b_+52, b_+54); goto load_respawn; }
-  CYC(b_+52, b_+54);
+  CYC(b_+O(25), b_+OE(28)); SET_HL(wDeathRespawnBuffer);
+  CYC(b_+O(28), b_+OE(29)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(29), b_+OE(30)); L = mem_rd(gb, HL);
+  CYC(b_+O(30), b_+OE(31)); H = A;
+  CYC(b_+O(31), b_+OE(34)); SET_BC(GV(0x03fe, 0x03af));
+  CALL_C(b_+O(34), compareHlToBc_hook, SYM(compareHlToBc), b_+OE(37));
+  if (F & FZ) { CYCT(b_+O(37), b_+OE(39)); goto fix_respawn; }
+  CYC(b_+O(37), b_+OE(39));
+  CYC(b_+O(39), b_+OE(42)); SET_BC(GV(0x0158, 0x00c5));
+  CALL_C(b_+O(42), compareHlToBc_hook, SYM(compareHlToBc), b_+OE(45));
+  if (!(F & FZ)) { CYCT(b_+O(45), b_+OE(47)); goto load_respawn; }
+  CYC(b_+O(45), b_+OE(47));
+  CYC(b_+O(47), b_+OE(50)); A = W8(wDeathRespawnBuffer_x);
+  CYC(b_+O(50), b_+OE(52)); alu_cp(gb, 0x40);
+  if (F & FC) { CYCT(b_+O(52), b_+OE(54)); goto load_respawn; }
+  CYC(b_+O(52), b_+OE(54));
 
 fix_respawn:
-  CYC(b_+54, b_+56); C = 0x03;
-  CALL_C(b_+56, loadDeathRespawnBufferPreset_hook, SYM(loadDeathRespawnBufferPreset), b_+59);
+  CYC(b_+O(54), b_+OE(56)); C = 0x03;
+  CALL_C(b_+O(56), loadDeathRespawnBufferPreset_hook, SYM(loadDeathRespawnBufferPreset), b_+OE(59));
 
 load_respawn:
-  CYC(b_+59, b_+62); A = W8(wFileIsLinkedGame);
-  CYC(b_+62, b_+65); W8(wIsLinkedGame) = A;
-  CYC(b_+65, b_+68); SET_HL(wDeathRespawnBuffer);
-  CYC(b_+68, b_+69); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+69, b_+72); W8(wActiveGroup) = A;
-  CYC(b_+72, b_+73); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+73, b_+76); W8(wActiveRoom) = A;
-  CYC(b_+76, b_+77); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+77, b_+80); W8(wRoomStateModifier) = A;
-  CYC(b_+80, b_+82); A = 0x03;
-  CYC(b_+82, b_+85); mem_wr(gb, w1Link_enabled, A);
-  CYC(b_+85, b_+86); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+86, b_+89); mem_wr(gb, w1Link_direction, A);
-  CYC(b_+89, b_+92); W8(wLinkLocalRespawnDir) = A;
-  CYC(b_+92, b_+93); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+93, b_+96); mem_wr(gb, w1Link_yh, A);
-  CYC(b_+96, b_+99); W8(wLinkLocalRespawnY) = A;
-  CYC(b_+99, b_+100); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+100, b_+103); mem_wr(gb, w1Link_xh, A);
-  CYC(b_+103, b_+106); W8(wLinkLocalRespawnX) = A;
-  CYC(b_+106, b_+107); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+107, b_+110); W8(wRememberedCompanionId) = A;
-  CYC(b_+110, b_+111); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+111, b_+114); W8(wRememberedCompanionGroup) = A;
-  CYC(b_+114, b_+115); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+115, b_+118); W8(wRememberedCompanionRoom) = A;
-  CYC(b_+118, b_+119); L = alu_inc8(gb, L);
-  CYC(b_+119, b_+120); L = alu_inc8(gb, L);
-  CYC(b_+120, b_+121); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+121, b_+124); W8(wRememberedCompanionY) = A;
-  CYC(b_+124, b_+125); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+125, b_+128); W8(wRememberedCompanionX) = A;
-  CYC(b_+128, b_+130); L = 0xaa;
-  CYC(b_+130, b_+131); A = mem_rd(gb, HL);
-  CYC(b_+131, b_+132); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+132, b_+134); goto reset_health; }
-  CYC(b_+132, b_+134);
-  CYC(b_+134, b_+136); alu_bit(gb, 7, A);
-  if (F & FZ) { CYCT(b_+136, b_+138); goto health_ready; }
-  CYC(b_+136, b_+138);
+  CYC(b_+O(59), b_+OE(62)); A = W8(wFileIsLinkedGame);
+  CYC(b_+O(62), b_+OE(65)); W8(wIsLinkedGame) = A;
+  CYC(b_+O(65), b_+OE(68)); SET_HL(wDeathRespawnBuffer);
+  CYC(b_+O(68), b_+OE(69)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(69), b_+OE(72)); W8(wActiveGroup) = A;
+  CYC(b_+O(72), b_+OE(73)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(73), b_+OE(76)); W8(wActiveRoom) = A;
+  CYC(b_+O(76), b_+OE(77)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(77), b_+OE(80)); W8(wRoomStateModifier) = A;
+  CYC(b_+O(80), b_+OE(82)); A = 0x03;
+  CYC(b_+O(82), b_+OE(85)); mem_wr(gb, w1Link_enabled, A);
+  CYC(b_+O(85), b_+OE(86)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(86), b_+OE(89)); mem_wr(gb, w1Link_direction, A);
+  CYC(b_+O(89), b_+OE(92)); W8(wLinkLocalRespawnDir) = A;
+  CYC(b_+O(92), b_+OE(93)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(93), b_+OE(96)); mem_wr(gb, w1Link_yh, A);
+  CYC(b_+O(96), b_+OE(99)); W8(wLinkLocalRespawnY) = A;
+  CYC(b_+O(99), b_+OE(100)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(100), b_+OE(103)); mem_wr(gb, w1Link_xh, A);
+  CYC(b_+O(103), b_+OE(106)); W8(wLinkLocalRespawnX) = A;
+  CYC(b_+O(106), b_+OE(107)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(107), b_+OE(110)); W8(wRememberedCompanionId) = A;
+  CYC(b_+O(110), b_+OE(111)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(111), b_+OE(114)); W8(wRememberedCompanionGroup) = A;
+  CYC(b_+O(114), b_+OE(115)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(115), b_+OE(118)); W8(wRememberedCompanionRoom) = A;
+  CYC(b_+O(118), b_+OE(119)); L = alu_inc8(gb, L);
+  CYC(b_+O(119), b_+OE(120)); L = alu_inc8(gb, L);
+  CYC(b_+O(120), b_+OE(121)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(121), b_+OE(124)); W8(wRememberedCompanionY) = A;
+  CYC(b_+O(124), b_+OE(125)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(125), b_+OE(128)); W8(wRememberedCompanionX) = A;
+  CYC(b_+O(128), b_+OE(130)); L = GV(0xaa, 0xa2);
+  CYC(b_+O(130), b_+OE(131)); A = mem_rd(gb, HL);
+  CYC(b_+O(131), b_+OE(132)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(132), b_+OE(134)); goto reset_health; }
+  CYC(b_+O(132), b_+OE(134));
+  CYC(b_+O(134), b_+OE(136)); alu_bit(gb, 7, A);
+  if (F & FZ) { CYCT(b_+O(136), b_+OE(138)); goto health_ready; }
+  CYC(b_+O(136), b_+OE(138));
 
 reset_health:
-  CYC(b_+138, b_+139); L = alu_inc8(gb, L);
-  CYC(b_+139, b_+140); A = mem_rd(gb, HL); SET_HL(HL - 1);
-  CYC(b_+140, b_+142); A = alu_srl(gb, A);
-  CYC(b_+142, b_+144); alu_and(gb, 0xfc);
-  CYC(b_+144, b_+146); alu_cp(gb, 0x0c);
-  if (!(F & FC)) { CYCT(b_+146, b_+148); goto health_ready; }
-  CYC(b_+146, b_+148);
-  CYC(b_+148, b_+150); A = 0x0c;
+  CYC(b_+O(138), b_+OE(139)); L = alu_inc8(gb, L);
+  CYC(b_+O(139), b_+OE(140)); A = mem_rd(gb, HL); SET_HL(HL - 1);
+  CYC(b_+O(140), b_+OE(142)); A = alu_srl(gb, A);
+  CYC(b_+O(142), b_+OE(144)); alu_and(gb, 0xfc);
+  CYC(b_+O(144), b_+OE(146)); alu_cp(gb, 0x0c);
+  if (!(F & FC)) { CYCT(b_+O(146), b_+OE(148)); goto health_ready; }
+  CYC(b_+O(146), b_+OE(148));
+  CYC(b_+O(148), b_+OE(150)); A = 0x0c;
 
 health_ready:
-  CYC(b_+150, b_+151); mem_wr(gb, HL, A);
-  CYC(b_+151, b_+154); W8(wDisplayedHearts) = A;
-  CYC(b_+154, b_+156); A = 0x88;
-  CYC(b_+156, b_+159); mem_wr(gb, w1Link_invincibilityCounter, A);
-  CYC(b_+159, b_+161); L = 0xad;
-  CYC(b_+161, b_+162); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+162, b_+165); W8(wDisplayedRupees) = A;
-  CYC(b_+165, b_+166); A = mem_rd(gb, HL);
-  CYC(b_+166, b_+169); mem_wr(gb, wDisplayedRupees + 1, A);
-  CALL_C(b_+169, loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+172);
-  CYC(b_+172, b_+174); A = 0xff;
-  CYC(b_+174, b_+177); W8(wActiveMusic) = A;
-  CYC(b_+177, b_+180); W8(wcc05) = A;
-  CYC(b_+180, b_+182); A = 0x21;
-  CALL_C(b_+182, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+185);
+  CYC(b_+O(150), b_+OE(151)); mem_wr(gb, HL, A);
+  CYC(b_+O(151), b_+OE(154)); W8(wDisplayedHearts) = A;
+  CYC(b_+O(154), b_+OE(156)); A = 0x88;
+  CYC(b_+O(156), b_+OE(159)); mem_wr(gb, w1Link_invincibilityCounter, A);
+  if (game_seasons) {      // Seasons records Link's position as the warp destination
+    CYC(b_+S(159), b_+S(162)); SET_DE(w1Link_yh);
+    CALL_C(b_+S(162), getShortPositionFromDE_hook, SYM(getShortPositionFromDE), b_+S(165));
+    CYC(b_+S(165), b_+S(168)); W8(wWarpDestPos) = A;
+  } else {
+    CYC(b_+159, b_+161); L = 0xad;
+    CYC(b_+161, b_+162); A = mem_rd(gb, HL); SET_HL(HL + 1);
+    CYC(b_+162, b_+165); W8(wDisplayedRupees) = A;
+    CYC(b_+165, b_+166); A = mem_rd(gb, HL);
+    CYC(b_+166, b_+169); mem_wr(gb, wDisplayedRupees + 1, A);
+  }
+  CALL_C(b_+O(169), loadScreenMusicAndSetRoomPack_hook, SYM(loadScreenMusicAndSetRoomPack), b_+OE(172));
+  CYC(b_+O(172), b_+OE(174)); A = 0xff;
+  CYC(b_+O(174), b_+OE(177)); W8(wActiveMusic) = A;
+  if (!game_seasons) { CYC(b_+177, b_+180); W8(wcc05) = A; }
+  CYC(b_+O(180), b_+OE(182)); A = 0x21;
+  CALL_C(b_+O(182), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+OE(185));
   if (!(F & FZ)) {
-    CYCT(b_+185, b_+187);
+    CYCT(b_+O(185), b_+OE(187));
     TAIL(func_5a60);
   }
-  CYC(b_+185, b_+187);
-  CYC(b_+187, b_+189); A = 0x3d;
-  CALL_C(b_+189, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+192);
-  if (!(F & FZ)) { CYCT(b_+192, b_+194); goto summon_link; }
-  CYC(b_+192, b_+194);
-  CYC(b_+194, b_+196); A = 0x02;
-  CYC(b_+196, b_+199); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
-  CYC(b_+199, b_+201); A = 0x0d;
-  CYC(b_+201, b_+204); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
-  CYC(b_+204, b_+207); TAIL(cutscene0d);
+  CYC(b_+O(185), b_+OE(187));
+  CYC(b_+O(187), b_+OE(189)); A = GV(0x3d, 0x2a);
+  CALL_C(b_+O(189), checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+OE(192));
+  if (!(F & FZ)) { CYCT(b_+O(192), b_+OE(194)); goto summon_link; }
+  CYC(b_+O(192), b_+OE(194));
+  CYC(b_+O(194), b_+OE(196)); A = 0x02;
+  CYC(b_+O(196), b_+OE(199)); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
+  CYC(b_+O(199), b_+OE(201)); A = 0x0d;
+  CYC(b_+O(201), b_+OE(204)); mem_wr(gb, wThreadStateBuffer + 0x0f, A);
+  CYC(b_+O(204), b_+OE(207)); TAIL(cutscene0d);
 
 summon_link:
-  CYC(b_+207, b_+209); A = 0x03;
-  CYC(b_+209, b_+212); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
-  CYC(b_+212, b_+213); alu_xor(gb, A);
-  CYC(b_+213, b_+216); mem_wr(gb, w1Link_enabled, A);
-  CYC(b_+216, b_+217); ret_effect(gb);
+  CYC(b_+O(207), b_+OE(209)); A = 0x03;
+  CYC(b_+O(209), b_+OE(212)); mem_wr(gb, wThreadStateBuffer + 0x0e, A);
+  CYC(b_+O(212), b_+OE(213)); alu_xor(gb, A);
+  CYC(b_+O(213), b_+OE(216)); mem_wr(gb, w1Link_enabled, A);
+  CYC(b_+O(216), b_+OE(217)); ret_effect(gb);
 }
 
 void initializeGame_hook(GB *gb) { initialize_game(gb, SYM(initializeGame), gb->sp); }

@@ -11,8 +11,10 @@ checkCollisionForCompanion
 checkItemUsed 7=13
 checkLinkJumpingOffCliff
 checkLinkOnGround
+checkPlayRoomMusic
 checkSkipPointer
 checkTileWarps
+checkUpdateDungeonMinimap
 checkUseItems_b06
 companionCheckMountingComplete
 companionTryToMount
@@ -32,12 +34,14 @@ enemyCode37
 enemyCode79
 func_5a60
 func_5c18
+func_5cfe
 functionCaller_b02
 generateVramTilesWithRoomChanges
 getTileMappingData
 giveTreasure_body
 initializeAnimations
 initializeFile_b07
+initializeGame
 interactionCode0f
 interactionCode60
 interactionCode6b
@@ -62,6 +66,7 @@ linkUpdateInAir_sidescroll
 linkUpdateSwimming_sidescroll
 linkedNpc_calcLowTextIndex
 loadItemIconGfx
+loadObjectGfx2
 loadScreenMusic
 loadScreenMusicAndSetRoomPack
 loadTilesetAndRoomLayout

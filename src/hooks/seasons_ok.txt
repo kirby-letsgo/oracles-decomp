@@ -291,6 +291,8 @@ screenTransitionState2@transitionLeft
 screenTransitionState2@transitionRight
 screenTransitionState2@transitionUp
 scriptCmd_loadSprite
+scriptFunc_jump
+scriptFunc_jump_scf
 secretListMenu_printSecret__getSecretText
 secretListMenu_printSecret__val0
 secretListMenu_state0

@@ -492,8 +492,6 @@ void s_linkInteractWithAButtonSensitiveObjects__foundObject(GB *gb);
 void s_linkInteractWithAButtonSensitiveObjects__negativeValue(GB *gb);
 void s_linkInteractWithAButtonSensitiveObjects__doneWithInvincibility(GB *gb);
 void s_loadAnimationData__helper(GB *gb);
-void s_loadObjectGfx(GB *gb);
-void s_loadObjectGfx2(GB *gb);
 void s_loadRoomCollisions__blankDataAroundCollisions(GB *gb);
 void s_loadRoomCollisions__blankDataHorizontally(GB *gb);
 void s_loadRoomCollisions__blankDataVertically(GB *gb);
@@ -540,8 +538,6 @@ void s_retrieveTextCharacter__color0(GB *gb);
 void s_retrieveTextCharacter__color1(GB *gb);
 void s_retrieveTextCharacter__color2(GB *gb);
 void s_roomTileChangesAfterLoad02(GB *gb);
-void s_scriptFunc_jump(GB *gb);
-void s_scriptFunc_jump_scf(GB *gb);
 void s_seasonsFunc_2678_hook(GB *gb);
 void s_seasonsFunc_331b_hook(GB *gb);
 void s_seasonsFunc_332f_hook(GB *gb);
@@ -1045,8 +1041,6 @@ void s_checkDarkenRoom(GB *gb);
 void s_checkDisplayEraOrSeasonInfo(GB *gb);
 void s_checkLinkCloseEnoughToWarpTileCenter__tileSolid(GB *gb);
 void s_checkLinkCloseEnoughToWarpTileCenter__func_618f(GB *gb);
-void s_checkPlayRoomMusic(GB *gb);
-void s_checkPlayRoomMusic__setMusic(GB *gb);
 void s_checkRoomPack(GB *gb);
 void s_checkRoomPackAfterWarp_body_hook(GB *gb);
 void s_checkSeedTreeRefillIndex(GB *gb);
@@ -1057,8 +1051,6 @@ void s_checkTileWarps__chimney(GB *gb);
 void s_checkTileWarps__checkAdjacentTileIsWarpTile(GB *gb);
 void s_checkTileWarps__checkAdjacentTileIsWarpTile__checkIsWarpTile(GB *gb);
 void s_checkTileWarps__checkLinkCloseEnoughToWarpTileCenter_multiTileDoor(GB *gb);
-void s_checkUpdateDungeonMinimap(GB *gb);
-void s_checkUpdateDungeonMinimap__setMinimapRoom(GB *gb);
 void s_cutscene00(GB *gb);
 void s_cutscene00__afterCall5956(GB *gb);
 void s_cutscene00__afterCall5959(GB *gb);
@@ -1119,15 +1111,7 @@ void s_cutscene15__state1__substate2__afterCall4ca4__afterCall4c63(GB *gb);
 void s_determineCompanionRegionSeason_hook(GB *gb);
 void s_determineSeasonForRoomPack_hook(GB *gb);
 void s_findActiveRoomInDungeonLayout(GB *gb);
-void s_func_5cfe(GB *gb);
-void s_func_5cfe__clearCompanion(GB *gb);
-void s_func_5cfe__end(GB *gb);
 void s_getPaletteFadeTransitionData(GB *gb);
-void s_initializeGame(GB *gb);
-void s_initializeGame__notGbaMode(GB *gb);
-void s_initializeGame__fixRespawnForGbc(GB *gb);
-void s_initializeGame__resetHealth(GB *gb);
-void s_initializeGame__summonLinkCutscene(GB *gb);
 void s_initializeSeedTreeRefillData(GB *gb);
 void s_makeActiveObjectFollowLink_b01(GB *gb);
 void s_paletteFadeHandler06(GB *gb);
@@ -5240,16 +5224,9 @@ void s_twinrova_state9__substate3(GB *gb);
 void s_twinrova_state9__substate4(GB *gb);
 void s_twinrova_stateF__nextState(GB *gb);
 void s_twinrova_subid0_stateB__waypointChanged(GB *gb);
-void s_scriptCmd_df(GB *gb);
 void s_scriptCmd_jump(GB *gb);
-void s_scriptCmd_jumpIfCBA5Eq(GB *gb);
-void s_scriptCmd_jumpIfGlobalFlagSet(GB *gb);
-void s_scriptCmd_jumpIfInteractionByteEq(GB *gb);
-void s_scriptCmd_jumpIfMemoryEq(GB *gb);
-void s_scriptCmd_jumpIfRoomFlagSet(GB *gb);
 void s_scriptCmd_jumpIfRoomFlagSet__flagunset(GB *gb);
 void s_scriptCmd_jumpIfRoomFlagSet__flagset(GB *gb);
-void s_scriptCmd_jumpIfSomething(GB *gb);
 void s_scriptCmd_setOrUnsetGlobalFlag__set(GB *gb);
 void s_scriptCmd_setOrUnsetGlobalFlag__unset(GB *gb);
 void s_scriptCmd_showPasswordScreen__askForSecret(GB *gb);
@@ -5463,6 +5440,8 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_loadObjectGfxHeaderToSlot4 loadObjectGfxHeaderToSlot4_hook
 #define s_loadTreeGfx loadTreeGfx_hook
 #define s_loadWeaponGfx loadWeaponGfx_b00_hook
+#define s_loadObjectGfx loadObjectGfx_hook
+#define s_loadObjectGfx2 loadObjectGfx2_hook
 #define s_loadTreasureDisplayData loadTreasureDisplayData_b00_hook
 #define s_decideItemDrop decideItemDrop_hook
 #define s_checkItemDropAvailable checkItemDropAvailable_hook
@@ -5660,6 +5639,8 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_scriptCmd_asmCallWithParam scriptCmd_asmCallWithParam_hook
 #define s__scriptCmd_asmRetFunc _scriptCmd_asmRetFunc_hook
 #define s__scriptFunc_setupAsmCall _scriptFunc_setupAsmCall_hook
+#define s_scriptFunc_jump_scf scriptFunc_jump_scf_hook
+#define s_scriptFunc_jump scriptFunc_jump_hook
 #define s_scriptFunc_add3ToHl_scf scriptFunc_add3ToHl_scf_hook
 #define s_scriptFunc_add3ToHl scriptFunc_add3ToHl_hook
 #define s_scriptCmd_loadScript scriptCmd_loadScript_hook
@@ -5938,7 +5919,9 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_checkLockBG7Color3ToBlack checkLockBG7Color3ToBlack_hook
 #define s_paletteThread_decCounter paletteThread_decCounter_hook
 #define s_func_593a func_593a_hook
+#define s_checkUpdateDungeonMinimap checkUpdateDungeonMinimap_hook
 #define s_runGameLogic runGameLogic_hook
+#define s_initializeGame initializeGame_hook
 #define s_loadingRoom loadingRoom_hook
 #define s_func_5a60 func_5a60_hook
 #define s_func_5a60__afterCall5aad func_5a60__afterCall5aad_hook
@@ -5953,6 +5936,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_func_5c6b__afterCall5c74 func_5c6b__afterCall5c74_hook
 #define s_setEnteredWarpPosition setEnteredWarpPosition_hook
 #define s_cutscene05 cutscene05_hook
+#define s_func_5cfe func_5cfe_hook
 #define s_func_5d31 func_5d31_hook
 #define s_func_5d31__afterCall5d34 func_5d31__afterCall5d34_hook
 #define s_func_5d41 func_5d41_hook
@@ -5963,6 +5947,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_triggerFadeoutTransition triggerFadeoutTransition_hook
 #define s_applyWarpTransition2 applyWarpTransition2_hook
 #define s_setCutsceneIndexIfCutsceneTriggerSet setCutsceneIndexIfCutsceneTriggerSet_hook
+#define s_checkPlayRoomMusic checkPlayRoomMusic_hook
 #define s_loadDeathRespawnBufferPreset loadDeathRespawnBufferPreset_hook
 #define s_calculateRoomEdge calculateRoomEdge_hook
 #define s_updateActiveRoom updateActiveRoom_hook
@@ -7088,6 +7073,9 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_scriptCmd_playSound scriptCmd_playSound_hook
 #define s_scriptCmd_updateLinkLocalRespawnPosition scriptCmd_updateLinkLocalRespawnPosition_hook
 #define s_scriptCmd_jumpIfLinkVariableNe scriptCmd_jumpIfLinkVariableNe_hook
+#define s_scriptCmd_jumpIfMemoryEq scriptCmd_jumpIfMemoryEq_hook
+#define s_scriptCmd_jumpIfInteractionByteEq scriptCmd_jumpIfInteractionByteEq_hook
+#define s_scriptCmd_jumpIfRoomFlagSet scriptCmd_jumpIfRoomFlagSet_hook
 #define s_scriptCmd_orRoomFlags scriptCmd_orRoomFlags_hook
 #define s_scriptCmd_checkSomething scriptCmd_checkSomething_hook
 #define s_scriptCmd_showLoadedText scriptCmd_showLoadedText_hook
@@ -7095,12 +7083,15 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_scriptCmd_setMusic scriptCmd_setMusic_hook
 #define s_scriptCmd_orMemory scriptCmd_orMemory_hook
 #define s_scriptCmd_spawnItem scriptCmd_spawnItem_hook
+#define s_scriptCmd_df scriptCmd_df_hook
+#define s_scriptCmd_jumpIfSomething scriptCmd_jumpIfSomething_hook
 #define s_scriptCmd_setLinkCantMove scriptCmd_setLinkCantMove_hook
 #define s_scriptCmd_checkCounter2Zero scriptCmd_checkCounter2Zero_hook
 #define s_scriptCmd_setTile scriptCmd_setTile_hook
 #define s_scriptCmd_setTileHere scriptCmd_setTileHere_hook
 #define s_scriptCmd_callScript scriptCmd_callScript_hook
 #define s_scriptCmd_ret scriptCmd_ret_hook
+#define s_scriptCmd_jumpIfCBA5Eq scriptCmd_jumpIfCBA5Eq_hook
 #define s_scriptCmd_jumpRandom scriptCmd_jumpRandom_hook
 #define s_scriptCmd_jumpTable scriptCmd_jumpTable_hook
 #define s_scriptCmd_jumpIfMemorySet scriptCmd_jumpIfMemorySet_hook
@@ -7116,6 +7107,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_scriptCmd_checkRupeeDisplayUpdated scriptCmd_checkRupeeDisplayUpdated_hook
 #define s_scriptCmd_checkNotCollidedWithLink_ignoreZ scriptCmd_checkNotCollidedWithLink_ignoreZ_hook
 #define s_scriptCmd_createPuff scriptCmd_createPuff_hook
+#define s_scriptCmd_jumpIfGlobalFlagSet scriptCmd_jumpIfGlobalFlagSet_hook
 #define s_scriptCmd_setOrUnsetGlobalFlag scriptCmd_setOrUnsetGlobalFlag_hook
 #define s_scriptCmd_initNpcHitbox scriptCmd_initNpcHitbox_hook
 #define s_scriptCmd_moveNpcUp scriptCmd_moveNpcUp_hook

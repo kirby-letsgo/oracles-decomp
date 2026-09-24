@@ -4388,7 +4388,21 @@ static void interaction_delete(GB *gb);
 
 // script helpers
 
+// Seasons has no scripts in RAM: a jump just loads the new address. scriptFunc_jump_scf enters
+// after the `xor a` (flags then say carry instead of zero).
+static void script_jump_seasons(GB *gb, bool after_xor) {
+  BASE(scriptFunc_jump);
+  if (!after_xor) { CYC(b_+S(0), b_+S(1)); alu_xor(gb, A); }
+  CYC(b_+S(1), b_+S(2)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+S(2), b_+S(3)); H = mem_rd(gb, HL);
+  CYC(b_+S(3), b_+S(4)); L = A;
+  CYC(b_+S(4), b_+S(6)); A = H8(hActiveObject);
+  CYC(b_+S(6), b_+S(7)); D = A;
+  CYC(b_+S(7), b_+S(8));
+}
+
 static void script_jump(GB *gb) {
+  if (game_seasons) { script_jump_seasons(gb, false); return; }
   BASE(scriptFunc_jump);
   A = H;
   alu_cp(gb, 0x80);
@@ -4421,6 +4435,13 @@ void scriptFunc_jump_hook(GB *gb) {
 
 void scriptFunc_jump_scf_hook(GB *gb) {
   BASE(scriptFunc_jump_scf);
+  if (game_seasons) {
+    CYC(b_+S(0), b_+S(1)); alu_scf(gb);
+    CYC(b_+S(1), b_+S(3));
+    script_jump_seasons(gb, true);
+    ret_effect(gb);
+    return;
+  }
   CYC(b_+0, b_+3);
   script_jump(gb);
   alu_scf(gb);
@@ -8515,52 +8536,56 @@ void loadTreeGfx_hook(GB *gb) {
 static void load_object_gfx2(GB *gb) {
   BASE(loadObjectGfx2);
   C = A;
-  CYC(b_+0, b_+1); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+1, b_+2); L = mem_rd(gb, HL);
+  CYC(b_+O(0), b_+OE(1)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(1), b_+OE(2)); L = mem_rd(gb, HL);
   alu_and(gb, 0x7f);
   H = A;
-  CYC(b_+2, b_+9); A = mem_rd(gb, wcc20);
-  alu_or(gb, A);
-  if (!(F & FZ)) {
-    CYCT(b_+9, b_+12);
-    A = D;
-    alu_or(gb, 0xd0);
-    D = A;
-    A = 0x05;
-    alu_add(gb, E);
-    E = A;
-    B = 0x1f;
-    CYC(b_+55, b_+65);
-    CALL_ROM(b_+65, ROM_decompressGraphics);
-    A = 0x01;
-    CYC(b_+68, b_+72); mem_wr(gb, IO_SVBK, A);
-    A = 0x3f;
-    CYC(b_+72, b_+76); H8(hRomBank) = A;
-    CYC(b_+76, b_+79); mem_wr(gb, MBC_ROM_BANK, A);
-    CYC(b_+79, b_+80);
-    return;
+  CYC(b_+O(2), b_+OE(6));
+  if (!game_seasons) {
+    CYC(b_+6, b_+9); A = mem_rd(gb, wcc20);
+    alu_or(gb, A);
+    if (!(F & FZ)) {
+      CYCT(b_+9, b_+12);
+      A = D;
+      alu_or(gb, 0xd0);
+      D = A;
+      A = 0x05;
+      alu_add(gb, E);
+      E = A;
+      B = 0x1f;
+      CYC(b_+55, b_+65);
+      CALL_ROM(b_+65, ROM_decompressGraphics);
+      A = 0x01;
+      CYC(b_+68, b_+72); mem_wr(gb, IO_SVBK, A);
+      A = 0x3f;
+      CYC(b_+72, b_+76); H8(hRomBank) = A;
+      CYC(b_+76, b_+79); mem_wr(gb, MBC_ROM_BANK, A);
+      CYC(b_+79, b_+80);
+      return;
+    }
+    CYC(b_+9, b_+12);
   }
-  CYC(b_+9, b_+13); push_effect(gb, DE);
-  CYC(b_+13, b_+16); A = W8(wcc07);
+  CYC(b_+O(12), b_+OE(13)); push_effect(gb, DE);
+  CYC(b_+O(13), b_+OE(16)); A = W8(wcc07);
   alu_xor(gb, 0xff);
-  CYC(b_+16, b_+21); W8(wcc07) = A;
+  CYC(b_+O(16), b_+OE(21)); W8(wcc07) = A;
   SET_DE(w4GfxBuf1 + 4);
-  if (!(F & FZ)) CYCT(b_+21, b_+26);
-  else { CYC(b_+21, b_+29); SET_DE(w4GfxBuf2 + 4); }
-  CYC(b_+29, b_+30); push_effect(gb, DE);
+  if (!(F & FZ)) CYCT(b_+O(21), b_+OE(26));
+  else { CYC(b_+O(21), b_+OE(29)); SET_DE(w4GfxBuf2 + 4); }
+  CYC(b_+O(29), b_+OE(30)); push_effect(gb, DE);
   B = 0x1f;
-  CYC(b_+30, b_+32);
-  CALL_ROM(b_+32, ROM_decompressGraphics);
-  CYC(b_+35, b_+36); SET_HL(pop_effect(gb));
-  CYC(b_+36, b_+37); SET_DE(pop_effect(gb));
+  CYC(b_+O(30), b_+OE(32));
+  CALL_ROM(b_+O(32), ROM_decompressGraphics);
+  CYC(b_+O(35), b_+OE(36)); SET_HL(pop_effect(gb));
+  CYC(b_+O(36), b_+OE(37)); SET_DE(pop_effect(gb));
   C = 0x04;
   A = 0x01;
-  CYC(b_+37, b_+43); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(37), b_+OE(43)); mem_wr(gb, IO_SVBK, A);
   A = 0x3f;
-  CYC(b_+43, b_+47); H8(hRomBank) = A;
-  CYC(b_+47, b_+50); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(43), b_+OE(47)); H8(hRomBank) = A;
+  CYC(b_+O(47), b_+OE(50)); mem_wr(gb, MBC_ROM_BANK, A);
   B = 0x1f;
-  CYC(b_+50, b_+55);
+  CYC(b_+O(50), b_+OE(55));
   queue_dma_transfer(gb);
 }
 
