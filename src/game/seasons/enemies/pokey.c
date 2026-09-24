@@ -260,13 +260,47 @@ L_6b18:
   TAIL(objectSetPriorityRelativeToLink);
 }
 
+// pokey_6b3c+5
+static void pokey_pokey_6b3c_5(GB *gb) {
+  BASE(pokey_6b3c);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+5, b_+7); A = 0x06;
+  CALL_C(b_+7, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+10);
+  CYC(b_+10, b_+11); A = mem_rd(gb, HL);
+  CYC(b_+11, b_+13); alu_and(gb, 0x1c);
+  CYC(b_+13, b_+14); alu_rrca(gb);
+  CYC(b_+14, b_+15); alu_rrca(gb);
+  CYC(b_+15, b_+16); B = A;
+  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+19, b_+21); alu_sub(gb, 0x02);
+  CYC(b_+21, b_+23); A = alu_swap(gb, A);
+  CYC(b_+23, b_+24); alu_rrca(gb);
+  CYC(b_+24, b_+25); alu_add(gb, B);
+  CYC(b_+25, b_+28); SET_HL(SYM(pokeyTable_0c_6b6a));
+  CYC(b_+28, b_+29); pokey_add_a_to_hl(gb, b_+29);
+  CYC(b_+29, b_+30); B = mem_rd(gb, HL);
+  CALL_C(b_+30, s_pokeyFunc_0c_6b82_hook, SYM(pokeyFunc_0c_6b82), b_+33);
+  CYC(b_+33, b_+35); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+35, b_+36); E = L;
+  CYC(b_+36, b_+37); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+37, b_+38); mem_wr(gb, DE, A);
+  CYC(b_+38, b_+39); L = alu_inc8(gb, L);
+  CYC(b_+39, b_+40); E = L;
+  CYC(b_+40, b_+41); A = mem_rd(gb, HL);
+  CYC(b_+41, b_+42); alu_add(gb, B);
+  CYC(b_+42, b_+43); mem_wr(gb, DE, A);
+  CYC(b_+43, b_+46);
+  TAIL(objectSetPriorityRelativeToLink);
+}
+
 void s_pokey_6b2e_hook(GB *gb) {
   BASE(pokey_6b2e);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); B = 0xf3;
   CALL_C(b_+2, s_pokeyFunc_0c_6b8e_hook, SYM(pokeyFunc_0c_6b8e), b_+5);
   CYC(b_+5, b_+7);
-  HANDOFF(SYM(pokey_6b3c) + 5); /* pokey_6b3c+5, interpreted */
+  pokey_pokey_6b3c_5(gb); return;
 }
 
 void s_pokey_6b35_hook(GB *gb) {
@@ -275,7 +309,7 @@ void s_pokey_6b35_hook(GB *gb) {
   CYC(b_+0, b_+2); B = 0xe6;
   CALL_C(b_+2, s_pokeyFunc_0c_6b8e_hook, SYM(pokeyFunc_0c_6b8e), b_+5);
   CYC(b_+5, b_+7);
-  HANDOFF(SYM(pokey_6b3c) + 5); /* pokey_6b3c+5, interpreted */
+  pokey_pokey_6b3c_5(gb); return;
 }
 
 void s_pokey_6b3c_hook(GB *gb) {
@@ -510,3 +544,4 @@ L_6c4e:
   CYC(b_+29, b_+30); mem_wr(gb, HL, A);
   RET(b_+30); return;
 }
+

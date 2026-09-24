@@ -231,7 +231,7 @@ state4:
   CYC(b_+209, b_+210); alu_or(gb, A);
   if (!(F & FZ)) CALL_C_CC(b_+210, s_func_4d54_hook, SYM(func_4d54), b_+213);
   else CYC(b_+210, b_+213);
-  CYC(b_+213, b_+216); SET_HL(w4TileMap);
+  CYC(b_+213, b_+216); SET_HL(w1Link);
   CALL_C(b_+216, s_preventObjectHFromPassingObjectD, SYM(preventObjectHFromPassingObjectD), b_+219);
   CALL_C(b_+219, s_objectAddToGrabbableObjectBuffer, SYM(objectAddToGrabbableObjectBuffer), b_+222);
   CYC(b_+222, b_+225);
@@ -280,7 +280,7 @@ state9:
   CYC(b_+285, b_+288);
   TAIL(objectSetVisible82);
 stateA:
-  CYC(b_+288, b_+291); SET_HL(w4TileMap);
+  CYC(b_+288, b_+291); SET_HL(w1Link);
   CALL_C(b_+291, s_preventObjectHFromPassingObjectD, SYM(preventObjectHFromPassingObjectD), b_+294);
   CALL_C(b_+294, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+297);
   if (!(F & FZ)) { CYCT(b_+297, b_+299); goto animate; }
@@ -306,7 +306,7 @@ stateB:
   CYC(b_+327, b_+330);
   TAIL(enemySetAnimation);
 L_4b47:
-  CYC(b_+330, b_+333); SET_HL(w4TileMap);
+  CYC(b_+330, b_+333); SET_HL(w1Link);
   CALL_C(b_+333, s_preventObjectHFromPassingObjectD, SYM(preventObjectHFromPassingObjectD), b_+336);
   CALL_C(b_+336, s_objectAddToGrabbableObjectBuffer, SYM(objectAddToGrabbableObjectBuffer), b_+339);
   CYC(b_+339, b_+341); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
@@ -738,3 +738,4 @@ void s_func_4d54_hook(GB *gb) {
   CYC(b_+16, b_+17); mem_wr(gb, HL, A);
   RET(b_+17); return;
 }
+

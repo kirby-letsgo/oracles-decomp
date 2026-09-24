@@ -457,53 +457,6 @@ L_4303:
   I(0x430c, 4); if (hook_is(gb, 0x43e2, itemDrop_chooseRandomFairyMovement_hook)) { itemDrop_chooseRandomFairyMovement_hook(gb); return; } HANDOFF(0x43e2);  // jp $43e2
 }
 
-// 10:4434
-void s_itemDrop_pullOreChunksWithMagnetGloves(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4434, 2); E = 0xc2;  // ld e,$c2
-  I(0x4436, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x4437, 2); alu_sub(gb, 0x0c);  // sub $0c
-  I(0x4439, 2); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FC)) { RET_TAKEN(0x443b); return; } I(0x443b, 2);  // ret nc
-  I(0x443c, 4); A = mem_rd(gb, 0xcc79);  // ld a,($cc79)
-  I(0x443f, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x4440); return; } I(0x4440, 2);  // ret z
-  CALL(0x4441, objectGetAngleTowardLink_hook, 0x1e5a, 0x4444);  // call $1e5a
-  I(0x4444, 1); C = A;  // ld c,a
-  I(0x4445, 1); H = D;  // ld h,d
-  I(0x4446, 2); L = 0xcb;  // ld l,$cb
-  I(0x4448, 4); A = mem_rd(gb, 0xd00b);  // ld a,($d00b)
-  I(0x444b, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  if (!(F & FC)) { I(0x444c, 3); goto L_4450; } I(0x444c, 2);  // jr nc,$4450
-  I(0x444e, 1); alu_cpl(gb);  // cpl
-  I(0x444f, 1); A = alu_inc8(gb, A);  // inc a
-L_4450:
-  I(0x4450, 1); B = A;  // ld b,a
-  I(0x4451, 2); L = 0xcd;  // ld l,$cd
-  I(0x4453, 4); A = mem_rd(gb, 0xd00d);  // ld a,($d00d)
-  I(0x4456, 2); alu_sub(gb, mem_rd(gb, HL));  // sub (hl)
-  if (!(F & FC)) { I(0x4457, 3); goto L_445b; } I(0x4457, 2);  // jr nc,$445b
-  I(0x4459, 1); alu_cpl(gb);  // cpl
-  I(0x445a, 1); A = alu_inc8(gb, A);  // inc a
-L_445b:
-  I(0x445b, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FC)) { I(0x445c, 3); goto L_445f; } I(0x445c, 2);  // jr nc,$445f
-  I(0x445e, 1); A = B;  // ld a,b
-L_445f:
-  I(0x445f, 2); alu_and(gb, 0xf0);  // and $f0
-  I(0x4461, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4463, 2); alu_bit(gb, 3, A);  // bit 3,a
-  if ((F & FZ)) { I(0x4465, 3); goto L_4469; } I(0x4465, 2);  // jr z,$4469
-  I(0x4467, 2); A = 0x07;  // ld a,$07
-L_4469:
-  I(0x4469, 3); SET_HL(0x447c);  // ld hl,$447c
-  RST_PUSH(0x446c, 0x446d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x446d, 2); B = mem_rd(gb, HL);  // ld b,(hl)
-  if (hook_is(gb, 0x446e, itemDrop_applySpeed_hook)) { itemDrop_applySpeed_hook(gb); return; } HANDOFF(0x446e);  // fallthrough
-}
-
 // 10:433d
 void s_itemDrop_spawnEnemy__delete(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -648,7 +601,7 @@ L_4195:
   I(0x419b, 3); mem_wr(gb, HL, 0xf0);  // ld (hl),$f0
   CALL(0x419d, objectSetVisiblec3_hook, 0x1e0c, 0x41a0);  // call $1e0c
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c
@@ -817,7 +770,7 @@ L_4195:
   I(0x419b, 3); mem_wr(gb, HL, 0xf0);  // ld (hl),$f0
   CALL(0x419d, objectSetVisiblec3_hook, 0x1e0c, 0x41a0);  // call $1e0c
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c
@@ -984,7 +937,7 @@ L_4195:
   I(0x419b, 3); mem_wr(gb, HL, 0xf0);  // ld (hl),$f0
   CALL(0x419d, objectSetVisiblec3_hook, 0x1e0c, 0x41a0);  // call $1e0c
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c
@@ -1196,7 +1149,7 @@ L_4195:
   I(0x419b, 3); mem_wr(gb, HL, 0xf0);  // ld (hl),$f0
   CALL(0x419d, objectSetVisiblec3_hook, 0x1e0c, 0x41a0);  // call $1e0c
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c
@@ -1226,7 +1179,7 @@ L_4195:
   I(0x419b, 3); mem_wr(gb, HL, 0xf0);  // ld (hl),$f0
   CALL(0x419d, objectSetVisiblec3_hook, 0x1e0c, 0x41a0);  // call $1e0c
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c
@@ -1249,7 +1202,7 @@ L_41a9:
 void s_partCode01__label_11_010(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c
@@ -1273,7 +1226,7 @@ void s_partCode01__state2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   goto L_41c1;
 L_41a0:
-  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves, 0x4434, 0x41a3);  // call $4434
+  CALL(0x41a0, s_itemDrop_pullOreChunksWithMagnetGloves_hook, 0x4434, 0x41a3);  // call $4434
   if ((F & FC)) { I(0x41a3, 3); goto L_41a9; } I(0x41a3, 2);  // jr c,$41a9
   CALL(0x41a5, itemDrop_checkOnHazard_hook, 0x439c, 0x41a8);  // call $439c
   if ((F & FC)) { RET_TAKEN(0x41a8); return; } I(0x41a8, 2);  // ret c

@@ -57,6 +57,7 @@ normalStatus:
   do { uint16_t jt_ = (slingshotEyeStatue_jump_table(gb));
     if (jt_ == b_+41) goto state0;
     if (jt_ == b_+45) goto state1;
+    if (jt_ == SYM(objectSetVisible83) && hook_is(gb, SYM(objectSetVisible83), s_objectSetVisible83)) { s_objectSetVisible83(gb); return; }
     HANDOFF(HL);
   } while (0);
 state0:

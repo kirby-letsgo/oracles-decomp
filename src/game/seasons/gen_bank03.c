@@ -123,24 +123,6 @@ L_5048:
   RET(0x504a); return;  // ret
 }
 
-// 03:4f54
-void s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4f54, 3); SET_HL(0xc48c);  // ld hl,$c48c
-  I(0x4f57, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4f58, 1); alu_cpl(gb);  // cpl
-  I(0x4f59, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4f5a, 1); B = A;  // ld b,a
-  I(0x4f5b, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4f5c, 1); alu_cpl(gb);  // cpl
-  I(0x4f5d, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x4f5e, 1); C = A;  // ld c,a
-  I(0x4f5f, 1); alu_xor(gb, A);  // xor a
-  I(0x4f60, 3); mem_wr(gb, 0xff9d, A);  // ldh ($ff9d),a
-  I(0x4f62, 3); SET_HL(0x543e);  // ld hl,$543e
-  I(0x4f65, 4); if (hook_is(gb, 0x0d3d, addSpritesToOam_withOffset_hook)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d3d);  // jp $0d3d
-}
-
 // 03:4f76
 void s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -227,7 +209,7 @@ void s_introCinematic_ridingHorse_state1(GB *gb) {
   I(0x4f1b, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
   I(0x4f1e, 4); A = mem_rd(gb, 0xc48d);  // ld a,($c48d)
   I(0x4f21, 4); mem_wr(gb, 0xcbbc, A);  // ld ($cbbc),a
-  CALL(0x4f24, s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1, 0x4f54, 0x4f27);  // call $4f54
+  CALL(0x4f24, s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1_hook, 0x4f54, 0x4f27);  // call $4f54
   I(0x4f27, 3); SET_HL(0xcbb3);  // ld hl,$cbb3
   I(0x4f2a, 3); mem_wr(gb, HL, 0x58);  // ld (hl),$58
   I(0x4f2c, 2); SET_HL(HL + 1);  // inc hl
@@ -251,8 +233,8 @@ void s_introCinematic_ridingHorse_state2(GB *gb) {
   CALL(0x4f4c, intro_incState_hook, 0x4d33, 0x4f4f);  // call $4d33
   I(0x4f4f, 3); s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_2(gb); return;  // jr $4f76
 L_4f51:
-  CALL(0x4f51, s_seasonsFunc_03_5367, 0x5367, 0x4f54);  // call $5367
-  s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1(gb); return;  // fallthrough
+  CALL(0x4f51, s_seasonsFunc_03_5367_hook, 0x5367, 0x4f54);  // call $5367
+  if (hook_is(gb, 0x4f54, s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1_hook)) { s_introCinematic_ridingHorse_drawLinkOnHorseCloseupSprites_1_hook(gb); return; } HANDOFF(0x4f54);  // fallthrough
 }
 
 // 03:4d88
@@ -320,44 +302,6 @@ L_4ce9:
   I(0x4cf1, 2); alu_cp(gb, 0x03);  // cp $03
   if (!(F & FZ)) { I(0x4cf3, 3); if (hook_is(gb, 0x4d03, intro_gotoTitlescreen_hook)) { intro_gotoTitlescreen_hook(gb); return; } HANDOFF(0x4d03); } I(0x4cf3, 2);  // jr nz,$4d03
   if (hook_is(gb, 0x4cf5, intro_runStage_hook)) { intro_runStage_hook(gb); return; } HANDOFF(0x4cf5);  // fallthrough
-}
-
-// 03:5367
-void s_seasonsFunc_03_5367(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5367, s_seasonsFunc_03_5367__func, 0x5380, 0x536a);  // call $5380
-  I(0x536a, 3); SET_BC(0x0506);  // ld bc,$0506
-  if (!(F & FZ)) { I(0x536d, 3); goto L_5372; } I(0x536d, 2);  // jr nz,$5372
-  I(0x536f, 3); SET_BC(0x0000);  // ld bc,$0000
-L_5372:
-  I(0x5372, 3); SET_HL(0xcbbb);  // ld hl,$cbbb
-  I(0x5375, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5376, 1); alu_add(gb, B);  // add b
-  I(0x5377, 4); mem_wr(gb, 0xc48c, A);  // ld ($c48c),a
-  I(0x537a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x537b, 1); alu_add(gb, C);  // add c
-  I(0x537c, 4); mem_wr(gb, 0xc48d, A);  // ld ($c48d),a
-  RET(0x537f); return;  // ret
-}
-
-// 03:5380
-void s_seasonsFunc_03_5367__func(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5380:
-  I(0x5380, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x5383, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5384, 3); goto L_5394; } I(0x5384, 2);  // jr nz,$5394
-  I(0x5386, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x5389, 2); alu_xor(gb, 0x01);  // xor $01
-  I(0x538b, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x538e, 2); A = 0x05;  // ld a,$05
-  if ((F & FZ)) { I(0x5390, 3); goto L_5394; } I(0x5390, 2);  // jr z,$5394
-  I(0x5392, 2); A = 0x22;  // ld a,$22
-L_5394:
-  I(0x5394, 4); mem_wr(gb, 0xcbb6, A);  // ld ($cbb6),a
-  I(0x5397, 4); A = mem_rd(gb, 0xcbba);  // ld a,($cbba)
-  I(0x539a, 1); alu_or(gb, A);  // or a
-  RET(0x539b); return;  // ret
 }
 
 // 03:4846

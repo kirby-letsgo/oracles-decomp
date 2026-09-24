@@ -1320,3 +1320,73 @@ void s_interactionCode6bSubid26_hook(GB *gb) {
   CYC(b_+12, b_+15);
   TAIL(interactionIncState);
 }
+
+static uint16_t miscellaneous1_d_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+// INTERAC_MISCELLANEOUS_1
+void s_interactionCode6b_hook(GB *gb) {
+  BASE(interactionCode6b);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (miscellaneous1_d_jump_table(gb));
+    if (jt_ == SYM(floodgateKeeper) && hook_is(gb, SYM(floodgateKeeper), s_floodgateKeeper_hook)) { s_floodgateKeeper_hook(gb); return; }
+    if (jt_ == SYM(floodgateKeeperSwitchScript) && hook_is(gb, SYM(floodgateKeeperSwitchScript), s_floodgateKeeperSwitchScript_hook)) { s_floodgateKeeperSwitchScript_hook(gb); return; }
+    if (jt_ == SYM(floodgateKeyhole) && hook_is(gb, SYM(floodgateKeyhole), s_floodgateKeyhole_hook)) { s_floodgateKeyhole_hook(gb); return; }
+    if (jt_ == SYM(d4KeyHole) && hook_is(gb, SYM(d4KeyHole), s_d4KeyHole_hook)) { s_d4KeyHole_hook(gb); return; }
+    if (jt_ == SYM(floodgateKey) && hook_is(gb, SYM(floodgateKey), s_floodgateKey_hook)) { s_floodgateKey_hook(gb); return; }
+    if (jt_ == SYM(dragonKey) && hook_is(gb, SYM(dragonKey), s_dragonKey_hook)) { s_dragonKey_hook(gb); return; }
+    if (jt_ == SYM(tarmArmosUnlockingStairs) && hook_is(gb, SYM(tarmArmosUnlockingStairs), s_tarmArmosUnlockingStairs_hook)) { s_tarmArmosUnlockingStairs_hook(gb); return; }
+    if (jt_ == SYM(tarmArmosWallByStump) && hook_is(gb, SYM(tarmArmosWallByStump), s_tarmArmosWallByStump_hook)) { s_tarmArmosWallByStump_hook(gb); return; }
+    if (jt_ == SYM(tarmEscapedLostWoods) && hook_is(gb, SYM(tarmEscapedLostWoods), s_tarmEscapedLostWoods_hook)) { s_tarmEscapedLostWoods_hook(gb); return; }
+    if (jt_ == SYM(oreChunkDigSpot) && hook_is(gb, SYM(oreChunkDigSpot), s_oreChunkDigSpot_hook)) { s_oreChunkDigSpot_hook(gb); return; }
+    if (jt_ == SYM(staticHeartPiece) && hook_is(gb, SYM(staticHeartPiece), s_staticHeartPiece_hook)) { s_staticHeartPiece_hook(gb); return; }
+    if (jt_ == SYM(permanentlyRemovableObjects) && hook_is(gb, SYM(permanentlyRemovableObjects), s_permanentlyRemovableObjects_hook)) { s_permanentlyRemovableObjects_hook(gb); return; }
+    if (jt_ == SYM(piratesBellRoomWhenFallingIn) && hook_is(gb, SYM(piratesBellRoomWhenFallingIn), s_piratesBellRoomWhenFallingIn_hook)) { s_piratesBellRoomWhenFallingIn_hook(gb); return; }
+    if (jt_ == SYM(greenJoyRing) && hook_is(gb, SYM(greenJoyRing), s_greenJoyRing_hook)) { s_greenJoyRing_hook(gb); return; }
+    if (jt_ == SYM(masterDiverPuzzle) && hook_is(gb, SYM(masterDiverPuzzle), s_masterDiverPuzzle_hook)) { s_masterDiverPuzzle_hook(gb); return; }
+    if (jt_ == SYM(piratesBell) && hook_is(gb, SYM(piratesBell), s_piratesBell_hook)) { s_piratesBell_hook(gb); return; }
+    if (jt_ == SYM(armosBlockingFlowerPathToD6) && hook_is(gb, SYM(armosBlockingFlowerPathToD6), s_armosBlockingFlowerPathToD6_hook)) { s_armosBlockingFlowerPathToD6_hook(gb); return; }
+    if (jt_ == SYM(natzuSwitch) && hook_is(gb, SYM(natzuSwitch), s_natzuSwitch_hook)) { s_natzuSwitch_hook(gb); return; }
+    if (jt_ == SYM(onoxCastleCutscene) && hook_is(gb, SYM(onoxCastleCutscene), s_onoxCastleCutscene_hook)) { s_onoxCastleCutscene_hook(gb); return; }
+    if (jt_ == SYM(savingZeldaNoEnemiesHandler) && hook_is(gb, SYM(savingZeldaNoEnemiesHandler), s_savingZeldaNoEnemiesHandler_hook)) { s_savingZeldaNoEnemiesHandler_hook(gb); return; }
+    if (jt_ == SYM(unblockingD3Dam) && hook_is(gb, SYM(unblockingD3Dam), s_unblockingD3Dam_hook)) { s_unblockingD3Dam_hook(gb); return; }
+    if (jt_ == SYM(replacePirateShipWithQuicksand) && hook_is(gb, SYM(replacePirateShipWithQuicksand), s_replacePirateShipWithQuicksand_hook)) { s_replacePirateShipWithQuicksand_hook(gb); return; }
+    if (jt_ == SYM(stolenFeatherGottenHandler) && hook_is(gb, SYM(stolenFeatherGottenHandler), s_stolenFeatherGottenHandler_hook)) { s_stolenFeatherGottenHandler_hook(gb); return; }
+    if (jt_ == SYM(horonVillagePortalBridgeSpawner) && hook_is(gb, SYM(horonVillagePortalBridgeSpawner), s_horonVillagePortalBridgeSpawner_hook)) { s_horonVillagePortalBridgeSpawner_hook(gb); return; }
+    if (jt_ == SYM(randomRingDigSpot) && hook_is(gb, SYM(randomRingDigSpot), s_randomRingDigSpot_hook)) { s_randomRingDigSpot_hook(gb); return; }
+    if (jt_ == SYM(staticGashaSeed) && hook_is(gb, SYM(staticGashaSeed), s_staticGashaSeed_hook)) { s_staticGashaSeed_hook(gb); return; }
+    if (jt_ == SYM(underwaterGashaSeed) && hook_is(gb, SYM(underwaterGashaSeed), s_underwaterGashaSeed_hook)) { s_underwaterGashaSeed_hook(gb); return; }
+    if (jt_ == SYM(tickTockSecretEntrance) && hook_is(gb, SYM(tickTockSecretEntrance), s_tickTockSecretEntrance_hook)) { s_tickTockSecretEntrance_hook(gb); return; }
+    if (jt_ == SYM(graveSecretEntrance) && hook_is(gb, SYM(graveSecretEntrance), s_graveSecretEntrance_hook)) { s_graveSecretEntrance_hook(gb); return; }
+    if (jt_ == SYM(d4MinibossRoom) && hook_is(gb, SYM(d4MinibossRoom), s_d4MinibossRoom_hook)) { s_d4MinibossRoom_hook(gb); return; }
+    if (jt_ == SYM(sentBackFromOnoxCastleBarrier) && hook_is(gb, SYM(sentBackFromOnoxCastleBarrier), s_sentBackFromOnoxCastleBarrier_hook)) { s_sentBackFromOnoxCastleBarrier_hook(gb); return; }
+    if (jt_ == SYM(sidescrollingStaticGashaSeed) && hook_is(gb, SYM(sidescrollingStaticGashaSeed), s_sidescrollingStaticGashaSeed_hook)) { s_sidescrollingStaticGashaSeed_hook(gb); return; }
+    if (jt_ == SYM(sidescrollingStaticSeedSatchel) && hook_is(gb, SYM(sidescrollingStaticSeedSatchel), s_sidescrollingStaticSeedSatchel_hook)) { s_sidescrollingStaticSeedSatchel_hook(gb); return; }
+    if (jt_ == SYM(mtCuccoBananaTree) && hook_is(gb, SYM(mtCuccoBananaTree), s_mtCuccoBananaTree_hook)) { s_mtCuccoBananaTree_hook(gb); return; }
+    if (jt_ == SYM(hardOre) && hook_is(gb, SYM(hardOre), s_hardOre_hook)) { s_hardOre_hook(gb); return; }
+    if (jt_ == SYM(interactionCode6bSubid23) && hook_is(gb, SYM(interactionCode6bSubid23), s_interactionCode6bSubid23_hook)) { s_interactionCode6bSubid23_hook(gb); return; }
+    if (jt_ == SYM(interactionCode6bSubid24) && hook_is(gb, SYM(interactionCode6bSubid24), s_interactionCode6bSubid24_hook)) { s_interactionCode6bSubid24_hook(gb); return; }
+    if (jt_ == SYM(interactionCode6bSubid25) && hook_is(gb, SYM(interactionCode6bSubid25), s_interactionCode6bSubid25_hook)) { s_interactionCode6bSubid25_hook(gb); return; }
+    if (jt_ == SYM(interactionCode6bSubid26) && hook_is(gb, SYM(interactionCode6bSubid26), s_interactionCode6bSubid26_hook)) { s_interactionCode6bSubid26_hook(gb); return; }
+    HANDOFF(HL);
+  } while (0);
+}
+

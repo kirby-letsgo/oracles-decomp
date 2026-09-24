@@ -1205,7 +1205,7 @@ void s_func_6cf6_hook(GB *gb) {
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
 L_6d03:
   CYC(b_+13, b_+14); A = mem_rd(gb, DE);
-  CYC(b_+14, b_+17); SET_HL(b_+30);
+  CYC(b_+14, b_+17); SET_HL(SYM(table_6d14));
   CYC(b_+17, b_+18); gleeok_add_a_to_hl(gb, b_+18);
   CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+20, b_+21); A = mem_rd(gb, HL);
@@ -1217,4 +1217,3 @@ L_6d03:
   CYC(b_+27, b_+29); mem_wr(gb, HL, 0x06);
   RET(b_+29); return;
 }
-

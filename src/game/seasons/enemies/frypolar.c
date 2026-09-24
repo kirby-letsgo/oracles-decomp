@@ -53,6 +53,31 @@ static void frypolar_add_double_index(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
+// func_62cc
+static void frypolar_func_62cc(GB *gb) {
+  BASE(func_62cc);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+0, b_+1); H = D;
+  CYC(b_+1, b_+3); L = ENEMY_BASE + OBJ_VAR34;
+  CALL_C(b_+3, s_ecom_readPositionVars, SYM(ecom_readPositionVars_b0d), b_+6);
+  CYC(b_+6, b_+7); alu_sub(gb, C);
+  CYC(b_+7, b_+9); alu_add(gb, 0x02);
+  CYC(b_+9, b_+11); alu_cp(gb, 0x05);
+  if (!(F & FC)) { RET_TAKEN(b_+11); return; }
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+14); A = mem_rd(gb, hFF8F);
+  CYC(b_+14, b_+15); alu_sub(gb, B);
+  CYC(b_+15, b_+17); alu_add(gb, 0x02);
+  CYC(b_+17, b_+19); alu_cp(gb, 0x05);
+  if (!(F & FC)) { RET_TAKEN(b_+19); return; }
+  CYC(b_+19, b_+20);
+  CYC(b_+20, b_+22); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+22, b_+23); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+23, b_+25); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+25, b_+27); mem_wr(gb, HL, 0x28);
+  RET(b_+27); return;
+}
+
 // ENEMY_FRYPOLAR
 void s_enemyCode77_hook(GB *gb) {
   BASE(enemyCode77);
@@ -292,7 +317,7 @@ subid0_stateB:
   CYC(b_+369, b_+371); A = 0xae;
   if (F & FZ) CALL_C_CC(b_+371, s_playSound, SYM(playSound_b00), b_+374);
   else CYC(b_+371, b_+374);
-  CALL_ROM(b_+374, SYM(func_62cc)); /* no hook: interpreted */
+  CALL_L(b_+374, frypolar_func_62cc, b_+377);
   if (!(F & FC)) CALL_C_CC(b_+377, s_ecom_moveTowardPosition, SYM(ecom_moveTowardPosition_b0d), b_+380);
   else CYC(b_+377, b_+380);
 subid0_animate:

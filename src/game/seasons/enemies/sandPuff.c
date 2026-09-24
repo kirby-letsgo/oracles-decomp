@@ -38,6 +38,7 @@ void s_enemyCode5b_hook(GB *gb) {
   do { uint16_t jt_ = (sandPuff_jump_table(gb));
     if (jt_ == b_+10) goto state0;
     if (jt_ == b_+27) goto state1;
+    if (jt_ == SYM(enemyAnimate) && hook_is(gb, SYM(enemyAnimate), s_enemyAnimate)) { s_enemyAnimate(gb); return; }
     HANDOFF(HL);
   } while (0);
 state0:

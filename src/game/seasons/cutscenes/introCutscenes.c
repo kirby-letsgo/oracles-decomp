@@ -1361,7 +1361,7 @@ void s_seasonsFunc_03_7a2e_hook(GB *gb) {
   if (!(F & FZ)) {
     CYCT(b_+11, b_+13);
     CYC((SYM(seasonsFunc_03_7a3b) + 32), (SYM(seasonsFunc_03_7a3b) + 35));
-    TAIL_SG(func_35ec);
+    TAIL_S(func_35ec);
   }
   CYC(b_+11, b_+13);
   TAIL_S(seasonsFunc_03_7a3b);
@@ -1391,7 +1391,7 @@ void s_seasonsFunc_03_7a3b_hook(GB *gb) {
   CYC(b_+26, b_+29); mem_wr(gb, wPaletteThread_mode, A);
   CYC(b_+29, b_+32); SET_HL(wTmpcbb8);
   CYC(b_+32, b_+35);
-  TAIL_SG(func_35ec);
+  TAIL_S(func_35ec);
 }
 
 // The pregame intro (CUTSCENE_S_PREGAME_INTRO): in a linked game, Twinrova's flames and Zelda in
@@ -1842,7 +1842,7 @@ void s_cutscene0eFunc3_hook(GB *gb) {
   CYC(b_+12, b_+14); A = 0xf0;
   CYC(b_+14, b_+15); C = A;
   CYC(b_+15, b_+18); mem_wr(gb, wPaletteThread_parameter, A);
-  CALL_C(b_+18, s_seasonsFunc_35cc, SYM(seasonsFunc_35cc), b_+21);
+  CALL_C(b_+18, s_seasonsFunc_35cc_hook, SYM(seasonsFunc_35cc), b_+21);
   CYC(b_+21, b_+23); A = 0xff;
   CYC(b_+23, b_+25); mem_wr(gb, hDirtyBgPalettes, A);
   CYC(b_+25, b_+27); mem_wr(gb, hDirtySprPalettes, A);

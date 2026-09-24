@@ -60,3 +60,13 @@ void s_forceLinkState8AndSetDirection_hook(GB *gb) {
   CYC(b_+4, b_+7);
   TAIL(setLinkForceStateToState08);
 }
+
+void s_makuTree_showText_hook(GB *gb) {
+  BASE(makuTree_showText);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_makuTree_add1bToLowTextIfLinked_hook, SYM(makuTree_add1bToLowTextIfLinked), b_+3);
+  CYC(b_+3, b_+5); B = 0x17;
+  CYC(b_+5, b_+8);
+  TAIL(showText);
+}
+

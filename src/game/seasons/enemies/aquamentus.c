@@ -8,6 +8,21 @@
 #define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
 // ref/oracles-disasm/object_code/seasons/enemies/aquamentus.s.
+// ENEMY_AQUAMENTUS
+// Variables (subid 1, main body):
+// var31: Affects collision box?
+// var32/var33: Target position?
+// var34: Reference to subid 2 (sprites only)
+// var35: Reference to subid 3 (the horn)
+// var36: Counter for playing footstep sound
+// var37: ?
+// Variables (subid 2, sprites only):
+// relatedObj1: Reference to subid 1 (main body)
+// relatedObj2: Reference to subid 3 (horn)
+// var30: Current animation
+// Variables (subid 3, horn):
+// relatedObj2: Reference to subid 2 (sprites)
+// var30: Current animation
 
 static uint16_t aquamentus_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -52,8 +67,21 @@ static void aquamentus_add_double_index(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
-// ENEMY_AQUAMENTUS, the Gnarled Root boss. Subid 0 spawns the parts; 1 is the body, 2 a
-// hitbox and 3 the horn.
+// ENEMY_AQUAMENTUS
+// Variables (subid 1, main body):
+// var31: Affects collision box?
+// var32/var33: Target position?
+// var34: Reference to subid 2 (sprites only)
+// var35: Reference to subid 3 (the horn)
+// var36: Counter for playing footstep sound
+// var37: ?
+// Variables (subid 2, sprites only):
+// relatedObj1: Reference to subid 1 (main body)
+// relatedObj2: Reference to subid 3 (horn)
+// var30: Current animation
+// Variables (subid 3, horn):
+// relatedObj2: Reference to subid 2 (sprites)
+// var30: Current animation
 void s_enemyCode78_hook(GB *gb) {
   BASE(enemyCode78);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -170,7 +198,7 @@ void s_aquamentus_state_stub_hook(GB *gb) {
   RET(b_+0); return;
 }
 
-// Body.
+// Body hitbox + general logic
 void s_aquamentus_subid1_hook(GB *gb) {
   BASE(aquamentus_subid1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -190,6 +218,7 @@ void s_aquamentus_subid1_hook(GB *gb) {
   } while (0);
 }
 
+// Initialization
 void s_aquamentus_body_state8_hook(GB *gb) {
   BASE(aquamentus_body_state8);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -213,6 +242,7 @@ void s_aquamentus_body_state8_hook(GB *gb) {
   RET(b_+30); return;
 }
 
+// Lowering down
 void s_aquamentus_body_state9_hook(GB *gb) {
   BASE(aquamentus_body_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -244,6 +274,7 @@ doneLowering:
   RET(b_+35); return;
 }
 
+// Hovering in place before landing
 void s_aquamentus_body_stateA_hook(GB *gb) {
   BASE(aquamentus_body_stateA);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -279,6 +310,7 @@ void s_aquamentus_body_pound_hook(GB *gb) {
   TAIL(playSound_b00);
 }
 
+// Standing in place
 void s_aquamentus_body_stateB_hook(GB *gb) {
   BASE(aquamentus_body_stateB);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -294,6 +326,7 @@ void s_aquamentus_body_stateB_hook(GB *gb) {
   TAIL_S(aquamentus_decideNextAttack);
 }
 
+// Moving forward
 void s_aquamentus_body_stateC_hook(GB *gb) {
   BASE(aquamentus_body_stateC);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -326,6 +359,7 @@ applySpeed:
   TAIL(objectApplySpeed);
 }
 
+// Walking back to original position
 void s_aquamentus_body_stateD_hook(GB *gb) {
   BASE(aquamentus_body_stateD);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -349,6 +383,7 @@ gotoStateB:
   RET(b_+32); return;
 }
 
+// Charge attack
 void s_aquamentus_body_stateE_hook(GB *gb) {
   BASE(aquamentus_body_stateE);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -446,7 +481,7 @@ lowerDown:
   RET(b_+47); return;
 }
 
-// The extra collision box that follows the body.
+// All sprites except horn
 void s_aquamentus_subid2_hook(GB *gb) {
   BASE(aquamentus_subid2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -493,7 +528,7 @@ state8:
   TAIL(objectSetVisible81);
 }
 
-// The horn.
+// Horn & horn hitbox
 void s_aquamentus_subid3_hook(GB *gb) {
   BASE(aquamentus_subid3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -577,6 +612,7 @@ void s_aquamentus_subid3_state8_hook(GB *gb) {
   TAIL(objectSetVisible81);
 }
 
+// @param	h	Child object
 void s_aquamentus_initializeChildObject_hook(GB *gb) {
   BASE(aquamentus_initializeChildObject);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -590,7 +626,7 @@ void s_aquamentus_initializeChildObject_hook(GB *gb) {
   TAIL(objectCopyPosition);
 }
 
-// Charge, fire or hover, by aquamentus_chargeProbabilities.
+// Chooses whether to charge (state $0e) or move forward (state $0c)
 void s_aquamentus_decideNextAttack_hook(GB *gb) {
   BASE(aquamentus_decideNextAttack);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -673,6 +709,7 @@ L_664b:
   RET(b_+16); return;
 }
 
+// Sets angle to move left, slightly up or down, depending on Link's position
 void s_aquamentus_body_calculateAngleForCharge_hook(GB *gb) {
   BASE(aquamentus_body_calculateAngleForCharge);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -694,6 +731,7 @@ setAngle:
   RET(b_+20); return;
 }
 
+// @param[out]	cflag	c if within 2 pixels of target position
 void s_aquamentus_body_checkReachedTargetPosition_hook(GB *gb) {
   BASE(aquamentus_body_checkReachedTargetPosition);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -712,6 +750,7 @@ void s_aquamentus_body_checkReachedTargetPosition_hook(GB *gb) {
   RET(b_+19); return;
 }
 
+// @param	b	Amount to subtract z value by (subpixels)
 void s_aquamentus_body_subZ_hook(GB *gb) {
   BASE(aquamentus_body_subZ);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -775,9 +814,8 @@ void s_aquamentus_playHoverSoundEvery32Frames_hook(GB *gb) {
   TAIL_S(aquamentus_playSound);
 }
 
-// aquamentus_body_playFootstepSoundEvery24Frames from +2: counts var36 down; at zero it reloads
-// it with a and plays the footstep.
-static void aquamentus_footstep_countdown(GB *gb) {
+// aquamentus_body_playFootstepSoundEvery24Frames+2
+static void aquamentus_aquamentus_body_playFootstepSoundEvery24Frames_2(GB *gb) {
   BASE(aquamentus_body_playFootstepSoundEvery24Frames);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+2, b_+3); H = D;
@@ -795,13 +833,21 @@ void s_aquamentus_body_playFootstepSoundEvery18Frames_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x12;
   CYC(b_+2, b_+4);
-  aquamentus_footstep_countdown(gb); return;
+  aquamentus_aquamentus_body_playFootstepSoundEvery24Frames_2(gb); return;
 }
 
 void s_aquamentus_body_playFootstepSoundEvery24Frames_hook(GB *gb) {
   BASE(aquamentus_body_playFootstepSoundEvery24Frames);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+2); A = 0x18;
-  aquamentus_footstep_countdown(gb); return;
+  CYC(b_+2, b_+3); H = D;
+  CYC(b_+3, b_+5); L = ENEMY_BASE + OBJ_VAR36;
+  CYC(b_+5, b_+6); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  if (!(F & FZ)) { RET_TAKEN(b_+6); return; }
+  CYC(b_+6, b_+7);
+  CYC(b_+7, b_+8); mem_wr(gb, HL, A);
+  CYC(b_+8, b_+10); A = 0x82;
+  s_aquamentus_playSound_hook(gb); return; // falls through
 }
 
 void s_aquamentus_playSound_hook(GB *gb) {
@@ -820,7 +866,7 @@ void s_aquamentus_horn_updateAnimation_hook(GB *gb) {
   CYC(b_+6, b_+8); L = ENEMY_BASE + OBJ_ANIM_PARAMETER;
   CYC(b_+8, b_+9); A = mem_rd(gb, HL);
   CYC(b_+9, b_+10); A = alu_inc8(gb, A);
-  CYC(b_+10, b_+13); SET_HL(b_+24);
+  CYC(b_+10, b_+13); SET_HL(b_+24 /* @animations */);
   CYC(b_+13, b_+14); aquamentus_add_a_to_hl(gb, b_+14);
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);
   CYC(b_+15, b_+16); H = D;
@@ -832,3 +878,4 @@ void s_aquamentus_horn_updateAnimation_hook(GB *gb) {
   CYC(b_+21, b_+24);
   TAIL(enemySetAnimation);
 }
+

@@ -141,7 +141,7 @@ stateStub:
 }
 
 // generalOnox_subid2@func_5c3b
-static void generalOnox_generalOnox_subid2_func_5c3b(GB *gb) {
+static void generalOnox_func_5c3b(GB *gb) {
   BASE(generalOnox_subid2);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+149, b_+150); H = D;
@@ -302,7 +302,7 @@ stateB_substate0:
   CYC(b_+195, b_+197);
   goto func_5a06;
 stateB_func_598b:
-  CALL_L(b_+197, generalOnox_generalOnox_subid2_func_5c3b, b_+200);
+  CALL_L(b_+197, generalOnox_func_5c3b, b_+200);
   if (!(F & FC)) { CYCT(b_+200, b_+202); goto L_59b1; }
   CYC(b_+200, b_+202);
   CALL_C(b_+202, s_enemyAnimate, SYM(enemyAnimate), b_+205);
@@ -442,6 +442,148 @@ stateC_substate2:
   goto func_594f;
 }
 
+// generalOnox_subid0@stateC@substate1
+static void generalOnox_stateC_substate1(GB *gb) {
+  BASE(generalOnox_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+374, b_+376); C = 0x20;
+  CALL_C(b_+376, s_objectUpdateSpeedZ_paramC, SYM(objectUpdateSpeedZ_paramC), b_+379);
+  if (!(F & FZ)) { RET_TAKEN(b_+379); return; }
+  CYC(b_+379, b_+380);
+  CYC(b_+380, b_+382); L = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+382, b_+383); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+383, b_+384); L = alu_inc8(gb, L);
+  CYC(b_+384, b_+386); A = 0xb4;
+  CYC(b_+386, b_+387); mem_wr(gb, HL, A);
+  CALL_C(b_+387, s_setScreenShakeCounter, SYM(setScreenShakeCounter), b_+390);
+  CALL_C(b_+390, s_objectSetVisible83, SYM(objectSetVisible83), b_+393);
+  CALL_C(b_+393, s_getFreePartSlot, SYM(getFreePartSlot), b_+396);
+  if (!(F & FZ)) { RET_TAKEN(b_+396); return; }
+  CYC(b_+396, b_+397);
+  CYC(b_+397, b_+399); mem_wr(gb, HL, 0x48);
+  RET(b_+399); return;
+}
+
+// generalOnox_subid0@stateC@substate0
+static void generalOnox_stateC_substate0(GB *gb) {
+  BASE(generalOnox_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+353, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+356);
+  if (!(F & FZ)) { RET_TAKEN(b_+356); return; }
+  CYC(b_+356, b_+357);
+  CYC(b_+357, b_+358); L = E;
+  CYC(b_+358, b_+359); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+359, b_+361); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+361, b_+363); A = 0xc0;
+  CYC(b_+363, b_+364); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+364, b_+366); mem_wr(gb, HL, 0xfd);
+  CYC(b_+366, b_+368); A = 0x81;
+  CALL_C(b_+368, s_playSound, SYM(playSound_b00), b_+371);
+  CYC(b_+371, b_+374);
+  TAIL(objectSetVisible81);
+}
+
+// generalOnox_subid0@stateB@substate1
+static void generalOnox_stateB_substate1(GB *gb) {
+  BASE(generalOnox_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+253, b_+255); A = 0x09;
+  CALL_C(b_+255, s_objectGetRelatedObject2Var, SYM(objectGetRelatedObject2Var), b_+258);
+  CYC(b_+258, b_+259); A = mem_rd(gb, HL);
+  CYC(b_+259, b_+261); alu_cp(gb, 0x03);
+  if (!(F & FZ)) { RET_TAKEN(b_+261); return; }
+  CYC(b_+261, b_+262);
+  CYC(b_+262, b_+264); L = PART_BASE + OBJ_STATE;
+  CYC(b_+264, b_+265); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+265, b_+267); L = PART_BASE + OBJ_DAMAGE;
+  CYC(b_+267, b_+269); mem_wr(gb, HL, 0xf8);
+  CYC(b_+269, b_+271); L = PART_BASE + OBJ_ANGLE;
+  CYC(b_+271, b_+273); mem_wr(gb, HL, 0x0e);
+  CYC(b_+273, b_+275); L = PART_BASE + OBJ_COUNTER1;
+  CYC(b_+275, b_+277); mem_wr(gb, HL, 0x00);
+  CYC(b_+277, b_+279); L = PART_BASE + OBJ_YH;
+  CYC(b_+279, b_+281); E = ENEMY_BASE + OBJ_YH;
+  CYC(b_+281, b_+282); A = mem_rd(gb, DE);
+  CYC(b_+282, b_+284); alu_sub(gb, 0x10);
+  CYC(b_+284, b_+285); mem_wr(gb, HL, A);
+  CYC(b_+285, b_+287); L = PART_BASE + OBJ_VAR30;
+  CYC(b_+287, b_+289); alu_add(gb, 0x21);
+  CYC(b_+289, b_+290); mem_wr(gb, HL, A);
+  CYC(b_+290, b_+292); L = PART_BASE + OBJ_XH;
+  CYC(b_+292, b_+294); E = ENEMY_BASE + OBJ_XH;
+  CYC(b_+294, b_+295); A = mem_rd(gb, DE);
+  CYC(b_+295, b_+297); alu_add(gb, 0x08);
+  CYC(b_+297, b_+298); mem_wr(gb, HL, A);
+  CYC(b_+298, b_+300); L = PART_BASE + OBJ_VAR31;
+  CYC(b_+300, b_+302); alu_add(gb, 0xf9);
+  CYC(b_+302, b_+303); mem_wr(gb, HL, A);
+  CYC(b_+303, b_+305); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+305, b_+307); A = 0x02;
+  CYC(b_+307, b_+308); mem_wr(gb, DE, A);
+  CYC(b_+308, b_+309); A = alu_inc8(gb, A);
+  CYC(b_+309, b_+312);
+  TAIL(enemySetAnimation);
+}
+
+// generalOnox_subid0@stateB@func_598b
+static void generalOnox_stateB_func_598b(GB *gb) {
+  BASE(generalOnox_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_L(b_+197, generalOnox_func_5c3b, b_+200);
+  if (!(F & FC)) { CYCT(b_+200, b_+202); goto L_59b1; }
+  CYC(b_+200, b_+202);
+  CALL_C(b_+202, s_enemyAnimate, SYM(enemyAnimate), b_+205);
+  CALL_C(b_+205, s_ecom_decCounter2, SYM(ecom_decCounter2_b0d), b_+208);
+  if (!(F & FZ)) { CYCT(b_+208, b_+210); goto stateB_func_59c0; }
+  CYC(b_+208, b_+210);
+  CYC(b_+210, b_+212); A = 0x09;
+  CALL_C(b_+212, s_objectGetRelatedObject2Var, SYM(objectGetRelatedObject2Var), b_+215);
+  CYC(b_+215, b_+216); A = mem_rd(gb, HL);
+  CYC(b_+216, b_+218); alu_sub(gb, 0x0e);
+  CYC(b_+218, b_+220); alu_cp(gb, 0x07);
+  if (!(F & FC)) { CYCT(b_+220, b_+222); goto stateB_func_59c0; }
+  CYC(b_+220, b_+222);
+  CYC(b_+222, b_+224); L = PART_BASE + OBJ_STATE;
+  CYC(b_+224, b_+225); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+225, b_+227); E = ENEMY_BASE + OBJ_SUBSTATE;
+  CYC(b_+227, b_+229); A = 0x01;
+  CYC(b_+229, b_+230); mem_wr(gb, DE, A);
+  CYC(b_+230, b_+232); A = 0x05;
+  CYC(b_+232, b_+235);
+  TAIL(enemySetAnimation);
+L_59b1:
+  CYC(b_+235, b_+237); L = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+237, b_+239); mem_wr(gb, HL, 0x0a);
+  CYC(b_+239, b_+242); A = mem_rd(gb, wFrameCounter);
+  CYC(b_+242, b_+244); alu_and(gb, 0x07);
+  if (F & FZ) CALL_C_CC(b_+244, s_generalOnox_func_59c0_hook, SYM(generalOnox_func_59c0), b_+247);
+  else CYC(b_+244, b_+247);
+  CALL_C(b_+247, s_ecom_applyVelocityForSideviewEnemyNoHoles, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0d), b_+250);
+stateB_func_59c0:
+  CYC(b_+250, b_+253);
+  TAIL(enemyAnimate);
+}
+
+// generalOnox_subid0@stateA
+static void generalOnox_stateA(GB *gb) {
+  BASE(generalOnox_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+153, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+156);
+  if (!(F & FZ)) { RET_TAKEN(b_+156); return; }
+  CYC(b_+156, b_+157);
+  CYC(b_+157, b_+159); mem_wr(gb, HL, 0xb4);
+  CYC(b_+159, b_+160); L = alu_inc8(gb, L);
+  CYC(b_+160, b_+162); mem_wr(gb, HL, 0x0a);
+  CYC(b_+162, b_+163); L = E;
+  CYC(b_+163, b_+164); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+164, b_+166);
+  goto stateB_func_59c0;
+
+stateB_func_59c0:
+  CYC(b_+250, b_+253);
+  TAIL(enemyAnimate);
+}
+
 void s_generalOnox_subid1_hook(GB *gb) {
   BASE(generalOnox_subid1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -451,7 +593,7 @@ void s_generalOnox_subid1_hook(GB *gb) {
   do { uint16_t jt_ = (generalOnox_jump_table(gb));
     if (jt_ == b_+16) goto state8;
     if (jt_ == b_+47) goto state9;
-    // generalOnox_subid0@stateA: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 254)) { generalOnox_stateA(gb); return; }
     if (jt_ == b_+159) goto stateB;
     if (jt_ == b_+254) goto stateC;
     if (jt_ == b_+270) goto stateD;
@@ -560,13 +702,13 @@ stateB:
   CYC(b_+161, b_+162); push_effect(gb, b_+162);
   do { uint16_t jt_ = (generalOnox_jump_table(gb));
     if (jt_ == b_+168) goto stateB_substate0;
-    // generalOnox_subid0@stateB@substate1: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 154)) { generalOnox_stateB_substate1(gb); return; }
     if (jt_ == b_+189) goto stateB_substate2;
     HANDOFF(HL);
   } while (0);
 stateB_substate0:
   CALL_C(b_+168, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+171);
-  if (!(F & FZ)) { CYCT(b_+171, b_+174); HANDOFF(SYM(generalOnox_subid0) + 197); /* generalOnox_subid0@stateB@func_598b, interpreted */ }
+  if (!(F & FZ)) { CYCT(b_+171, b_+174); generalOnox_stateB_func_598b(gb); return; }
   CYC(b_+171, b_+174);
   CYC(b_+174, b_+176); A = 0x24;
   CALL_C(b_+176, s_objectGetRelatedObject2Var, SYM(objectGetRelatedObject2Var), b_+179);
@@ -627,8 +769,8 @@ stateC:
   CYC(b_+255, b_+256); A = mem_rd(gb, DE);
   CYC(b_+256, b_+257); push_effect(gb, b_+257);
   do { uint16_t jt_ = (generalOnox_jump_table(gb));
-    // generalOnox_subid0@stateC@substate0: interpreted, through the HANDOFF below
-    // generalOnox_subid0@stateC@substate1: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 54)) { generalOnox_stateC_substate0(gb); return; }
+    if (jt_ == (b_ - 33)) { generalOnox_stateC_substate1(gb); return; }
     if (jt_ == b_+263) goto stateC_substate2;
     HANDOFF(HL);
   } while (0);

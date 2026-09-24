@@ -445,23 +445,6 @@ L_20c2:
   RET(0x20cb); return;  // ret
 }
 
-// 00:3d3d
-void s_checkGotMakuSeedDidNotSeeZeldaKidnapped(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3d3d, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3d3f, AF);  // push af
-  I(0x3d40, 2); A = 0x0a;  // ld a,$0a
-  I(0x3d42, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3d44, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3d47, s_checkGotMakuSeedDidNotSeeZeldaKidnapped_body, 0x7a7b, 0x3d4a);  // call $7a7b
-  PUSH(0x3d4a, AF);  // push af
-  SET_BC(POP(0x3d4b));  // pop bc
-  SET_AF(POP(0x3d4c));  // pop af
-  I(0x3d4d, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3d4f, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3d52); return;  // ret
-}
-
 // 00:1c69
 void s_checkGrabbableObjects__objectLoop(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -591,21 +574,6 @@ void s_checkLinkID0AndControlNormal(GB *gb) {
   RET(0x1ce5); return;  // ret
 }
 
-// 00:3ab2
-void s_checkRoomPackAfterWarp(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3ab2, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3ab4, AF);  // push af
-  I(0x3ab5, 2); A = 0x01;  // ld a,$01
-  I(0x3ab7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3ab9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3abc, s_checkRoomPackAfterWarp_body_hook, 0x7e6e, 0x3abf);  // call $7e6e
-  SET_AF(POP(0x3abf));  // pop af
-  I(0x3ac0, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3ac2, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3ac5); return;  // ret
-}
-
 // 00:1986
 void s_clearAllItemsAndPutLinkOnGround(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -685,37 +653,6 @@ L_1995:
   if ((F & FC)) { I(0x199f, 3); goto L_1994; } I(0x199f, 2);  // jr c,$1994
   SET_DE(POP(0x19a1));  // pop de
   I(0x19a2, 4); if (hook_is(gb, 0x29d3, putLinkOnGround_hook)) { putLinkOnGround_hook(gb); return; } HANDOFF(0x29d3);  // jp $29d3
-}
-
-// 00:1734
-void s_cpOreChunkValue(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x1734, 3); SET_HL(0xc6a7);  // ld hl,$c6a7
-  I(0x1737, 3); goto L_173c;  // jr $173c
-L_173c:
-  CALL(0x173c, getRupeeValue_hook, 0x175a, 0x173f);  // call $175a
-  I(0x173f, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x1740, 2); H = mem_rd(gb, HL);  // ld h,(hl)
-  I(0x1741, 1); L = A;  // ld l,a
-  CALL(0x1742, compareHlToBc_hook, 0x01d6, 0x1745);  // call $01d6
-  I(0x1745, 1); A = alu_inc8(gb, A);  // inc a
-  if (!(F & FZ)) { I(0x1746, 3); goto L_174a; } I(0x1746, 2);  // jr nz,$174a
-  I(0x1748, 1); A = alu_inc8(gb, A);  // inc a
-  RET(0x1749); return;  // ret
-L_174a:
-  I(0x174a, 1); alu_xor(gb, A);  // xor a
-  RET(0x174b); return;  // ret
-}
-
-// 00:3d30
-void s_createSokraSnore(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3d30, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
-  I(0x3d33, 2); alu_and(gb, 0x3f);  // and $3f
-  if (!(F & FZ)) { RET_TAKEN(0x3d35); return; } I(0x3d35, 2);  // ret nz
-  I(0x3d36, 2); B = 0xfa;  // ld b,$fa
-  I(0x3d38, 2); C = 0xfc;  // ld c,$fc
-  I(0x3d3a, 4); if (hook_is(gb, 0x273f, objectCreateFloatingSnore_hook)) { objectCreateFloatingSnore_hook(gb); return; } HANDOFF(0x273f);  // jp $273f
 }
 
 // 00:0d95
@@ -1196,32 +1133,6 @@ L_28bc:
   RET(0x28be); return;  // ret
 }
 
-// 00:3346
-void s_flameOfDestructionsCutsceneCaller(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3346, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3348, AF);  // push af
-  I(0x3349, 2); A = 0x03;  // ld a,$03
-  I(0x334b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x334d, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3350, s_flameOfDestructionCutsceneBody_hook, 0x6dfd, 0x3353);  // call $6dfd
-L_3353:
-  SET_AF(POP(0x3353));  // pop af
-  I(0x3354, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3356, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3359); return;  // ret
-}
-
-// 00:3353
-void s_flameOfDestructionsCutsceneCaller__afterCall3353(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_3353:
-  SET_AF(POP(0x3353));  // pop af
-  I(0x3354, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3356, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3359); return;  // ret
-}
-
 // 00:369b
 void s_forceLoadRoom(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1529,21 +1440,6 @@ L_3481:
   RET(0x349f); return;  // ret
 }
 
-// 00:35ec
-void s_func_35ec(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x35ec, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x35ee, AF);  // push af
-  I(0x35ef, 2); A = 0x01;  // ld a,$01
-  I(0x35f1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35f3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x35f6, paletteFadeHandler08__seasonsFunc_01_5816_hook, 0x565d, 0x35f9);  // call $565d
-  SET_AF(POP(0x35f9));  // pop af
-  I(0x35fa, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35fc, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x35ff); return;  // ret
-}
-
 // 00:3a06
 void s_generateVramTilesWithRoomChanges(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1586,23 +1482,6 @@ L_10c7:
   I(0x10c8, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x10ca, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   RET(0x10cd); return;  // ret
-}
-
-// 00:3e8f
-void s_getLinkedHerosCaveSideEntranceRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3e8f, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3e91, AF);  // push af
-  I(0x3e92, 2); A = 0x04;  // ld a,$04
-  I(0x3e94, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e96, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x3e99, 3); SET_HL(0x7655);  // ld hl,$7655
-  I(0x3e9c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x3e9d, 4); mem_wr(gb, 0xcc64, A);  // ld ($cc64),a
-  SET_AF(POP(0x3ea0));  // pop af
-  I(0x3ea1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3ea3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3ea6); return;  // ret
 }
 
 // 00:203f
@@ -2808,7 +2687,7 @@ L_3870:
   I(0x3876, 2); A = 0x04;  // ld a,$04
   I(0x3878, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x387a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x387d, s_checkIsTempleRemains, 0x6cff, 0x3880);  // call $6cff
+  CALL(0x387d, s_checkIsTempleRemains_hook, 0x6cff, 0x3880);  // call $6cff
   if (!(F & FC)) { RET_TAKEN(0x3880); return; } I(0x3880, 2);  // ret nc
   I(0x3881, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
   I(0x3884, 3); SET_HL(0x3890);  // ld hl,$3890
@@ -3268,16 +3147,6 @@ L_106c:
   RET(0x1075); return;  // ret
 }
 
-// 00:174c
-void s_removeOreChunkValue(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x174c, 3); SET_HL(0xc6a7);  // ld hl,$c6a7
-  I(0x174f, 3); goto L_1754;  // jr $1754
-L_1754:
-  CALL(0x1754, getRupeeValue_hook, 0x175a, 0x1757);  // call $175a
-  I(0x1757, 4); if (hook_is(gb, 0x018f, subDecimalFromHlRef_hook)) { subDecimalFromHlRef_hook(gb); return; } HANDOFF(0x018f);  // jp $018f
-}
-
 // 00:18d6
 void s_retrieveTextCharacter__func_18fd(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3468,7 +3337,7 @@ void s_roomTileChangesAfterLoad02(GB *gb) {
   I(0x3652, 2); A = 0x09;  // ld a,$09
   I(0x3654, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x3656, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3659, s_roomTileChangesAfterLoad02_body, 0x53f0, 0x365c);  // call $53f0
+  CALL(0x3659, s_roomTileChangesAfterLoad02_body_hook, 0x53f0, 0x365c);  // call $53f0
   SET_AF(POP(0x365c));  // pop af
   I(0x365d, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x365f, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
@@ -3499,383 +3368,6 @@ L_2583:
   I(0x2586, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
   I(0x2588, 1); D = A;  // ld d,a
   RET(0x2589); return;  // ret
-}
-
-// 00:331b
-void s_seasonsFunc_331b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x331b, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x331d, AF);  // push af
-  I(0x331e, 2); A = 0x0f;  // ld a,$0f
-  I(0x3320, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3322, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3325, s_seasonsFunc_0f_6f75_hook, 0x6f75, 0x3328);  // call $6f75
-L_3328:
-  SET_AF(POP(0x3328));  // pop af
-  I(0x3329, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x332b, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x332e); return;  // ret
-}
-
-// 00:3328
-void s_seasonsFunc_331b__afterCall3328(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_3328:
-  SET_AF(POP(0x3328));  // pop af
-  I(0x3329, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x332b, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x332e); return;  // ret
-}
-
-// 00:332f
-void s_seasonsFunc_332f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x332f, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3331, AF);  // push af
-  I(0x3332, 2); A = 0x0f;  // ld a,$0f
-  I(0x3334, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3336, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3339, s_seasonsFunc_0f_704d_hook, 0x704d, 0x333c);  // call $704d
-  CALL_ASM(0x333c, 0x7182, 0x333f); /* unported */  // call $7182
-  SET_AF(POP(0x333f));  // pop af
-  I(0x3340, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3342, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3345); return;  // ret
-}
-
-// 00:34a0
-void s_seasonsFunc_34a0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x34a0, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x34a2, AF);  // push af
-  I(0x34a3, 2); A = 0x05;  // ld a,$05
-  I(0x34a5, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34a7, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34aa, updateSpecialObjects_hook, 0x4000, 0x34ad);  // call $4000
-L_34ad:
-  I(0x34ad, 2); A = 0x07;  // ld a,$07
-  I(0x34af, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34b1, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34b4, updateItems_hook, 0x485a, 0x34b7);  // call $485a
-L_34b7:
-  I(0x34b7, 2); A = 0x00;  // ld a,$00
-  I(0x34b9, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34bb, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34be, updateEnemies_hook, 0x2e86, 0x34c1);  // call $2e86
-L_34c1:
-  I(0x34c1, 2); A = 0x10;  // ld a,$10
-  I(0x34c3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34c5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34c8, updateParts_hook, 0x61dc, 0x34cb);  // call $61dc
-L_34cb:
-  I(0x34cb, 2); A = 0x00;  // ld a,$00
-  I(0x34cd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34cf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34d2, updateInteractions_hook, 0x3b0a, 0x34d5);  // call $3b0a
-L_34d5:
-  I(0x34d5, 2); A = 0x0f;  // ld a,$0f
-  I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
-  I(0x34df, 2); A = 0x06;  // ld a,$06
-  I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x34e6, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x34e9, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { CALL(0x34ea, updateGrabbedObjectPosition_hook, 0x5429, 0x34ed); } else I(0x34ea, 3);  // call c,$5429
-  CALL(0x34ed, loadLinkAndCompanionAnimationFrame_hook, 0x2a6c, 0x34f0);  // call $2a6c
-  I(0x34f0, 2); A = 0x07;  // ld a,$07
-  I(0x34f2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34f4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34f7, updateItemsPost_hook, 0x4902, 0x34fa);  // call $4902
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:34ad
-void s_seasonsFunc_34a0__afterCall34ad(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_34ad:
-  I(0x34ad, 2); A = 0x07;  // ld a,$07
-  I(0x34af, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34b1, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34b4, updateItems_hook, 0x485a, 0x34b7);  // call $485a
-L_34b7:
-  I(0x34b7, 2); A = 0x00;  // ld a,$00
-  I(0x34b9, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34bb, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34be, updateEnemies_hook, 0x2e86, 0x34c1);  // call $2e86
-L_34c1:
-  I(0x34c1, 2); A = 0x10;  // ld a,$10
-  I(0x34c3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34c5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34c8, updateParts_hook, 0x61dc, 0x34cb);  // call $61dc
-L_34cb:
-  I(0x34cb, 2); A = 0x00;  // ld a,$00
-  I(0x34cd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34cf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34d2, updateInteractions_hook, 0x3b0a, 0x34d5);  // call $3b0a
-L_34d5:
-  I(0x34d5, 2); A = 0x0f;  // ld a,$0f
-  I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
-  I(0x34df, 2); A = 0x06;  // ld a,$06
-  I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x34e6, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x34e9, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { CALL(0x34ea, updateGrabbedObjectPosition_hook, 0x5429, 0x34ed); } else I(0x34ea, 3);  // call c,$5429
-  CALL(0x34ed, loadLinkAndCompanionAnimationFrame_hook, 0x2a6c, 0x34f0);  // call $2a6c
-  I(0x34f0, 2); A = 0x07;  // ld a,$07
-  I(0x34f2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34f4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34f7, updateItemsPost_hook, 0x4902, 0x34fa);  // call $4902
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:34b7
-void s_seasonsFunc_34a0__afterCall34b7(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_34b7:
-  I(0x34b7, 2); A = 0x00;  // ld a,$00
-  I(0x34b9, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34bb, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34be, updateEnemies_hook, 0x2e86, 0x34c1);  // call $2e86
-L_34c1:
-  I(0x34c1, 2); A = 0x10;  // ld a,$10
-  I(0x34c3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34c5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34c8, updateParts_hook, 0x61dc, 0x34cb);  // call $61dc
-L_34cb:
-  I(0x34cb, 2); A = 0x00;  // ld a,$00
-  I(0x34cd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34cf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34d2, updateInteractions_hook, 0x3b0a, 0x34d5);  // call $3b0a
-L_34d5:
-  I(0x34d5, 2); A = 0x0f;  // ld a,$0f
-  I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
-  I(0x34df, 2); A = 0x06;  // ld a,$06
-  I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x34e6, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x34e9, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { CALL(0x34ea, updateGrabbedObjectPosition_hook, 0x5429, 0x34ed); } else I(0x34ea, 3);  // call c,$5429
-  CALL(0x34ed, loadLinkAndCompanionAnimationFrame_hook, 0x2a6c, 0x34f0);  // call $2a6c
-  I(0x34f0, 2); A = 0x07;  // ld a,$07
-  I(0x34f2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34f4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34f7, updateItemsPost_hook, 0x4902, 0x34fa);  // call $4902
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:34c1
-void s_seasonsFunc_34a0__afterCall34c1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_34c1:
-  I(0x34c1, 2); A = 0x10;  // ld a,$10
-  I(0x34c3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34c5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34c8, updateParts_hook, 0x61dc, 0x34cb);  // call $61dc
-L_34cb:
-  I(0x34cb, 2); A = 0x00;  // ld a,$00
-  I(0x34cd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34cf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34d2, updateInteractions_hook, 0x3b0a, 0x34d5);  // call $3b0a
-L_34d5:
-  I(0x34d5, 2); A = 0x0f;  // ld a,$0f
-  I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
-  I(0x34df, 2); A = 0x06;  // ld a,$06
-  I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x34e6, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x34e9, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { CALL(0x34ea, updateGrabbedObjectPosition_hook, 0x5429, 0x34ed); } else I(0x34ea, 3);  // call c,$5429
-  CALL(0x34ed, loadLinkAndCompanionAnimationFrame_hook, 0x2a6c, 0x34f0);  // call $2a6c
-  I(0x34f0, 2); A = 0x07;  // ld a,$07
-  I(0x34f2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34f4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34f7, updateItemsPost_hook, 0x4902, 0x34fa);  // call $4902
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:34cb
-void s_seasonsFunc_34a0__afterCall34cb(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_34cb:
-  I(0x34cb, 2); A = 0x00;  // ld a,$00
-  I(0x34cd, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34cf, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34d2, updateInteractions_hook, 0x3b0a, 0x34d5);  // call $3b0a
-L_34d5:
-  I(0x34d5, 2); A = 0x0f;  // ld a,$0f
-  I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
-  I(0x34df, 2); A = 0x06;  // ld a,$06
-  I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x34e6, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x34e9, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { CALL(0x34ea, updateGrabbedObjectPosition_hook, 0x5429, 0x34ed); } else I(0x34ea, 3);  // call c,$5429
-  CALL(0x34ed, loadLinkAndCompanionAnimationFrame_hook, 0x2a6c, 0x34f0);  // call $2a6c
-  I(0x34f0, 2); A = 0x07;  // ld a,$07
-  I(0x34f2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34f4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34f7, updateItemsPost_hook, 0x4902, 0x34fa);  // call $4902
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:34d5
-void s_seasonsFunc_34a0__afterCall34d5(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_34d5:
-  I(0x34d5, 2); A = 0x0f;  // ld a,$0f
-  I(0x34d7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34d9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34dc, s_seasonsFunc_0f_7159_hook, 0x7159, 0x34df);  // call $7159
-  I(0x34df, 2); A = 0x06;  // ld a,$06
-  I(0x34e1, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34e3, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x34e6, 4); A = mem_rd(gb, 0xcc75);  // ld a,($cc75)
-  I(0x34e9, 1); alu_rlca(gb);  // rlca
-  if ((F & FC)) { CALL(0x34ea, updateGrabbedObjectPosition_hook, 0x5429, 0x34ed); } else I(0x34ea, 3);  // call c,$5429
-  CALL(0x34ed, loadLinkAndCompanionAnimationFrame_hook, 0x2a6c, 0x34f0);  // call $2a6c
-  I(0x34f0, 2); A = 0x07;  // ld a,$07
-  I(0x34f2, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34f4, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x34f7, updateItemsPost_hook, 0x4902, 0x34fa);  // call $4902
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:34fa
-void s_seasonsFunc_34a0__afterCall34fa(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_34fa:
-  I(0x34fa, 2); A = 0x0f;  // ld a,$0f
-  I(0x34fc, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x34fe, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3501, s_seasonsFunc_0f_7182_hook, 0x7182, 0x3504);  // call $7182
-  I(0x3504, 2); A = 0x04;  // ld a,$04
-  I(0x3506, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3508, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x350b, updateChangedTileQueue_hook, 0x6b25, 0x350e);  // call $6b25
-  I(0x350e, 1); alu_xor(gb, A);  // xor a
-  I(0x350f, 4); mem_wr(gb, 0xc4b6, A);  // ld ($c4b6),a
-  SET_AF(POP(0x3512));  // pop af
-  I(0x3513, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3515, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3518); return;  // ret
-}
-
-// 00:35cc
-void s_seasonsFunc_35cc(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x35cc, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
-  I(0x35ce, 1); C = A;  // ld c,a
-  I(0x35cf, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  I(0x35d1, 1); B = A;  // ld b,a
-  PUSH(0x35d2, BC);  // push bc
-  I(0x35d3, 2); A = 0x02;  // ld a,$02
-  I(0x35d5, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x35d7, 2); A = 0x01;  // ld a,$01
-  I(0x35d9, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35db, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x35de, paletteThread_calculateFadingPalettes_hook, 0x5683, 0x35e1);  // call $5683
-  SET_BC(POP(0x35e1));  // pop bc
-  I(0x35e2, 1); A = B;  // ld a,b
-  I(0x35e3, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x35e5, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x35e8, 1); A = C;  // ld a,c
-  I(0x35e9, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x35eb); return;  // ret
 }
 
 // 00:0c1e
@@ -3914,25 +3406,6 @@ L_0c3b:
   CALL(0x0c41, writeToSC_hook, 0x0c46, 0x0c44);  // call $0c46
   SET_AF(POP(0x0c44));  // pop af
   RETI(0x0c45); return;  // reti
-}
-
-// 00:3e20
-void s_setMakuTreeStageAndMapText(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3e20, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3e22, AF);  // push af
-  I(0x3e23, 2); A = 0x09;  // ld a,$09
-  I(0x3e25, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e27, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e2a, s_makuTree_setAppropriateStage, 0x7d8b, 0x3e2d);  // call $7d8b
-  I(0x3e2d, 2); A = 0x15;  // ld a,$15
-  I(0x3e2f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e31, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e34, s_makuTree_setMapTextBasedOnStage_hook, 0x60fc, 0x3e37);  // call $60fc
-  SET_AF(POP(0x3e37));  // pop af
-  I(0x3e38, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e3a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3e3d); return;  // ret
 }
 
 // 00:11da
@@ -3976,24 +3449,6 @@ void s_setSeason_b00(GB *gb) {
   I(0x3aac, 2); A = 0x02;  // ld a,$02
   I(0x3aae, 4); mem_wr(gb, 0xcc68, A);  // ld ($cc68),a
   RET(0x3ab1); return;  // ret
-}
-
-// 00:3e52
-void s_setUpCharactersAfterMoblinKeepDestroyed(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3e52, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3e54, AF);  // push af
-  I(0x3e55, 2); A = 0x0a;  // ld a,$0a
-  I(0x3e57, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e59, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3e5c, s_moblinKeepScene_setLinkDirectionAndPositionAfterDestroyed, 0x69d4, 0x3e5f);  // call $69d4
-  I(0x3e5f, 2); A = 0x01;  // ld a,$01
-  CALL_ASM(0x3e61, 0x69e7, 0x3e64); /* unported */  // call $69e7
-  CALL_ASM(0x3e64, 0x6a0a, 0x3e67); /* unported */  // call $6a0a
-  SET_AF(POP(0x3e67));  // pop af
-  I(0x3e68, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3e6a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3e6d); return;  // ret
 }
 
 // 00:2ce9
@@ -4313,57 +3768,5 @@ L_0aa8:
   I(0x0ab2, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
   I(0x0ab3, 2); mem_wr(gb, DE, A);  // ld (de),a
   RET(0x0ab4); return;  // ret
-}
-
-// 00:335a
-void s_zeldaAndVillagersCutsceneCaller(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x335a, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x335c, AF);  // push af
-  I(0x335d, 2); A = 0x03;  // ld a,$03
-  I(0x335f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3361, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3364, s_zeldaAndVillagersCutsceneBody_hook, 0x6e05, 0x3367);  // call $6e05
-L_3367:
-  SET_AF(POP(0x3367));  // pop af
-  I(0x3368, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x336a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x336d); return;  // ret
-}
-
-// 00:3367
-void s_zeldaAndVillagersCutsceneCaller__afterCall3367(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_3367:
-  SET_AF(POP(0x3367));  // pop af
-  I(0x3368, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x336a, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x336d); return;  // ret
-}
-
-// 00:336e
-void s_zeldaKidnappedCutsceneCaller(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x336e, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3370, AF);  // push af
-  I(0x3371, 2); A = 0x03;  // ld a,$03
-  I(0x3373, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3375, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3378, s_zeldaKidnappedCutsceneBody_hook, 0x6e0d, 0x337b);  // call $6e0d
-L_337b:
-  SET_AF(POP(0x337b));  // pop af
-  I(0x337c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x337e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3381); return;  // ret
-}
-
-// 00:337b
-void s_zeldaKidnappedCutsceneCaller__afterCall337b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_337b:
-  SET_AF(POP(0x337b));  // pop af
-  I(0x337c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x337e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x3381); return;  // ret
 }
 

@@ -7,11 +7,37 @@
 #define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
-// ref/oracles-disasm/object_code/seasons/enemies/dragonOnox.s, bank $0f: ENEMY_DRAGON_ONOX, the
-// final boss. The main body runs the fight; shoulders, claws and the spheres that link them are
-// separate enemies placed from the body each frame.
+// ref/oracles-disasm/object_code/seasons/enemies/dragonOnox.s.
+// ENEMY_DRAGON_ONOX
+// Variables:
+// var2a:
+// var2f:
+// var30:
+// var31:
+// var32:
+// var33:
+// var34:
+// var35:
+// var36:
+// var37:
+// var38:
+// $cfc8 - near end
+// $cfc9
+// $cfca
+// $cfcb
+// $cfcc
+// $cfcd
+// $cfd7 - Pointer to main body (subid $01)
+// $cfd8 - Pointer to left shoulder (subid $02)
+// $cfd9 - Pointer to right shoulder (subid $03)
+// $cfda - Pointer to left claw (subid $04)
+// $cfdb - Pointer to right claw (subid $05)
+// $cfdc - Pointer to left claw sphere (subid $06)
+// $cfdd - Pointer to right claw sphere (subid $07)
+// $cfde - Pointer to left shoulder sphere (subid $08)
+// $cfdf - Pointer to right shoulder sphere (subid $09)
 
-static uint16_t onox_jump_table(GB *gb) {
+static uint16_t dragonOnox_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
   burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
   burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
@@ -29,7 +55,7 @@ static uint16_t onox_jump_table(GB *gb) {
   return HL;
 }
 
-static void onox_add_a_to_hl(GB *gb, uint16_t return_address) {
+static void dragonOnox_add_a_to_hl(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
   burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
@@ -43,7 +69,7 @@ static void onox_add_a_to_hl(GB *gb, uint16_t return_address) {
   ret_effect(gb);
 }
 
-static void onox_add_double_index(GB *gb, uint16_t return_address) {
+static void dragonOnox_add_double_index(GB *gb, uint16_t return_address) {
   push_effect(gb, return_address);
   burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
   burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
@@ -54,6 +80,34 @@ static void onox_add_double_index(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
+// ENEMY_DRAGON_ONOX
+// Variables:
+// var2a:
+// var2f:
+// var30:
+// var31:
+// var32:
+// var33:
+// var34:
+// var35:
+// var36:
+// var37:
+// var38:
+// $cfc8 - near end
+// $cfc9
+// $cfca
+// $cfcb
+// $cfcc
+// $cfcd
+// $cfd7 - Pointer to main body (subid $01)
+// $cfd8 - Pointer to left shoulder (subid $02)
+// $cfd9 - Pointer to right shoulder (subid $03)
+// $cfda - Pointer to left claw (subid $04)
+// $cfdb - Pointer to right claw (subid $05)
+// $cfdc - Pointer to left claw sphere (subid $06)
+// $cfdd - Pointer to right claw sphere (subid $07)
+// $cfde - Pointer to left shoulder sphere (subid $08)
+// $cfdf - Pointer to right shoulder sphere (subid $09)
 void s_enemyCode05_hook(GB *gb) {
   BASE(enemyCode05);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -108,7 +162,7 @@ normalStatus:
   CYC(b_+69, b_+71); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+71, b_+72); A = B;
   CYC(b_+72, b_+73); push_effect(gb, b_+73);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == SYM(dragonOnox_bodyPartSpawner) && hook_is(gb, SYM(dragonOnox_bodyPartSpawner), s_dragonOnox_bodyPartSpawner_hook)) { s_dragonOnox_bodyPartSpawner_hook(gb); return; }
     if (jt_ == SYM(dragonOnox_mainBody) && hook_is(gb, SYM(dragonOnox_mainBody), s_dragonOnox_mainBody_hook)) { s_dragonOnox_mainBody_hook(gb); return; }
     if (jt_ == SYM(dragonOnox_leftShoulder) && hook_is(gb, SYM(dragonOnox_leftShoulder), s_dragonOnox_leftShoulder_hook)) { s_dragonOnox_leftShoulder_hook(gb); return; }
@@ -193,7 +247,7 @@ void s_dragonOnox_mainBodyStateHandler_hook(GB *gb) {
   CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == SYM(dragonOnox_mainBody_state0) && hook_is(gb, SYM(dragonOnox_mainBody_state0), s_dragonOnox_mainBody_state0_hook)) { s_dragonOnox_mainBody_state0_hook(gb); return; }
     if (jt_ == SYM(dragonOnox_mainBody_state1) && hook_is(gb, SYM(dragonOnox_mainBody_state1), s_dragonOnox_mainBody_state1_hook)) { s_dragonOnox_mainBody_state1_hook(gb); return; }
     if (jt_ == SYM(dragonOnox_mainBody_state2) && hook_is(gb, SYM(dragonOnox_mainBody_state2), s_dragonOnox_mainBody_state2_hook)) { s_dragonOnox_mainBody_state2_hook(gb); return; }
@@ -347,7 +401,7 @@ L_5e1c:
   CYC(b_+13, b_+14); E = alu_inc8(gb, E);
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); push_effect(gb, b_+16);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+26) goto substate0;
     if (jt_ == b_+63) goto substate1;
     if (jt_ == b_+75) goto substate2;
@@ -535,7 +589,7 @@ L_5f07:
   CYC(b_+13, b_+14); E = alu_inc8(gb, E);
   CYC(b_+14, b_+15); A = mem_rd(gb, DE);
   CYC(b_+15, b_+16); push_effect(gb, b_+16);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+24) goto substate0;
     if (jt_ == b_+38) goto substate1;
     if (jt_ == b_+68) goto substate2;
@@ -648,7 +702,7 @@ void s_dragonOnox_mainBody_state8_hook(GB *gb) {
   CYC(b_+0, b_+1); E = alu_inc8(gb, E);
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+17) goto substate0;
     if (jt_ == b_+42) goto substate1;
     if (jt_ == b_+82) goto substate2;
@@ -833,7 +887,7 @@ L_608f:
   CYC(b_+11, b_+12); E = alu_inc8(gb, E);
   CYC(b_+12, b_+13); A = mem_rd(gb, DE);
   CYC(b_+13, b_+14); push_effect(gb, b_+14);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+22) goto substate0;
     if (jt_ == b_+30) goto substate1;
     if (jt_ == b_+54) goto substate2;
@@ -895,8 +949,8 @@ substate3:
   CYC(b_+92, b_+94); mem_wr(gb, HL, 0x14);
   CYC(b_+94, b_+96); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+96, b_+97); A = mem_rd(gb, HL);
-  CYC(b_+97, b_+100); SET_HL(b_+146);
-  CYC(b_+100, b_+101); onox_add_a_to_hl(gb, b_+101);
+  CYC(b_+97, b_+100); SET_HL(b_+146 /* @seasonsTable_0f_6116 */);
+  CYC(b_+100, b_+101); dragonOnox_add_a_to_hl(gb, b_+101);
   CYC(b_+101, b_+102); C = mem_rd(gb, HL);
   CALL_C(b_+102, s_getFreePartSlot, SYM(getFreePartSlot), b_+105);
   if (!(F & FZ)) { RET_TAKEN(b_+105); return; }
@@ -946,7 +1000,7 @@ void s_dragonOnox_mainBody_stateE_hook(GB *gb) {
   CYC(b_+0, b_+1); E = alu_inc8(gb, E);
   CYC(b_+1, b_+2); A = mem_rd(gb, DE);
   CYC(b_+2, b_+3); push_effect(gb, b_+3);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+9) goto substate0;
     if (jt_ == b_+81) goto substate1;
     if (jt_ == b_+89) goto substate2;
@@ -1004,8 +1058,8 @@ substate2:
   CALL_C(b_+99, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+102);
   CYC(b_+102, b_+103); A = mem_rd(gb, HL);
   CYC(b_+103, b_+105); alu_and(gb, 0x03);
-  CYC(b_+105, b_+108); SET_HL(b_+119);
-  CYC(b_+108, b_+109); onox_add_a_to_hl(gb, b_+109);
+  CYC(b_+105, b_+108); SET_HL(b_+119 /* @seasonsTable_0f_61b9 */);
+  CYC(b_+108, b_+109); dragonOnox_add_a_to_hl(gb, b_+109);
   CYC(b_+109, b_+112); A = mem_rd(gb, wTmpcfc0 + 0x0d);
   CYC(b_+112, b_+113); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+113, b_+116); mem_wr(gb, wTmpcfc0 + 0x0d, A);
@@ -1018,7 +1072,7 @@ void s_dragonOnox_leftShoulder_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto animate;
     if (jt_ == b_+17) goto offsetBasedOncfca;
     HANDOFF(HL);
@@ -1057,7 +1111,7 @@ void s_dragonOnox_rightShoulder_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto animate;
     if (jt_ == b_+17) goto offsetBasedOncfca;
     HANDOFF(HL);
@@ -1091,52 +1145,28 @@ L_6212:
   RET(b_+49); return;
 }
 
-// dragonOnox_leftClaw@seasonsFunc_0f_62a5 +: the claw at the body plus (var37, var38).
-static void onox_claw_follow_body(GB *gb) {
+// dragonOnox_leftClaw@state3@seasonsFunc_0f_63e1
+static void dragonOnox_state3_seasonsFunc_0f_63e1(GB *gb) {
   BASE(dragonOnox_leftClaw);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+149, b_+151); A = 0x00;
-  CALL_C(b_+151, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+154);
-  CYC(b_+154, b_+156); E = ENEMY_BASE + OBJ_VAR37;
-  CYC(b_+156, b_+157); A = mem_rd(gb, DE);
-  CYC(b_+157, b_+158); B = A;
-  CYC(b_+158, b_+159); E = alu_inc8(gb, E);
-  CYC(b_+159, b_+160); A = mem_rd(gb, DE);
-  CYC(b_+160, b_+161); C = A;
-  CYC(b_+161, b_+164);
-  TAIL(objectTakePositionWithOffset);
+  CYC(b_+448, b_+449); H = D;
+  CYC(b_+449, b_+451); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+451, b_+453); mem_wr(gb, HL, 0x01);
+  CYC(b_+453, b_+455); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_Y;
+  CYC(b_+455, b_+457); mem_wr(gb, HL, 0x05);
+  CYC(b_+457, b_+458); L = alu_inc8(gb, L);
+  CYC(b_+458, b_+460); mem_wr(gb, HL, 0x09);
+  CYC(b_+460, b_+462); L = ENEMY_BASE + OBJ_DAMAGE;
+  CYC(b_+462, b_+464); mem_wr(gb, HL, 0xfc);
+  CYC(b_+464, b_+466); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+466, b_+467); A = mem_rd(gb, DE);
+  CYC(b_+467, b_+468); A = alu_dec8(gb, A);
+  CYC(b_+468, b_+471);
+  TAIL(enemySetAnimation);
 }
 
-// dragonOnox_leftClaw@seasonsFunc_0f_6277.
-static void onox_claw_seasonsFunc_0f_6277(GB *gb) {
-  BASE(dragonOnox_leftClaw);
-  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+86, b_+87); H = D;
-  CYC(b_+87, b_+88); L = E;
-  CYC(b_+88, b_+90); mem_wr(gb, HL, 0x00);
-  CYC(b_+90, b_+92); L = ENEMY_BASE + OBJ_STATE;
-  CYC(b_+92, b_+93); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+93, b_+94); mem_wr(gb, HL, A);
-  CYC(b_+94, b_+95); L = alu_inc8(gb, L);
-  CYC(b_+95, b_+97); mem_wr(gb, HL, 0x00);
-  CYC(b_+97, b_+98); L = alu_inc8(gb, L);
-  CYC(b_+98, b_+100); mem_wr(gb, HL, 0x1e);
-  CYC(b_+100, b_+102); L = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+102, b_+103); A = mem_rd(gb, HL);
-  CYC(b_+103, b_+105); alu_cp(gb, 0x04);
-  CYC(b_+105, b_+107); A = 0xd8;
-  if (F & FZ) { CYCT(b_+107, b_+109); goto L_6290; }
-  CYC(b_+107, b_+109);
-  CYC(b_+109, b_+111); A = 0x28;
-L_6290:
-  CYC(b_+111, b_+113); L = ENEMY_BASE + OBJ_VAR38;
-  CYC(b_+113, b_+114); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+114, b_+116); mem_wr(gb, HL, 0x30);
-  RET(b_+116); return;
-}
-
-// dragonOnox_leftClaw@seasonsFunc_0f_62a5@seasonsFunc_0f_6386.
-static void onox_claw_seasonsFunc_0f_6386(GB *gb) {
+// dragonOnox_leftClaw@seasonsFunc_0f_62a5@seasonsFunc_0f_6386
+static void dragonOnox_seasonsFunc_0f_62a5_seasonsFunc_0f_6386(GB *gb) {
   BASE(dragonOnox_leftClaw);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+357, b_+359); A = 0x0b;
@@ -1155,14 +1185,14 @@ static void onox_claw_seasonsFunc_0f_6386(GB *gb) {
   RET(b_+376); return;
 }
 
-// dragonOnox_leftClaw@seasonsFunc_0f_62a5: the claw attack substates.
-static void onox_claw_seasonsFunc_0f_62a5(GB *gb) {
+// dragonOnox_leftClaw@seasonsFunc_0f_62a5
+static void dragonOnox_seasonsFunc_0f_62a5(GB *gb) {
   BASE(dragonOnox_leftClaw);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+132, b_+133); E = alu_inc8(gb, E);
   CYC(b_+133, b_+134); A = mem_rd(gb, DE);
   CYC(b_+134, b_+135); push_effect(gb, b_+135);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+164) goto seasonsFunc_0f_62a5_substate0;
     if (jt_ == b_+189) goto seasonsFunc_0f_62a5_substate1;
     if (jt_ == b_+205) goto seasonsFunc_0f_62a5_substate2;
@@ -1230,7 +1260,7 @@ seasonsFunc_0f_62a5_substate3:
   CYC(b_+241, b_+243); L = ENEMY_BASE + OBJ_VAR35;
   CALL_C(b_+243, s_ecom_readPositionVars, SYM(ecom_readPositionVars_b0d), b_+246);
   CALL_C(b_+246, s_ecom_moveTowardPosition, SYM(ecom_moveTowardPosition_b0d), b_+249);
-  CALL_L(b_+249, onox_claw_seasonsFunc_0f_6386, b_+252);
+  CALL_L(b_+249, dragonOnox_seasonsFunc_0f_62a5_seasonsFunc_0f_6386, b_+252);
   CYC(b_+252, b_+254); E = ENEMY_BASE + OBJ_YH;
   CYC(b_+254, b_+255); A = mem_rd(gb, DE);
   CYC(b_+255, b_+257); alu_cp(gb, 0xa0);
@@ -1334,82 +1364,32 @@ seasonsFunc_0f_62a5_substate6:
   RET(b_+391); return;
 }
 
-// dragonOnox_leftClaw@state2 (the right claw uses it too).
-static void onox_claw_state2(GB *gb) {
+// dragonOnox_leftClaw@seasonsFunc_0f_6277
+static void dragonOnox_seasonsFunc_0f_6277(GB *gb) {
   BASE(dragonOnox_leftClaw);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+117, b_+120); A = mem_rd(gb, wTmpcfc0 + 0x0a);
-  CYC(b_+120, b_+122); alu_sub(gb, 0x06);
-  CYC(b_+122, b_+124); alu_cp(gb, 0x02);
-  if (F & FC) { CYCT(b_+124, b_+126); { onox_claw_follow_body(gb); return; } }
-  CYC(b_+124, b_+126);
-  CALL_L(b_+126, onox_claw_seasonsFunc_0f_62a5, b_+129);
-  CYC(b_+129, b_+132);
-  TAIL_S(seasonsFunc_0f_6557);
-}
-
-// dragonOnox_leftClaw@state3@seasonsFunc_0f_63e1.
-static void onox_claw_seasonsFunc_0f_63e1(GB *gb) {
-  BASE(dragonOnox_leftClaw);
-  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+448, b_+449); H = D;
-  CYC(b_+449, b_+451); L = ENEMY_BASE + OBJ_STATE;
-  CYC(b_+451, b_+453); mem_wr(gb, HL, 0x01);
-  CYC(b_+453, b_+455); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_Y;
-  CYC(b_+455, b_+457); mem_wr(gb, HL, 0x05);
-  CYC(b_+457, b_+458); L = alu_inc8(gb, L);
-  CYC(b_+458, b_+460); mem_wr(gb, HL, 0x09);
-  CYC(b_+460, b_+462); L = ENEMY_BASE + OBJ_DAMAGE;
-  CYC(b_+462, b_+464); mem_wr(gb, HL, 0xfc);
-  CYC(b_+464, b_+466); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+466, b_+467); A = mem_rd(gb, DE);
-  CYC(b_+467, b_+468); A = alu_dec8(gb, A);
-  CYC(b_+468, b_+471);
-  TAIL(enemySetAnimation);}
-
-// dragonOnox_leftClaw@state3 (the right claw uses it too).
-static void onox_claw_state3(GB *gb) {
-  BASE(dragonOnox_leftClaw);
-  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CYC(b_+392, b_+393); E = alu_inc8(gb, E);
-  CYC(b_+393, b_+394); A = mem_rd(gb, DE);
-  CYC(b_+394, b_+395); push_effect(gb, b_+395);
-  do { uint16_t jt_ = (onox_jump_table(gb));
-    if (jt_ == b_+399) goto state3_substate0;
-    if (jt_ == b_+421) goto state3_substate1;
-    HANDOFF(HL);
-  } while (0);
-state3_substate0:
-  CYC(b_+399, b_+400); H = D;
-  CYC(b_+400, b_+401); L = E;
-  CYC(b_+401, b_+402); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+402, b_+404); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_Y;
-  CYC(b_+404, b_+406); mem_wr(gb, HL, 0x0e);
-  CYC(b_+406, b_+407); L = alu_inc8(gb, L);
-  CYC(b_+407, b_+409); mem_wr(gb, HL, 0x0a);
-  CYC(b_+409, b_+411); L = ENEMY_BASE + OBJ_DAMAGE;
-  CYC(b_+411, b_+413); mem_wr(gb, HL, 0xf8);
-  CYC(b_+413, b_+415); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+415, b_+416); A = mem_rd(gb, DE);
-  CYC(b_+416, b_+418); alu_add(gb, 0x03);
-  CALL_C(b_+418, s_enemySetAnimation, SYM(enemySetAnimation), b_+421);
-state3_substate1:
-  CYC(b_+421, b_+424); A = mem_rd(gb, wTmpcfc0 + 0x0a);
-  CYC(b_+424, b_+425); alu_or(gb, A);
-  if (F & FZ) CALL_L_CC(b_+425, onox_claw_seasonsFunc_0f_63e1, b_+428);
-  else CYC(b_+425, b_+428);
-  CYC(b_+428, b_+430); A = 0x00;
-  CALL_C(b_+430, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+433);
-  CYC(b_+433, b_+436); SET_BC(0x30d8);
-  CYC(b_+436, b_+438); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+438, b_+439); A = mem_rd(gb, DE);
-  CYC(b_+439, b_+441); alu_cp(gb, 0x04);
-  if (F & FZ) { CYCT(b_+441, b_+443); goto L_63de; }
-  CYC(b_+441, b_+443);
-  CYC(b_+443, b_+445); C = 0x28;
-L_63de:
-  CYC(b_+445, b_+448);
-  TAIL(objectTakePositionWithOffset);
+  CYC(b_+86, b_+87); H = D;
+  CYC(b_+87, b_+88); L = E;
+  CYC(b_+88, b_+90); mem_wr(gb, HL, 0x00);
+  CYC(b_+90, b_+92); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+92, b_+93); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+93, b_+94); mem_wr(gb, HL, A);
+  CYC(b_+94, b_+95); L = alu_inc8(gb, L);
+  CYC(b_+95, b_+97); mem_wr(gb, HL, 0x00);
+  CYC(b_+97, b_+98); L = alu_inc8(gb, L);
+  CYC(b_+98, b_+100); mem_wr(gb, HL, 0x1e);
+  CYC(b_+100, b_+102); L = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+102, b_+103); A = mem_rd(gb, HL);
+  CYC(b_+103, b_+105); alu_cp(gb, 0x04);
+  CYC(b_+105, b_+107); A = 0xd8;
+  if (F & FZ) { CYCT(b_+107, b_+109); goto L_6290; }
+  CYC(b_+107, b_+109);
+  CYC(b_+109, b_+111); A = 0x28;
+L_6290:
+  CYC(b_+111, b_+113); L = ENEMY_BASE + OBJ_VAR38;
+  CYC(b_+113, b_+114); mem_wr(gb, HL, A); SET_HL(HL - 1);
+  CYC(b_+114, b_+116); mem_wr(gb, HL, 0x30);
+  RET(b_+116); return;
 }
 
 void s_dragonOnox_leftClaw_hook(GB *gb) {
@@ -1417,11 +1397,11 @@ void s_dragonOnox_leftClaw_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+10) goto state0;
     if (jt_ == b_+45) goto state1;
-    if (jt_ == b_+117) { onox_claw_state2(gb); return; }
-    if (jt_ == b_+392) { onox_claw_state3(gb); return; }
+    if (jt_ == b_+117) goto state2;
+    if (jt_ == b_+392) goto state3;
     HANDOFF(HL);
   } while (0);
 state0:
@@ -1449,7 +1429,7 @@ state1:
   CYC(b_+45, b_+47); E = ENEMY_BASE + OBJ_VAR30;
   CYC(b_+47, b_+48); A = mem_rd(gb, DE);
   CYC(b_+48, b_+49); alu_or(gb, A);
-  if (!(F & FZ)) CALL_L_CC(b_+49, onox_claw_seasonsFunc_0f_6277, b_+52);
+  if (!(F & FZ)) CALL_L_CC(b_+49, dragonOnox_seasonsFunc_0f_6277, b_+52);
   else CYC(b_+49, b_+52);
   CYC(b_+52, b_+54); A = 0x00;
   CALL_C(b_+54, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+57);
@@ -1470,6 +1450,140 @@ L_6271:
   CALL_C(b_+80, s_objectTakePositionWithOffset, SYM(objectTakePositionWithOffset), b_+83);
   CYC(b_+83, b_+86);
   TAIL_S(seasonsFunc_0f_6557);
+
+state2:
+  CYC(b_+117, b_+120); A = mem_rd(gb, wTmpcfc0 + 0x0a);
+  CYC(b_+120, b_+122); alu_sub(gb, 0x06);
+  CYC(b_+122, b_+124); alu_cp(gb, 0x02);
+  if (F & FC) { CYCT(b_+124, b_+126); goto L_62b6; }
+  CYC(b_+124, b_+126);
+  CALL_L(b_+126, dragonOnox_seasonsFunc_0f_62a5, b_+129);
+  CYC(b_+129, b_+132);
+  TAIL_S(seasonsFunc_0f_6557);
+
+L_62b6:
+  CYC(b_+149, b_+151); A = 0x00;
+  CALL_C(b_+151, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+154);
+  CYC(b_+154, b_+156); E = ENEMY_BASE + OBJ_VAR37;
+  CYC(b_+156, b_+157); A = mem_rd(gb, DE);
+  CYC(b_+157, b_+158); B = A;
+  CYC(b_+158, b_+159); E = alu_inc8(gb, E);
+  CYC(b_+159, b_+160); A = mem_rd(gb, DE);
+  CYC(b_+160, b_+161); C = A;
+  CYC(b_+161, b_+164);
+  TAIL(objectTakePositionWithOffset);
+
+state3:
+  CYC(b_+392, b_+393); E = alu_inc8(gb, E);
+  CYC(b_+393, b_+394); A = mem_rd(gb, DE);
+  CYC(b_+394, b_+395); push_effect(gb, b_+395);
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
+    if (jt_ == b_+399) goto state3_substate0;
+    if (jt_ == b_+421) goto state3_substate1;
+    HANDOFF(HL);
+  } while (0);
+state3_substate0:
+  CYC(b_+399, b_+400); H = D;
+  CYC(b_+400, b_+401); L = E;
+  CYC(b_+401, b_+402); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+402, b_+404); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_Y;
+  CYC(b_+404, b_+406); mem_wr(gb, HL, 0x0e);
+  CYC(b_+406, b_+407); L = alu_inc8(gb, L);
+  CYC(b_+407, b_+409); mem_wr(gb, HL, 0x0a);
+  CYC(b_+409, b_+411); L = ENEMY_BASE + OBJ_DAMAGE;
+  CYC(b_+411, b_+413); mem_wr(gb, HL, 0xf8);
+  CYC(b_+413, b_+415); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+415, b_+416); A = mem_rd(gb, DE);
+  CYC(b_+416, b_+418); alu_add(gb, 0x03);
+  CALL_C(b_+418, s_enemySetAnimation, SYM(enemySetAnimation), b_+421);
+state3_substate1:
+  CYC(b_+421, b_+424); A = mem_rd(gb, wTmpcfc0 + 0x0a);
+  CYC(b_+424, b_+425); alu_or(gb, A);
+  if (F & FZ) CALL_L_CC(b_+425, dragonOnox_state3_seasonsFunc_0f_63e1, b_+428);
+  else CYC(b_+425, b_+428);
+  CYC(b_+428, b_+430); A = 0x00;
+  CALL_C(b_+430, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+433);
+  CYC(b_+433, b_+436); SET_BC(0x30d8);
+  CYC(b_+436, b_+438); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+438, b_+439); A = mem_rd(gb, DE);
+  CYC(b_+439, b_+441); alu_cp(gb, 0x04);
+  if (F & FZ) { CYCT(b_+441, b_+443); goto L_63de; }
+  CYC(b_+441, b_+443);
+  CYC(b_+443, b_+445); C = 0x28;
+L_63de:
+  CYC(b_+445, b_+448);
+  TAIL(objectTakePositionWithOffset);
+}
+
+// dragonOnox_leftClaw@state3
+static void dragonOnox_state3(GB *gb) {
+  BASE(dragonOnox_leftClaw);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+392, b_+393); E = alu_inc8(gb, E);
+  CYC(b_+393, b_+394); A = mem_rd(gb, DE);
+  CYC(b_+394, b_+395); push_effect(gb, b_+395);
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
+    if (jt_ == b_+399) goto state3_substate0;
+    if (jt_ == b_+421) goto state3_substate1;
+    HANDOFF(HL);
+  } while (0);
+state3_substate0:
+  CYC(b_+399, b_+400); H = D;
+  CYC(b_+400, b_+401); L = E;
+  CYC(b_+401, b_+402); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+402, b_+404); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_Y;
+  CYC(b_+404, b_+406); mem_wr(gb, HL, 0x0e);
+  CYC(b_+406, b_+407); L = alu_inc8(gb, L);
+  CYC(b_+407, b_+409); mem_wr(gb, HL, 0x0a);
+  CYC(b_+409, b_+411); L = ENEMY_BASE + OBJ_DAMAGE;
+  CYC(b_+411, b_+413); mem_wr(gb, HL, 0xf8);
+  CYC(b_+413, b_+415); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+415, b_+416); A = mem_rd(gb, DE);
+  CYC(b_+416, b_+418); alu_add(gb, 0x03);
+  CALL_C(b_+418, s_enemySetAnimation, SYM(enemySetAnimation), b_+421);
+state3_substate1:
+  CYC(b_+421, b_+424); A = mem_rd(gb, wTmpcfc0 + 0x0a);
+  CYC(b_+424, b_+425); alu_or(gb, A);
+  if (F & FZ) CALL_L_CC(b_+425, dragonOnox_state3_seasonsFunc_0f_63e1, b_+428);
+  else CYC(b_+425, b_+428);
+  CYC(b_+428, b_+430); A = 0x00;
+  CALL_C(b_+430, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+433);
+  CYC(b_+433, b_+436); SET_BC(0x30d8);
+  CYC(b_+436, b_+438); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+438, b_+439); A = mem_rd(gb, DE);
+  CYC(b_+439, b_+441); alu_cp(gb, 0x04);
+  if (F & FZ) { CYCT(b_+441, b_+443); goto L_63de; }
+  CYC(b_+441, b_+443);
+  CYC(b_+443, b_+445); C = 0x28;
+L_63de:
+  CYC(b_+445, b_+448);
+  TAIL(objectTakePositionWithOffset);
+}
+
+// dragonOnox_leftClaw@state2
+static void dragonOnox_state2(GB *gb) {
+  BASE(dragonOnox_leftClaw);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+117, b_+120); A = mem_rd(gb, wTmpcfc0 + 0x0a);
+  CYC(b_+120, b_+122); alu_sub(gb, 0x06);
+  CYC(b_+122, b_+124); alu_cp(gb, 0x02);
+  if (F & FC) { CYCT(b_+124, b_+126); goto L_62b6; }
+  CYC(b_+124, b_+126);
+  CALL_L(b_+126, dragonOnox_seasonsFunc_0f_62a5, b_+129);
+  CYC(b_+129, b_+132);
+  TAIL_S(seasonsFunc_0f_6557);
+
+L_62b6:
+  CYC(b_+149, b_+151); A = 0x00;
+  CALL_C(b_+151, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+154);
+  CYC(b_+154, b_+156); E = ENEMY_BASE + OBJ_VAR37;
+  CYC(b_+156, b_+157); A = mem_rd(gb, DE);
+  CYC(b_+157, b_+158); B = A;
+  CYC(b_+158, b_+159); E = alu_inc8(gb, E);
+  CYC(b_+159, b_+160); A = mem_rd(gb, DE);
+  CYC(b_+160, b_+161); C = A;
+  CYC(b_+161, b_+164);
+  TAIL(objectTakePositionWithOffset);
 }
 
 void s_dragonOnox_rightClaw_hook(GB *gb) {
@@ -1477,11 +1591,11 @@ void s_dragonOnox_rightClaw_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+10) goto state0;
     if (jt_ == b_+48) goto state1;
-    if (jt_ == 0x6296) { onox_claw_state2(gb); return; }
-    if (jt_ == 0x63a9) { onox_claw_state3(gb); return; }
+    if (jt_ == (b_ - 354)) { dragonOnox_state2(gb); return; }
+    if (jt_ == (b_ - 79)) { dragonOnox_state3(gb); return; }
     HANDOFF(HL);
   } while (0);
 state0:
@@ -1511,7 +1625,7 @@ state1:
   CYC(b_+48, b_+50); E = ENEMY_BASE + OBJ_VAR30;
   CYC(b_+50, b_+51); A = mem_rd(gb, DE);
   CYC(b_+51, b_+52); alu_or(gb, A);
-  if (!(F & FZ)) CALL_L_CC(b_+52, onox_claw_seasonsFunc_0f_6277, b_+55);
+  if (!(F & FZ)) CALL_L_CC(b_+52, dragonOnox_seasonsFunc_0f_6277, b_+55);
   else CYC(b_+52, b_+55);
   CYC(b_+55, b_+57); A = 0x00;
   CALL_C(b_+57, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+60);
@@ -1534,34 +1648,12 @@ L_644b:
   TAIL_S(seasonsFunc_0f_6557);
 }
 
-// dragonOnox_leftClawSphere@connectParts: this sphere placed between its two related objects.
-static void onox_claw_sphere_connect(GB *gb) {
-  BASE(dragonOnox_leftClawSphere);
-  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CALL_C(b_+33, s_dragonOnoxDistanceToRelatedObjects_hook, SYM(dragonOnoxDistanceToRelatedObjects), b_+36);
-  CYC(b_+36, b_+37); E = L;
-  CYC(b_+37, b_+39); B = alu_sra(gb, B);
-  CYC(b_+39, b_+40); A = B;
-  CYC(b_+40, b_+42); B = alu_sra(gb, B);
-  CYC(b_+42, b_+43); alu_add(gb, B);
-  CYC(b_+43, b_+44); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+44, b_+45); mem_wr(gb, DE, A);
-  CYC(b_+45, b_+47); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+47, b_+48); E = L;
-  CYC(b_+48, b_+50); C = alu_sra(gb, C);
-  CYC(b_+50, b_+51); A = C;
-  CYC(b_+51, b_+53); C = alu_sra(gb, C);
-  CYC(b_+53, b_+54); alu_add(gb, C);
-  CYC(b_+54, b_+55); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+55, b_+56); mem_wr(gb, DE, A);
-  RET(b_+56); return;}
-
 void s_dragonOnox_leftClawSphere_hook(GB *gb) {
   BASE(dragonOnox_leftClawSphere);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto linkPartsAndAnimate;
     if (jt_ == b_+33) goto connectParts;
     HANDOFF(HL);
@@ -1601,14 +1693,37 @@ connectParts:
   RET(b_+56); return;
 }
 
+// dragonOnox_leftClawSphere@connectParts
+static void dragonOnox_connectParts(GB *gb) {
+  BASE(dragonOnox_leftClawSphere);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+33, s_dragonOnoxDistanceToRelatedObjects_hook, SYM(dragonOnoxDistanceToRelatedObjects), b_+36);
+  CYC(b_+36, b_+37); E = L;
+  CYC(b_+37, b_+39); B = alu_sra(gb, B);
+  CYC(b_+39, b_+40); A = B;
+  CYC(b_+40, b_+42); B = alu_sra(gb, B);
+  CYC(b_+42, b_+43); alu_add(gb, B);
+  CYC(b_+43, b_+44); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+44, b_+45); mem_wr(gb, DE, A);
+  CYC(b_+45, b_+47); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+47, b_+48); E = L;
+  CYC(b_+48, b_+50); C = alu_sra(gb, C);
+  CYC(b_+50, b_+51); A = C;
+  CYC(b_+51, b_+53); C = alu_sra(gb, C);
+  CYC(b_+53, b_+54); alu_add(gb, C);
+  CYC(b_+54, b_+55); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+55, b_+56); mem_wr(gb, DE, A);
+  RET(b_+56); return;
+}
+
 void s_dragonOnox_rightClawSphere_hook(GB *gb) {
   BASE(dragonOnox_rightClawSphere);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto linkPartsAndAnimate;
-    if (jt_ == 0x6472) { onox_claw_sphere_connect(gb); return; }
+    if (jt_ == (b_ - 24)) { dragonOnox_connectParts(gb); return; }
     HANDOFF(HL);
   } while (0);
 linkPartsAndAnimate:
@@ -1627,39 +1742,15 @@ linkPartsAndAnimate:
   CALL_C(b_+27, s_enemySetAnimation, SYM(enemySetAnimation), b_+30);
   CALL_C(b_+30, s_objectSetVisible82, SYM(objectSetVisible82), b_+33);
   CYC(b_+33, b_+35);
-  onox_claw_sphere_connect(gb); return;
+  dragonOnox_connectParts(gb); return;
 }
-
-// dragonOnox_leftShoulderSphere@connectParts: this sphere placed between its two related objects.
-static void onox_shoulder_sphere_connect(GB *gb) {
-  BASE(dragonOnox_leftShoulderSphere);
-  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CALL_C(b_+33, s_dragonOnoxDistanceToRelatedObjects_hook, SYM(dragonOnoxDistanceToRelatedObjects), b_+36);
-  CYC(b_+36, b_+37); E = L;
-  CYC(b_+37, b_+39); B = alu_sra(gb, B);
-  CYC(b_+39, b_+41); B = alu_sra(gb, B);
-  CYC(b_+41, b_+42); A = B;
-  CYC(b_+42, b_+44); B = alu_sra(gb, B);
-  CYC(b_+44, b_+45); alu_add(gb, B);
-  CYC(b_+45, b_+46); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+46, b_+47); mem_wr(gb, DE, A);
-  CYC(b_+47, b_+49); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+49, b_+50); E = L;
-  CYC(b_+50, b_+52); C = alu_sra(gb, C);
-  CYC(b_+52, b_+54); C = alu_sra(gb, C);
-  CYC(b_+54, b_+55); A = C;
-  CYC(b_+55, b_+57); C = alu_sra(gb, C);
-  CYC(b_+57, b_+58); alu_add(gb, C);
-  CYC(b_+58, b_+59); alu_add(gb, mem_rd(gb, HL));
-  CYC(b_+59, b_+60); mem_wr(gb, DE, A);
-  RET(b_+60); return;}
 
 void s_dragonOnox_leftShoulderSphere_hook(GB *gb) {
   BASE(dragonOnox_leftShoulderSphere);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto linkPartsAndAnimate;
     if (jt_ == b_+33) goto connectParts;
     HANDOFF(HL);
@@ -1701,14 +1792,39 @@ connectParts:
   RET(b_+60); return;
 }
 
+// dragonOnox_leftShoulderSphere@connectParts
+static void dragonOnox_dragonOnox_leftShoulderSphere_connectParts(GB *gb) {
+  BASE(dragonOnox_leftShoulderSphere);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+33, s_dragonOnoxDistanceToRelatedObjects_hook, SYM(dragonOnoxDistanceToRelatedObjects), b_+36);
+  CYC(b_+36, b_+37); E = L;
+  CYC(b_+37, b_+39); B = alu_sra(gb, B);
+  CYC(b_+39, b_+41); B = alu_sra(gb, B);
+  CYC(b_+41, b_+42); A = B;
+  CYC(b_+42, b_+44); B = alu_sra(gb, B);
+  CYC(b_+44, b_+45); alu_add(gb, B);
+  CYC(b_+45, b_+46); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+46, b_+47); mem_wr(gb, DE, A);
+  CYC(b_+47, b_+49); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+49, b_+50); E = L;
+  CYC(b_+50, b_+52); C = alu_sra(gb, C);
+  CYC(b_+52, b_+54); C = alu_sra(gb, C);
+  CYC(b_+54, b_+55); A = C;
+  CYC(b_+55, b_+57); C = alu_sra(gb, C);
+  CYC(b_+57, b_+58); alu_add(gb, C);
+  CYC(b_+58, b_+59); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+59, b_+60); mem_wr(gb, DE, A);
+  RET(b_+60); return;
+}
+
 void s_dragonOnox_rightShoulderSphere_hook(GB *gb) {
   BASE(dragonOnox_rightShoulderSphere);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+1); A = mem_rd(gb, DE);
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
-  do { uint16_t jt_ = (onox_jump_table(gb));
+  do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto linkPartsAndAnimate;
-    if (jt_ == 0x64ce) { onox_shoulder_sphere_connect(gb); return; }
+    if (jt_ == (b_ - 28)) { dragonOnox_dragonOnox_leftShoulderSphere_connectParts(gb); return; }
     HANDOFF(HL);
   } while (0);
 linkPartsAndAnimate:
@@ -1727,7 +1843,7 @@ linkPartsAndAnimate:
   CALL_C(b_+27, s_enemySetAnimation, SYM(enemySetAnimation), b_+30);
   CALL_C(b_+30, s_objectSetVisible82, SYM(objectSetVisible82), b_+33);
   CYC(b_+33, b_+35);
-  onox_shoulder_sphere_connect(gb); return;
+  dragonOnox_dragonOnox_leftShoulderSphere_connectParts(gb); return;
 }
 
 void s_seasonsFunc_0f_650d_hook(GB *gb) {
@@ -1768,6 +1884,9 @@ void s_seasonsFunc_0f_6529_hook(GB *gb) {
   TAIL(objectGetRelativeAngleWithTempVars);
 }
 
+// @param[out]	b	relatedObj1.yh - relatedObj2.yh
+// @param[out]	c	relatedObj1.xh - relatedObj2.xh
+// @param[out]	hl	relatedObj2.yh
 void s_dragonOnoxDistanceToRelatedObjects_hook(GB *gb) {
   BASE(dragonOnoxDistanceToRelatedObjects);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1890,7 +2009,7 @@ void s_seasonsFunc_0f_65c7_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_rrca(gb);
   CYC(b_+7, b_+8); alu_add(gb, B);
   CYC(b_+8, b_+11); SET_HL(SYM(seasonsTable_0f_65ed));
-  CYC(b_+11, b_+12); onox_add_a_to_hl(gb, b_+12);
+  CYC(b_+11, b_+12); dragonOnox_add_a_to_hl(gb, b_+12);
   CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_YH;
   CYC(b_+14, b_+17); A = mem_rd(gb, wTmpcfc0 + 0x0c);
   CYC(b_+17, b_+18); alu_add(gb, mem_rd(gb, HL));
@@ -1974,7 +2093,7 @@ void s_seasonsFunc_0f_6637_hook(GB *gb) {
   CYC(b_+6, b_+8); alu_and(gb, 0x07);
   CYC(b_+8, b_+9); mem_wr(gb, DE, A);
   CYC(b_+9, b_+12); SET_HL(SYM(seasonsTable_0f_664c));
-  CYC(b_+12, b_+13); onox_add_double_index(gb, b_+13);
+  CYC(b_+12, b_+13); dragonOnox_add_double_index(gb, b_+13);
   CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_VAR35;
   CYC(b_+15, b_+16); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+16, b_+17); mem_wr(gb, DE, A);
@@ -1997,7 +2116,7 @@ void s_seasonsFunc_0f_665c_hook(GB *gb) {
   CALL_C(b_+14, s_getRandomNumber_noPreserveVars, SYM(getRandomNumber_noPreserveVars), b_+17);
   CYC(b_+17, b_+19); alu_and(gb, 0x07);
   CYC(b_+19, b_+22); SET_HL(SYM(seasonsTable_0f_6678));
-  CYC(b_+22, b_+23); onox_add_a_to_hl(gb, b_+23);
+  CYC(b_+22, b_+23); dragonOnox_add_a_to_hl(gb, b_+23);
   CYC(b_+23, b_+25); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+25, b_+26); A = mem_rd(gb, HL);
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
@@ -2019,7 +2138,7 @@ L_6680:
   CYC(b_+12, b_+13); A = B;
   CYC(b_+13, b_+14); mem_wr(gb, DE, A);
   CYC(b_+14, b_+17); SET_HL(SYM(seasonsTable_0f_669a));
-  CYC(b_+17, b_+18); onox_add_double_index(gb, b_+18);
+  CYC(b_+17, b_+18); dragonOnox_add_double_index(gb, b_+18);
   CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_VAR35;
   CYC(b_+20, b_+21); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
@@ -2072,3 +2191,4 @@ void s_dragonOnoxLowHealthThresholdIntoC_hook(GB *gb) {
   CYC(b_+6, b_+8); C = 0x18;
   RET(b_+8); return;
 }
+

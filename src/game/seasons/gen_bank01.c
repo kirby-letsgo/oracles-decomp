@@ -172,8 +172,8 @@ L_7df4:
   I(0x7e02, 1); A = B;  // ld a,b
   I(0x7e03, 4); mem_wr(gb, 0xcc4d, A);  // ld ($cc4d),a
   I(0x7e06, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x7e07, 3); s_setHoronVillageSeason(gb); return; } I(0x7e07, 2);  // jr z,$7e2c
-  s_determineSeasonForRoomPack(gb); return;  // fallthrough
+  if ((F & FZ)) { I(0x7e07, 3); if (hook_is(gb, 0x7e2c, s_setHoronVillageSeason_hook)) { s_setHoronVillageSeason_hook(gb); return; } HANDOFF(0x7e2c); } I(0x7e07, 2);  // jr z,$7e2c
+  if (hook_is(gb, 0x7e09, s_determineSeasonForRoomPack_hook)) { s_determineSeasonForRoomPack_hook(gb); return; } HANDOFF(0x7e09);  // fallthrough
 }
 
 // 01:5efd
@@ -714,7 +714,7 @@ L_5c2e:
 // 01:5c31
 void s_cutscene10(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5c31, s_flameOfDestructionsCutsceneCaller, 0x3346, 0x5c34);  // call $3346
+  CALL(0x5c31, s_flameOfDestructionsCutsceneCaller_hook, 0x3346, 0x5c34);  // call $3346
 L_5c34:
   I(0x5c34, 4); if (hook_is(gb, 0x5bc5, func_5d41_hook)) { func_5d41_hook(gb); return; } HANDOFF(0x5bc5);  // jp $5bc5
 }
@@ -729,7 +729,7 @@ L_5c34:
 // 01:5c37
 void s_cutscene11(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5c37, s_zeldaAndVillagersCutsceneCaller, 0x335a, 0x5c3a);  // call $335a
+  CALL(0x5c37, s_zeldaAndVillagersCutsceneCaller_hook, 0x335a, 0x5c3a);  // call $335a
 L_5c3a:
   I(0x5c3a, 4); if (hook_is(gb, 0x5bb5, func_5d31_hook)) { func_5d31_hook(gb); return; } HANDOFF(0x5bb5);  // jp $5bb5
 }
@@ -744,7 +744,7 @@ L_5c3a:
 // 01:5c3d
 void s_cutscene12(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5c3d, s_zeldaKidnappedCutsceneCaller, 0x336e, 0x5c40);  // call $336e
+  CALL(0x5c3d, s_zeldaKidnappedCutsceneCaller_hook, 0x336e, 0x5c40);  // call $336e
 L_5c40:
   I(0x5c40, 4); if (hook_is(gb, 0x5bc5, func_5d41_hook)) { func_5d41_hook(gb); return; } HANDOFF(0x5bc5);  // jp $5bc5
 }
@@ -802,9 +802,9 @@ L_5b9a:
   I(0x5b9b, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
   I(0x5b9e, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5b9f, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85); } I(0x5b9f, 3);  // jp nz,$5c85
-  CALL(0x5ba2, s_seasonsFunc_331b, 0x331b, 0x5ba5);  // call $331b
+  CALL(0x5ba2, s_seasonsFunc_331b_hook, 0x331b, 0x5ba5);  // call $331b
 L_5ba5:
-  CALL(0x5ba5, s_seasonsFunc_34a0, 0x34a0, 0x5ba8);  // call $34a0
+  CALL(0x5ba5, s_seasonsFunc_34a0_hook, 0x34a0, 0x5ba8);  // call $34a0
 L_5ba8:
   CALL(0x5ba8, updateStatusBar_hook, 0x1a62, 0x5bab);  // call $1a62
 L_5bab:
@@ -859,9 +859,9 @@ L_5b9a:
   I(0x5b9b, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
   I(0x5b9e, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5b9f, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85); } I(0x5b9f, 3);  // jp nz,$5c85
-  CALL(0x5ba2, s_seasonsFunc_331b, 0x331b, 0x5ba5);  // call $331b
+  CALL(0x5ba2, s_seasonsFunc_331b_hook, 0x331b, 0x5ba5);  // call $331b
 L_5ba5:
-  CALL(0x5ba5, s_seasonsFunc_34a0, 0x34a0, 0x5ba8);  // call $34a0
+  CALL(0x5ba5, s_seasonsFunc_34a0_hook, 0x34a0, 0x5ba8);  // call $34a0
 L_5ba8:
   CALL(0x5ba8, updateStatusBar_hook, 0x1a62, 0x5bab);  // call $1a62
 L_5bab:
@@ -883,9 +883,9 @@ L_5b9a:
   I(0x5b9b, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
   I(0x5b9e, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5b9f, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85); } I(0x5b9f, 3);  // jp nz,$5c85
-  CALL(0x5ba2, s_seasonsFunc_331b, 0x331b, 0x5ba5);  // call $331b
+  CALL(0x5ba2, s_seasonsFunc_331b_hook, 0x331b, 0x5ba5);  // call $331b
 L_5ba5:
-  CALL(0x5ba5, s_seasonsFunc_34a0, 0x34a0, 0x5ba8);  // call $34a0
+  CALL(0x5ba5, s_seasonsFunc_34a0_hook, 0x34a0, 0x5ba8);  // call $34a0
 L_5ba8:
   CALL(0x5ba8, updateStatusBar_hook, 0x1a62, 0x5bab);  // call $1a62
 L_5bab:
@@ -905,9 +905,9 @@ L_5b9a:
   I(0x5b9b, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
   I(0x5b9e, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5b9f, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85); } I(0x5b9f, 3);  // jp nz,$5c85
-  CALL(0x5ba2, s_seasonsFunc_331b, 0x331b, 0x5ba5);  // call $331b
+  CALL(0x5ba2, s_seasonsFunc_331b_hook, 0x331b, 0x5ba5);  // call $331b
 L_5ba5:
-  CALL(0x5ba5, s_seasonsFunc_34a0, 0x34a0, 0x5ba8);  // call $34a0
+  CALL(0x5ba5, s_seasonsFunc_34a0_hook, 0x34a0, 0x5ba8);  // call $34a0
 L_5ba8:
   CALL(0x5ba8, updateStatusBar_hook, 0x1a62, 0x5bab);  // call $1a62
 L_5bab:
@@ -925,9 +925,9 @@ L_5b9a:
   I(0x5b9b, 4); A = mem_rd(gb, 0xcc67);  // ld a,($cc67)
   I(0x5b9e, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x5b9f, 4); if (hook_is(gb, 0x5c85, applyWarpTransition2_hook)) { applyWarpTransition2_hook(gb); return; } HANDOFF(0x5c85); } I(0x5b9f, 3);  // jp nz,$5c85
-  CALL(0x5ba2, s_seasonsFunc_331b, 0x331b, 0x5ba5);  // call $331b
+  CALL(0x5ba2, s_seasonsFunc_331b_hook, 0x331b, 0x5ba5);  // call $331b
 L_5ba5:
-  CALL(0x5ba5, s_seasonsFunc_34a0, 0x34a0, 0x5ba8);  // call $34a0
+  CALL(0x5ba5, s_seasonsFunc_34a0_hook, 0x34a0, 0x5ba8);  // call $34a0
 L_5ba8:
   CALL(0x5ba8, updateStatusBar_hook, 0x1a62, 0x5bab);  // call $1a62
 L_5bab:
@@ -941,7 +941,7 @@ L_5bab:
 void s_cutscene13__afterCall5ba5(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5ba5:
-  CALL(0x5ba5, s_seasonsFunc_34a0, 0x34a0, 0x5ba8);  // call $34a0
+  CALL(0x5ba5, s_seasonsFunc_34a0_hook, 0x34a0, 0x5ba8);  // call $34a0
 L_5ba8:
   CALL(0x5ba8, updateStatusBar_hook, 0x1a62, 0x5bab);  // call $1a62
 L_5bab:
@@ -1657,51 +1657,6 @@ L_4c63:
   RET(0x4c8b); return;  // ret
 }
 
-// 01:7e3c
-void s_determineCompanionRegionSeason(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7e3c, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { I(0x7e3e, 3); goto L_7e44; } I(0x7e3e, 2);  // jr z,$7e44
-  I(0x7e40, 2); A = 0x01;  // ld a,$01
-  I(0x7e42, 3); s_setSeason_b01(gb); return;  // jr $7e1e
-L_7e44:
-  I(0x7e44, 4); A = mem_rd(gb, 0xc610);  // ld a,($c610)
-  I(0x7e47, 2); alu_sub(gb, 0x0a);  // sub $0a
-  I(0x7e49, 2); alu_and(gb, 0x03);  // and $03
-  I(0x7e4b, 4); mem_wr(gb, 0xcc4e, A);  // ld ($cc4e),a
-  I(0x7e4e, 3); s_setSeason_b01(gb); return;  // jr $7e1e
-}
-
-// 01:7e44
-void s_determineCompanionRegionSeason__companionRegion(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_7e44:
-  I(0x7e44, 4); A = mem_rd(gb, 0xc610);  // ld a,($c610)
-  I(0x7e47, 2); alu_sub(gb, 0x0a);  // sub $0a
-  I(0x7e49, 2); alu_and(gb, 0x03);  // and $03
-  I(0x7e4b, 4); mem_wr(gb, 0xcc4e, A);  // ld ($cc4e),a
-  I(0x7e4e, 3); s_setSeason_b01(gb); return;  // jr $7e1e
-}
-
-// 01:7e09
-void s_determineSeasonForRoomPack(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7e09, 2); alu_cp(gb, 0xf0);  // cp $f0
-  if (!(F & FC)) { I(0x7e0b, 3); s_determineCompanionRegionSeason(gb); return; } I(0x7e0b, 2);  // jr nc,$7e3c
-  I(0x7e0d, 2); A = 0x30;  // ld a,$30
-  CALL(0x7e0f, checkGlobalFlag_hook, 0x30c7, 0x7e12);  // call $30c7
-  I(0x7e12, 4); A = mem_rd(gb, 0xcc61);  // ld a,($cc61)
-  if ((F & FZ)) { I(0x7e15, 3); goto L_7e19; } I(0x7e15, 2);  // jr z,$7e19
-  I(0x7e17, 2); alu_and(gb, 0x0f);  // and $0f
-L_7e19:
-  I(0x7e19, 3); SET_HL(0x7e50);  // ld hl,$7e50
-  RST_PUSH(0x7e1c, 0x7e1d);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x7e1d, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  s_setSeason_b01(gb); return;  // fallthrough
-}
-
 // 01:551f
 void s_findActiveRoomInDungeonLayout(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2324,480 +2279,6 @@ L_5ecc:
   RET(0x5ecd); return;  // ret
 }
 
-// 01:5dd3
-void s_screenTransitionLostWoods(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5dd3, s_screenTransitionLostWoods__checkMoveNorthTransitions, 0x5def, 0x5dd6);  // call $5def
-L_5dd6:
-  if ((F & FC)) { RET_TAKEN(0x5dd6); return; } I(0x5dd6, 2);  // ret c
-  CALL(0x5dd7, s_screenTransitionLostWoods__checkSwordUpgradeTransitions, 0x5e31, 0x5dda);  // call $5e31
-L_5dda:
-  if ((F & FC)) { RET_TAKEN(0x5dda); return; } I(0x5dda, 2);  // ret c
-  I(0x5ddb, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5dde, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5ddf, 3); goto L_5de8; } I(0x5ddf, 2);  // jr nz,$5de8
-  I(0x5de1, 4); A = mem_rd(gb, 0xcc53);  // ld a,($cc53)
-  I(0x5de4, 2); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FZ)) { I(0x5de6, 3); if (hook_is(gb, 0x5da5, screenTransitionStandard_hook)) { screenTransitionStandard_hook(gb); return; } HANDOFF(0x5da5); } I(0x5de6, 2);  // jr nz,$5da5
-L_5de8:
-  I(0x5de8, 2); A = 0x40;  // ld a,$40
-  I(0x5dea, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ded, 1); alu_scf(gb);  // scf
-  RET(0x5dee); return;  // ret
-}
-
-// 01:5dd6
-void s_screenTransitionLostWoods__afterCall5dd6(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5dd6:
-  if ((F & FC)) { RET_TAKEN(0x5dd6); return; } I(0x5dd6, 2);  // ret c
-  CALL(0x5dd7, s_screenTransitionLostWoods__checkSwordUpgradeTransitions, 0x5e31, 0x5dda);  // call $5e31
-L_5dda:
-  if ((F & FC)) { RET_TAKEN(0x5dda); return; } I(0x5dda, 2);  // ret c
-  I(0x5ddb, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5dde, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5ddf, 3); goto L_5de8; } I(0x5ddf, 2);  // jr nz,$5de8
-  I(0x5de1, 4); A = mem_rd(gb, 0xcc53);  // ld a,($cc53)
-  I(0x5de4, 2); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FZ)) { I(0x5de6, 3); if (hook_is(gb, 0x5da5, screenTransitionStandard_hook)) { screenTransitionStandard_hook(gb); return; } HANDOFF(0x5da5); } I(0x5de6, 2);  // jr nz,$5da5
-L_5de8:
-  I(0x5de8, 2); A = 0x40;  // ld a,$40
-  I(0x5dea, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ded, 1); alu_scf(gb);  // scf
-  RET(0x5dee); return;  // ret
-}
-
-// 01:5dda
-void s_screenTransitionLostWoods__afterCall5dda(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5dda:
-  if ((F & FC)) { RET_TAKEN(0x5dda); return; } I(0x5dda, 2);  // ret c
-  I(0x5ddb, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5dde, 1); A = alu_dec8(gb, A);  // dec a
-  if (!(F & FZ)) { I(0x5ddf, 3); goto L_5de8; } I(0x5ddf, 2);  // jr nz,$5de8
-  I(0x5de1, 4); A = mem_rd(gb, 0xcc53);  // ld a,($cc53)
-  I(0x5de4, 2); alu_cp(gb, 0x03);  // cp $03
-  if (!(F & FZ)) { I(0x5de6, 3); if (hook_is(gb, 0x5da5, screenTransitionStandard_hook)) { screenTransitionStandard_hook(gb); return; } HANDOFF(0x5da5); } I(0x5de6, 2);  // jr nz,$5da5
-L_5de8:
-  I(0x5de8, 2); A = 0x40;  // ld a,$40
-  I(0x5dea, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ded, 1); alu_scf(gb);  // scf
-  RET(0x5dee); return;  // ret
-}
-
-// 01:5def
-void s_screenTransitionLostWoods__checkMoveNorthTransitions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5def:
-  I(0x5def, 4); A = mem_rd(gb, 0xcc53);  // ld a,($cc53)
-  RST_PUSH(0x5df2, 0x5df3);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x5dfb: goto L_5dfb; case 0x5e14: goto L_5e14; case 0x5e19: goto L_5e19; case 0x5e1e: goto L_5e1e; default: HANDOFF(HL); }
-L_5dfb:
-  I(0x5dfb, 3); SET_BC(0x0303);  // ld bc,$0303
-L_5dfe:
-  I(0x5dfe, 3); SET_HL(0xcc53);  // ld hl,$cc53
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e14:
-  I(0x5e14, 3); SET_BC(0x0202);  // ld bc,$0202
-  I(0x5e17, 3); goto L_5dfe;  // jr $5dfe
-L_5e19:
-  I(0x5e19, 3); SET_BC(0x0100);  // ld bc,$0100
-  I(0x5e1c, 3); goto L_5dfe;  // jr $5dfe
-L_5e1e:
-  I(0x5e1e, 3); SET_BC(0x0001);  // ld bc,$0001
-  CALL(0x5e21, s_screenTransitionLostWoods__checkTransitionForNorth, 0x5dfe, 0x5e24);  // call $5dfe
-  I(0x5e24, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5e25, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { RET_TAKEN(0x5e27); return; } I(0x5e27, 2);  // ret nz
-  I(0x5e28, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5e2a, 2); A = 0x30;  // ld a,$30
-  I(0x5e2c, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5e2f, 1); alu_scf(gb);  // scf
-  RET(0x5e30); return;  // ret
-}
-
-// 01:5dfb
-void s_screenTransitionLostWoods__transition0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5dfb:
-  I(0x5dfb, 3); SET_BC(0x0303);  // ld bc,$0303
-L_5dfe:
-  I(0x5dfe, 3); SET_HL(0xcc53);  // ld hl,$cc53
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-}
-
-// 01:5dfe
-void s_screenTransitionLostWoods__checkTransitionForNorth(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5dfe:
-  I(0x5dfe, 3); SET_HL(0xcc53);  // ld hl,$cc53
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-}
-
-// 01:5e01
-void s_screenTransitionLostWoods__checkTransition(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-}
-
-// 01:5e10
-void s_screenTransitionLostWoods__wrongWay(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-}
-
-// 01:5e14
-void s_screenTransitionLostWoods__transition1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5e14;
-L_5dfe:
-  I(0x5dfe, 3); SET_HL(0xcc53);  // ld hl,$cc53
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e14:
-  I(0x5e14, 3); SET_BC(0x0202);  // ld bc,$0202
-  I(0x5e17, 3); goto L_5dfe;  // jr $5dfe
-}
-
-// 01:5e19
-void s_screenTransitionLostWoods__transition2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5e19;
-L_5dfe:
-  I(0x5dfe, 3); SET_HL(0xcc53);  // ld hl,$cc53
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e19:
-  I(0x5e19, 3); SET_BC(0x0100);  // ld bc,$0100
-  I(0x5e1c, 3); goto L_5dfe;  // jr $5dfe
-}
-
-// 01:5e1e
-void s_screenTransitionLostWoods__transition3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e1e:
-  I(0x5e1e, 3); SET_BC(0x0001);  // ld bc,$0001
-  CALL(0x5e21, s_screenTransitionLostWoods__checkTransitionForNorth, 0x5dfe, 0x5e24);  // call $5dfe
-  I(0x5e24, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5e25, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { RET_TAKEN(0x5e27); return; } I(0x5e27, 2);  // ret nz
-  I(0x5e28, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5e2a, 2); A = 0x30;  // ld a,$30
-  I(0x5e2c, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5e2f, 1); alu_scf(gb);  // scf
-  RET(0x5e30); return;  // ret
-}
-
-// 01:5e31
-void s_screenTransitionLostWoods__checkSwordUpgradeTransitions(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5e31;
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e31:
-  I(0x5e31, 4); A = mem_rd(gb, 0xcc54);  // ld a,($cc54)
-  RST_PUSH(0x5e34, 0x5e35);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x5e3d: goto L_5e3d; case 0x5e45: goto L_5e45; case 0x5e4d: goto L_5e4d; case 0x5e55: goto L_5e55; default: HANDOFF(HL); }
-L_5e3d:
-  I(0x5e3d, 3); SET_BC(0x0303);  // ld bc,$0303
-  I(0x5e40, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  I(0x5e43, 3); goto L_5e01;  // jr $5e01
-L_5e45:
-  I(0x5e45, 3); SET_BC(0x0302);  // ld bc,$0302
-  I(0x5e48, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  I(0x5e4b, 3); goto L_5e01;  // jr $5e01
-L_5e4d:
-  I(0x5e4d, 3); SET_BC(0x0300);  // ld bc,$0300
-  I(0x5e50, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  I(0x5e53, 3); goto L_5e01;  // jr $5e01
-L_5e55:
-  I(0x5e55, 3); SET_BC(0x0301);  // ld bc,$0301
-  I(0x5e58, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  CALL(0x5e5b, s_screenTransitionLostWoods__checkTransition, 0x5e01, 0x5e5e);  // call $5e01
-  I(0x5e5e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5e5f, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { RET_TAKEN(0x5e61); return; } I(0x5e61, 2);  // ret nz
-  I(0x5e62, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5e64, 2); A = 0xc9;  // ld a,$c9
-  I(0x5e66, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5e69, 1); alu_scf(gb);  // scf
-  RET(0x5e6a); return;  // ret
-}
-
-// 01:5e3d
-void s_screenTransitionLostWoods__checkSwordUpgradeTransitions__transition0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5e3d;
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e3d:
-  I(0x5e3d, 3); SET_BC(0x0303);  // ld bc,$0303
-  I(0x5e40, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  I(0x5e43, 3); goto L_5e01;  // jr $5e01
-}
-
-// 01:5e45
-void s_screenTransitionLostWoods__checkSwordUpgradeTransitions__transition1(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5e45;
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e45:
-  I(0x5e45, 3); SET_BC(0x0302);  // ld bc,$0302
-  I(0x5e48, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  I(0x5e4b, 3); goto L_5e01;  // jr $5e01
-}
-
-// 01:5e4d
-void s_screenTransitionLostWoods__checkSwordUpgradeTransitions__transition2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_5e4d;
-L_5e01:
-  I(0x5e01, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e04, 1); alu_cp(gb, B);  // cp b
-  if (!(F & FZ)) { I(0x5e05, 3); goto L_5e10; } I(0x5e05, 2);  // jr nz,$5e10
-  I(0x5e07, 4); A = mem_rd(gb, 0xcc4e);  // ld a,($cc4e)
-  I(0x5e0a, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x5e0b, 3); goto L_5e10; } I(0x5e0b, 2);  // jr nz,$5e10
-  I(0x5e0d, 3); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  I(0x5e0e, 3); goto L_5e12;  // jr $5e12
-L_5e10:
-  I(0x5e10, 1); alu_xor(gb, A);  // xor a
-  I(0x5e11, 2); mem_wr(gb, HL, A);  // ld (hl),a
-L_5e12:
-  I(0x5e12, 1); alu_xor(gb, A);  // xor a
-  RET(0x5e13); return;  // ret
-L_5e4d:
-  I(0x5e4d, 3); SET_BC(0x0300);  // ld bc,$0300
-  I(0x5e50, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  I(0x5e53, 3); goto L_5e01;  // jr $5e01
-}
-
-// 01:5e55
-void s_screenTransitionLostWoods__checkSwordUpgradeTransitions__transition3(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e55:
-  I(0x5e55, 3); SET_BC(0x0301);  // ld bc,$0301
-  I(0x5e58, 3); SET_HL(0xcc54);  // ld hl,$cc54
-  CALL(0x5e5b, s_screenTransitionLostWoods__checkTransition, 0x5e01, 0x5e5e);  // call $5e01
-  I(0x5e5e, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5e5f, 2); alu_cp(gb, 0x04);  // cp $04
-  if (!(F & FZ)) { RET_TAKEN(0x5e61); return; } I(0x5e61, 2);  // ret nz
-  I(0x5e62, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x5e64, 2); A = 0xc9;  // ld a,$c9
-  I(0x5e66, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5e69, 1); alu_scf(gb);  // scf
-  RET(0x5e6a); return;  // ret
-}
-
-// 01:5e75
-void s_screenTransitionOnoxDungeon(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5e75, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x5e78, 2); alu_and(gb, 0x03);  // and $03
-  RST_PUSH(0x5e7a, 0x5e7b);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x5e83: goto L_5e83; case 0x5e91: goto L_5e91; case 0x5e96: goto L_5e96; default: HANDOFF(HL); }
-L_5e83:
-  CALL(0x5e83, getThisRoomFlags_hook, 0x1956, 0x5e86);  // call $1956
-  I(0x5e86, 2); alu_and(gb, 0x40);  // and $40
-  if (!(F & FZ)) { I(0x5e88, 4); if (hook_is(gb, 0x5da5, screenTransitionStandard_hook)) { screenTransitionStandard_hook(gb); return; } HANDOFF(0x5da5); } I(0x5e88, 3);  // jp nz,$5da5
-  I(0x5e8b, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x5e8e, 1); B = A;  // ld b,a
-  I(0x5e8f, 3); goto L_5e9d;  // jr $5e9d
-L_5e91:
-  I(0x5e91, 3); SET_BC(0x9834);  // ld bc,$9834
-  I(0x5e94, 3); goto L_5e99;  // jr $5e99
-L_5e96:
-  I(0x5e96, 3); SET_BC(0x9632);  // ld bc,$9632
-L_5e99:
-  I(0x5e99, 1); A = C;  // ld a,c
-  I(0x5e9a, 4); mem_wr(gb, 0xcc56, A);  // ld ($cc56),a
-L_5e9d:
-  I(0x5e9d, 1); A = B;  // ld a,b
-  I(0x5e9e, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ea1, 1); alu_scf(gb);  // scf
-  RET(0x5ea2); return;  // ret
-}
-
-// 01:5e83
-void s_screenTransitionOnoxDungeon__up(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e83:
-  CALL(0x5e83, getThisRoomFlags_hook, 0x1956, 0x5e86);  // call $1956
-  I(0x5e86, 2); alu_and(gb, 0x40);  // and $40
-  if (!(F & FZ)) { I(0x5e88, 4); if (hook_is(gb, 0x5da5, screenTransitionStandard_hook)) { screenTransitionStandard_hook(gb); return; } HANDOFF(0x5da5); } I(0x5e88, 3);  // jp nz,$5da5
-  I(0x5e8b, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x5e8e, 1); B = A;  // ld b,a
-  I(0x5e8f, 3); goto L_5e9d;  // jr $5e9d
-L_5e9d:
-  I(0x5e9d, 1); A = B;  // ld a,b
-  I(0x5e9e, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ea1, 1); alu_scf(gb);  // scf
-  RET(0x5ea2); return;  // ret
-}
-
-// 01:5e91
-void s_screenTransitionOnoxDungeon__right(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e91:
-  I(0x5e91, 3); SET_BC(0x9834);  // ld bc,$9834
-  I(0x5e94, 3); goto L_5e99;  // jr $5e99
-L_5e99:
-  I(0x5e99, 1); A = C;  // ld a,c
-  I(0x5e9a, 4); mem_wr(gb, 0xcc56, A);  // ld ($cc56),a
-  I(0x5e9d, 1); A = B;  // ld a,b
-  I(0x5e9e, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ea1, 1); alu_scf(gb);  // scf
-  RET(0x5ea2); return;  // ret
-}
-
-// 01:5e96
-void s_screenTransitionOnoxDungeon__left(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5e96:
-  I(0x5e96, 3); SET_BC(0x9632);  // ld bc,$9632
-  I(0x5e99, 1); A = C;  // ld a,c
-  I(0x5e9a, 4); mem_wr(gb, 0xcc56, A);  // ld ($cc56),a
-  I(0x5e9d, 1); A = B;  // ld a,b
-  I(0x5e9e, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5ea1, 1); alu_scf(gb);  // scf
-  RET(0x5ea2); return;  // ret
-}
-
 // 01:4336
 void s_screenTransitionState5Substate0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2867,28 +2348,6 @@ L_437e:
   I(0x4383, 2); A = 0x01;  // ld a,$01
   I(0x4385, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
   RET(0x4388); return;  // ret
-}
-
-// 01:5e6b
-void s_screenTransitionSwordUpgrade(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x5e6b, clearEyePuzzleVars_hook, 0x5dad, 0x5e6e);  // call $5dad
-  I(0x5e6e, 2); A = 0x40;  // ld a,$40
-  I(0x5e70, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  I(0x5e73, 1); alu_scf(gb);  // scf
-  RET(0x5e74); return;  // ret
-}
-
-// 01:7e2c
-void s_setHoronVillageSeason(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x7e2c, 2); A = 0x30;  // ld a,$30
-  CALL(0x7e2e, checkGlobalFlag_hook, 0x30c7, 0x7e31);  // call $30c7
-  I(0x7e31, 2); A = 0x00;  // ld a,$00
-  if (!(F & FZ)) { I(0x7e33, 3); s_setSeason_b01(gb); return; } I(0x7e33, 2);  // jr nz,$7e1e
-  CALL(0x7e35, getRandomNumber_hook, 0x041a, 0x7e38);  // call $041a
-  I(0x7e38, 2); alu_and(gb, 0x03);  // and $03
-  I(0x7e3a, 3); s_setSeason_b01(gb); return;  // jr $7e1e
 }
 
 // 01:7e1e

@@ -320,6 +320,73 @@ static void gohmaGel_seasonsFunc_0d_6f25(GB *gb) {
   RET(b_+91); return;
 }
 
+// gohma_gel_subid0@stateC
+static void gohmaGel_stateC(GB *gb) {
+  BASE(gohma_gel_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+62, s_enemyAnimate, SYM(enemyAnimate), b_+65);
+  CALL_C(b_+65, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+68);
+  if (!(F & FZ)) { RET_TAKEN(b_+68); return; }
+  CYC(b_+68, b_+69);
+  CALL_C(b_+69, s_objectSetVisiblec1, SYM(objectSetVisiblec1), b_+72);
+  CYC(b_+72, b_+74); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+74, b_+76); mem_wr(gb, HL, 0x0b);
+  CYC(b_+76, b_+78); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+78, b_+80); A = 0x80;
+  CYC(b_+80, b_+81); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+81, b_+83); mem_wr(gb, HL, 0xfe);
+  CYC(b_+83, b_+86);
+  TAIL(ecom_updateAngleTowardTarget_b0d);
+}
+
+// gohma_gel_subid0@stateB
+static void gohmaGel_stateB(GB *gb) {
+  BASE(gohma_gel_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+17, s_enemyAnimate, SYM(enemyAnimate), b_+20);
+  CYC(b_+20, b_+22); C = 0x0c;
+  CALL_C(b_+22, s_objectUpdateSpeedZ_paramC, SYM(objectUpdateSpeedZ_paramC), b_+25);
+  if (F & FZ) { CYCT(b_+25, b_+27); goto L_6e35; }
+  CYC(b_+25, b_+27);
+  CALL_C(b_+27, s_ecom_bounceOffWallsAndHoles, SYM(ecom_bounceOffWallsAndHoles_b0d), b_+30);
+  CYC(b_+30, b_+33);
+  TAIL(objectApplySpeed);
+L_6e35:
+  CALL_C(b_+33, s_getRandomNumber_noPreserveVars, SYM(getRandomNumber_noPreserveVars), b_+36);
+  CYC(b_+36, b_+38); alu_and(gb, 0x07);
+  CYC(b_+38, b_+41); SET_HL(b_+54 /* @gohma_gel_seasonsTable_0d_6e4a */);
+  CYC(b_+41, b_+42); gohmaGel_add_a_to_hl(gb, b_+42);
+  CYC(b_+42, b_+44); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+44, b_+45); A = mem_rd(gb, HL);
+  CYC(b_+45, b_+46); mem_wr(gb, DE, A);
+  CYC(b_+46, b_+48); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+48, b_+50); A = 0x0c;
+  CYC(b_+50, b_+51); mem_wr(gb, DE, A);
+  CYC(b_+51, b_+54);
+  TAIL(objectSetVisible82);
+}
+
+// gohma_gel_subid0@stateA
+static void gohmaGel_stateA(GB *gb) {
+  BASE(gohma_gel_subid0);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+10, b_+11); H = D;
+  CYC(b_+11, b_+13); L = ENEMY_BASE + OBJ_SPEED;
+  CYC(b_+13, b_+15); mem_wr(gb, HL, 0x28);
+  CYC(b_+15, b_+17);
+  goto L_6e5c;
+
+L_6e5c:
+  CYC(b_+72, b_+74); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+74, b_+76); mem_wr(gb, HL, 0x0b);
+  CYC(b_+76, b_+78); L = ENEMY_BASE + OBJ_SPEED_Z;
+  CYC(b_+78, b_+80); A = 0x80;
+  CYC(b_+80, b_+81); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+81, b_+83); mem_wr(gb, HL, 0xfe);
+  CYC(b_+83, b_+86);
+  TAIL(ecom_updateAngleTowardTarget_b0d);
+}
+
 void s_gohma_gel_subid2_hook(GB *gb) {
   BASE(gohma_gel_subid2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -327,9 +394,9 @@ void s_gohma_gel_subid2_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x0a);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (gohmaGel_jump_table(gb));
-    // gohma_gel_subid0@stateA: interpreted, through the HANDOFF below
-    // gohma_gel_subid0@stateB: interpreted, through the HANDOFF below
-    // gohma_gel_subid0@stateC: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 185)) { gohmaGel_stateA(gb); return; }
+    if (jt_ == (b_ - 178)) { gohmaGel_stateB(gb); return; }
+    if (jt_ == (b_ - 133)) { gohmaGel_stateC(gb); return; }
     if (jt_ == b_+14) goto stateD;
     if (jt_ == b_+92) goto seasonsFunc_0d_6f33;
     HANDOFF(HL);

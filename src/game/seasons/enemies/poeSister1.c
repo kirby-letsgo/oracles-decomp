@@ -42,6 +42,164 @@ static void poeSister1_add_a_to_hl(GB *gb, uint16_t return_address) {
   ret_effect(gb);
 }
 
+// enemyCode76@state11
+static void poeSister1_state11(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+365, s_enemyAnimate, SYM(enemyAnimate), b_+368);
+  CYC(b_+368, b_+370); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+370, b_+371); A = mem_rd(gb, DE);
+  CYC(b_+371, b_+372); A = alu_inc8(gb, A);
+  if (F & FZ) { CYCT(b_+372, b_+375); TAIL_S(poeSister5f3b); }
+  CYC(b_+372, b_+375);
+  CYC(b_+375, b_+377); alu_sub(gb, 0x02);
+  if (!(F & FZ)) { RET_TAKEN(b_+377); return; }
+  CYC(b_+377, b_+378);
+  CALL_C(b_+378, s_func_5f54_hook, SYM(func_5f54), b_+381);
+  if (!(F & FZ)) { RET_TAKEN(b_+381); return; }
+  CYC(b_+381, b_+382);
+  CYC(b_+382, b_+384); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+384, b_+386); A = 0x02;
+  CYC(b_+386, b_+387); mem_wr(gb, DE, A);
+  RET(b_+387); return;
+}
+
+// enemyCode76@state10
+static void poeSister1_state10(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+animate:
+  CYC(b_+318, b_+321);
+  TAIL(enemyAnimate);
+  CYC(b_+321, b_+322); H = D;
+  CYC(b_+322, b_+324); L = ENEMY_BASE + OBJ_VAR34;
+  CALL_C(b_+324, s_ecom_readPositionVars, SYM(ecom_readPositionVars_b0d), b_+327);
+  CYC(b_+327, b_+328); alu_sub(gb, C);
+  CYC(b_+328, b_+330); alu_add(gb, 0x0c);
+  CYC(b_+330, b_+332); alu_cp(gb, 0x19);
+  if (!(F & FC)) { CYCT(b_+332, b_+334); goto L_5d53; }
+  CYC(b_+332, b_+334);
+  CYC(b_+334, b_+336); A = mem_rd(gb, hFF8F);
+  CYC(b_+336, b_+337); alu_sub(gb, B);
+  CYC(b_+337, b_+339); alu_add(gb, 0x07);
+  CYC(b_+339, b_+341); alu_cp(gb, 0x0f);
+  if (!(F & FC)) { CYCT(b_+341, b_+343); goto L_5d53; }
+  CYC(b_+341, b_+343);
+  CYC(b_+343, b_+344); L = E;
+  CYC(b_+344, b_+345); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+345, b_+347); L = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+347, b_+348); A = mem_rd(gb, HL);
+  CYC(b_+348, b_+350); alu_and(gb, 0x10);
+  CYC(b_+350, b_+352); A = alu_swap(gb, A);
+  CYC(b_+352, b_+354); alu_add(gb, 0x04);
+  CYC(b_+354, b_+356); L = ENEMY_BASE + OBJ_DIRECTION;
+  CYC(b_+356, b_+357); mem_wr(gb, HL, A);
+  CYC(b_+357, b_+360);
+  TAIL(enemySetAnimation);
+L_5d53:
+  CALL_C(b_+360, s_ecom_moveTowardPosition, SYM(ecom_moveTowardPosition_b0d), b_+363);
+  CYC(b_+363, b_+365);
+  goto animate;
+}
+
+// enemyCode76@stateB
+static void poeSister1_stateB(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+234, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+237);
+  if (!(F & FZ)) { CYCT(b_+237, b_+240); TAIL(ecom_flickerVisibility_b0d); }
+  CYC(b_+237, b_+240);
+  CYC(b_+240, b_+242); mem_wr(gb, HL, 0x10);
+  CYC(b_+242, b_+243); L = E;
+  CYC(b_+243, b_+244); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+244, b_+246); L = ENEMY_BASE + OBJ_VAR37;
+  CYC(b_+246, b_+248); alu_bit(gb, 1, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+248, b_+250); goto L_5ced; }
+  CYC(b_+248, b_+250);
+  CYC(b_+250, b_+252); mem_wr(gb, HL, mem_rd(gb, HL) & 0xfd);
+  CYC(b_+252, b_+254); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+254, b_+255); A = mem_rd(gb, HL);
+  CYC(b_+255, b_+257); alu_add(gb, 0x2c);
+  CYC(b_+257, b_+258); mem_wr(gb, HL, A);
+L_5ced:
+  CYC(b_+258, b_+261);
+  TAIL(objectSetInvisible);
+}
+
+// enemyCode76@state9
+static void poeSister1_state9(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+190, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+193);
+  if (!(F & FZ)) { CYCT(b_+193, b_+196); TAIL(ecom_flickerVisibility_b0d); }
+  CYC(b_+193, b_+196);
+  CYC(b_+196, b_+198); mem_wr(gb, HL, 0x1f);
+  CYC(b_+198, b_+199); L = E;
+  CYC(b_+199, b_+200); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+200, b_+203);
+  TAIL(objectSetVisible82);
+}
+
+// enemyCode76@state8
+static void poeSister1_state8(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+173, b_+176); A = mem_rd(gb, wcc93);
+  CYC(b_+176, b_+177); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+177); return; }
+  CYC(b_+177, b_+178);
+  CYC(b_+178, b_+179); A = alu_inc8(gb, A);
+  CYC(b_+179, b_+182); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+182, b_+183); H = D;
+  CYC(b_+183, b_+184); L = E;
+  CYC(b_+184, b_+185); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+185, b_+187); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+187, b_+189); mem_wr(gb, HL, 0x2d);
+  RET(b_+189); return;
+}
+
+// enemyCode76@stateStub
+static void poeSister1_stateStub(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  RET(b_+172); return;
+}
+
+// enemyCode76@state5
+static void poeSister1_state5(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+155, s_ecom_galeSeedEffect, SYM(ecom_galeSeedEffect_b0d), b_+158);
+  if (!(F & FC)) { CYCT(b_+158, b_+161); TAIL(enemyDelete); }
+  CYC(b_+158, b_+161);
+  CYC(b_+161, b_+163); E = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+163, b_+164); A = mem_rd(gb, DE);
+  CYC(b_+164, b_+165); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+165); return; }
+  CYC(b_+165, b_+166);
+  CYC(b_+166, b_+169); SET_BC(0x0a08);
+  CYC(b_+169, b_+172);
+  TAIL(showText);
+}
+
+// enemyCode76@func5c6d
+static void poeSister1_func5c6d(GB *gb) {
+  BASE(enemyCode76);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+130, b_+132); L = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+132, b_+134); mem_wr(gb, HL, 0x0b);
+  CYC(b_+134, b_+136); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
+  CYC(b_+136, b_+138); mem_wr(gb, HL, 0x5c);
+  CYC(b_+138, b_+140); L = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+140, b_+142); mem_wr(gb, HL, 0x3c);
+  CYC(b_+142, b_+144); A = 0x01;
+  CYC(b_+144, b_+147); mem_wr(gb, wLoadedTreeGfxIndex, A);
+  CALL_C(b_+147, s_objectSetVisible82, SYM(objectSetVisible82), b_+150);
+  CYC(b_+150, b_+152); A = 0x02;
+  CYC(b_+152, b_+155);
+  TAIL(enemySetAnimation);
+}
+
 // enemyCode7e@func_5d86
 static void poeSister1_func_5d86(GB *gb) {
   BASE(enemyCode7e);
@@ -53,17 +211,17 @@ static void poeSister1_func_5d86(GB *gb) {
   CYC(b_+32, b_+33); push_effect(gb, b_+33);
   do { uint16_t jt_ = (poeSister1_jump_table(gb));
     if (jt_ == b_+69) goto state0;
-    // enemyCode76@stateStub: interpreted, through the HANDOFF below
-    // enemyCode76@state5: interpreted, through the HANDOFF below
-    // enemyCode76@state8: interpreted, through the HANDOFF below
-    // enemyCode76@state9: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 216)) { poeSister1_stateStub(gb); return; }
+    if (jt_ == (b_ - 233)) { poeSister1_state5(gb); return; }
+    if (jt_ == (b_ - 215)) { poeSister1_state8(gb); return; }
+    if (jt_ == (b_ - 198)) { poeSister1_state9(gb); return; }
     if (jt_ == b_+127) goto stateA;
-    // enemyCode76@stateB: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 154)) { poeSister1_stateB(gb); return; }
     if (jt_ == b_+137) goto stateC;
     if (jt_ == b_+151) goto stateD;
     if (jt_ == b_+202) goto stateE;
-    // enemyCode76@state10: interpreted, through the HANDOFF below
-    // enemyCode76@state11: interpreted, through the HANDOFF below
+    if (jt_ == (b_ - 67)) { poeSister1_state10(gb); return; }
+    if (jt_ == (b_ - 23)) { poeSister1_state11(gb); return; }
     HANDOFF(HL);
   } while (0);
 state0:
@@ -84,7 +242,7 @@ state0:
   CYC(b_+95, b_+97); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+97, b_+98); A = mem_rd(gb, DE);
   CYC(b_+98, b_+99); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+99, b_+102); HANDOFF(SYM(enemyCode76) + 130); /* enemyCode76@func5c6d, interpreted */ }
+  if (F & FZ) { CYCT(b_+99, b_+102); poeSister1_func5c6d(gb); return; }
   CYC(b_+99, b_+102);
   CYC(b_+102, b_+104); L = ENEMY_BASE + OBJ_STATE;
   CYC(b_+104, b_+106); mem_wr(gb, HL, 0x08);
@@ -624,3 +782,4 @@ L_6066:
   CYC(b_+49, b_+52);
   TAIL(setWarpDestVariables);
 }
+

@@ -512,6 +512,19 @@ L_7a0d:
   s_func_7a14_hook(gb); return; // falls through
 }
 
+// enemyCode7d+582
+static void manhandla_enemyCode7d_582(GB *gb) {
+  BASE(enemyCode7d);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CALL_C(b_+582, s_getRandomNumber_noPreserveVars, SYM(getRandomNumber_noPreserveVars), b_+585);
+  CYC(b_+585, b_+587); alu_and(gb, 0x50);
+  CYC(b_+587, b_+589); alu_add(gb, 0x5a);
+  CYC(b_+589, b_+591); E = ENEMY_BASE + OBJ_COUNTER1;
+  CYC(b_+591, b_+592); mem_wr(gb, DE, A);
+  CYC(b_+592, b_+595);
+  TAIL_S(func_7ad6);
+}
+
 void s_func_7a14_hook(GB *gb) {
   BASE(func_7a14);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -521,7 +534,7 @@ void s_func_7a14_hook(GB *gb) {
   CYC(b_+5, b_+7); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+7, b_+9); mem_wr(gb, HL, 0x0a);
   CYC(b_+9, b_+11);
-  HANDOFF(SYM(enemyCode7d) + 582); /* enemyCode7d+582, interpreted */
+  manhandla_enemyCode7d_582(gb); return;
 }
 
 void s_func_7a1f_hook(GB *gb) {
@@ -760,3 +773,4 @@ void s_func_7b1c_hook(GB *gb) {
   CYC(b_+35, b_+36); alu_scf(gb);
   RET(b_+36); return;
 }
+

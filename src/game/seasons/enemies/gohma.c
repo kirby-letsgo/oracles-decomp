@@ -7,7 +7,18 @@
 #define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
-// ref/oracles-disasm/object_code/seasons/enemies/gohma.s, bank $0e.
+// ref/oracles-disasm/object_code/seasons/enemies/gohma.s.
+// ENEMY_GOHMA
+// Variables for subid 1 (main body):
+// relatedObj2: Reference to subid 3 (claw)
+// var30: ?
+// var31: Affects animation?
+// var32: Number of "children" spawned (ENEMY_GOHMA_GEL)
+// Variables for subid 2 (body hitbox):
+// relatedObj1: Reference to subid 1
+// Variables for subid 3 (claw):
+// relatedObj1: Reference to subid 1
+// var30: Nonzero if Link was caught?
 
 static uint16_t gohma_jump_table(GB *gb) {
   burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
@@ -52,9 +63,17 @@ static void gohma_add_double_index(GB *gb, uint16_t return_address) {
   burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
 }
 
-// ENEMY_GOHMA. Subid 0 spawns the parts; 1 is the body (relatedObj2 the claw, var31 its
-// animation, var32 the gel children spawned), 2 the leg hitbox and 3 the claw (var30 set
-// once Link is caught); 2 and 3 point at the body through relatedObj1.
+// ENEMY_GOHMA
+// Variables for subid 1 (main body):
+// relatedObj2: Reference to subid 3 (claw)
+// var30: ?
+// var31: Affects animation?
+// var32: Number of "children" spawned (ENEMY_GOHMA_GEL)
+// Variables for subid 2 (body hitbox):
+// relatedObj1: Reference to subid 1
+// Variables for subid 3 (claw):
+// relatedObj1: Reference to subid 1
+// var30: Nonzero if Link was caught?
 void s_enemyCode7b_hook(GB *gb) {
   BASE(enemyCode7b);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -148,7 +167,6 @@ state8OrHigher:
   } while (0);
 }
 
-// Boss room setup.
 void s_gohma_state_uninitialized_hook(GB *gb) {
   BASE(gohma_state_uninitialized);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -163,9 +181,8 @@ void s_gohma_state_uninitialized_hook(GB *gb) {
   s_gohma_state_spawner_hook(gb); return; // falls through
 }
 
-// gohma_state_spawner@spawnChild: another gohma part with subid e, its relatedObj1 pointing
-// at the body in c.
-static void gohma_spawn_child(GB *gb) {
+// gohma_state_spawner@spawnChild
+static void gohma_spawnChild(GB *gb) {
   BASE(gohma_state_spawner);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CALL_C(b_+40, s_ecom_spawnUncountedEnemyWithSubid01, SYM(ecom_spawnUncountedEnemyWithSubid01_b0d), b_+43);
@@ -177,7 +194,6 @@ static void gohma_spawn_child(GB *gb) {
   RET(b_+50); return;
 }
 
-// Subid 0: the body, then the leg hitbox and the claw, then this spawner is deleted.
 void s_gohma_state_spawner_hook(GB *gb) {
   BASE(gohma_state_spawner);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -194,9 +210,9 @@ void s_gohma_state_spawner_hook(GB *gb) {
   CYC(b_+18, b_+19); mem_wr(gb, HL, A);
   CYC(b_+19, b_+20); C = H;
   CYC(b_+20, b_+22); E = 0x02;
-  CALL_L(b_+22, gohma_spawn_child, b_+25);
+  CALL_L(b_+22, gohma_spawnChild, b_+25);
   CYC(b_+25, b_+27); E = 0x03;
-  CALL_L(b_+27, gohma_spawn_child, b_+30);
+  CALL_L(b_+27, gohma_spawnChild, b_+30);
   CYC(b_+30, b_+31); A = H;
   CYC(b_+31, b_+32); H = C;
   CYC(b_+32, b_+34); L = ENEMY_BASE + OBJ_VAR19;
@@ -212,7 +228,7 @@ void s_gohma_state_stub_hook(GB *gb) {
   RET(b_+0); return;
 }
 
-// Body.
+// Main body
 void s_gohma_subid1_hook(GB *gb) {
   BASE(gohma_subid1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -230,7 +246,7 @@ void s_gohma_subid1_hook(GB *gb) {
   } while (0);
 }
 
-// Body initialization.
+// Initialization
 void s_gohma_subid1_state8_hook(GB *gb) {
   BASE(gohma_subid1_state8);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -252,7 +268,7 @@ void s_gohma_subid1_state8_hook(GB *gb) {
   TAIL(ecom_setZAboveScreen_b0d);
 }
 
-// Following Link along the ceiling.
+// Following Link from the ceiling
 void s_gohma_subid1_state9_hook(GB *gb) {
   BASE(gohma_subid1_state9);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -293,7 +309,7 @@ L_6dfd:
   RET(b_+58); return;
 }
 
-// Falling down.
+// Falling down
 void s_gohma_subid1_stateA_hook(GB *gb) {
   BASE(gohma_subid1_stateA);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -324,7 +340,7 @@ hitGround:
   TAIL(objectSetVisible83);
 }
 
-// Standing in place.
+// Standing in place
 void s_gohma_subid1_stateB_hook(GB *gb) {
   BASE(gohma_subid1_stateB);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -339,7 +355,7 @@ void s_gohma_subid1_stateB_hook(GB *gb) {
   RET(b_+11); return;
 }
 
-// Phase 1 of the fight, claw intact: stand, walk, lunge.
+// Phase 1 of fight: claw still intact
 void s_gohma_subid1_stateC_hook(GB *gb) {
   BASE(gohma_subid1_stateC);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -443,7 +459,7 @@ void s_gohma_setAnimation_hook(GB *gb) {
   TAIL(enemySetAnimation);
 }
 
-// Lunging toward Link, or moving back, with the claw.
+// Lunging toward Link (or moving back) with claw
 void s_gohma_stateC_substate2_hook(GB *gb) {
   BASE(gohma_stateC_substate2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -472,7 +488,7 @@ doneLunge:
   RET(b_+30); return;
 }
 
-// Link grabbed.
+// Grabbed Link
 void s_gohma_stateC_setSubstate4_hook(GB *gb) {
   BASE(gohma_stateC_setSubstate4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -484,7 +500,7 @@ void s_gohma_stateC_setSubstate4_hook(GB *gb) {
   TAIL_S(gohma_setAnimation);
 }
 
-// Standing in place after a lunge.
+// Standing in place after lunge
 void s_gohma_stateC_substate3_hook(GB *gb) {
   BASE(gohma_stateC_substate3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -505,7 +521,7 @@ void s_gohma_stateC_substate3_hook(GB *gb) {
   RET(b_+22); return;
 }
 
-// Holding Link.
+// Holding Link
 void s_gohma_stateC_substate4_hook(GB *gb) {
   BASE(gohma_stateC_substate4);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -524,7 +540,7 @@ void s_gohma_stateC_substate4_hook(GB *gb) {
   RET(b_+20); return;
 }
 
-// Phase 2, claw destroyed: moves around spawning gel children.
+// Phase 2 of fight: claw destroyed
 void s_gohma_subid1_stateD_hook(GB *gb) {
   BASE(gohma_subid1_stateD);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -587,7 +603,7 @@ animate:
   TAIL(enemyAnimate);
 }
 
-// The leg hitbox, which follows the body.
+// Collision box for legs
 void s_gohma_subid2_hook(GB *gb) {
   BASE(gohma_subid2);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -624,8 +640,8 @@ state9:
   TAIL(objectTakePositionWithOffset);
 }
 
-// gohma_subid3@updateNormalPosition: the claw held at (+8,-6) from the body.
-static void gohma_claw_follow_body(GB *gb) {
+// gohma_subid3@updateNormalPosition
+static void gohma_updateNormalPosition(GB *gb) {
   BASE(gohma_subid3);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+112, b_+115); SET_BC(0x08fa);
@@ -635,7 +651,7 @@ static void gohma_claw_follow_body(GB *gb) {
   TAIL(objectTakePositionWithOffset);
 }
 
-// The claw: falls with the body, blocks the eye, lunges, grabs Link and slams him.
+// Claw
 void s_gohma_subid3_hook(GB *gb) {
   BASE(gohma_subid3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -696,7 +712,7 @@ closeToGround:
 stateA:
   CALL_C(b_+80, s_gohma_checkShouldBlock_hook, SYM(gohma_checkShouldBlock), b_+83);
   CALL_C(b_+83, s_gohma_updateCollisionsEnabled_hook, SYM(gohma_updateCollisionsEnabled), b_+86);
-  CALL_L(b_+86, gohma_claw_follow_body, b_+89);
+  CALL_L(b_+86, gohma_updateNormalPosition, b_+89);
   CYC(b_+89, b_+92);
   TAIL(enemyAnimate);
 stateB:
@@ -831,12 +847,12 @@ L_70bb:
   CALL_C(b_+298, s_gohma_updateLinkAnimAndClawPositionDuringSlamAttack_hook, SYM(gohma_updateLinkAnimAndClawPositionDuringSlamAttack), b_+301);
 updateLinkPosition:
   CYC(b_+301, b_+304); SET_BC(0x0002);
-  CYC(b_+304, b_+307); SET_HL(w4TileMap);
+  CYC(b_+304, b_+307); SET_HL(w1Link);
   CYC(b_+307, b_+310);
   TAIL(objectCopyPositionWithOffset);
 }
 
-// Fast vertically, slow horizontally while falling.
+// Updates speed while falling to be fast vertically, slow horizontally.
 void s_gohma_updateSpeedWhileFalling_hook(GB *gb) {
   BASE(gohma_updateSpeedWhileFalling);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -851,7 +867,7 @@ void s_gohma_updateSpeedWhileFalling_hook(GB *gb) {
   RET(b_+12); return;
 }
 
-// Turns around at walls; the walking sound.
+// Reverses direction if gohma hits a wall, and plays walking sound.
 void s_gohma_checkWallsAndPlayWalkingSound_hook(GB *gb) {
   BASE(gohma_checkWallsAndPlayWalkingSound);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -916,7 +932,7 @@ L_7113:
   TAIL(playSound_b00);
 }
 
-// Body and claw collisions on or off with the animation.
+// Used by subid 1 (body) and 3 (claw)?
 void s_gohma_updateCollisionsEnabled_hook(GB *gb) {
   BASE(gohma_updateCollisionsEnabled);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -940,7 +956,7 @@ L_713b:
   RET(b_+24); return;
 }
 
-// The body has no health left.
+// Main body has died (health is 0).
 void s_gohma_subid1_dead_hook(GB *gb) {
   BASE(gohma_subid1_dead);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -975,7 +991,7 @@ dead:
   TAIL(enemyBoss_dead_b0f);
 }
 
-// The claw has no health left.
+// Claw is dead
 void s_gohma_subid3_dead_hook(GB *gb) {
   BASE(gohma_subid3_dead);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1102,12 +1118,13 @@ setAngle:
   RET(b_+53); return;
 }
 
+// Sets counter1 to something.
 void s_gohma_decideMovementDuration_hook(GB *gb) {
   BASE(gohma_decideMovementDuration);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, s_getRandomNumber_noPreserveVars, SYM(getRandomNumber_noPreserveVars), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x03);
-  CYC(b_+5, b_+8); SET_HL(b_+23);
+  CYC(b_+5, b_+8); SET_HL(b_+23 /* @counter1Vals */);
   CYC(b_+8, b_+9); gohma_add_a_to_hl(gb, b_+9);
   CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
@@ -1142,6 +1159,7 @@ void s_gohma_decideAnimation_hook(GB *gb) {
   TAIL(enemySetAnimation);
 }
 
+// Updates movement for "lunge" at Link with claw
 void s_gohma_updateLunge_hook(GB *gb) {
   BASE(gohma_updateLunge);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1165,6 +1183,7 @@ void s_gohma_updateLunge_hook(GB *gb) {
   TAIL_S(gohma_updateMovement);
 }
 
+// Decides angle to use while charging toward Link, and plays sound effect.
 void s_gohma_initAngleForLungeAtLink_hook(GB *gb) {
   BASE(gohma_initAngleForLungeAtLink);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1192,6 +1211,7 @@ setAngle:
   TAIL(playSound_b00);
 }
 
+// @param	hl	Pointer to counter1
 void s_gohma_phase2_spawnGelChild_hook(GB *gb) {
   BASE(gohma_phase2_spawnGelChild);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1222,6 +1242,7 @@ void s_gohma_phase2_spawnGelChild_hook(GB *gb) {
   TAIL(playSound_b00);
 }
 
+// If Link is using something and a certain item type is active, block eye with claw
 void s_gohma_checkShouldBlock_hook(GB *gb) {
   BASE(gohma_checkShouldBlock);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1278,10 +1299,11 @@ void s_gohma_claw_updatePositionInLunge_hook(GB *gb) {
   s_gohma_claw_setPositionInLunge_hook(gb); return; // falls through
 }
 
+// @param	a	Position index
 void s_gohma_claw_setPositionInLunge_hook(GB *gb) {
   BASE(gohma_claw_setPositionInLunge);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(b_+15);
+  CYC(b_+0, b_+3); SET_HL(b_+15 /* @positions */);
   CYC(b_+3, b_+4); gohma_add_a_to_hl(gb, b_+4);
   CYC(b_+4, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   CYC(b_+5, b_+6); B = A;
@@ -1292,6 +1314,7 @@ void s_gohma_claw_setPositionInLunge_hook(GB *gb) {
   TAIL(objectTakePositionWithOffset);
 }
 
+// @param	hl	Pointer to w1Link.animParameter?
 void s_gohma_updateLinkAnimAndClawPositionDuringSlamAttack_hook(GB *gb) {
   BASE(gohma_updateLinkAnimAndClawPositionDuringSlamAttack);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1319,3 +1342,4 @@ void s_gohma_updateClawPositionDuringSlamAttack_hook(GB *gb) {
   CYC(b_+17, b_+20);
   TAIL(objectTakePositionWithOffset);
 }
+

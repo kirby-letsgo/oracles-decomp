@@ -16,9 +16,12 @@ audits (audit_bounds, audit_imm, audit_addr, audit_calls, audit_retcc) before ga
 import re, sys
 ROM = open('roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc', 'rb').read()
 PREFIX = 'draft'
+WB_OVERRIDE = {}
 args = []
 for a in sys.argv[1:]:
     if a.startswith('--prefix='): PREFIX = a.split('=', 1)[1]
+    elif a.startswith('--wbank='):
+        WB_OVERRIDE = {k: int(v) for k, v in (x.split(':') for x in a.split('=', 1)[1].split(','))}
     elif a.startswith('--'): pass
     else: args.append(a)
 
@@ -36,7 +39,10 @@ for line in open('ref/oracles-disasm/seasons.sym'):
         tops.setdefault(n, (b, a))
         name_at.setdefault((b, a), n)
 top_addrs = {}
-for n, (b, a) in tops.items(): top_addrs.setdefault(b, set()).add(a)
+for (b, a) in name_at: top_addrs.setdefault(b, set()).add(a)
+def noncanonical(b, a):
+    n = name_at.get((b, a))
+    return n is not None and tops[n][1] != a
 if 0 not in top_addrs: top_addrs[0] = set()
 
 h = open('src/game/syms.h').read(); c = open('src/game/syms.c').read()
@@ -60,8 +66,36 @@ def rank(n):
     if '_' in n: r += 1
     return (r, len(n))
 
+WBANK = [1]
+WINDOW = [0x100]
+def bank_name(n, b):
+    pre = f'w{b}'
+    return n.startswith(pre) and not n[len(pre):len(pre) + 1] in '0123456789'
+
+def banked(v, b):
+    ex = [n for n in ram_names.get(v, []) if bank_name(n, b)]
+    if ex: return min(ex, key=rank)
+    for d in range(1, WINDOW[0]):
+        ex = [n for n in ram_names.get(v - d, []) if bank_name(n, b)]
+        if ex: return f'{min(ex, key=rank)} + 0x{d:02x}'
+    return None
+
+def pick_wbank(values):
+    ds = [v for v in values if 0xd000 <= v < 0xe000]
+    if not ds: return 1
+    def score(b):
+        sc = 0
+        for v in ds:
+            n = banked(v, b)
+            if n: sc += 2 if '+' not in n else 1
+        return sc
+    return max([1, 3, 2, 4, 5, 6, 7], key=score)
+
 def ram(v):
     if 0xcfc0 < v < 0xd000: return f'wTmpcfc0 + 0x{v - 0xcfc0:02x}'
+    if 0xd000 <= v < 0xe000:
+        n = banked(v, WBANK[0])
+        if n: return n
     names = ram_names.get(v, [])
     cands = [n for n in ram_sym.get(v, []) if n in names] or names
     if cands: return min(cands, key=rank)
@@ -137,36 +171,80 @@ def imm16_expr(bank, v, base, lo, hi, guess=True):
     if v >= 0xa000: return ram(v) if v in ram_names or (v >= 0xc000 and v < 0xe000) or v >= 0xff80 else f'0x{v:04x}'
     if lo <= v < hi: return f'b_+{v - base}'
     n = name_at.get((bank if v >= 0x4000 else 0, v))
+    if n and noncanonical(bank if v >= 0x4000 else 0, v) and base >= 0:
+        d = v - base
+        return (f'(b_ + {d})' if d >= 0 else f'(b_ - {-d})') + f' /* {n} */'
     if n: return f'SYM({symref(n)})'
     loc = locs.get((bank if v >= 0x4000 else 0, v))
     if not guess: return f'0x{v:04x}'
-    if loc: return f'0x{v:04x} /* TODO {loc} */'
+    if loc:
+        tb = bank if v >= 0x4000 else 0
+        parent = loc.split('@')[0]
+        if parent in tops and tops[parent][0] == tb and tops[parent][1] <= v:
+            return f'(SYM({symref(parent)}) + {v - tops[parent][1]}) /* @{loc.split("@", 1)[1]} */'
+        return f'0x{v:04x} /* TODO {loc} */'
     other = [nm for (b, a), nm in name_at.items() if a == v and v >= 0x4000]
+    scripts = [nm for nm in other if 'script' in nm.lower()]
+    if len(other) == 1 or len(scripts) == 1: return f'SYM({symref((scripts or other)[0])})'
     if other: return f'0x{v:04x} /* TODO SYM of one of: {" ".join(sorted(other)[:6])} */'
     return f'0x{v:04x}'
 
-def draft(name, start=None, helper=None, pending=None):
-    bank, base = tops[name]
-    later = sorted(a for a in top_addrs.get(bank if base >= 0x4000 else 0, set()) if a > base)
-    hi = later[0] if later else base + 0x400
-    entry = base if start is None else start
+C_KEYWORDS = {'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do', 'double', 'else', 'enum',
+              'extern', 'float', 'for', 'goto', 'if', 'int', 'long', 'register', 'return', 'short', 'signed',
+              'sizeof', 'static', 'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while'}
+helper_names = {}
+def helper_name(owner, label, t):
+    n = f'{PREFIX}_{label}'
+    if helper_names.get(n, t) != t: n = f'{PREFIX}_{owner}_{label}'
+    helper_names[n] = t
+    return n
+
+def owner_of(tb, t):
+    cands = [a2 for a2 in top_addrs.get(tb, ()) if a2 <= t]
+    return max(cands) if cands else None
+
+def canonical_base(tb, a):
+    cands = [a2 for a2 in top_addrs.get(tb, ()) if a2 <= a and not noncanonical(tb, a2)]
+    return max(cands) if cands else None
+
+def need_helper(pending, tb, t):
+    o = owner_of(tb, t)
+    if o is None: return None
+    on = name_at[(tb, o)]
+    l = locs.get((tb, t))
+    label = (l.split('@', 1)[1].replace('@', '_') if l else (on if t == o else f'{on}_{t - o}'))
+    if label in C_KEYWORDS: label = 'l_' + label
+    key = (tb, t)
+    if pending is not None and key in pending: return pending[key][2]
+    fname = helper_name(on, label, key)
+    if pending is not None: pending[key] = (on, (tb, o), fname)
+    return fname
+
+def draft(name, start=None, helper=None, pending=None, owner=None):
+    bank, lo = owner if owner else tops[name]
+    base_label = name
+    if noncanonical(bank, lo):
+        cb = canonical_base(bank, lo)
+        base_label = name_at[(bank, cb)]
+    base = tops[base_label][1]
+    later = sorted(a for a in top_addrs.get(bank if lo >= 0x4000 else 0, set()) if a > lo)
+    hi = later[0] if later else lo + 0x400
+    entry = lo if start is None else start
     seen, work, tables = {}, [entry], {}
     labels = set()
     while work:
         a = work.pop()
-        while base <= a < hi and a not in seen:
+        while lo <= a < hi and a not in seen:
             op = rd(bank, a); n = length(op); seen[a] = n
             nxt = a + n
             if op in (0x18, 0x20, 0x28, 0x30, 0x38):
                 t = (nxt + ((rd(bank, a + 1) ^ 0x80) - 0x80)) & 0xffff
-                if base <= t < hi: labels.add(t); work.append(t)
+                if lo <= t < hi: labels.add(t); work.append(t)
                 if op == 0x18: break
             elif op in (0xc3, 0xc2, 0xca, 0xd2, 0xda):
                 t = rd(bank, a + 1) | rd(bank, a + 2) << 8
-                if base <= t < hi and t not in name_at: labels.add(t); work.append(t)
+                if lo <= t < hi: labels.add(t); work.append(t)
                 if op == 0xc3: break
-            elif op in (0xc4, 0xcc, 0xd4, 0xdc, 0xcd):
-                pass
             elif op in (0xc9, 0xd9, 0xe9): break
             elif op == 0xc7:
                 ents, p = [], nxt
@@ -174,9 +252,10 @@ def draft(name, start=None, helper=None, pending=None):
                 while p + 1 < hi and (first is None or p < first):
                     if ents and ((bank, p) in locs or (bank, p) in name_at): break
                     t = rd(bank, p) | rd(bank, p + 1) << 8
-                    if not (base <= t < hi) and (t < 0x4000 or ((bank, t) not in name_at and (bank, t) not in locs)): break
+                    tb = bank if t >= 0x4000 else 0
+                    if not (lo <= t < hi) and ((tb, t) not in name_at and (tb, t) not in locs): break
                     ents.append(t)
-                    if base <= t < hi:
+                    if lo <= t < hi:
                         first = t if first is None else min(first, t)
                         labels.add(t); work.append(t)
                     p += 2
@@ -184,13 +263,33 @@ def draft(name, start=None, helper=None, pending=None):
                 tables[a] = ents
                 break
             a = nxt
+    vals, svbk = [], None
+    for a in sorted(seen):
+        op = rd(bank, a)
+        if op in (0x01, 0x11, 0x21, 0xea, 0xfa): vals.append(rd(bank, a + 1) | rd(bank, a + 2) << 8)
+        if op == 0xe0 and rd(bank, a + 1) == 0x70 and rd(bank, a - 2) == 0x3e and rd(bank, a - 1) and svbk is None:
+            svbk = rd(bank, a - 1)
+    WINDOW[0] = 0x100
+    WBANK[0] = svbk if svbk else pick_wbank(vals)
+    if name in WB_OVERRIDE: WBANK[0], WINDOW[0] = WB_OVERRIDE[name], 0x800
     if helper:
-        out = [f'// {locs.get((bank, entry), hex(entry))}', f'static void {helper}(GB *gb) {{', f'  BASE({symref(name)});', '  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;']
+        out = [f'// {locs.get((bank, entry), name + ("+" + str(entry - lo) if entry != lo else ""))}', f'static void {helper}(GB *gb) {{', f'  BASE({symref(base_label)});', '  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;']
     else:
-        out = [f'void s_{name}_hook(GB *gb) {{', f'  BASE({symref(name)});', '  uint16_t sp0_ = gb->sp; (void)sp0_;']
+        out = [f'void s_{name}_hook(GB *gb) {{', f'  BASE({symref(base_label)});', '  uint16_t sp0_ = gb->sp; (void)sp0_;']
     def lab(t):
         l = locs.get((bank, t))
-        return (l.split('@', 1)[1] if l else f'L_{t:04x}').replace('@', '_')
+        r = (l.split('@', 1)[1] if l else f'L_{t:04x}').replace('@', '_')
+        return 'l_' + r if r in C_KEYWORDS else r
+    rombank = [None]
+    last_a = [None]
+    KEEPS_A = {0x00, 0xe0, 0xea, 0x02, 0x12, 0x22, 0x32, 0x77, 0xc5, 0xd5, 0xe5, 0xf5, 0x47, 0x4f, 0x57, 0x5f, 0x67, 0x6f,
+               0x06, 0x0e, 0x16, 0x1e, 0x26, 0x2e, 0x36, 0x01, 0x11, 0x21, 0x03, 0x13, 0x23, 0x0b, 0x1b, 0x2b}
+    def tbank(t):
+        if t < 0x4000: return 0
+        if bank == 0: return rombank[0]
+        return bank
+    def is_c(tb, t):
+        return (tb, t) in name_at and not noncanonical(tb, t) and hooked(name_at[(tb, t)])
     prev_end = None
     for a in sorted(seen):
         op = rd(bank, a); n = seen[a]; e = a + n; x, y = a - base, e - base
@@ -203,30 +302,30 @@ def draft(name, start=None, helper=None, pending=None):
         n16 = n1 | (rd(bank, a + 2) << 8) if n > 2 else 0
         s = None
         hi3, mid, lo3 = op >> 6, (op >> 3) & 7, op & 7
-        def jump(t, cond=None, kind='jp'):
-            if base <= t < hi and t in labels:
+        def jump(t, cond=None):
+            tb = tbank(t)
+            if lo <= t < hi and t in labels:
                 go = f'goto {lab(t)};'
-            elif (bank if t >= 0x4000 else 0, t) in name_at:
-                go = tail_of(name_at[(bank if t >= 0x4000 else 0, t)])
+            elif tb is None:
+                go = f'/* TODO jump to {hex(t)} in an unknown bank */ HANDOFF(0x{t:04x});'
+            elif is_c(tb, t):
+                go = tail_of(name_at[(tb, t)])
             else:
-                l = locs.get((bank if t >= 0x4000 else 0, t))
-                tb2 = bank if t >= 0x4000 else 0
-                owner = max((a2 for a2 in top_addrs.get(tb2, ()) if a2 <= t), default=None)
-                if owner is not None:
-                    on = name_at[(tb2, owner)]
-                    go = f'HANDOFF(SYM({symref(on)}) + {t - owner}); /* {l or on + "+" + str(t - owner)}, interpreted */'
-                else:
-                    go = f'/* TODO jump to {hex(t)} */ HANDOFF(0x{t:04x});'
+                f = need_helper(pending, tb, t)
+                go = f'{f}(gb); return;' if f else f'/* TODO jump to {hex(t)} */ HANDOFF(0x{t:04x});'
             if cond is None: return f'  {cy}\n  {go}'
             return f'  if ({cond}) {{ {cyt} {go} }}\n  {cy}'
         if op == 0x00: s = f'  {cy}'
         elif hi3 == 1 and op != 0x76:
-            src = r8get(lo3)
-            s = f'  {cy} ' + r8set(mid, src)
+            s = f'  {cy} ' + r8set(mid, r8get(lo3))
         elif hi3 == 0 and lo3 == 6: s = f'  {cy} ' + r8set(mid, field(n1) if OBJ and mid in (3, 5) and n1 >= 0x40 else f'0x{n1:02x}')
         elif hi3 == 0 and lo3 == 1 and mid % 2 == 0:
             rp = RP[mid // 2]
-            v = imm16_expr(bank, n16, base, base, hi, guess=(rp == 'HL'))
+            xb = bank
+            if rp == 'HL' and rd(bank, e) == 0x1e and rd(bank, e + 2) in (0xcd, 0xc3) and \
+                    name_at.get((0, rd(bank, e + 3) | rd(bank, e + 4) << 8)) == 'interBankCall':
+                xb = rd(bank, e + 1)
+            v = imm16_expr(xb, n16, base if xb == bank else -1, lo if xb == bank else -1, hi if xb == bank else -1, guess=(rp == 'HL' and xb == bank))
             if rp in ('BC', 'DE') and v.startswith('b_'):
                 loc = locs.get((bank, n16))
                 v += f' /* @{loc.split("@", 1)[1]} */' if loc else f' /* TODO pointer or the constant 0x{n16:04x}? */'
@@ -252,8 +351,10 @@ def draft(name, start=None, helper=None, pending=None):
                               0x27: 'alu_daa(gb);', 0x2f: 'alu_cpl(gb);', 0x37: 'alu_scf(gb);', 0x3f: 'alu_ccf(gb);'}[op]
         elif hi3 == 2: s = f'  {cy} {ALU[mid]}(gb, {r8get(lo3)});'
         elif hi3 == 3 and lo3 == 6: s = f'  {cy} {ALU[mid]}(gb, 0x{n1:02x});'
-        elif op == 0xea: s = f'  {cy} mem_wr(gb, {imm16_expr(bank, n16, base, base, hi)}, A);'
-        elif op == 0xfa: s = f'  {cy} A = mem_rd(gb, {imm16_expr(bank, n16, base, base, hi)});'
+        elif op == 0xea:
+            s = f'  {cy} mem_wr(gb, {imm16_expr(bank, n16, base, lo, hi)}, A);'
+            if 0x2000 <= n16 < 0x4000: rombank[0] = last_a[0]
+        elif op == 0xfa: s = f'  {cy} A = mem_rd(gb, {imm16_expr(bank, n16, base, lo, hi)});'
         elif op == 0xe0: s = f'  {cy} mem_wr(gb, {ram(0xff00 | n1)}, A);'
         elif op == 0xf0: s = f'  {cy} A = mem_rd(gb, {ram(0xff00 | n1)});'
         elif op == 0xe2: s = f'  {cy} mem_wr(gb, 0xff00 | C, A);'
@@ -271,26 +372,20 @@ def draft(name, start=None, helper=None, pending=None):
         elif op == 0xc3: s = jump(n16)
         elif op in (0xc2, 0xca, 0xd2, 0xda): s = jump(n16, CC[(op >> 3) & 3])
         elif op in (0xcd, 0xc4, 0xcc, 0xd4, 0xdc):
-            t = n16; tb = bank if t >= 0x4000 else 0
-            if base <= t < hi:
-                callee, target, local = f'{PREFIX}_{lab(t)}', None, True
-                if pending is not None: pending.setdefault(t, (name, callee))
-            elif (tb, t) in name_at: nm = name_at[(tb, t)]; callee, target, local = fn_of(nm), f'SYM({symref(nm)})', False
-            elif (tb, t) in locs and tb == bank:
-                owner = max(a2 for a2 in top_addrs[bank] if a2 <= t)
-                on = name_at[(bank, owner)]
-                callee, target, local = f'{PREFIX}_{on}_{locs[(tb, t)].split("@")[-1]}', None, True
-                if pending is not None: pending.setdefault(t, (on, callee))
-            else: callee, target, local = f'TODO_{locs.get((tb, t), hex(t))}', f'0x{t:04x}', False
-            rom_call = not local and target and target.startswith('SYM(') and (tb, t) in name_at and not hooked(name_at[(tb, t)])
-            if rom_call:
-                s = (f'  CALL_ROM(b_+{x}, {target}); /* no hook: interpreted */' if op == 0xcd else
-                     f'  if ({CC[(op >> 3) & 3]}) CALL_ROM_CC(b_+{x}, {target});\n  else {cy}')
-            elif op == 0xcd:
-                s = f'  CALL_L(b_+{x}, {callee}, b_+{y});' if local else f'  CALL_C(b_+{x}, {callee}, {target}, b_+{y});'
+            t = n16; tb = tbank(t)
+            if tb is not None and is_c(tb, t):
+                nm = name_at[(tb, t)]
+                c1 = f'CALL_C(b_+{x}, {fn_of(nm)}, SYM({symref(nm)}), b_+{y});'
+                c2 = f'CALL_C_CC(b_+{x}, {fn_of(nm)}, SYM({symref(nm)}), b_+{y});'
             else:
-                c1 = f'CALL_L_CC(b_+{x}, {callee}, b_+{y});' if local else f'CALL_C_CC(b_+{x}, {callee}, {target}, b_+{y});'
-                s = f'  if ({CC[(op >> 3) & 3]}) {c1}\n  else {cy}'
+                f = need_helper(pending, tb, t) if tb is not None else None
+                if f:
+                    c1 = f'CALL_L(b_+{x}, {f}, b_+{y});'
+                    c2 = f'CALL_L_CC(b_+{x}, {f}, b_+{y});'
+                else:
+                    c1 = f'CALL_ROM(b_+{x}, 0x{t:04x}); /* TODO unknown bank */'
+                    c2 = f'CALL_ROM_CC(b_+{x}, 0x{t:04x}); /* TODO unknown bank */'
+            s = f'  {c1}' if op == 0xcd else f'  if ({CC[(op >> 3) & 3]}) {c2}\n  else {cy}'
         elif op == 0xc9: s = f'  RET(b_+{x}); return;'
         elif op in (0xc0, 0xc8, 0xd0, 0xd8): s = f'  if ({CC[(op >> 3) & 3]}) {{ RET_TAKEN(b_+{x}); return; }}\n  CYC(b_+{x}, b_+{y});'
         elif op == 0xe9: s = f'  {cy}\n  HANDOFF(HL);'
@@ -298,25 +393,32 @@ def draft(name, start=None, helper=None, pending=None):
         elif op == 0xdf: s = f'  {cy} {PREFIX}_add_double_index(gb, b_+{y});'
         elif op == 0xc7:
             lines = [f'  {cy} push_effect(gb, b_+{y});', f'  do {{ uint16_t jt_ = ({PREFIX}_jump_table(gb));']
-            done = set()
+            done_t = set()
             for t in tables.get(a, []):
-                if t in done: continue
-                done.add(t)
-                if base <= t < hi: lines.append(f'    if (jt_ == b_+{t - base}) goto {lab(t)};')
-                elif (bank, t) in name_at:
-                    nm = name_at[(bank, t)]; f = fn_of(nm)
+                if t in done_t: continue
+                done_t.add(t)
+                tb = bank if t >= 0x4000 else 0
+                if lo <= t < hi: lines.append(f'    if (jt_ == b_+{t - base}) goto {lab(t)};')
+                elif is_c(tb, t):
+                    nm = name_at[(tb, t)]; f = fn_of(nm)
                     lines.append(f'    if (jt_ == SYM({symref(nm)}) && hook_is(gb, SYM({symref(nm)}), {f})) {{ {f}(gb); return; }}')
-                elif (bank, t) in locs:
-                    lines.append(f'    // {locs[(bank, t)]}: interpreted, through the HANDOFF below')
+                else:
+                    f = need_helper(pending, tb, t)
+                    d = t - base
+                    lines.append(f'    if (jt_ == {"(b_ + " + str(d) + ")" if d >= 0 else "(b_ - " + str(-d) + ")"}) {{ {f}(gb); return; }}')
             lines.append('    HANDOFF(HL);')
             lines.append('  } while (0);')
             s = '\n'.join(lines)
             prev_end = None
         else: s = f'  {cy} /* TODO opcode ${op:02x} */'
         out.append(s)
+        if op == 0x3e: last_a[0] = n1
+        elif op not in KEEPS_A: last_a[0] = None
         if e == hi and op not in (0x18, 0xc3, 0xc9, 0xd9, 0xe9, 0xc7) and (bank, hi) in name_at:
-            nm = name_at[(bank, hi)]
-            out.append(f'  {fn_of(nm)}(gb); return; // falls through')
+            if is_c(bank, hi):
+                out.append(f'  {fn_of(name_at[(bank, hi)])}(gb); return; // falls through')
+            else:
+                out.append(f'  {need_helper(pending, bank, hi)}(gb); return; // falls through')
     out.append('}')
     return '\n'.join(out)
 
@@ -325,8 +427,9 @@ for n in args:
     helpers = []
     main = draft(n, pending=pending)
     while set(pending) - done:
-        t = min(set(pending) - done); done.add(t)
-        helpers.append(draft(pending[t][0], start=t, helper=pending[t][1], pending=pending))
+        key = min(set(pending) - done); done.add(key)
+        on, okey, fname = pending[key]
+        helpers.append(draft(on, start=key[1], helper=fname, pending=pending, owner=okey))
     for h in reversed(helpers): print(h); print()
     print(main); print()
 missing = sorted(x for x in needed if not re.search(rf'^{re.escape(x)} ', open('src/hooks/syms_used.txt').read(), re.M))

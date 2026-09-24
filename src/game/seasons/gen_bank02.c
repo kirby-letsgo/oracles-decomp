@@ -2,13 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 02:66ab
-void s_checkPirateShipMoved(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x66ab, 2); A = 0x17;  // ld a,$17
-  I(0x66ad, 4); if (hook_is(gb, 0x30c7, checkGlobalFlag_hook)) { checkGlobalFlag_hook(gb); return; } HANDOFF(0x30c7);  // jp $30c7
-}
-
 // 02:5372
 void s_drawTreasureExtraTiles(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2894,125 +2887,6 @@ L_669c:
   RET(0x66aa); return;  // ret
 }
 
-// 02:6612
-void s_mapMenu_drawJewelLocations(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x6612, 3); SET_DE(0x666b);  // ld de,$666b
-  I(0x6615, 3); SET_HL(0xcec0);  // ld hl,$cec0
-  I(0x6618, 2); B = 0x05;  // ld b,$05
-  CALL(0x661a, copyMemoryReverse_hook, 0x045b, 0x661d);  // call $045b
-  I(0x661d, 2); L = 0xc3;  // ld l,$c3
-  I(0x661f, 4); A = mem_rd(gb, 0xcc00);  // ld a,($cc00)
-  I(0x6622, 1); alu_add(gb, A);  // add a
-  I(0x6623, 2); A = alu_swap(gb, A);  // swap a
-  I(0x6625, 2); alu_and(gb, 0x03);  // and $03
-  I(0x6627, 1); alu_add(gb, A);  // add a
-  I(0x6628, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
-  I(0x6629, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x662a, 4); A = mem_rd(gb, 0xcbb3);  // ld a,($cbb3)
-  I(0x662d, 1); alu_rrca(gb);  // rrca
-  if ((F & FC)) { RET_TAKEN(0x662e); return; } I(0x662e, 2);  // ret c
-  I(0x662f, 2); A = 0x4b;  // ld a,$4b
-  CALL(0x6631, checkTreasureObtained_hook, 0x1717, 0x6634);  // call $1717
-  if (!(F & FC)) { RET_TAKEN(0x6634); return; } I(0x6634, 2);  // ret nc
-  I(0x6635, 3); SET_BC(0x0400);  // ld bc,$0400
-L_6638:
-  I(0x6638, 1); A = C;  // ld a,c
-  I(0x6639, 2); alu_add(gb, 0x4c);  // add $4c
-  CALL(0x663b, checkTreasureObtained_hook, 0x1717, 0x663e);  // call $1717
-  if ((F & FC)) { I(0x663e, 3); goto L_665e; } I(0x663e, 2);  // jr c,$665e
-  I(0x6640, 1); A = C;  // ld a,c
-  I(0x6641, 3); SET_HL(0xc6e1);  // ld hl,$c6e1
-  CALL(0x6644, checkFlag_hook, 0x0205, 0x6647);  // call $0205
-  if (!(F & FZ)) { I(0x6647, 3); goto L_665e; } I(0x6647, 2);  // jr nz,$665e
-  PUSH(0x6649, BC);  // push bc
-  CALL(0x664a, checkIsLinkedGame_hook, 0x196b, 0x664d);  // call $196b
-  I(0x664d, 1); A = C;  // ld a,c
-  if ((F & FZ)) { I(0x664e, 3); goto L_6652; } I(0x664e, 2);  // jr z,$6652
-  I(0x6650, 2); alu_add(gb, 0x04);  // add $04
-L_6652:
-  I(0x6652, 3); SET_HL(0x6663);  // ld hl,$6663
-  RST_PUSH(0x6655, 0x6656);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6656, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6657, 3); SET_HL(0xcec0);  // ld hl,$cec0
-  CALL(0x665a, mapMenu_drawSpriteAtRoomIndex_hook, 0x65a1, 0x665d);  // call $65a1
-  SET_BC(POP(0x665d));  // pop bc
-L_665e:
-  I(0x665e, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x665f, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6660, 3); goto L_6638; } I(0x6660, 2);  // jr nz,$6638
-  RET(0x6662); return;  // ret
-}
-
-// 02:6638
-void s_mapMenu_drawJewelLocations__drawTreasure(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6638:
-  I(0x6638, 1); A = C;  // ld a,c
-  I(0x6639, 2); alu_add(gb, 0x4c);  // add $4c
-  CALL(0x663b, checkTreasureObtained_hook, 0x1717, 0x663e);  // call $1717
-  if ((F & FC)) { I(0x663e, 3); goto L_665e; } I(0x663e, 2);  // jr c,$665e
-  I(0x6640, 1); A = C;  // ld a,c
-  I(0x6641, 3); SET_HL(0xc6e1);  // ld hl,$c6e1
-  CALL(0x6644, checkFlag_hook, 0x0205, 0x6647);  // call $0205
-  if (!(F & FZ)) { I(0x6647, 3); goto L_665e; } I(0x6647, 2);  // jr nz,$665e
-  PUSH(0x6649, BC);  // push bc
-  CALL(0x664a, checkIsLinkedGame_hook, 0x196b, 0x664d);  // call $196b
-  I(0x664d, 1); A = C;  // ld a,c
-  if ((F & FZ)) { I(0x664e, 3); goto L_6652; } I(0x664e, 2);  // jr z,$6652
-  I(0x6650, 2); alu_add(gb, 0x04);  // add $04
-L_6652:
-  I(0x6652, 3); SET_HL(0x6663);  // ld hl,$6663
-  RST_PUSH(0x6655, 0x6656);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6656, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6657, 3); SET_HL(0xcec0);  // ld hl,$cec0
-  CALL(0x665a, mapMenu_drawSpriteAtRoomIndex_hook, 0x65a1, 0x665d);  // call $65a1
-  SET_BC(POP(0x665d));  // pop bc
-L_665e:
-  I(0x665e, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x665f, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6660, 3); goto L_6638; } I(0x6660, 2);  // jr nz,$6638
-  RET(0x6662); return;  // ret
-}
-
-// 02:665e
-void s_mapMenu_drawJewelLocations__nextTreasure(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_665e;
-L_6638:
-  I(0x6638, 1); A = C;  // ld a,c
-  I(0x6639, 2); alu_add(gb, 0x4c);  // add $4c
-  CALL(0x663b, checkTreasureObtained_hook, 0x1717, 0x663e);  // call $1717
-  if ((F & FC)) { I(0x663e, 3); goto L_665e; } I(0x663e, 2);  // jr c,$665e
-  I(0x6640, 1); A = C;  // ld a,c
-  I(0x6641, 3); SET_HL(0xc6e1);  // ld hl,$c6e1
-  CALL(0x6644, checkFlag_hook, 0x0205, 0x6647);  // call $0205
-  if (!(F & FZ)) { I(0x6647, 3); goto L_665e; } I(0x6647, 2);  // jr nz,$665e
-  PUSH(0x6649, BC);  // push bc
-  CALL(0x664a, checkIsLinkedGame_hook, 0x196b, 0x664d);  // call $196b
-  I(0x664d, 1); A = C;  // ld a,c
-  if ((F & FZ)) { I(0x664e, 3); goto L_6652; } I(0x664e, 2);  // jr z,$6652
-  I(0x6650, 2); alu_add(gb, 0x04);  // add $04
-L_6652:
-  I(0x6652, 3); SET_HL(0x6663);  // ld hl,$6663
-  RST_PUSH(0x6655, 0x6656);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x6656, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x6657, 3); SET_HL(0xcec0);  // ld hl,$cec0
-  CALL(0x665a, mapMenu_drawSpriteAtRoomIndex_hook, 0x65a1, 0x665d);  // call $65a1
-  SET_BC(POP(0x665d));  // pop bc
-L_665e:
-  I(0x665e, 1); C = alu_inc8(gb, C);  // inc c
-  I(0x665f, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6660, 3); goto L_6638; } I(0x6660, 2);  // jr nz,$6638
-  RET(0x6662); return;  // ret
-}
-
 // 02:63d9
 void s_mapMenu_drawSprites__dungeon(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -3035,7 +2909,7 @@ L_63eb:
   I(0x63f4, 4); A = mem_rd(gb, 0xcbc1);  // ld a,($cbc1)
   I(0x63f7, 1); alu_or(gb, A);  // or a
   if (!(F & FZ)) { I(0x63f8, 4); if (hook_is(gb, 0x65c0, mapMenu_drawWarpSites_hook)) { mapMenu_drawWarpSites_hook(gb); return; } HANDOFF(0x65c0); } I(0x63f8, 3);  // jp nz,$65c0
-  I(0x63fb, 4); s_mapMenu_drawJewelLocations(gb); return;  // jp $6612
+  I(0x63fb, 4); if (hook_is(gb, 0x6612, s_mapMenu_drawJewelLocations_hook)) { s_mapMenu_drawJewelLocations_hook(gb); return; } HANDOFF(0x6612);  // jp $6612
 }
 
 // 02:6142
@@ -3407,12 +3281,12 @@ L_5f04:
   I(0x5f0f, 1); alu_rlca(gb);  // rlca
   I(0x5f10, 2); A = 0x05;  // ld a,$05
   if ((F & FC)) { CALL(0x5f12, mapMenu_performTileSubstitutions_hook, 0x5dc2, 0x5f15); } else I(0x5f12, 3);  // call c,$5dc2
-  CALL(0x5f15, s_checkPirateShipMoved, 0x66ab, 0x5f18);  // call $66ab
+  CALL(0x5f15, s_checkPirateShipMoved_hook, 0x66ab, 0x5f18);  // call $66ab
   I(0x5f18, 2); A = 0x06;  // ld a,$06
   if (!(F & FZ)) { CALL(0x5f1a, mapMenu_performTileSubstitutions_hook, 0x5dc2, 0x5f1d); } else I(0x5f1a, 3);  // call nz,$5dc2
   I(0x5f1d, 3); goto L_5f27;  // jr $5f27
 L_5f1f:
-  CALL(0x5f1f, s_checkPirateShipMoved, 0x66ab, 0x5f22);  // call $66ab
+  CALL(0x5f1f, s_checkPirateShipMoved_hook, 0x66ab, 0x5f22);  // call $66ab
   I(0x5f22, 2); A = 0x07;  // ld a,$07
   if (!(F & FZ)) { CALL(0x5f24, mapMenu_performTileSubstitutions_hook, 0x5dc2, 0x5f27); } else I(0x5f24, 3);  // call nz,$5dc2
 L_5f27:
@@ -3476,7 +3350,7 @@ L_5f04:
   I(0x5f0f, 1); alu_rlca(gb);  // rlca
   I(0x5f10, 2); A = 0x05;  // ld a,$05
   if ((F & FC)) { CALL(0x5f12, mapMenu_performTileSubstitutions_hook, 0x5dc2, 0x5f15); } else I(0x5f12, 3);  // call c,$5dc2
-  CALL(0x5f15, s_checkPirateShipMoved, 0x66ab, 0x5f18);  // call $66ab
+  CALL(0x5f15, s_checkPirateShipMoved_hook, 0x66ab, 0x5f18);  // call $66ab
   I(0x5f18, 2); A = 0x06;  // ld a,$06
   if (!(F & FZ)) { CALL(0x5f1a, mapMenu_performTileSubstitutions_hook, 0x5dc2, 0x5f1d); } else I(0x5f1a, 3);  // call nz,$5dc2
   I(0x5f1d, 3); goto L_5f27;  // jr $5f27
@@ -3509,7 +3383,7 @@ L_5f73:
 void s_mapMenu_state0__subrosia(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5f1f:
-  CALL(0x5f1f, s_checkPirateShipMoved, 0x66ab, 0x5f22);  // call $66ab
+  CALL(0x5f1f, s_checkPirateShipMoved_hook, 0x66ab, 0x5f22);  // call $66ab
   I(0x5f22, 2); A = 0x07;  // ld a,$07
   if (!(F & FZ)) { CALL(0x5f24, mapMenu_performTileSubstitutions_hook, 0x5dc2, 0x5f27); } else I(0x5f24, 3);  // call nz,$5dc2
   CALL(0x5f27, s_mapMenu_clearUnvisitedTiles, 0x6670, 0x5f2a);  // call $6670
@@ -4208,27 +4082,6 @@ L_62f0:
   RET(0x62f5); return;  // ret
 }
 
-// 02:6231
-void s_minimapPopupType_pirateShip(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL(0x6231, s_checkPirateShipMoved, 0x66ab, 0x6234);  // call $66ab
-  I(0x6234, 1); A = E;  // ld a,e
-  I(0x6235, 3); SET_HL(0x624a);  // ld hl,$624a
-  if ((F & FZ)) { I(0x6238, 3); goto L_623d; } I(0x6238, 2);  // jr z,$623d
-  I(0x623a, 3); SET_HL(0x624e);  // ld hl,$624e
-L_623d:
-  I(0x623d, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x6240, 1); C = A;  // ld c,a
-L_6241:
-  I(0x6241, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6242, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6243, 3); if (hook_is(gb, 0x6208, minimapNoPopup_hook)) { minimapNoPopup_hook(gb); return; } HANDOFF(0x6208); } I(0x6243, 2);  // jr z,$6208
-  I(0x6245, 1); alu_cp(gb, C);  // cp c
-  if (!(F & FZ)) { I(0x6246, 3); goto L_6241; } I(0x6246, 2);  // jr nz,$6241
-  I(0x6248, 1); A = E;  // ld a,e
-  RET(0x6249); return;  // ret
-}
-
 // 02:620a
 void s_minimapPopupType_shop(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4243,25 +4096,6 @@ void s_minimapPopupType_shop(GB *gb) {
 L_6219:
   I(0x6219, 1); A = E;  // ld a,e
   RET(0x621a); return;  // ret
-}
-
-// 02:621b
-void s_minimapPopupType_templeOfSeasons(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x621b, 2); E = 0x11;  // ld e,$11
-  I(0x621d, 4); A = mem_rd(gb, 0xcbb6);  // ld a,($cbb6)
-  I(0x6220, 2); alu_cp(gb, 0x28);  // cp $28
-  if ((F & FZ)) { I(0x6222, 3); goto L_622f; } I(0x6222, 2);  // jr z,$622f
-  I(0x6224, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x6225, 2); alu_cp(gb, 0x08);  // cp $08
-  if ((F & FZ)) { I(0x6227, 3); goto L_622f; } I(0x6227, 2);  // jr z,$622f
-  I(0x6229, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x622a, 2); alu_cp(gb, 0x0a);  // cp $0a
-  if ((F & FZ)) { I(0x622c, 3); goto L_622f; } I(0x622c, 2);  // jr z,$622f
-  I(0x622e, 1); E = alu_inc8(gb, E);  // inc e
-L_622f:
-  I(0x622f, 1); A = E;  // ld a,e
-  RET(0x6230); return;  // ret
 }
 
 // 02:5092
@@ -4307,7 +4141,7 @@ L_50d1:
   I(0x50eb, 1); A = alu_inc8(gb, A);  // inc a
   if (!(F & FZ)) { I(0x50ec, 3); goto L_50f2; } I(0x50ec, 2);  // jr nz,$50f2
   SET_DE(POP(0x50ee));  // pop de
-  I(0x50ef, 4); s_seasonsFunc_332f(gb); return;  // jp $332f
+  I(0x50ef, 4); if (hook_is(gb, 0x332f, s_seasonsFunc_332f_hook)) { s_seasonsFunc_332f_hook(gb); return; } HANDOFF(0x332f);  // jp $332f
 L_50f2:
   I(0x50f2, 4); A = mem_rd(gb, 0xc485);  // ld a,($c485)
   I(0x50f5, 4); mem_wr(gb, 0xc497, A);  // ld ($c497),a
@@ -4335,7 +4169,7 @@ L_50d1:
   I(0x50eb, 1); A = alu_inc8(gb, A);  // inc a
   if (!(F & FZ)) { I(0x50ec, 3); goto L_50f2; } I(0x50ec, 2);  // jr nz,$50f2
   SET_DE(POP(0x50ee));  // pop de
-  I(0x50ef, 4); s_seasonsFunc_332f(gb); return;  // jp $332f
+  I(0x50ef, 4); if (hook_is(gb, 0x332f, s_seasonsFunc_332f_hook)) { s_seasonsFunc_332f_hook(gb); return; } HANDOFF(0x332f);  // jp $332f
 L_50f2:
   I(0x50f2, 4); A = mem_rd(gb, 0xc485);  // ld a,($c485)
   I(0x50f5, 4); mem_wr(gb, 0xc497, A);  // ld ($c497),a
@@ -4361,7 +4195,7 @@ L_50d1:
   I(0x50eb, 1); A = alu_inc8(gb, A);  // inc a
   if (!(F & FZ)) { I(0x50ec, 3); goto L_50f2; } I(0x50ec, 2);  // jr nz,$50f2
   SET_DE(POP(0x50ee));  // pop de
-  I(0x50ef, 4); s_seasonsFunc_332f(gb); return;  // jp $332f
+  I(0x50ef, 4); if (hook_is(gb, 0x332f, s_seasonsFunc_332f_hook)) { s_seasonsFunc_332f_hook(gb); return; } HANDOFF(0x332f);  // jp $332f
 L_50f2:
   I(0x50f2, 4); A = mem_rd(gb, 0xc485);  // ld a,($c485)
   I(0x50f5, 4); mem_wr(gb, 0xc497, A);  // ld ($c497),a

@@ -783,6 +783,27 @@ void s_func_5512_hook(GB *gb) {
   TAIL(enemySetAnimation);
 }
 
+// seasonsFunc_0e_5523+16
+static void syger_seasonsFunc_0e_5523_16(GB *gb) {
+  BASE(seasonsFunc_0e_5523);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+16, b_+17); alu_sub(gb, C);
+  CYC(b_+17, b_+19); alu_add(gb, 0x02);
+  CYC(b_+19, b_+21); alu_cp(gb, 0x05);
+  if (!(F & FC)) { CYCT(b_+21, b_+24); TAIL(ecom_moveTowardPosition_b0d); }
+  CYC(b_+21, b_+24);
+  CYC(b_+24, b_+26); A = mem_rd(gb, hFF8F);
+  CYC(b_+26, b_+27); alu_sub(gb, B);
+  CYC(b_+27, b_+29); alu_add(gb, 0x02);
+  CYC(b_+29, b_+31); alu_cp(gb, 0x05);
+  if (!(F & FC)) { CYCT(b_+31, b_+34); TAIL(ecom_moveTowardPosition_b0d); }
+  CYC(b_+31, b_+34);
+  CYC(b_+34, b_+35); mem_wr(gb, HL, C);
+  CYC(b_+35, b_+37); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+37, b_+38); mem_wr(gb, HL, B);
+  RET(b_+38); return;
+}
+
 void s_seasonsFunc_0e_5518_hook(GB *gb) {
   BASE(seasonsFunc_0e_5518);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -791,7 +812,7 @@ void s_seasonsFunc_0e_5518_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_VAR36;
   CALL_C(b_+6, s_ecom_readPositionVars, SYM(ecom_readPositionVars_b0d), b_+9);
   CYC(b_+9, b_+11);
-  HANDOFF(SYM(seasonsFunc_0e_5523) + 16); /* seasonsFunc_0e_5523+16, interpreted */
+  syger_seasonsFunc_0e_5523_16(gb); return;
 }
 
 void s_seasonsFunc_0e_5523_hook(GB *gb) {
@@ -893,3 +914,4 @@ void s_seasonsFunc_0e_557b_hook(GB *gb) {
   CYC(b_+23, b_+24); mem_wr(gb, DE, A);
   RET(b_+24); return;
 }
+
