@@ -244,6 +244,7 @@ mooshState8Substate3
 movingPlatform_loadScript
 nextToChestTile
 nextToSignTile
+npcFaceLinkAndAnimate
 objectAddToAButtonSensitiveObjectList
 objectAddToGrabbableObjectBuffer
 objectCheckTileAtPositionIsWater

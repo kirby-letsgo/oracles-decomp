@@ -1,6 +1,7 @@
 #include "game/game.h"
 #include "rt/fibers.h"
 #include "game/gen.h"
+void s_seasonsFunc_2678_hook(GB *gb);
 
 static void thread_yield(GB *gb);
 static void thread_resume_pops(GB *gb);
@@ -4611,6 +4612,7 @@ void interactionAnimateAsNpc_hook(GB *gb) {
 
 void npcFaceLinkAndAnimate_hook(GB *gb) {
   BASE(npcFaceLinkAndAnimate);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
   E = 0x6c;
   A = 0x01;
   CYC(b_+0, b_+5); mem_wr(gb, DE, A);
@@ -4640,10 +4642,16 @@ void npcFaceLinkAndAnimate_hook(GB *gb) {
     if (F & FZ) { CYCT(b_+30, b_+32); interaction_animate_as_npc(gb); ret_effect(gb); return; }
     CYC(b_+30, b_+33); mem_wr(gb, HL, A);
     B = alu_srl(gb, B);
-    E = 0x77;
-    CYC(b_+33, b_+38); A = mem_rd(gb, DE);
-    alu_add(gb, B);
-    CYC(b_+38, b_+42);
+    if (game_seasons) {
+      CYC(b_+33, b_+35);
+      CALL_C(b_+S(35), s_seasonsFunc_2678_hook, SYM(seasonsFunc_2678), b_+S(38));
+      CYC(b_+S(38), b_+S(39)); A = B;
+    } else {
+      E = 0x77;
+      CYC(b_+33, b_+38); A = mem_rd(gb, DE);
+      CYC(b_+38, b_+39); alu_add(gb, B);
+    }
+    CYC(b_+39, b_+42);
     interaction_set_animation(gb);
     E = 0x6b;
     A = 0x1e;
@@ -6513,28 +6521,38 @@ void setHlToTileMappingDataPlusATimes8_hook(GB *gb) {
 
 void getTileMappingData_hook(GB *gb) {
   BASE(getTileMappingData);
-  C = A;
-  CYC(b_+0, b_+3); uint8_t svbk = mem_rd(gb, IO_SVBK), f = F;
-  CYC(b_+3, b_+8); mem_wr(gb, IO_SVBK, 0x03);
-  A = C;
-  CYC(b_+8, b_+12);
-  set_hl_to_tile_mapping_data(gb);
-  uint16_t de = DE;
-  SET_DE(wTmpcec0);
-  B = 0x08;
-  CYC(b_+12, b_+21);
-  copyMemory(gb, DE, HL, 8);
-  SET_HL(HL + 8);
-  SET_DE(de);
-  CYC(b_+21, b_+25); A = mem_rd(gb, wTmpcec0 + 4);
-  B = A;
-  CYC(b_+25, b_+29); A = mem_rd(gb, wTmpcec0);
-  C = A;
-  A = svbk;
-  F = f;
-  CYC(b_+29, b_+33); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+33, b_+34);
-  ret_effect(gb);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+O(0), b_+OE(1)); C = A;
+  CYC(b_+O(1), b_+OE(3)); A = mem_rd(gb, IO_SVBK);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, AF);
+  CYC(b_+O(4), b_+OE(6)); A = 0x03;
+  CYC(b_+O(6), b_+OE(8)); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(8), b_+OE(9)); A = C;
+  CALL_C(b_+O(9), setHlToTileMappingDataPlusATimes8_hook, SYM(setHlToTileMappingDataPlusATimes8), b_+OE(12));
+  CYC(b_+O(12), b_+OE(13)); push_effect(gb, DE);
+  CYC(b_+O(13), b_+OE(16)); SET_DE(wTmpcec0);
+  CYC(b_+O(16), b_+OE(18)); B = 0x08;
+  if (game_seasons) {
+    for (;;) {
+      CYC(b_+S(18), b_+S(19)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+      CYC(b_+S(19), b_+S(20)); mem_wr(gb, DE, A);
+      CYC(b_+S(20), b_+S(21)); E = alu_inc8(gb, E);
+      CYC(b_+S(21), b_+S(22)); B = alu_dec8(gb, B);
+      if (!(F & FZ)) { CYCT(b_+S(22), b_+S(24)); continue; }
+      CYC(b_+S(22), b_+S(24));
+      break;
+    }
+  } else {
+    CALL_C(b_+18, copyMemory_hook, SYM(copyMemory), b_+21);
+  }
+  CYC(b_+O(21), b_+OE(22)); SET_DE(pop_effect(gb));
+  CYC(b_+O(22), b_+OE(25)); A = mem_rd(gb, wTmpcec0 + 4);
+  CYC(b_+O(25), b_+OE(26)); B = A;
+  CYC(b_+O(26), b_+OE(29)); A = mem_rd(gb, wTmpcec0);
+  CYC(b_+O(29), b_+OE(30)); C = A;
+  CYC(b_+O(30), b_+OE(31)); SET_AF(pop_effect(gb));
+  CYC(b_+O(31), b_+OE(33)); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(33), b_+OE(34)); ret_effect(gb);
 }
 
 static void set_tile(GB *gb) {
@@ -7147,23 +7165,30 @@ void uniqueGfxFunc_380b_hook(GB *gb) {
 
 static void generate_vram_tiles_with_room_changes(GB *gb, uint16_t sp0_) {
   BASE(generateVramTilesWithRoomChanges);
-  CYC(b_+0, b_+2); C = mem_rd(gb, IO_SVBK);
-  CYC(b_+2, b_+5); B = H8(hRomBank);
-  uint16_t bc = BC;
-  CYC(b_+5, b_+11); H8(hRomBank) = 0x04;
-  CYC(b_+11, b_+14); mem_wr(gb, MBC_ROM_BANK, 0x04);
-  CALL_C(b_+14, generateW3VramTilesAndAttributes_hook, SYM(generateW3VramTilesAndAttributes), b_+17);
-  SET_HL(ROM_b02_applyRoomSpecificTileChangesAfterGfxLoad);
-  E = 0x02;
-  CYC(b_+17, b_+22);
-  CALL_ROM(b_+22, ROM_interBankCall);
-  SET_BC(bc);
-  A = B;
-  CYC(b_+25, b_+29); H8(hRomBank) = A;
-  CYC(b_+29, b_+32); mem_wr(gb, MBC_ROM_BANK, A);
-  A = C;
-  CYC(b_+32, b_+35); mem_wr(gb, IO_SVBK, A);
-  CYC(b_+35, b_+36);
+  CYC(b_+O(0), b_+OE(2)); A = mem_rd(gb, IO_SVBK);
+  CYC(b_+O(2), b_+OE(3)); C = A;
+  CYC(b_+O(3), b_+OE(5)); A = H8(hRomBank);
+  CYC(b_+O(5), b_+OE(6)); B = A;
+  CYC(b_+O(6), b_+OE(7)); push_effect(gb, BC);
+  CYC(b_+O(7), b_+OE(9)); A = 0x04;
+  CYC(b_+O(9), b_+OE(11)); H8(hRomBank) = A;
+  CYC(b_+O(11), b_+OE(14)); mem_wr(gb, MBC_ROM_BANK, A);
+  if (game_seasons) {
+    CALL_C(b_+S(14), generateW3VramTilesAndAttributes_hook, SYM(generateW3VramTilesAndAttributes), b_+S(17));
+    CALL_C(b_+S(17), applyRoomSpecificTileChangesAfterGfxLoad_hook, SYM(applyRoomSpecificTileChangesAfterGfxLoad), b_+S(20));
+  } else {
+    CALL_C(b_+14, generateW3VramTilesAndAttributes_hook, SYM(generateW3VramTilesAndAttributes), b_+17);
+    CYC(b_+17, b_+20); SET_HL(ROM_b02_applyRoomSpecificTileChangesAfterGfxLoad);
+    CYC(b_+20, b_+22); E = 0x02;
+    CALL_ROM(b_+22, ROM_interBankCall);
+  }
+  CYC(b_+O(25), b_+OE(26)); SET_BC(pop_effect(gb));
+  CYC(b_+O(26), b_+OE(27)); A = B;
+  CYC(b_+O(27), b_+OE(29)); H8(hRomBank) = A;
+  CYC(b_+O(29), b_+OE(32)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(32), b_+OE(33)); A = C;
+  CYC(b_+O(33), b_+OE(35)); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+O(35), b_+OE(36));
 }
 
 void generateVramTilesWithRoomChanges_hook(GB *gb) {
@@ -10089,35 +10114,37 @@ void loadTilesetUniqueGfx_hook(GB *gb) {
 
 void loadTilesetGraphics_hook(GB *gb) {
   BASE(loadTilesetGraphics);
-  CYC(b_+0, b_+2); A = H8(hRomBank);
-  CYC(b_+2, b_+3); push_effect(gb, AF);
-  CYC(b_+3, b_+6); A = W8(wTilesetGfx);
-  CYC(b_+6, b_+9);
+  CYC(b_+O(0), b_+OE(2)); A = H8(hRomBank);
+  CYC(b_+O(2), b_+OE(3)); push_effect(gb, AF);
+  CYC(b_+O(3), b_+OE(6)); A = W8(wTilesetGfx);
+  CYC(b_+O(6), b_+OE(9));
   load_gfx_header(gb, SYM(loadGfxHeader), gfxHeaderTable_bank01, true);
-  CYC(b_+9, b_+12); A = W8(wTilesetPalette);
-  CALL_ROM(b_+12, ROM_loadPaletteHeader);
-  CYC(b_+15, b_+18);
+  CYC(b_+O(9), b_+OE(12)); A = W8(wTilesetPalette);
+  CALL_ROM(b_+O(12), ROM_loadPaletteHeader);
+  CYC(b_+O(15), b_+OE(18));
   load_tileset_unique_gfx(gb);
-  switch_bank(gb, b_+18, 0x04);
-  CALL_ROM(b_+25, ROM_b04_initializeAnimations);
-  SET_HL(ROM_b02_func_02_7a77);
-  E = 0x02;
-  CYC(b_+28, b_+33);
-  CALL_ROM(b_+33, ROM_interBankCall);
-  SET_HL(ROM_b02_checkLoadPastSignAndChestGfx);
-  E = 0x02;
-  CYC(b_+36, b_+41);
-  CALL_ROM(b_+41, ROM_interBankCall);
-  CYC(b_+44, b_+47); A = W8(wTilesetUniqueGfx);
-  CYC(b_+47, b_+50); W8(wLoadedTilesetUniqueGfx) = A;
-  CYC(b_+50, b_+53); A = W8(wTilesetPalette);
-  CYC(b_+53, b_+56); W8(wLoadedTilesetPalette) = A;
-  CYC(b_+56, b_+59); A = W8(wTilesetAnimation);
-  CYC(b_+59, b_+62); W8(wLoadedTilesetAnimation) = A;
-  CYC(b_+62, b_+63); SET_AF(pop_effect(gb));
-  CYC(b_+63, b_+65); H8(hRomBank) = A;
-  CYC(b_+65, b_+68); mem_wr(gb, MBC_ROM_BANK, A);
-  CYC(b_+68, b_+69);
+  switch_bank(gb, b_+O(18), 0x04);
+  CALL_ROM(b_+O(25), ROM_b04_initializeAnimations);
+  if (!game_seasons) {
+    SET_HL(ROM_b02_func_02_7a77);
+    E = 0x02;
+    CYC(b_+28, b_+33);
+    CALL_ROM(b_+33, ROM_interBankCall);
+    SET_HL(ROM_b02_checkLoadPastSignAndChestGfx);
+    E = 0x02;
+    CYC(b_+36, b_+41);
+    CALL_ROM(b_+41, ROM_interBankCall);
+  }
+  CYC(b_+O(44), b_+OE(47)); A = W8(wTilesetUniqueGfx);
+  CYC(b_+O(47), b_+OE(50)); W8(wLoadedTilesetUniqueGfx) = A;
+  CYC(b_+O(50), b_+OE(53)); A = W8(wTilesetPalette);
+  CYC(b_+O(53), b_+OE(56)); W8(wLoadedTilesetPalette) = A;
+  CYC(b_+O(56), b_+OE(59)); A = W8(wTilesetAnimation);
+  CYC(b_+O(59), b_+OE(62)); W8(wLoadedTilesetAnimation) = A;
+  CYC(b_+O(62), b_+OE(63)); SET_AF(pop_effect(gb));
+  CYC(b_+O(63), b_+OE(65)); H8(hRomBank) = A;
+  CYC(b_+O(65), b_+OE(68)); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+O(68), b_+OE(69));
   ret_effect(gb);
 }
 

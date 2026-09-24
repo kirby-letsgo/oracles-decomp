@@ -15,6 +15,35 @@ static uint8_t *read_all(const char *path, size_t *size);
 static uint8_t *rec_buf;
 static uint64_t rec_len, rec_cap, rec_resume;
 static const char *rec_path;
+static GB *rec_gb;
+
+// A snapshot of the machine next to the recording (FILE.inputs.state), taken whenever the inputs
+// are written: resuming loads it instead of replaying every recorded frame. It ends with the
+// number of input frames it goes with; a snapshot from another build or another length is ignored.
+static void rec_state_path(char *out, size_t n) { snprintf(out, n, "%s.state", rec_path); }
+
+static void rec_state_write(void) {
+  char path[1024];
+  rec_state_path(path, sizeof path);
+  if (!oracles_save_boot_state(rec_gb, path)) return;
+  FILE *f = fopen(path, "ab");
+  if (!f) return;
+  uint64_t len = rec_len;
+  fwrite(&len, sizeof len, 1, f);
+  fclose(f);
+}
+
+static bool rec_state_load(void) {
+  char path[1024];
+  rec_state_path(path, sizeof path);
+  FILE *f = fopen(path, "rb");
+  if (!f) return false;
+  uint64_t len = 0;
+  bool ok = fseek(f, -(long)sizeof len, SEEK_END) == 0 && fread(&len, sizeof len, 1, f) == 1;
+  fclose(f);
+  if (!ok || len != rec_len) return false;
+  return oracles_load_boot_state(rec_gb, path);
+}
 
 static void rec_push(uint8_t joy) {
   if (rec_len == rec_cap) { rec_cap = rec_cap ? rec_cap * 2 : 1 << 16; rec_buf = realloc(rec_buf, rec_cap); }
@@ -31,6 +60,10 @@ static void rec_load_existing(void) {
   for (uint32_t i = 0; i < count && 8 + i < n; i++) rec_push(d[8 + i]);
   rec_resume = rec_len;
   free(d);
+  if (rec_state_load()) {
+    fprintf(stderr, "resuming at frame %llu from the saved snapshot\n", (unsigned long long)rec_resume);
+    return;
+  }
   fprintf(stderr, "resuming: replaying %llu recorded frames first\n", (unsigned long long)rec_resume);
 }
 
@@ -56,6 +89,7 @@ static void rec_write(void) {
   fwrite(&n, 4, 1, f);
   fwrite(rec_buf, 1, rec_len, f);
   fclose(f);
+  rec_state_write();
 }
 
 #define SCALE 4
@@ -151,7 +185,7 @@ int main(int argc, char **argv) {
   char sav[1024];
   sav_path(argv[1], sav, sizeof sav);
   if (!rec_path) load_sram(gb, sav);
-  else rec_load_existing();
+  else { rec_gb = gb; rec_load_existing(); }
 
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMEPAD)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
   SDL_Window *win;

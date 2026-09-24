@@ -50,3 +50,4 @@ interactionCodeac   # flag number and seed-tree bit per game as GV
 interactionCodeac@checkUpdateState
 spawnBridge   # Seasons stores the registers to other fields
 companionCheckEnableTerrainEffects   # Seasons tile checks written out from +26
+npcFaceLinkAndAnimate   # Seasons calls seasonsFunc_2678 where Ages reads var37

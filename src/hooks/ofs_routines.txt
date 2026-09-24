@@ -31,7 +31,10 @@ enemyCode79
 func_5a60
 func_5c18
 functionCaller_b02
+generateVramTilesWithRoomChanges
+getTileMappingData
 giveTreasure_body
+initializeAnimations
 initializeFile_b07
 interactionCode0f
 interactionCode60
@@ -43,6 +46,7 @@ interactionCodedc
 interactionCodee0
 introCinematic_inTemple
 introCinematic_ridingHorse
+inventoryMenuState0
 inventoryMenuState3
 itemDrop_spawnEnemy
 itemInitializeFromLinkPosition
@@ -51,11 +55,13 @@ kingMoblinBomb_state2
 linkApplyTileTypes 233=227 234=228
 linkCutscene0
 linkState01 149=148
+linkState01_sidescroll
 linkedNpc_calcLowTextIndex
 loadItemIconGfx
 loadScreenMusic
 loadScreenMusicAndSetRoomPack
 loadTilesetAndRoomLayout
+loadTilesetGraphics
 loadTilesetLayout
 mapGetRoomTextOrReturn
 mapMenu_checkRoomVisited
@@ -63,6 +69,8 @@ mapMenu_drawSpriteAtRoomIndex
 mapMenu_loadPopupData
 objectCheckIsOverHazard
 paletteFadeHandler
+paletteFadeHandler05
+parentItemCode_bombchu
 parentItemCode_foolsOre
 parentItemCode_punch
 parseGivenObjectData_b12
@@ -70,6 +78,7 @@ parseStaticObjects
 partCode09
 partCode13
 partCode27
+playCompassSoundIfKeyInRoom
 rickyStateA
 screenTransitionState2
 scriptCmd_initNpcHitbox

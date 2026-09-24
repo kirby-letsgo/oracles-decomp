@@ -11,3 +11,4 @@ CLAUDE.md
 Testing
 __pycache__/
 .claude/
+tas/*.inputs.state

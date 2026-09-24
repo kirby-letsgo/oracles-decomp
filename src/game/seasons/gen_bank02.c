@@ -958,93 +958,6 @@ L_5d59:
   I(0x5d5c, 4); if (hook_is(gb, 0x0d3d, addSpritesToOam_withOffset_hook)) { addSpritesToOam_withOffset_hook(gb); return; } HANDOFF(0x0d3d);  // jp $0d3d
 }
 
-// 02:5529
-void s_inventoryMenuState0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5529, 3); SET_HL(0xcbd2);  // ld hl,$cbd2
-  I(0x552c, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x552d, 2); alu_cp(gb, 0x08);  // cp $08
-  if (!(F & FC)) { I(0x552f, 3); goto L_5533; } I(0x552f, 2);  // jr nc,$5533
-  I(0x5531, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-L_5533:
-  I(0x5533, 1); alu_xor(gb, A);  // xor a
-  I(0x5534, 4); mem_wr(gb, 0xcbcf, A);  // ld ($cbcf),a
-  I(0x5537, 4); mem_wr(gb, 0xcbba, A);  // ld ($cbba),a
-  I(0x553a, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x553b, 4); mem_wr(gb, 0xcbbb, A);  // ld ($cbbb),a
-  CALL(0x553e, s_checkWhetherToDisplaySeasonInSubscreen_hook, 0x58f0, 0x5541);  // call $58f0
-  if ((F & FZ)) { I(0x5541, 3); goto L_5545; } I(0x5541, 2);  // jr z,$5545
-  I(0x5543, 2); A = 0x01;  // ld a,$01
-L_5545:
-  I(0x5545, 4); mem_wr(gb, 0xcbb9, A);  // ld ($cbb9),a
-  CALL(0x5548, loadCommonGraphics_hook, 0x1a5e, 0x554b);  // call $1a5e
-L_554b:
-  I(0x554b, 2); A = 0x08;  // ld a,$08
-  CALL(0x554d, loadGfxHeader_hook, 0x0602, 0x5550);  // call $0602
-  I(0x5550, 2); A = 0x06;  // ld a,$06
-  CALL(0x5552, loadUncompressedGfxHeader_hook, 0x05b6, 0x5555);  // call $05b6
-  I(0x5555, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x5557, loadPaletteHeader_hook, 0x04e7, 0x555a);  // call $04e7
-  I(0x555a, 3); SET_HL(0x469d);  // ld hl,$469d
-  I(0x555d, 2); E = 0x3f;  // ld e,$3f
-  CALL(0x555f, interBankCall_hook, 0x008a, 0x5562);  // call $008a
-L_5562:
-  CALL(0x5562, func_02_55b2_hook, 0x557c, 0x5565);  // call $557c
-L_5565:
-  I(0x5565, 2); A = 0x01;  // ld a,$01
-  I(0x5567, 4); mem_wr(gb, 0xcbcd, A);  // ld ($cbcd),a
-  CALL(0x556a, fastFadeinFromWhite_hook, 0x3168, 0x556d);  // call $3168
-  I(0x556d, 2); A = 0x03;  // ld a,$03
-  I(0x556f, 4); if (hook_is(gb, 0x02ea, loadGfxRegisterStateIndex_hook)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
-// 02:554b
-void s_inventoryMenuState0__afterCall554b(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_554b:
-  I(0x554b, 2); A = 0x08;  // ld a,$08
-  CALL(0x554d, loadGfxHeader_hook, 0x0602, 0x5550);  // call $0602
-  I(0x5550, 2); A = 0x06;  // ld a,$06
-  CALL(0x5552, loadUncompressedGfxHeader_hook, 0x05b6, 0x5555);  // call $05b6
-  I(0x5555, 2); A = 0x0a;  // ld a,$0a
-  CALL(0x5557, loadPaletteHeader_hook, 0x04e7, 0x555a);  // call $04e7
-  I(0x555a, 3); SET_HL(0x469d);  // ld hl,$469d
-  I(0x555d, 2); E = 0x3f;  // ld e,$3f
-  CALL(0x555f, interBankCall_hook, 0x008a, 0x5562);  // call $008a
-L_5562:
-  CALL(0x5562, func_02_55b2_hook, 0x557c, 0x5565);  // call $557c
-L_5565:
-  I(0x5565, 2); A = 0x01;  // ld a,$01
-  I(0x5567, 4); mem_wr(gb, 0xcbcd, A);  // ld ($cbcd),a
-  CALL(0x556a, fastFadeinFromWhite_hook, 0x3168, 0x556d);  // call $3168
-  I(0x556d, 2); A = 0x03;  // ld a,$03
-  I(0x556f, 4); if (hook_is(gb, 0x02ea, loadGfxRegisterStateIndex_hook)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
-// 02:5562
-void s_inventoryMenuState0__afterCall5562(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5562:
-  CALL(0x5562, func_02_55b2_hook, 0x557c, 0x5565);  // call $557c
-L_5565:
-  I(0x5565, 2); A = 0x01;  // ld a,$01
-  I(0x5567, 4); mem_wr(gb, 0xcbcd, A);  // ld ($cbcd),a
-  CALL(0x556a, fastFadeinFromWhite_hook, 0x3168, 0x556d);  // call $3168
-  I(0x556d, 2); A = 0x03;  // ld a,$03
-  I(0x556f, 4); if (hook_is(gb, 0x02ea, loadGfxRegisterStateIndex_hook)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
-// 02:5565
-void s_inventoryMenuState0__afterCall5565(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5565:
-  I(0x5565, 2); A = 0x01;  // ld a,$01
-  I(0x5567, 4); mem_wr(gb, 0xcbcd, A);  // ld ($cbcd),a
-  CALL(0x556a, fastFadeinFromWhite_hook, 0x3168, 0x556d);  // call $3168
-  I(0x556d, 2); A = 0x03;  // ld a,$03
-  I(0x556f, 4); if (hook_is(gb, 0x02ea, loadGfxRegisterStateIndex_hook)) { loadGfxRegisterStateIndex_hook(gb); return; } HANDOFF(0x02ea);  // jp $02ea
-}
-
 // 02:55b3
 void s_inventoryMenuState1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -4102,7 +4015,7 @@ void s_reloadGraphicsOnExitMenu_body(GB *gb) {
 L_50ce:
   CALL(0x50ce, loadTilesetData_hook, 0x381a, 0x50d1);  // call $381a
 L_50d1:
-  CALL(0x50d1, s_loadTilesetGraphics, 0x3737, 0x50d4);  // call $3737
+  CALL(0x50d1, loadTilesetGraphics_hook, 0x3737, 0x50d4);  // call $3737
   CALL(0x50d4, reloadTileMap_hook, 0x12ba, 0x50d7);  // call $12ba
   CALL(0x50d7, fastFadeinFromWhiteToRoom_hook, 0x3204, 0x50da);  // call $3204
   I(0x50da, 4); A = mem_rd(gb, 0xcbe3);  // ld a,($cbe3)
@@ -4130,7 +4043,7 @@ void s_reloadGraphicsOnExitMenu_body__afterCall50ce(GB *gb) {
 L_50ce:
   CALL(0x50ce, loadTilesetData_hook, 0x381a, 0x50d1);  // call $381a
 L_50d1:
-  CALL(0x50d1, s_loadTilesetGraphics, 0x3737, 0x50d4);  // call $3737
+  CALL(0x50d1, loadTilesetGraphics_hook, 0x3737, 0x50d4);  // call $3737
   CALL(0x50d4, reloadTileMap_hook, 0x12ba, 0x50d7);  // call $12ba
   CALL(0x50d7, fastFadeinFromWhiteToRoom_hook, 0x3204, 0x50da);  // call $3204
   I(0x50da, 4); A = mem_rd(gb, 0xcbe3);  // ld a,($cbe3)
@@ -4156,7 +4069,7 @@ L_50f2:
 void s_reloadGraphicsOnExitMenu_body__afterCall50d1(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_50d1:
-  CALL(0x50d1, s_loadTilesetGraphics, 0x3737, 0x50d4);  // call $3737
+  CALL(0x50d1, loadTilesetGraphics_hook, 0x3737, 0x50d4);  // call $3737
   CALL(0x50d4, reloadTileMap_hook, 0x12ba, 0x50d7);  // call $12ba
   CALL(0x50d7, fastFadeinFromWhiteToRoom_hook, 0x3204, 0x50da);  // call $3204
   I(0x50da, 4); A = mem_rd(gb, 0xcbe3);  // ld a,($cbe3)

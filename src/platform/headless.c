@@ -313,6 +313,7 @@ int main(int argc, char **argv) {
   if (hook_mode != HOOK_MODE_OFF) hooks_report();
   if (dbg_pc_hist) { FILE *hf = fopen(getenv("PCHIST"), "wb"); fwrite(dbg_pc_hist, sizeof *dbg_pc_hist, 128 << 15, hf); fclose(hf); }
   if (gb->sample_overflow) fprintf(stderr, "sample ring overflow: %llu frames dropped\n", (unsigned long long)gb->sample_overflow);
+  if ((p = arg_value(argc, argv, "--state-out")) && !oracles_save_boot_state(gb, p)) { fprintf(stderr, "cannot write %s\n", p); return 2; }
   printf("done: %llu frames, state %016llx\n", (unsigned long long)GRID_FRAME(gb->cycles),
          (unsigned long long)gb_state_hash(gb));
   return 0;

@@ -137,7 +137,35 @@ void parentItemCode_bracelet_hook(GB *gb){BASE(parentItemCode_bracelet);uint16_t
   else { hook_continue(gb,HL,sp0_); }
 } while (0);}
 
-void parentItemCode_bombchu_hook(GB *gb){BASE(parentItemCode_bombchu);uint16_t sp0_=gb->sp;CYC(b_+0,b_+2);E=4;CYC(b_+2,b_+3);A=mem_rd(gb,DE);CYC(b_+3,b_+4);push_effect(gb,b_+4);uint16_t target=bombs_bracelet_jump_table(gb);if(target!=b_+8){hook_continue(gb,target,sp0_);return;}CALL_C(b_+8,isLinkUnderwater_hook,SYM(isLinkUnderwater),b_+11);if(!(F&FZ)){CYCT(b_+11,b_+14);clearParentItem_hook(gb);return;}CYC(b_+11,b_+14);CYC(b_+14,b_+17);A=W8(w1Companion_id);CYC(b_+17,b_+19);alu_cp(gb,0x13);if(F&FZ){CYCT(b_+19,b_+22);clearParentItem_hook(gb);return;}CYC(b_+19,b_+22);CYC(b_+22,b_+25);A=W8(wLinkSwimmingState);CYC(b_+25,b_+26);alu_or(gb,A);if(!(F&FZ)){CYCT(b_+26,b_+29);clearParentItem_hook(gb);return;}CYC(b_+26,b_+29);CYC(b_+29,b_+32);A=W8(wNumBombchus);CYC(b_+32,b_+33);alu_or(gb,A);if(F&FZ){CYCT(b_+33,b_+36);clearParentItem_hook(gb);return;}CYC(b_+33,b_+36);CALL_C(b_+36,parentItemLoadAnimationAndIncState_hook,SYM(parentItemLoadAnimationAndIncState),b_+39);CYC(b_+39,b_+41);E=1;CYC(b_+41,b_+44);itemCreateChildAndDeleteOnFailure_hook(gb);}
+void parentItemCode_bombchu_hook(GB *gb) {
+  BASE(parentItemCode_bombchu);
+  uint16_t sp0_ = gb->sp;
+  CYC(b_+O(0), b_+OE(2)); E = 0x04;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
+  uint16_t target = bombs_bracelet_jump_table(gb);
+  if (target != b_+O(8)) { hook_continue(gb, target, sp0_); return; }
+  if (!game_seasons) {      // no bombchus underwater or on the Dimitri raft
+    CALL_C(b_+8, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+11);
+    if (!(F & FZ)) { CYCT(b_+11, b_+14); TAIL(clearParentItem); }
+    CYC(b_+11, b_+14);
+    CYC(b_+14, b_+17); A = W8(w1Companion_id);
+    CYC(b_+17, b_+19); alu_cp(gb, 0x13);
+    if (F & FZ) { CYCT(b_+19, b_+22); TAIL(clearParentItem); }
+    CYC(b_+19, b_+22);
+  }
+  CYC(b_+O(22), b_+OE(25)); A = W8(wLinkSwimmingState);
+  CYC(b_+O(25), b_+OE(26)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(26), b_+OE(29)); TAIL(clearParentItem); }
+  CYC(b_+O(26), b_+OE(29));
+  CYC(b_+O(29), b_+OE(32)); A = W8(wNumBombchus);
+  CYC(b_+O(32), b_+OE(33)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(33), b_+OE(36)); TAIL(clearParentItem); }
+  CYC(b_+O(33), b_+OE(36));
+  CALL_C(b_+O(36), parentItemLoadAnimationAndIncState_hook, SYM(parentItemLoadAnimationAndIncState), b_+OE(39));
+  CYC(b_+O(39), b_+OE(41)); E = 0x01;
+  CYC(b_+O(41), b_+OE(44)); TAIL(itemCreateChildAndDeleteOnFailure);
+}
 
 void parentItemCode_bomb_hook(GB *gb){BASE(parentItemCode_bomb);uint16_t sp0_=gb->sp;CYC(b_+0,b_+2);E=4;CYC(b_+2,b_+3);A=mem_rd(gb,DE);CYC(b_+3,b_+4);push_effect(gb,b_+4);do { uint16_t jt_ = (bombs_bracelet_jump_table(gb));
   if (jt_ == b_+14) { break; }

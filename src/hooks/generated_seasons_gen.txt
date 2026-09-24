@@ -445,9 +445,6 @@
 00:28b7 s_enemyStandardUpdate__reachedGround L
 00:28bc s_enemyStandardUpdate__ret02 L
 00:3346 s_flameOfDestructionsCutsceneCaller_hook -
-00:369b s_forceLoadRoom -
-00:36ae s_forceLoadRoom__afterCall36ae L
-00:36b4 s_forceLoadRoom__afterCall36b4 L
 00:0eb9 s_func_0eda__nextSprite L
 00:0ed1 s_func_0eda__end L
 00:12dd s_func_131f -
@@ -460,7 +457,6 @@
 00:3477 s_func_3539__afterCall3477 L
 00:3481 s_func_3539__afterCall3481 L
 00:35ec s_func_35ec_hook -
-00:3a06 s_generateVramTilesWithRoomChanges -
 00:10c4 s_getChestData__chestNotFound L
 00:10c7 s_getChestData__end L
 00:3e8f s_getLinkedHerosCaveSideEntranceRoom_hook -
@@ -468,7 +464,6 @@
 00:20f1 s_getScaledPositionOffsetForVelocity__scaleComponent L
 00:29c1 s_getSimulatedInput__returnInput L
 00:3e3e s_getSunkenCityNPCVisibleSubId_caller_hook -
-00:3a25 s_getTileMappingData -
 00:0265 s_hexToDec__doneHundreds L
 00:3017 s_initializeRoom -
 00:301a s_initializeRoom__afterCall301a L
@@ -512,13 +507,11 @@
 00:39cb s_loadRoomLayout__decompressLayoutHelper L
 00:39df s_loadRoomLayout__loadLayoutData L
 00:3870 s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains L
-00:3737 s_loadTilesetGraphics -
 00:36dc s_loadTilesetLayout__helper L
 00:3810 s_loadUniqueGfxHeaderEntry__loadPaletteIndex L
 00:324e s_mainThreadStart__mainThread L
 00:180b s_makeActiveObjectFollowLink_b00 -
 00:35b8 s_multiIntroCutsceneCaller_hook -
-00:2646 s_npcFaceLinkAndAnimate -
 00:1af7 s_objectAddToAButtonSensitiveObjectList__next L
 00:1b02 s_objectAddToAButtonSensitiveObjectList__foundBlankEntry L
 00:1fd3 s_objectApplyComponentSpeed__addSpeedComponent L
@@ -1133,10 +1126,7 @@
 01:5888 s_initializeGame__summonLinkCutscene L
 01:5f53 s_initializeSeedTreeRefillData -
 01:489d s_makeActiveObjectFollowLink_b01 -
-01:55fc s_paletteFadeHandler05 -
 01:5612 s_paletteFadeHandler06 -
-01:49e5 s_playCompassSoundIfKeyInRoom -
-01:4a17 s_playCompassSoundIfKeyInRoom__playSound L
 01:5ec2 s_screenTransitionEyePuzzle__up L
 01:5ecc s_screenTransitionEyePuzzle__rightOrLeft L
 01:5dd3 s_screenTransitionLostWoods_hook -
@@ -2308,7 +2298,6 @@
 06:4a4b s_parentItemCode_biggoronSword -
 06:4ea7 s_parentItemCode_bomb -
 06:4eb5 s_parentItemCode_bomb__state0 L
-06:4e89 s_parentItemCode_bombchu -
 06:4e91 s_parentItemCode_bombchu__state0 L
 06:4e0f s_parentItemCode_boomerang -
 06:4e19 s_parentItemCode_boomerang__state0 L
@@ -3491,8 +3480,6 @@
 04:6d36 s_getMoblinKeepScreenIndex_hook -
 04:6d17 s_getMoblinKeepSeasonsTilesetData_hook -
 04:6ce6 s_getTempleRemainsSeasonsTilesetData_hook -
-04:574c s_initializeAnimations -
-04:5755 s_initializeAnimations__locFunc L
 04:45f8 s_label_04_033 -
 04:4659 s_label_04_035_hook -
 04:465f s_label_04_036_hook -
@@ -4463,10 +4450,6 @@
 02:5d3d s_inventoryMenuDrawSprites__menuScrolling L
 02:5d57 s_inventoryMenuDrawSprites__drawSpriteWithXOffset L
 02:5d59 s_inventoryMenuDrawSprites__drawSprite L
-02:5529 s_inventoryMenuState0 -
-02:554b s_inventoryMenuState0__afterCall554b L
-02:5562 s_inventoryMenuState0__afterCall5562 L
-02:5565 s_inventoryMenuState0__afterCall5565 L
 02:55b3 s_inventoryMenuState1 -
 02:55d0 s_inventoryMenuState1__func_02_5606 L
 02:55d7 s_inventoryMenuState1__subscreen0 L

@@ -9,12 +9,12 @@
 void initializeAnimations__locFunc_hook(GB *gb) {
   BASE(initializeAnimations);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CALL_C(b_+25, updateAnimationData_hook, SYM(updateAnimationData), b_+28);
+  CALL_C(b_+O(25), updateAnimationData_hook, SYM(updateAnimationData), b_+OE(28));
   for (;;) {
-    CALL_C(b_+28, updateAnimationQueue_hook, SYM(updateAnimationQueue), b_+31);
-    if (!(F & FZ)) { CYCT(b_+31, b_+33); continue; }
-    CYC(b_+31, b_+33);
-    CYC(b_+33, b_+34);
+    CALL_C(b_+O(28), updateAnimationQueue_hook, SYM(updateAnimationQueue), b_+OE(31));
+    if (!(F & FZ)) { CYCT(b_+O(31), b_+OE(33)); continue; }
+    CYC(b_+O(31), b_+OE(33));
+    CYC(b_+O(33), b_+OE(34));
     ret_effect(gb);
     return;
   }
@@ -23,18 +23,21 @@ void initializeAnimations__locFunc_hook(GB *gb) {
 void initializeAnimations_hook(GB *gb) {
   BASE(initializeAnimations);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = mem_rd(gb, wTilesetAnimation);
-  CYC(b_+3, b_+5); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
-  CYC(b_+5, b_+6);
-  CALL_C(b_+6, loadAnimationData_hook, SYM(loadAnimationData), b_+9);
-  CALL_L(b_+9, initializeAnimations__locFunc_hook, b_+12);
-  CYC(b_+12, b_+15); SET_HL(wAnimationState);
-  CYC(b_+15, b_+17); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
-  CALL_L(b_+17, initializeAnimations__locFunc_hook, b_+20);
-  CYC(b_+20, b_+23); SET_HL(wAnimationState);
-  CYC(b_+23, b_+25); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
-  TAIL(initializeAnimations__locFunc);
+  CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wTilesetAnimation);
+  CYC(b_+O(3), b_+OE(5)); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+O(5), b_+OE(6)); ret_effect(gb); return; }
+  CYC(b_+O(5), b_+OE(6));
+  CALL_C(b_+O(6), loadAnimationData_hook, SYM(loadAnimationData), b_+OE(9));
+  if (game_seasons) { initializeAnimations__locFunc_hook(gb); return; }      // Seasons runs the loop once, inline
+  if (!game_seasons) {
+    CALL_L(b_+9, initializeAnimations__locFunc_hook, b_+12);
+    CYC(b_+12, b_+15); SET_HL(wAnimationState);
+    CYC(b_+15, b_+17); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+    CALL_L(b_+17, initializeAnimations__locFunc_hook, b_+20);
+    CYC(b_+20, b_+23); SET_HL(wAnimationState);
+    CYC(b_+23, b_+25); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x80));
+    TAIL(initializeAnimations__locFunc);
+  }
 }
 
 void updateAnimations_hook(GB *gb) {

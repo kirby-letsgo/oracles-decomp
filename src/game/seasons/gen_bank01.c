@@ -438,7 +438,7 @@ L_596f:
   CALL(0x5972, s_checkUpdateDungeonMinimap, 0x578d, 0x5975);  // call $578d
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x597a, s_playCompassSoundIfKeyInRoom, 0x49e5, 0x597d);  // call $49e5
+  CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
   I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
 }
 
@@ -463,7 +463,7 @@ L_596f:
   CALL(0x5972, s_checkUpdateDungeonMinimap, 0x578d, 0x5975);  // call $578d
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x597a, s_playCompassSoundIfKeyInRoom, 0x49e5, 0x597d);  // call $49e5
+  CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
   I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
 }
 
@@ -486,7 +486,7 @@ L_596f:
   CALL(0x5972, s_checkUpdateDungeonMinimap, 0x578d, 0x5975);  // call $578d
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x597a, s_playCompassSoundIfKeyInRoom, 0x49e5, 0x597d);  // call $49e5
+  CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
   I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
 }
 
@@ -507,7 +507,7 @@ L_596f:
   CALL(0x5972, s_checkUpdateDungeonMinimap, 0x578d, 0x5975);  // call $578d
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x597a, s_playCompassSoundIfKeyInRoom, 0x49e5, 0x597d);  // call $49e5
+  CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
   I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
 }
 
@@ -519,7 +519,7 @@ L_596f:
   CALL(0x5972, s_checkUpdateDungeonMinimap, 0x578d, 0x5975);  // call $578d
   I(0x5975, 2); A = 0x01;  // ld a,$01
   I(0x5977, 4); mem_wr(gb, 0xc2ef, A);  // ld ($c2ef),a
-  CALL(0x597a, s_playCompassSoundIfKeyInRoom, 0x49e5, 0x597d);  // call $49e5
+  CALL(0x597a, playCompassSoundIfKeyInRoom_hook, 0x49e5, 0x597d);  // call $49e5
   I(0x597d, 4); s_updateGrassAnimationModifier(gb); return;  // jp $5cec
 }
 
@@ -559,7 +559,7 @@ L_5aab:
   CALL(0x5ac3, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x5ac6);  // call $32dc
   CALL(0x5ac6, loadTilesetData_hook, 0x381a, 0x5ac9);  // call $381a
 L_5ac9:
-  CALL(0x5ac9, s_loadTilesetGraphics, 0x3737, 0x5acc);  // call $3737
+  CALL(0x5ac9, loadTilesetGraphics_hook, 0x3737, 0x5acc);  // call $3737
   CALL(0x5acc, s_func_131f, 0x12dd, 0x5acf);  // call $12dd
 L_5acf:
   I(0x5acf, 3); SET_DE(0xd00b);  // ld de,$d00b
@@ -572,7 +572,7 @@ L_5acf:
 void s_cutscene04__afterCall5ac9(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5ac9:
-  CALL(0x5ac9, s_loadTilesetGraphics, 0x3737, 0x5acc);  // call $3737
+  CALL(0x5ac9, loadTilesetGraphics_hook, 0x3737, 0x5acc);  // call $3737
   CALL(0x5acc, s_func_131f, 0x12dd, 0x5acf);  // call $12dd
 L_5acf:
   I(0x5acf, 3); SET_DE(0xd00b);  // ld de,$d00b
@@ -1555,7 +1555,7 @@ L_4c0f:
   CALL(0x4c27, stopTextThread_hook, 0x1826, 0x4c2a);  // call $1826
   CALL(0x4c2a, applyWarpDest_hook, 0x32be, 0x4c2d);  // call $32be
   CALL(0x4c2d, loadTilesetData_hook, 0x381a, 0x4c30);  // call $381a
-  CALL(0x4c30, s_loadTilesetGraphics, 0x3737, 0x4c33);  // call $3737
+  CALL(0x4c30, loadTilesetGraphics_hook, 0x3737, 0x4c33);  // call $3737
   CALL(0x4c33, loadDungeonLayout_hook, 0x2cfd, 0x4c36);  // call $2cfd
   CALL(0x4c36, s_func_131f, 0x12dd, 0x4c39);  // call $12dd
   CALL(0x4c39, clearEnemiesKilledList_b00_hook, 0x30d9, 0x4c3c);  // call $30d9
@@ -2183,23 +2183,6 @@ void s_makeActiveObjectFollowLink_b01(GB *gb) {
   if (hook_is(gb, 0x48a6, resetFollowingLinkPath_hook)) { resetFollowingLinkPath_hook(gb); return; } HANDOFF(0x48a6);  // fallthrough
 }
 
-// 01:55fc
-void s_paletteFadeHandler05(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x55fc, 1); alu_xor(gb, A);  // xor a
-  I(0x55fd, 3); mem_wr(gb, 0xff8b, A);  // ldh ($ff8b),a
-  I(0x55ff, 4); A = mem_rd(gb, 0xc4ae);  // ld a,($c4ae)
-  I(0x5602, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5603, 1); B = A;  // ld b,a
-  I(0x5604, 4); A = mem_rd(gb, 0xc2ff);  // ld a,($c2ff)
-  I(0x5607, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x5608, 1); alu_cp(gb, B);  // cp b
-  if ((F & FZ)) { I(0x5609, 3); if (hook_is(gb, 0x55e8, paletteThread_stop_hook)) { paletteThread_stop_hook(gb); return; } HANDOFF(0x55e8); } I(0x5609, 2);  // jr z,$55e8
-  I(0x560b, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
-  I(0x560e, 1); C = A;  // ld c,a
-  I(0x560f, 4); if (hook_is(gb, 0x5586, updateFadingPalettes_hook)) { updateFadingPalettes_hook(gb); return; } HANDOFF(0x5586);  // jp $5586
-}
-
 // 01:5612
 void s_paletteFadeHandler06(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2215,47 +2198,6 @@ void s_paletteFadeHandler06(GB *gb) {
   I(0x5621, 4); mem_wr(gb, 0xc2ff, A);  // ld ($c2ff),a
   I(0x5624, 1); C = A;  // ld c,a
   I(0x5625, 4); if (hook_is(gb, 0x5586, updateFadingPalettes_hook)) { updateFadingPalettes_hook(gb); return; } HANDOFF(0x5586);  // jp $5586
-}
-
-// 01:49e5
-void s_playCompassSoundIfKeyInRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x49e5, 4); A = mem_rd(gb, 0xcc02);  // ld a,($cc02)
-  I(0x49e8, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x49e9); return; } I(0x49e9, 2);  // ret nz
-  I(0x49ea, 4); A = mem_rd(gb, 0xcc55);  // ld a,($cc55)
-  I(0x49ed, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x49ef); return; } I(0x49ef, 2);  // ret z
-  I(0x49f0, 3); SET_HL(0xc67c);  // ld hl,$c67c
-  CALL(0x49f3, checkFlag_hook, 0x0205, 0x49f6);  // call $0205
-  if ((F & FZ)) { RET_TAKEN(0x49f6); return; } I(0x49f6, 2);  // ret z
-  CALL(0x49f7, getThisRoomFlags_hook, 0x1956, 0x49fa);  // call $1956
-  I(0x49fa, 2); alu_and(gb, 0x20);  // and $20
-  if (!(F & FZ)) { RET_TAKEN(0x49fc); return; } I(0x49fc, 2);  // ret nz
-  I(0x49fd, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x4a00, 2); alu_cp(gb, 0x06);  // cp $06
-  if (!(F & FZ)) { I(0x4a02, 3); goto L_4a0b; } I(0x4a02, 2);  // jr nz,$4a0b
-  I(0x4a04, 4); A = mem_rd(gb, 0xcc4c);  // ld a,($cc4c)
-  I(0x4a07, 2); alu_cp(gb, 0x8b);  // cp $8b
-  if ((F & FZ)) { I(0x4a09, 3); goto L_4a17; } I(0x4a09, 2);  // jr z,$4a17
-L_4a0b:
-  I(0x4a0b, 4); A = mem_rd(gb, 0xcc58);  // ld a,($cc58)
-  I(0x4a0e, 2); alu_and(gb, 0x70);  // and $70
-  I(0x4a10, 2); alu_cp(gb, 0x30);  // cp $30
-  if ((F & FZ)) { I(0x4a12, 3); goto L_4a17; } I(0x4a12, 2);  // jr z,$4a17
-  I(0x4a14, 2); alu_cp(gb, 0x10);  // cp $10
-  if (!(F & FZ)) { RET_TAKEN(0x4a16); return; } I(0x4a16, 2);  // ret nz
-L_4a17:
-  I(0x4a17, 2); A = 0xa2;  // ld a,$a2
-  I(0x4a19, 4); if (hook_is(gb, 0x0c74, playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c74);  // jp $0c74
-}
-
-// 01:4a17
-void s_playCompassSoundIfKeyInRoom__playSound(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4a17:
-  I(0x4a17, 2); A = 0xa2;  // ld a,$a2
-  I(0x4a19, 4); if (hook_is(gb, 0x0c74, playSound_b00_hook)) { playSound_b00_hook(gb); return; } HANDOFF(0x0c74);  // jp $0c74
 }
 
 // 01:5ec2

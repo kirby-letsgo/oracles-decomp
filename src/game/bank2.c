@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/gen.h"
+void s_checkWhetherToDisplaySeasonInSubscreen_hook(GB *gb);
 
 #undef CYC
 #undef CYCT
@@ -5624,33 +5625,42 @@ show_text:
 void inventoryMenuState0_hook(GB *gb) {
   BASE(inventoryMenuState0);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_HL(wInventorySubmenu2CursorPos);
-  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
-  CYC(b_+4, b_+6); alu_cp(gb, 0x08);
-  if (!(F & FC)) CYCT(b_+6, b_+8);
-  else { CYC(b_+6, b_+8); CYC(b_+8, b_+10); mem_wr(gb, HL, 0); }
-  CYC(b_+10, b_+11); alu_xor(gb, A);
-  CYC(b_+11, b_+14); W8(wInventorySubmenu) = A;
-  CYC(b_+14, b_+17); W8(wInventory_cbba) = A;
-  CYC(b_+17, b_+20); W8(wInventory_submenu2CursorPos2) = A;
-  CYC(b_+20, b_+21); A = alu_dec8(gb, A);
-  CYC(b_+21, b_+24); W8(wInventory_activeText) = A;
-  CALL_C(b_+24, loadCommonGraphics_hook, SYM(loadCommonGraphics), b_+27);
-  CYC(b_+27, b_+29); A = 0x08;
-  CALL_C(b_+29, loadGfxHeader_hook, SYM(loadGfxHeader), b_+32);
-  CYC(b_+32, b_+34); A = 0x06;
-  CALL_C(b_+34, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+37);
-  CYC(b_+37, b_+39); A = 0x0a;
-  CALL_C(b_+39, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+42);
-  CYC(b_+42, b_+45); SET_HL((SYM(label_02_038) + 24));
-  CYC(b_+45, b_+47); E = 0x3f;
-  CALL_C(b_+47, interBankCall_hook, 0x008a, b_+50);
-  CALL_C(b_+50, func_02_55b2_hook, SYM(func_02_55b2), b_+53);
-  CYC(b_+53, b_+55); A = 0x01;
-  CYC(b_+55, b_+58); W8(wMenuActiveState) = A;
-  CALL_C(b_+58, fastFadeinFromWhite_hook, SYM(fastFadeinFromWhite), b_+61);
-  CYC(b_+61, b_+63); A = 0x03;
-  CYC(b_+63, b_+66); TAIL(loadGfxRegisterStateIndex);
+  CYC(b_+O(0), b_+OE(3)); SET_HL(wInventorySubmenu2CursorPos);
+  CYC(b_+O(3), b_+OE(4)); A = mem_rd(gb, HL);
+  CYC(b_+O(4), b_+OE(6)); alu_cp(gb, 0x08);
+  if (!(F & FC)) CYCT(b_+O(6), b_+OE(8));
+  else { CYC(b_+O(6), b_+OE(8)); CYC(b_+O(8), b_+OE(10)); mem_wr(gb, HL, 0); }
+  CYC(b_+O(10), b_+OE(11)); alu_xor(gb, A);
+  CYC(b_+O(11), b_+OE(14)); W8(wInventorySubmenu) = A;
+  CYC(b_+O(14), b_+OE(17)); W8(wInventory_cbba) = A;
+  if (game_seasons) {
+    CYC(b_+S(17), b_+S(18)); A = alu_dec8(gb, A);
+    CYC(b_+S(18), b_+S(21)); W8(wInventory_activeText) = A;
+    CALL_C(b_+S(21), s_checkWhetherToDisplaySeasonInSubscreen_hook, SYM(checkWhetherToDisplaySeasonInSubscreen), b_+S(24));
+    if (F & FZ) CYCT(b_+S(24), b_+S(26));
+    else { CYC(b_+S(24), b_+S(26)); CYC(b_+S(26), b_+S(28)); A = 0x01; }
+    CYC(b_+S(28), b_+S(31)); W8(wInventory_submenu2CursorPos2) = A;
+  } else {
+    CYC(b_+17, b_+20); W8(wInventory_submenu2CursorPos2) = A;
+    CYC(b_+20, b_+21); A = alu_dec8(gb, A);
+    CYC(b_+21, b_+24); W8(wInventory_activeText) = A;
+  }
+  CALL_C(b_+O(24), loadCommonGraphics_hook, SYM(loadCommonGraphics), b_+OE(27));
+  CYC(b_+O(27), b_+OE(29)); A = 0x08;
+  CALL_C(b_+O(29), loadGfxHeader_hook, SYM(loadGfxHeader), b_+OE(32));
+  CYC(b_+O(32), b_+OE(34)); A = 0x06;
+  CALL_C(b_+O(34), loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+OE(37));
+  CYC(b_+O(37), b_+OE(39)); A = 0x0a;
+  CALL_C(b_+O(39), loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+OE(42));
+  CYC(b_+O(42), b_+OE(45)); SET_HL(SYM(getNumUnappraisedRings));
+  CYC(b_+O(45), b_+OE(47)); E = 0x3f;
+  CALL_C(b_+O(47), interBankCall_hook, 0x008a, b_+OE(50));
+  CALL_C(b_+O(50), func_02_55b2_hook, SYM(func_02_55b2), b_+OE(53));
+  CYC(b_+O(53), b_+OE(55)); A = 0x01;
+  CYC(b_+O(55), b_+OE(58)); W8(wMenuActiveState) = A;
+  CALL_C(b_+O(58), fastFadeinFromWhite_hook, SYM(fastFadeinFromWhite), b_+OE(61));
+  CYC(b_+O(61), b_+OE(63)); A = 0x03;
+  CYC(b_+O(63), b_+OE(66)); TAIL(loadGfxRegisterStateIndex);
 }
 
 void func_02_55a8_hook(GB *gb) {

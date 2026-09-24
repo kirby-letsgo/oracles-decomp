@@ -406,6 +406,7 @@
 00:25cb interactionSetAnimation_hook -
 00:25e4 _interactionNextAnimationFrame_hook -
 00:261d objectPreventLinkFromPassing_hook -
+00:2646 npcFaceLinkAndAnimate_hook -
 00:2686 interactionAnimateAsNpc_hook -
 00:2689 interactionPushLinkAwayAndUpdateDrawPriority_hook -
 00:268f returnIfScrollMode01Unset_hook -
@@ -566,8 +567,10 @@
 00:359c setEnemyTargetToLinkPosition_hook -
 00:3600 loadAnimationData_hook -
 00:3663 getIndexOfGashaSpotInRoom_hook -
+00:369b forceLoadRoom_hook -
 00:36b7 loadTilesetLayout_hook -
 00:3716 loadUniqueGfxHeader_hook -
+00:3737 loadTilesetGraphics_hook -
 00:376c updateTilesetUniqueGfx_hook -
 00:379c uniqueGfxFunc_380b_hook -
 00:37b9 loadTilesetUniqueGfx_hook -
@@ -575,6 +578,8 @@
 00:381a loadTilesetData_hook -
 00:3836 loadTilesetAndRoomLayout_hook -
 00:3894 loadRoomLayout_hook -
+00:3a06 generateVramTilesWithRoomChanges_hook -
+00:3a25 getTileMappingData_hook -
 00:3a4a setHlToTileMappingDataPlusATimes8_hook -
 00:3a52 setTile_hook -
 00:3a7c setInterleavedTile_hook -
@@ -673,6 +678,8 @@
 01:49c5 clearEnemiesWithEnabled2_hook -
 01:49cc clearPartsWithEnabled2_hook -
 01:49d1 clearObjectsWithEnabled2_hlpr_hook -
+01:49e5 playCompassSoundIfKeyInRoom_hook -
+01:4a17 playCompassSoundIfKeyInRoom__playSound_hook -
 01:4a1c updateLinkBeingShocked_hook -
 01:4a27 updateLinkBeingShocked__val00_hook -
 01:4a28 updateLinkBeingShocked__val01_hook -
@@ -718,6 +725,7 @@
 01:55d4 paletteFadeHandler04_hook -
 01:55e8 paletteThread_stop_hook -
 01:55f2 paletteThread_refreshPalettesAndStop_hook -
+01:55fc paletteFadeHandler05_hook -
 01:5628 paletteFadeHandler07_hook -
 01:5657 paletteFadeHandler08_hook -
 01:565d paletteFadeHandler08__seasonsFunc_01_5816_hook -
@@ -972,6 +980,7 @@
 02:54ef runInventoryMenu__inventoryMenuStates_hook -
 02:54fb showItemText1_hook -
 02:5500 showItemText2_hook -
+02:5529 inventoryMenuState0_hook -
 02:5572 func_02_55a8_hook -
 02:557c func_02_55b2_hook -
 02:5596 func_02_55b2__subScreen0_hook -
@@ -1346,6 +1355,8 @@
 04:46a8 findScreenEdgeWarpSource_hook -
 04:4712 func_04_4732_hook -
 04:4722 getLinkWarpQuadrant_hook -
+04:574c initializeAnimations_hook -
+04:5755 initializeAnimations__locFunc_hook -
 04:575e updateAnimations_hook -
 04:5773 updateAnimationQueue_hook -
 04:579a updateAnimationData_hook -
@@ -1680,6 +1691,7 @@
 06:4db4 clearSelfIfNoSeeds_hook -
 06:4dc7 parentItemGenericState1_hook -
 06:4dd1 parentItemCode_shovel_hook -
+06:4e89 parentItemCode_bombchu_hook -
 06:4eed tryPickupBombs_hook -
 06:4f13 makeLinkPickupObjectH_hook -
 06:52d0 checkNoOtherParentItemsInUse_hook -

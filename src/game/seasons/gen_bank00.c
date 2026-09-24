@@ -1133,41 +1133,6 @@ L_28bc:
   RET(0x28be); return;  // ret
 }
 
-// 00:369b
-void s_forceLoadRoom(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x369b, 2); alu_and(gb, 0x03);  // and $03
-  I(0x369d, 4); mem_wr(gb, 0xcc4e, A);  // ld ($cc4e),a
-  I(0x36a0, 1); A = B;  // ld a,b
-  I(0x36a1, 4); mem_wr(gb, 0xcc49, A);  // ld ($cc49),a
-  I(0x36a4, 1); A = C;  // ld a,c
-  I(0x36a5, 4); mem_wr(gb, 0xcc4c, A);  // ld ($cc4c),a
-  CALL(0x36a8, loadScreenMusicAndSetRoomPack_hook, 0x32dc, 0x36ab);  // call $32dc
-  CALL(0x36ab, loadTilesetData_hook, 0x381a, 0x36ae);  // call $381a
-L_36ae:
-  CALL(0x36ae, s_loadTilesetGraphics, 0x3737, 0x36b1);  // call $3737
-  CALL(0x36b1, loadTilesetAndRoomLayout_hook, 0x3836, 0x36b4);  // call $3836
-L_36b4:
-  I(0x36b4, 4); s_generateVramTilesWithRoomChanges(gb); return;  // jp $3a06
-}
-
-// 00:36ae
-void s_forceLoadRoom__afterCall36ae(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_36ae:
-  CALL(0x36ae, s_loadTilesetGraphics, 0x3737, 0x36b1);  // call $3737
-  CALL(0x36b1, loadTilesetAndRoomLayout_hook, 0x3836, 0x36b4);  // call $3836
-L_36b4:
-  I(0x36b4, 4); s_generateVramTilesWithRoomChanges(gb); return;  // jp $3a06
-}
-
-// 00:36b4
-void s_forceLoadRoom__afterCall36b4(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_36b4:
-  I(0x36b4, 4); s_generateVramTilesWithRoomChanges(gb); return;  // jp $3a06
-}
-
 // 00:0eb9
 void s_func_0eda__nextSprite(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1219,7 +1184,7 @@ void s_func_131f(GB *gb) {
   CALL(0x12f4, loadTilesetAndRoomLayout_hook, 0x3836, 0x12f7);  // call $3836
 L_12f7:
   CALL(0x12f7, loadRoomCollisions_hook, 0x1569, 0x12fa);  // call $1569
-  CALL(0x12fa, s_generateVramTilesWithRoomChanges, 0x3a06, 0x12fd);  // call $3a06
+  CALL(0x12fa, generateVramTilesWithRoomChanges_hook, 0x3a06, 0x12fd);  // call $3a06
   I(0x12fd, 2); A = 0x10;  // ld a,$10
   CALL(0x12ff, loadUncompressedGfxHeader_hook, 0x05b6, 0x1302);  // call $05b6
   I(0x1302, 4); A = mem_rd(gb, 0xcd22);  // ld a,($cd22)
@@ -1237,7 +1202,7 @@ void s_func_131f__afterCall12f7(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_12f7:
   CALL(0x12f7, loadRoomCollisions_hook, 0x1569, 0x12fa);  // call $1569
-  CALL(0x12fa, s_generateVramTilesWithRoomChanges, 0x3a06, 0x12fd);  // call $3a06
+  CALL(0x12fa, generateVramTilesWithRoomChanges_hook, 0x3a06, 0x12fd);  // call $3a06
   I(0x12fd, 2); A = 0x10;  // ld a,$10
   CALL(0x12ff, loadUncompressedGfxHeader_hook, 0x05b6, 0x1302);  // call $05b6
   I(0x1302, 4); A = mem_rd(gb, 0xcd22);  // ld a,($cd22)
@@ -1282,7 +1247,7 @@ L_1357:
   CALL(0x135d, loadTilesetAndRoomLayout_hook, 0x3836, 0x1360);  // call $3836
 L_1360:
   CALL(0x1360, loadRoomCollisions_hook, 0x1569, 0x1363);  // call $1569
-  CALL(0x1363, s_generateVramTilesWithRoomChanges, 0x3a06, 0x1366);  // call $3a06
+  CALL(0x1363, generateVramTilesWithRoomChanges_hook, 0x3a06, 0x1366);  // call $3a06
   SET_BC(POP(0x1366));  // pop bc
   I(0x1367, 1); A = B;  // ld a,b
   I(0x1368, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -1302,7 +1267,7 @@ L_1357:
   CALL(0x135d, loadTilesetAndRoomLayout_hook, 0x3836, 0x1360);  // call $3836
 L_1360:
   CALL(0x1360, loadRoomCollisions_hook, 0x1569, 0x1363);  // call $1569
-  CALL(0x1363, s_generateVramTilesWithRoomChanges, 0x3a06, 0x1366);  // call $3a06
+  CALL(0x1363, generateVramTilesWithRoomChanges_hook, 0x3a06, 0x1366);  // call $3a06
   SET_BC(POP(0x1366));  // pop bc
   I(0x1367, 1); A = B;  // ld a,b
   I(0x1368, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -1318,7 +1283,7 @@ void s_func_1383__afterCall1360(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_1360:
   CALL(0x1360, loadRoomCollisions_hook, 0x1569, 0x1363);  // call $1569
-  CALL(0x1363, s_generateVramTilesWithRoomChanges, 0x3a06, 0x1366);  // call $3a06
+  CALL(0x1363, generateVramTilesWithRoomChanges_hook, 0x3a06, 0x1366);  // call $3a06
   SET_BC(POP(0x1366));  // pop bc
   I(0x1367, 1); A = B;  // ld a,b
   I(0x1368, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
@@ -1440,28 +1405,6 @@ L_3481:
   RET(0x349f); return;  // ret
 }
 
-// 00:3a06
-void s_generateVramTilesWithRoomChanges(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3a06, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
-  I(0x3a08, 1); C = A;  // ld c,a
-  I(0x3a09, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  I(0x3a0b, 1); B = A;  // ld b,a
-  PUSH(0x3a0c, BC);  // push bc
-  I(0x3a0d, 2); A = 0x04;  // ld a,$04
-  I(0x3a0f, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3a11, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3a14, generateW3VramTilesAndAttributes_hook, 0x6ae4, 0x3a17);  // call $6ae4
-  CALL_ASM(0x3a17, 0x66ef, 0x3a1a); /* unported */  // call $66ef
-  SET_BC(POP(0x3a1a));  // pop bc
-  I(0x3a1b, 1); A = B;  // ld a,b
-  I(0x3a1c, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3a1e, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  I(0x3a21, 1); A = C;  // ld a,c
-  I(0x3a22, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x3a24); return;  // ret
-}
-
 // 00:10c4
 void s_getChestData__chestNotFound(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1530,35 +1473,6 @@ void s_getSimulatedInput__returnInput(GB *gb) {
 L_29c1:
   I(0x29c1, 4); A = mem_rd(gb, 0xcbc9);  // ld a,($cbc9)
   RET(0x29c4); return;  // ret
-}
-
-// 00:3a25
-void s_getTileMappingData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3a25, 1); C = A;  // ld c,a
-  I(0x3a26, 3); A = mem_rd(gb, 0xff70);  // ldh a,($ff70)
-  PUSH(0x3a28, AF);  // push af
-  I(0x3a29, 2); A = 0x03;  // ld a,$03
-  I(0x3a2b, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x3a2d, 1); A = C;  // ld a,c
-  CALL(0x3a2e, setHlToTileMappingDataPlusATimes8_hook, 0x3a4a, 0x3a31);  // call $3a4a
-  PUSH(0x3a31, DE);  // push de
-  I(0x3a32, 3); SET_DE(0xcec0);  // ld de,$cec0
-  I(0x3a35, 2); B = 0x08;  // ld b,$08
-L_3a37:
-  I(0x3a37, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x3a38, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x3a39, 1); E = alu_inc8(gb, E);  // inc e
-  I(0x3a3a, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x3a3b, 3); goto L_3a37; } I(0x3a3b, 2);  // jr nz,$3a37
-  SET_DE(POP(0x3a3d));  // pop de
-  I(0x3a3e, 4); A = mem_rd(gb, 0xcec4);  // ld a,($cec4)
-  I(0x3a41, 1); B = A;  // ld b,a
-  I(0x3a42, 4); A = mem_rd(gb, 0xcec0);  // ld a,($cec0)
-  I(0x3a45, 1); C = A;  // ld c,a
-  SET_AF(POP(0x3a46));  // pop af
-  I(0x3a47, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x3a49); return;  // ret
 }
 
 // 00:0265
@@ -2700,32 +2614,6 @@ L_3870:
   RET(0x388f); return;  // ret
 }
 
-// 00:3737
-void s_loadTilesetGraphics(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3737, 3); A = mem_rd(gb, 0xff97);  // ldh a,($ff97)
-  PUSH(0x3739, AF);  // push af
-  I(0x373a, 4); A = mem_rd(gb, 0xcd21);  // ld a,($cd21)
-  CALL(0x373d, loadGfxHeader_hook, 0x0602, 0x3740);  // call $0602
-  I(0x3740, 4); A = mem_rd(gb, 0xcd22);  // ld a,($cd22)
-  CALL(0x3743, loadPaletteHeader_hook, 0x04e7, 0x3746);  // call $04e7
-  CALL(0x3746, loadTilesetUniqueGfx_hook, 0x37b9, 0x3749);  // call $37b9
-  I(0x3749, 2); A = 0x04;  // ld a,$04
-  I(0x374b, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x374d, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  CALL(0x3750, s_initializeAnimations, 0x574c, 0x3753);  // call $574c
-  I(0x3753, 4); A = mem_rd(gb, 0xcd20);  // ld a,($cd20)
-  I(0x3756, 4); mem_wr(gb, 0xcd28, A);  // ld ($cd28),a
-  I(0x3759, 4); A = mem_rd(gb, 0xcd22);  // ld a,($cd22)
-  I(0x375c, 4); mem_wr(gb, 0xcd29, A);  // ld ($cd29),a
-  I(0x375f, 4); A = mem_rd(gb, 0xcd25);  // ld a,($cd25)
-  I(0x3762, 4); mem_wr(gb, 0xcd2b, A);  // ld ($cd2b),a
-  SET_AF(POP(0x3765));  // pop af
-  I(0x3766, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
-  I(0x3768, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
-  RET(0x376b); return;  // ret
-}
-
 // 00:36dc
 void s_loadTilesetLayout__helper(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2828,43 +2716,6 @@ void s_makeActiveObjectFollowLink_b00(GB *gb) {
   I(0x1819, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x181b, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   RET(0x181e); return;  // ret
-}
-
-// 00:2646
-void s_npcFaceLinkAndAnimate(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x2646, 2); E = 0x6c;  // ld e,$6c
-  I(0x2648, 2); A = 0x01;  // ld a,$01
-  I(0x264a, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x264b, 2); E = 0x6b;  // ld e,$6b
-  I(0x264d, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x264e, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { I(0x264f, 3); goto L_2674; } I(0x264f, 2);  // jr nz,$2674
-  I(0x2651, 2); C = 0x28;  // ld c,$28
-  CALL(0x2653, objectCheckLinkWithinDistance_hook, 0x1f60, 0x2656);  // call $1f60
-  if ((F & FC)) { I(0x2656, 3); goto L_265d; } I(0x2656, 2);  // jr c,$265d
-  I(0x2658, 2); L = 0x6c;  // ld l,$6c
-  I(0x265a, 3); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));  // dec (hl)
-  I(0x265b, 2); A = 0x04;  // ld a,$04
-L_265d:
-  I(0x265d, 1); B = A;  // ld b,a
-  I(0x265e, 1); alu_add(gb, A);  // add a
-  I(0x265f, 1); alu_add(gb, A);  // add a
-  I(0x2660, 1); H = D;  // ld h,d
-  I(0x2661, 2); L = 0x49;  // ld l,$49
-  I(0x2663, 2); alu_cp(gb, mem_rd(gb, HL));  // cp (hl)
-  if ((F & FZ)) { I(0x2664, 3); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686); } I(0x2664, 2);  // jr z,$2686
-  I(0x2666, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x2667, 2); B = alu_srl(gb, B);  // srl b
-  CALL(0x2669, s_seasonsFunc_2678_hook, 0x2678, 0x266c);  // call $2678
-  I(0x266c, 1); A = B;  // ld a,b
-  CALL(0x266d, interactionSetAnimation_hook, 0x25cb, 0x2670);  // call $25cb
-  I(0x2670, 2); E = 0x6b;  // ld e,$6b
-  I(0x2672, 2); A = 0x1e;  // ld a,$1e
-L_2674:
-  I(0x2674, 1); A = alu_dec8(gb, A);  // dec a
-  I(0x2675, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x2676, 3); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686);  // jr $2686
 }
 
 // 00:1af7

@@ -448,6 +448,19 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-24 (later still): DIFFERENT batch 7: generateVramTilesWithRoomChanges and
+  getTileMappingData (rewritten faithfully: real push/pop and calls; Seasons calls the tile
+  changes directly and copies the mapping inline), initializeAnimations (Seasons runs the loop
+  once inline), inventoryMenuState0 (Seasons season-display check), linkState01_sidescroll,
+  parentItemCode_bombchu (rewritten readable), loadTilesetGraphics, npcFaceLinkAndAnimate,
+  paletteFadeHandler05, playCompassSoundIfKeyInRoom (Seasons room 06:8b). Shared Seasons hooks
+  3,687 -> 3,698. Recording: `oracles --record` writes FILE.inputs.state (a machine snapshot plus
+  the input count) with every save and resumes from it instead of replaying (6 minutes -> instant);
+  a stale or foreign snapshot falls back to the replay. Proven: resume-from-snapshot ends in the
+  same state hash as a full replay. Headless `--state-out FILE` saves the state at the end of a run.
+  The recording now holds 142,176 frames. Gates: shadow verify 0 mismatches on both movies, ctest
+  10/10, native both, audits and lint 0.
+
 - 2026-09-24 (later): merged Fable's Seasons milestone 3 batches 5b-7 (through `f947eb9`):
   1,271 of 1,279 ranked Seasons-only routines hand-written, `tools/draft_rewrite.py`,
   `audit_addr.py`, `audit_bounds.py`. Merge fixes: `ofsmap.py`/`gameconst.py` skip

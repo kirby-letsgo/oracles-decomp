@@ -317,7 +317,7 @@ L_665f:
   I(0x665f, 2); E = 0x42;  // ld e,$42
   I(0x6661, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6662, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6663, 4); s_npcFaceLinkAndAnimate(gb); return; } I(0x6663, 3);  // jp z,$2646
+  if ((F & FZ)) { I(0x6663, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646); } I(0x6663, 3);  // jp z,$2646
   I(0x6666, 4); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686);  // jp $2686
 }
 
@@ -457,7 +457,7 @@ L_665f:
   I(0x665f, 2); E = 0x42;  // ld e,$42
   I(0x6661, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6662, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6663, 4); s_npcFaceLinkAndAnimate(gb); return; } I(0x6663, 3);  // jp z,$2646
+  if ((F & FZ)) { I(0x6663, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646); } I(0x6663, 3);  // jp z,$2646
   I(0x6666, 4); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686);  // jp $2686
 }
 
@@ -468,7 +468,7 @@ L_665f:
   I(0x665f, 2); E = 0x42;  // ld e,$42
   I(0x6661, 2); A = mem_rd(gb, DE);  // ld a,(de)
   I(0x6662, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { I(0x6663, 4); s_npcFaceLinkAndAnimate(gb); return; } I(0x6663, 3);  // jp z,$2646
+  if ((F & FZ)) { I(0x6663, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646); } I(0x6663, 3);  // jp z,$2646
   I(0x6666, 4); if (hook_is(gb, 0x2686, interactionAnimateAsNpc_hook)) { interactionAnimateAsNpc_hook(gb); return; } HANDOFF(0x2686);  // jp $2686
 }
 

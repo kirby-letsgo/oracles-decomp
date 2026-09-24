@@ -1661,29 +1661,34 @@ void paletteFadeHandler0d_hook(GB *gb) {
 
 void paletteFadeHandler05_hook(GB *gb) {
   BASE(paletteFadeHandler05);
-  CYC(b_+0, b_+1); alu_xor(gb, A);
-  CYC(b_+1, b_+3); mem_wr(gb, hFF8B, A);
-  CYC(b_+3, b_+6); A = mem_rd(gb, wPaletteThread_speed);
-  CYC(b_+6, b_+7); C = A;
-  CYC(b_+7, b_+10); A = mem_rd(gb, wPaletteThread_parameter);
-  CYC(b_+10, b_+11); A = alu_dec8(gb, A);
-  CYC(b_+11, b_+12); B = A;
-  CYC(b_+12, b_+15); A = mem_rd(gb, (wThreadStateBuffer + 31));
-  CYC(b_+15, b_+16); alu_sub(gb, C);
-  CYC(b_+16, b_+17); alu_cp(gb, B);
-  if (F & FZ) {
-    CYCT(b_+17, b_+19);
-    TAIL(paletteThread_stop);
+  CYC(b_+O(0), b_+OE(1)); alu_xor(gb, A);
+  CYC(b_+O(1), b_+OE(3)); mem_wr(gb, hFF8B, A);
+  if (game_seasons) {      // Seasons steps the fade offset by one instead of the thread speed
+    CYC(b_+S(3), b_+S(6)); A = mem_rd(gb, wPaletteThread_parameter);
+    CYC(b_+S(6), b_+S(7)); A = alu_dec8(gb, A);
+    CYC(b_+S(7), b_+S(8)); B = A;
+    CYC(b_+S(8), b_+S(11)); A = mem_rd(gb, (wThreadStateBuffer + 31));
+    CYC(b_+S(11), b_+S(12)); A = alu_dec8(gb, A);
+    CYC(b_+S(12), b_+S(13)); alu_cp(gb, B);
+    if (F & FZ) { CYCT(b_+S(13), b_+S(15)); TAIL(paletteThread_stop); }
+    CYC(b_+S(13), b_+S(15));
+  } else {
+    CYC(b_+3, b_+6); A = mem_rd(gb, wPaletteThread_speed);
+    CYC(b_+6, b_+7); C = A;
+    CYC(b_+7, b_+10); A = mem_rd(gb, wPaletteThread_parameter);
+    CYC(b_+10, b_+11); A = alu_dec8(gb, A);
+    CYC(b_+11, b_+12); B = A;
+    CYC(b_+12, b_+15); A = mem_rd(gb, (wThreadStateBuffer + 31));
+    CYC(b_+15, b_+16); alu_sub(gb, C);
+    CYC(b_+16, b_+17); alu_cp(gb, B);
+    if (F & FZ) { CYCT(b_+17, b_+19); TAIL(paletteThread_stop); }
+    CYC(b_+17, b_+19);
+    if (F & FC) { CYCT(b_+19, b_+21); TAIL(paletteThread_stop); }
+    CYC(b_+19, b_+21);
   }
-  CYC(b_+17, b_+19);
-  if (F & FC) {
-    CYCT(b_+19, b_+21);
-    TAIL(paletteThread_stop);
-  }
-  CYC(b_+19, b_+21);
-  CYC(b_+21, b_+24); mem_wr(gb, (wThreadStateBuffer + 31), A);
-  CYC(b_+24, b_+25); C = A;
-  CYC(b_+25, b_+28); TAIL(updateFadingPalettes);
+  CYC(b_+O(21), b_+OE(24)); mem_wr(gb, (wThreadStateBuffer + 31), A);
+  CYC(b_+O(24), b_+OE(25)); C = A;
+  CYC(b_+O(25), b_+OE(28)); TAIL(updateFadingPalettes);
 }
 
 void paletteFadeHandler0e_hook(GB *gb) {
@@ -3944,36 +3949,48 @@ void clearObjectsWithEnabled2_hlpr_hook(GB *gb) {
 void playCompassSoundIfKeyInRoom_hook(GB *gb) {
   BASE(playCompassSoundIfKeyInRoom);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); A = mem_rd(gb, wMenuDisabled);
-  CYC(b_+3, b_+4); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+4, b_+5); ret_effect(gb); return; }
-  CYC(b_+4, b_+5);
-  CYC(b_+5, b_+8); A = mem_rd(gb, wDungeonIndex);
-  CYC(b_+8, b_+10); alu_cp(gb, 0xff);
-  if (F & FZ) { CYCT(b_+10, b_+11); ret_effect(gb); return; }
-  CYC(b_+10, b_+11);
-  CYC(b_+11, b_+14); SET_HL(wDungeonCompasses);
-  CALL_C(b_+14, checkFlag_hook, SYM(checkFlag), b_+17);
-  if (F & FZ) { CYCT(b_+17, b_+18); ret_effect(gb); return; }
-  CYC(b_+17, b_+18);
-  CALL_C(b_+18, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+21);
-  CYC(b_+21, b_+23); alu_and(gb, 0x20);
-  if (!(F & FZ)) { CYCT(b_+23, b_+24); ret_effect(gb); return; }
-  CYC(b_+23, b_+24);
-  CYC(b_+24, b_+27); A = mem_rd(gb, wDungeonRoomProperties);
-  CYC(b_+27, b_+29); alu_and(gb, 0x70);
-  CYC(b_+29, b_+31); alu_cp(gb, 0x30);
-  if (F & FZ) { CYCT(b_+31, b_+33); playCompassSoundIfKeyInRoom__playSound_hook(gb); return; }
-  CYC(b_+31, b_+33);
-  CYC(b_+33, b_+35); alu_cp(gb, 0x10);
-  if (!(F & FZ)) { CYCT(b_+35, b_+36); ret_effect(gb); return; }
-  CYC(b_+35, b_+36); TAIL(playCompassSoundIfKeyInRoom__playSound);
+  CYC(b_+O(0), b_+OE(3)); A = mem_rd(gb, wMenuDisabled);
+  CYC(b_+O(3), b_+OE(4)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(4), b_+OE(5)); ret_effect(gb); return; }
+  CYC(b_+O(4), b_+OE(5));
+  CYC(b_+O(5), b_+OE(8)); A = mem_rd(gb, wDungeonIndex);
+  CYC(b_+O(8), b_+OE(10)); alu_cp(gb, 0xff);
+  if (F & FZ) { CYCT(b_+O(10), b_+OE(11)); ret_effect(gb); return; }
+  CYC(b_+O(10), b_+OE(11));
+  CYC(b_+O(11), b_+OE(14)); SET_HL(wDungeonCompasses);
+  CALL_C(b_+O(14), checkFlag_hook, SYM(checkFlag), b_+OE(17));
+  if (F & FZ) { CYCT(b_+O(17), b_+OE(18)); ret_effect(gb); return; }
+  CYC(b_+O(17), b_+OE(18));
+  CALL_C(b_+O(18), getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+OE(21));
+  CYC(b_+O(21), b_+OE(23)); alu_and(gb, 0x20);
+  if (!(F & FZ)) { CYCT(b_+O(23), b_+OE(24)); ret_effect(gb); return; }
+  CYC(b_+O(23), b_+OE(24));
+  if (game_seasons) {      // the Seasons compass also chimes in dungeon room 06:8b
+    CYC(b_+S(24), b_+S(27)); A = W8(wActiveGroup);
+    CYC(b_+S(27), b_+S(29)); alu_cp(gb, 0x06);
+    if (!(F & FZ)) CYCT(b_+S(29), b_+S(31));
+    else {
+      CYC(b_+S(29), b_+S(31));
+      CYC(b_+S(31), b_+S(34)); A = W8(wActiveRoom);
+      CYC(b_+S(34), b_+S(36)); alu_cp(gb, 0x8b);
+      if (F & FZ) { CYCT(b_+S(36), b_+S(38)); playCompassSoundIfKeyInRoom__playSound_hook(gb); return; }
+      CYC(b_+S(36), b_+S(38));
+    }
+  }
+  CYC(b_+O(24), b_+OE(27)); A = mem_rd(gb, wDungeonRoomProperties);
+  CYC(b_+O(27), b_+OE(29)); alu_and(gb, 0x70);
+  CYC(b_+O(29), b_+OE(31)); alu_cp(gb, 0x30);
+  if (F & FZ) { CYCT(b_+O(31), b_+OE(33)); playCompassSoundIfKeyInRoom__playSound_hook(gb); return; }
+  CYC(b_+O(31), b_+OE(33));
+  CYC(b_+O(33), b_+OE(35)); alu_cp(gb, 0x10);
+  if (!(F & FZ)) { CYCT(b_+O(35), b_+OE(36)); ret_effect(gb); return; }
+  CYC(b_+O(35), b_+OE(36)); TAIL(playCompassSoundIfKeyInRoom__playSound);
 }
 
 void playCompassSoundIfKeyInRoom__playSound_hook(GB *gb) {
   BASE(playCompassSoundIfKeyInRoom);
-  CYC(b_+36, b_+38); A = 0xa2;
-  CYC(b_+38, b_+41); TAIL(playSound_b00);
+  CYC(b_+O(36), b_+OE(38)); A = 0xa2;
+  CYC(b_+O(38), b_+OE(41)); TAIL(playSound_b00);
 }
 
 void updateLinkBeingShocked_hook(GB *gb) {

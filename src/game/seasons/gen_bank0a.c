@@ -1225,7 +1225,7 @@ L_4f66:
 L_4f7b:
   CALL(0x4f7b, interactionRunScript_hook, 0x250c, 0x4f7e);  // call $250c
 L_4f7e:
-  I(0x4f7e, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x4f7e, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:4f60
@@ -1247,7 +1247,7 @@ L_4f66:
 L_4f7b:
   CALL(0x4f7b, interactionRunScript_hook, 0x250c, 0x4f7e);  // call $250c
 L_4f7e:
-  I(0x4f7e, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x4f7e, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:4f66
@@ -1265,7 +1265,7 @@ L_4f66:
 L_4f7b:
   CALL(0x4f7b, interactionRunScript_hook, 0x250c, 0x4f7e);  // call $250c
 L_4f7e:
-  I(0x4f7e, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x4f7e, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:4f7b
@@ -1274,14 +1274,14 @@ void s_interactionCode8f__state1(GB *gb) {
 L_4f7b:
   CALL(0x4f7b, interactionRunScript_hook, 0x250c, 0x4f7e);  // call $250c
 L_4f7e:
-  I(0x4f7e, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x4f7e, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:4f7e
 void s_interactionCode8f__afterCall4f7e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4f7e:
-  I(0x4f7e, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x4f7e, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:4f81
@@ -7374,7 +7374,7 @@ L_585a:
 L_5875:
   CALL(0x5875, interactionRunScript_hook, 0x250c, 0x5878);  // call $250c
 L_5878:
-  I(0x5878, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x5878, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:585a
@@ -7400,7 +7400,7 @@ L_585a:
 L_5875:
   CALL(0x5875, interactionRunScript_hook, 0x250c, 0x5878);  // call $250c
 L_5878:
-  I(0x5878, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x5878, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:5875
@@ -7409,14 +7409,14 @@ void s_interactionCode99__state1(GB *gb) {
 L_5875:
   CALL(0x5875, interactionRunScript_hook, 0x250c, 0x5878);  // call $250c
 L_5878:
-  I(0x5878, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x5878, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:5878
 void s_interactionCode99__afterCall5878(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_5878:
-  I(0x5878, 4); s_npcFaceLinkAndAnimate(gb); return;  // jp $2646
+  I(0x5878, 4); if (hook_is(gb, 0x2646, npcFaceLinkAndAnimate_hook)) { npcFaceLinkAndAnimate_hook(gb); return; } HANDOFF(0x2646);  // jp $2646
 }
 
 // 0a:6075

@@ -449,9 +449,6 @@ void s_enemyStandardUpdate__stunned(GB *gb);
 void s_enemyStandardUpdate__reachedGround(GB *gb);
 void s_enemyStandardUpdate__ret02(GB *gb);
 void s_flameOfDestructionsCutsceneCaller_hook(GB *gb);
-void s_forceLoadRoom(GB *gb);
-void s_forceLoadRoom__afterCall36ae(GB *gb);
-void s_forceLoadRoom__afterCall36b4(GB *gb);
 void s_func_0eda__nextSprite(GB *gb);
 void s_func_0eda__end(GB *gb);
 void s_func_131f(GB *gb);
@@ -464,7 +461,6 @@ void s_func_3539__afterCall346d(GB *gb);
 void s_func_3539__afterCall3477(GB *gb);
 void s_func_3539__afterCall3481(GB *gb);
 void s_func_35ec_hook(GB *gb);
-void s_generateVramTilesWithRoomChanges(GB *gb);
 void s_getChestData__chestNotFound(GB *gb);
 void s_getChestData__end(GB *gb);
 void s_getLinkedHerosCaveSideEntranceRoom_hook(GB *gb);
@@ -472,7 +468,6 @@ void s_getPositionOffsetForVelocity__invalid(GB *gb);
 void s_getScaledPositionOffsetForVelocity__scaleComponent(GB *gb);
 void s_getSimulatedInput__returnInput(GB *gb);
 void s_getSunkenCityNPCVisibleSubId_caller_hook(GB *gb);
-void s_getTileMappingData(GB *gb);
 void s_hexToDec__doneHundreds(GB *gb);
 void s_initializeRoom(GB *gb);
 void s_initializeRoom__afterCall301a(GB *gb);
@@ -516,13 +511,11 @@ void s_loadRoomLayout__checkDeNextLayoutRow(GB *gb);
 void s_loadRoomLayout__decompressLayoutHelper(GB *gb);
 void s_loadRoomLayout__loadLayoutData(GB *gb);
 void s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains(GB *gb);
-void s_loadTilesetGraphics(GB *gb);
 void s_loadTilesetLayout__helper(GB *gb);
 void s_loadUniqueGfxHeaderEntry__loadPaletteIndex(GB *gb);
 void s_mainThreadStart__mainThread(GB *gb);
 void s_makeActiveObjectFollowLink_b00(GB *gb);
 void s_multiIntroCutsceneCaller_hook(GB *gb);
-void s_npcFaceLinkAndAnimate(GB *gb);
 void s_objectAddToAButtonSensitiveObjectList__next(GB *gb);
 void s_objectAddToAButtonSensitiveObjectList__foundBlankEntry(GB *gb);
 void s_objectApplyComponentSpeed__addSpeedComponent(GB *gb);
@@ -1137,10 +1130,7 @@ void s_initializeGame__resetHealth(GB *gb);
 void s_initializeGame__summonLinkCutscene(GB *gb);
 void s_initializeSeedTreeRefillData(GB *gb);
 void s_makeActiveObjectFollowLink_b01(GB *gb);
-void s_paletteFadeHandler05(GB *gb);
 void s_paletteFadeHandler06(GB *gb);
-void s_playCompassSoundIfKeyInRoom(GB *gb);
-void s_playCompassSoundIfKeyInRoom__playSound(GB *gb);
 void s_screenTransitionEyePuzzle__up(GB *gb);
 void s_screenTransitionEyePuzzle__rightOrLeft(GB *gb);
 void s_screenTransitionLostWoods_hook(GB *gb);
@@ -2312,7 +2302,6 @@ void s_nextToTileWithInfoText__rock(GB *gb);
 void s_parentItemCode_biggoronSword(GB *gb);
 void s_parentItemCode_bomb(GB *gb);
 void s_parentItemCode_bomb__state0(GB *gb);
-void s_parentItemCode_bombchu(GB *gb);
 void s_parentItemCode_bombchu__state0(GB *gb);
 void s_parentItemCode_boomerang(GB *gb);
 void s_parentItemCode_boomerang__state0(GB *gb);
@@ -3495,8 +3484,6 @@ void s_getLinkWarpQuadrant__largeRoom(GB *gb);
 void s_getMoblinKeepScreenIndex_hook(GB *gb);
 void s_getMoblinKeepSeasonsTilesetData_hook(GB *gb);
 void s_getTempleRemainsSeasonsTilesetData_hook(GB *gb);
-void s_initializeAnimations(GB *gb);
-void s_initializeAnimations__locFunc(GB *gb);
 void s_label_04_033(GB *gb);
 void s_label_04_035_hook(GB *gb);
 void s_label_04_036_hook(GB *gb);
@@ -4467,10 +4454,6 @@ void s_inventoryMenuDrawSprites__drawIfOnSubscreen1(GB *gb);
 void s_inventoryMenuDrawSprites__menuScrolling(GB *gb);
 void s_inventoryMenuDrawSprites__drawSpriteWithXOffset(GB *gb);
 void s_inventoryMenuDrawSprites__drawSprite(GB *gb);
-void s_inventoryMenuState0(GB *gb);
-void s_inventoryMenuState0__afterCall554b(GB *gb);
-void s_inventoryMenuState0__afterCall5562(GB *gb);
-void s_inventoryMenuState0__afterCall5565(GB *gb);
 void s_inventoryMenuState1(GB *gb);
 void s_inventoryMenuState1__func_02_5606(GB *gb);
 void s_inventoryMenuState1__subscreen0(GB *gb);
@@ -5713,6 +5696,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_interactionSetAnimation interactionSetAnimation_hook
 #define s__interactionNextAnimationFrame _interactionNextAnimationFrame_hook
 #define s_objectPreventLinkFromPassing objectPreventLinkFromPassing_hook
+#define s_npcFaceLinkAndAnimate npcFaceLinkAndAnimate_hook
 #define s_interactionAnimateAsNpc interactionAnimateAsNpc_hook
 #define s_interactionPushLinkAwayAndUpdateDrawPriority interactionPushLinkAwayAndUpdateDrawPriority_hook
 #define s_returnIfScrollMode01Unset returnIfScrollMode01Unset_hook
@@ -5871,8 +5855,10 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_setEnemyTargetToLinkPosition setEnemyTargetToLinkPosition_hook
 #define s_loadAnimationData loadAnimationData_hook
 #define s_getIndexOfGashaSpotInRoom getIndexOfGashaSpotInRoom_hook
+#define s_forceLoadRoom forceLoadRoom_hook
 #define s_loadTilesetLayout loadTilesetLayout_hook
 #define s_loadUniqueGfxHeader loadUniqueGfxHeader_hook
+#define s_loadTilesetGraphics loadTilesetGraphics_hook
 #define s_updateTilesetUniqueGfx updateTilesetUniqueGfx_hook
 #define s_uniqueGfxFunc_380b uniqueGfxFunc_380b_hook
 #define s_loadTilesetUniqueGfx loadTilesetUniqueGfx_hook
@@ -5880,6 +5866,8 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_loadTilesetData loadTilesetData_hook
 #define s_loadTilesetAndRoomLayout loadTilesetAndRoomLayout_hook
 #define s_loadRoomLayout loadRoomLayout_hook
+#define s_generateVramTilesWithRoomChanges generateVramTilesWithRoomChanges_hook
+#define s_getTileMappingData getTileMappingData_hook
 #define s_setHlToTileMappingDataPlusATimes8 setHlToTileMappingDataPlusATimes8_hook
 #define s_setTile setTile_hook
 #define s_setInterleavedTile setInterleavedTile_hook
@@ -5944,6 +5932,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_clearEnemiesWithEnabled2 clearEnemiesWithEnabled2_hook
 #define s_clearPartsWithEnabled2 clearPartsWithEnabled2_hook
 #define s_clearObjectsWithEnabled2_hlpr clearObjectsWithEnabled2_hlpr_hook
+#define s_playCompassSoundIfKeyInRoom playCompassSoundIfKeyInRoom_hook
 #define s_updateLinkBeingShocked updateLinkBeingShocked_hook
 #define s_initiateFallDownHoleWarp initiateFallDownHoleWarp_hook
 #define s_cutscene17 cutscene17_hook
@@ -5968,6 +5957,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_paletteFadeHandler04 paletteFadeHandler04_hook
 #define s_paletteThread_stop paletteThread_stop_hook
 #define s_paletteThread_refreshPalettesAndStop paletteThread_refreshPalettesAndStop_hook
+#define s_paletteFadeHandler05 paletteFadeHandler05_hook
 #define s_paletteFadeHandler07 paletteFadeHandler07_hook
 #define s_paletteFadeHandler08 paletteFadeHandler08_hook
 #define s_paletteThread_calculateFadingPalettes paletteThread_calculateFadingPalettes_hook
@@ -6117,6 +6107,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_runInventoryMenu runInventoryMenu_hook
 #define s_showItemText1 showItemText1_hook
 #define s_showItemText2 showItemText2_hook
+#define s_inventoryMenuState0 inventoryMenuState0_hook
 #define s_func_02_55a8 func_02_55a8_hook
 #define s_func_02_55b2 func_02_55b2_hook
 #define s_inventoryMenuState3 inventoryMenuState3_hook
@@ -6389,6 +6380,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_findScreenEdgeWarpSource findScreenEdgeWarpSource_hook
 #define s_func_04_4732 func_04_4732_hook
 #define s_getLinkWarpQuadrant getLinkWarpQuadrant_hook
+#define s_initializeAnimations initializeAnimations_hook
 #define s_updateAnimations updateAnimations_hook
 #define s_updateAnimationQueue updateAnimationQueue_hook
 #define s_updateAnimationData updateAnimationData_hook
@@ -6712,6 +6704,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_clearSelfIfNoSeeds clearSelfIfNoSeeds_hook
 #define s_parentItemGenericState1 parentItemGenericState1_hook
 #define s_parentItemCode_shovel parentItemCode_shovel_hook
+#define s_parentItemCode_bombchu parentItemCode_bombchu_hook
 #define s_tryPickupBombs tryPickupBombs_hook
 #define s_makeLinkPickupObjectH makeLinkPickupObjectH_hook
 #define s_checkNoOtherParentItemsInUse checkNoOtherParentItemsInUse_hook

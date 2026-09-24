@@ -717,32 +717,6 @@ L_4736:
   RET(0x473b); return;  // ret
 }
 
-// 04:574c
-void s_initializeAnimations(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x574c, 4); A = mem_rd(gb, 0xcd25);  // ld a,($cd25)
-  I(0x574f, 2); alu_cp(gb, 0xff);  // cp $ff
-  if ((F & FZ)) { RET_TAKEN(0x5751); return; } I(0x5751, 2);  // ret z
-  CALL(0x5752, loadAnimationData_hook, 0x3600, 0x5755);  // call $3600
-L_5755:
-  CALL(0x5755, updateAnimationData_hook, 0x579a, 0x5758);  // call $579a
-L_5758:
-  CALL(0x5758, updateAnimationQueue_hook, 0x5773, 0x575b);  // call $5773
-  if (!(F & FZ)) { I(0x575b, 3); goto L_5758; } I(0x575b, 2);  // jr nz,$5758
-  RET(0x575d); return;  // ret
-}
-
-// 04:5755
-void s_initializeAnimations__locFunc(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5755:
-  CALL(0x5755, updateAnimationData_hook, 0x579a, 0x5758);  // call $579a
-L_5758:
-  CALL(0x5758, updateAnimationQueue_hook, 0x5773, 0x575b);  // call $5773
-  if (!(F & FZ)) { I(0x575b, 3); goto L_5758; } I(0x575b, 2);  // jr nz,$5758
-  RET(0x575d); return;  // ret
-}
-
 // 04:45f8
 void s_label_04_033(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
