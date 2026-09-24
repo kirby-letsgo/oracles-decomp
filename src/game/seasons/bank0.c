@@ -439,3 +439,23 @@ void s_getLinkedHerosCaveSideEntranceRoom_hook(GB *gb) {
   RET(b_+23); return;
 }
 
+
+// setSeason in bank 0: the season for group 0 rooms (none past room pack $f0).
+void s_setSeason_b00_hook(GB *gb) {
+  BASE(setSeason);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+1); B = A;
+  CYC(b_+1, b_+4); A = mem_rd(gb, wActiveGroup);
+  CYC(b_+4, b_+5); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+9); A = mem_rd(gb, wRoomPack);
+  CYC(b_+9, b_+11); alu_cp(gb, 0xf1);
+  if (!(F & FC)) { RET_TAKEN(b_+11); return; }
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+13); A = B;
+  CYC(b_+13, b_+16); mem_wr(gb, wRoomStateModifier, A);
+  CYC(b_+16, b_+18); A = 0x02;
+  CYC(b_+18, b_+21); mem_wr(gb, wcc4c, A);
+  RET(b_+21); return;
+}

@@ -236,3 +236,4 @@ void s_func_54ae_hook(GB *gb) {
   CYC(b_+52, b_+53); mem_wr(gb, HL, A);
   RET(b_+53); return;
 }
+

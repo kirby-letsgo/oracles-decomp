@@ -432,29 +432,6 @@ L_424a:
   RET(0x4252); return;  // ret
 }
 
-// 0e:4446
-void s_ecom_seasonsFunc_4446_b0e(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4446, 1); B = A;  // ld b,a
-  I(0x4447, 4); A = mem_rd(gb, 0xcc79);  // ld a,($cc79)
-  I(0x444a, 1); alu_or(gb, A);  // or a
-  I(0x444b, 1); A = B;  // ld a,b
-  if ((F & FZ)) { I(0x444c, 4); if (hook_is(gb, 0x4051, ecom_checkHazards_b0f_hook)) { ecom_checkHazards_b0f_hook(gb); return; } HANDOFF(0x4051); } I(0x444c, 3);  // jp z,$4051
-  I(0x444f, 1); H = D;  // ld h,d
-  I(0x4450, 2); L = 0xbf;  // ld l,$bf
-  I(0x4452, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 1)));  // res 1,(hl)
-  I(0x4454, 2); L = 0xa4;  // ld l,$a4
-  I(0x4456, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7)));  // set 7,(hl)
-  PUSH(0x4458, AF);  // push af
-  CALL(0x4459, objectGetAngleTowardLink_hook, 0x1e5a, 0x445c);  // call $1e5a
-  I(0x445c, 1); C = A;  // ld c,a
-  I(0x445d, 2); B = 0x14;  // ld b,$14
-  CALL(0x445f, ecom_applyGivenVelocity_b0f_hook, 0x4138, 0x4462);  // call $4138
-  SET_AF(POP(0x4462));  // pop af
-  I(0x4463, 1); alu_or(gb, A);  // or a
-  RET(0x4464); return;  // ret
-}
-
 // 0e:43f9
 void s_ecom_updateAnimationFromAngle__setAnimation_b0e(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

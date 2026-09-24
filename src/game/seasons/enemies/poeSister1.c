@@ -68,9 +68,11 @@ static void poeSister1_state11(GB *gb) {
 static void poeSister1_state10(GB *gb) {
   BASE(enemyCode76);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  goto state10;
 animate:
   CYC(b_+318, b_+321);
   TAIL(enemyAnimate);
+state10:
   CYC(b_+321, b_+322); H = D;
   CYC(b_+322, b_+324); L = ENEMY_BASE + OBJ_VAR34;
   CALL_C(b_+324, s_ecom_readPositionVars, SYM(ecom_readPositionVars_b0d), b_+327);

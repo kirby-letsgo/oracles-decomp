@@ -46,10 +46,12 @@ static void manhandla_add_a_to_hl(GB *gb, uint16_t return_address) {
 static void manhandla_subid1_func_78ce(GB *gb) {
   BASE(enemyCode7d);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  goto subid1_func_78ce;
 subid1_animate:
   CYC(b_+286, b_+289);
   TAIL(enemyAnimate);
 
+subid1_func_78ce:
   CYC(b_+293, b_+294); L = E;
   CYC(b_+294, b_+296); mem_wr(gb, HL, 0x09);
   CALL_C(b_+296, s_getRandomNumber_noPreserveVars, SYM(getRandomNumber_noPreserveVars), b_+299);

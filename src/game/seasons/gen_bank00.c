@@ -3434,23 +3434,6 @@ L_11e5:
   RET(0x11eb); return;  // ret
 }
 
-// 00:3a9c
-void s_setSeason_b00(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x3a9c, 1); B = A;  // ld b,a
-  I(0x3a9d, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x3aa0, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x3aa1); return; } I(0x3aa1, 2);  // ret nz
-  I(0x3aa2, 4); A = mem_rd(gb, 0xcc4d);  // ld a,($cc4d)
-  I(0x3aa5, 2); alu_cp(gb, 0xf1);  // cp $f1
-  if (!(F & FC)) { RET_TAKEN(0x3aa7); return; } I(0x3aa7, 2);  // ret nc
-  I(0x3aa8, 1); A = B;  // ld a,b
-  I(0x3aa9, 4); mem_wr(gb, 0xcc4e, A);  // ld ($cc4e),a
-  I(0x3aac, 2); A = 0x02;  // ld a,$02
-  I(0x3aae, 4); mem_wr(gb, 0xcc68, A);  // ld ($cc68),a
-  RET(0x3ab1); return;  // ret
-}
-
 // 00:2ce9
 void s_specialObjectCode_linkInCutscene_b00(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

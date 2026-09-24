@@ -220,7 +220,7 @@ def need_helper(pending, tb, t):
     if pending is not None: pending[key] = (on, (tb, o), fname)
     return fname
 
-def draft(name, start=None, helper=None, pending=None, owner=None):
+def draft(name, start=None, helper=None, pending=None, owner=None, hookname=None):
     bank, lo = owner if owner else tops[name]
     base_label = name
     if noncanonical(bank, lo):
@@ -275,7 +275,7 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
     if helper:
         out = [f'// {locs.get((bank, entry), name + ("+" + str(entry - lo) if entry != lo else ""))}', f'static void {helper}(GB *gb) {{', f'  BASE({symref(base_label)});', '  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;']
     else:
-        out = [f'void s_{name}_hook(GB *gb) {{', f'  BASE({symref(base_label)});', '  uint16_t sp0_ = gb->sp; (void)sp0_;']
+        out = [f'void s_{hookname or name}_hook(GB *gb) {{', f'  BASE({symref(base_label)});', '  uint16_t sp0_ = gb->sp; (void)sp0_;']
     def lab(t):
         l = locs.get((bank, t))
         r = (l.split('@', 1)[1] if l else f'L_{t:04x}').replace('@', '_')
@@ -288,8 +288,29 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
         if t < 0x4000: return 0
         if bank == 0: return rombank[0]
         return bank
+    def hname(tb, t):
+        n = name_at.get((tb, t))
+        if n is None: return None
+        if not noncanonical(tb, t) and hooked(n): return n
+        sfx = f'{n}_b{tb:02x}'
+        return sfx if sfx in hand else None
     def is_c(tb, t):
-        return (tb, t) in name_at and not noncanonical(tb, t) and hooked(name_at[(tb, t)])
+        return hname(tb, t) is not None
+    def addr_expr(tb, t):
+        n = name_at[(tb, t)]
+        if not noncanonical(tb, t): return f'SYM({symref(n)})'
+        if tb == bank:
+            d = t - base
+            return f'(b_ + {d})' if d >= 0 else f'(b_ - {-d})'
+        cb = canonical_base(tb, t)
+        return f'(SYM({symref(name_at[(tb, cb)])}) + {t - cb})'
+    def c_tail(tb, t):
+        hn = hname(tb, t)
+        if hn != name_at[(tb, t)]: return f'{fn_of(hn)}(gb); return;'
+        return tail_of(hn)
+    if entry != min(seen):
+        labels.add(entry)
+        out.append(f'  goto {lab(entry)};')
     prev_end = None
     for a in sorted(seen):
         op = rd(bank, a); n = seen[a]; e = a + n; x, y = a - base, e - base
@@ -309,7 +330,7 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
             elif tb is None:
                 go = f'/* TODO jump to {hex(t)} in an unknown bank */ HANDOFF(0x{t:04x});'
             elif is_c(tb, t):
-                go = tail_of(name_at[(tb, t)])
+                go = c_tail(tb, t)
             else:
                 f = need_helper(pending, tb, t)
                 go = f'{f}(gb); return;' if f else f'/* TODO jump to {hex(t)} */ HANDOFF(0x{t:04x});'
@@ -374,9 +395,9 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
         elif op in (0xcd, 0xc4, 0xcc, 0xd4, 0xdc):
             t = n16; tb = tbank(t)
             if tb is not None and is_c(tb, t):
-                nm = name_at[(tb, t)]
-                c1 = f'CALL_C(b_+{x}, {fn_of(nm)}, SYM({symref(nm)}), b_+{y});'
-                c2 = f'CALL_C_CC(b_+{x}, {fn_of(nm)}, SYM({symref(nm)}), b_+{y});'
+                hn = hname(tb, t)
+                c1 = f'CALL_C(b_+{x}, {fn_of(hn)}, {addr_expr(tb, t)}, b_+{y});'
+                c2 = f'CALL_C_CC(b_+{x}, {fn_of(hn)}, {addr_expr(tb, t)}, b_+{y});'
             else:
                 f = need_helper(pending, tb, t) if tb is not None else None
                 if f:
@@ -400,8 +421,8 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
                 tb = bank if t >= 0x4000 else 0
                 if lo <= t < hi: lines.append(f'    if (jt_ == b_+{t - base}) goto {lab(t)};')
                 elif is_c(tb, t):
-                    nm = name_at[(tb, t)]; f = fn_of(nm)
-                    lines.append(f'    if (jt_ == SYM({symref(nm)}) && hook_is(gb, SYM({symref(nm)}), {f})) {{ {f}(gb); return; }}')
+                    f = fn_of(hname(tb, t)); ae = addr_expr(tb, t)
+                    lines.append(f'    if (jt_ == {ae} && hook_is(gb, {ae}, {f})) {{ {f}(gb); return; }}')
                 else:
                     f = need_helper(pending, tb, t)
                     d = t - base
@@ -416,7 +437,7 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
         elif op not in KEEPS_A: last_a[0] = None
         if e == hi and op not in (0x18, 0xc3, 0xc9, 0xd9, 0xe9, 0xc7) and (bank, hi) in name_at:
             if is_c(bank, hi):
-                out.append(f'  {fn_of(name_at[(bank, hi)])}(gb); return; // falls through')
+                out.append(f'  {fn_of(hname(bank, hi))}(gb); return; // falls through')
             else:
                 out.append(f'  {need_helper(pending, bank, hi)}(gb); return; // falls through')
     out.append('}')
@@ -425,7 +446,12 @@ def draft(name, start=None, helper=None, pending=None, owner=None):
 pending, done = {}, set()
 for n in args:
     helpers = []
-    main = draft(n, pending=pending)
+    if ':' in n:
+        n, bk = n.split(':'); bk = int(bk, 16)
+        addr = next(a for (b, a), nm in name_at.items() if b == bk and nm == n)
+        main = draft(n, pending=pending, owner=(bk, addr), hookname=f'{n}_b{bk:02x}')
+    else:
+        main = draft(n, pending=pending)
     while set(pending) - done:
         key = min(set(pending) - done); done.add(key)
         on, okey, fname = pending[key]
