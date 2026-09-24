@@ -345,6 +345,7 @@ subid1:
     if (jt_ == b_+424) goto subid1_state8;
     if (jt_ == b_+452) goto subid1_state9;
     if (jt_ == b_+326) goto subid0_stateA;
+    if (jt_ == b_+385) goto subid0_stateB;
     HANDOFF(HL);
   } while (0);
 subid1_state8:

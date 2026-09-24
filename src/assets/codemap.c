@@ -2363,7 +2363,8 @@ const CodeRange codemap_seasons[] = {
   {0x0124fb, 5},
   {0x012504, 5},
   {0x01250d, 5},
-  {0x012516, 54},
+  {0x012516, 2},
+  {0x012519, 51},
   {0x01255e, 83},
   {0x0125b5, 10},
   {0x0125c3, 31},
@@ -3925,4 +3926,4 @@ const CodeRange codemap_seasons[] = {
   {0x0fda86, 34},
   {0x0fdab0, 75},
 };
-const size_t codemap_seasons_n = 1856;
+const size_t codemap_seasons_n = 1857;

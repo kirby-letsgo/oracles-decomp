@@ -460,6 +460,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-24 (night): merged Fable's `33124fb` (Seasons milestone 3 complete: all 1,279 ranked
+  Seasons-only routines hand-written). Seasons playthrough extended to the full 142,176-frame
+  recording (reference re-recorded; first 87,496 frames identical). Shadow verify on the merged
+  tree: 0 mismatches over 23.7M calls, reference matched. The native build found two gaps past
+  frame 87k: brotherGoriyas' subid-1 jump table lacked its stateB entry (native has no
+  interpreter to fall back to; fixed), and loadAnimationData reads one code byte as data in
+  Seasons as it does in Ages (keep_code entry). New `tools/audit_jumptables.py` checks each C
+  jump-table chain against the ROM table: 23 hits in Seasons files to triage (Fable), 252 in
+  shared/Ages files, mostly dispatch forms the audit does not parse yet. Gates: ctest 10/10 with
+  the 142k playthrough and native both.
+
 - 2026-09-24 (later still): DIFFERENT batch 7: generateVramTilesWithRoomChanges and
   getTileMappingData (rewritten faithfully: real push/pop and calls; Seasons calls the tile
   changes directly and copies the mapping inline), initializeAnimations (Seasons runs the loop
