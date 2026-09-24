@@ -308,7 +308,7 @@ void applyWarpTransition2_hook(GB *gb) {
     CYC(b_+22, b_+23); ret_effect(gb);
     return;
   }
-  CYC(b_+23, b_+26); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+23, b_+26); A = W8(wLinkObjectIndex);
   CYC(b_+26, b_+28); alu_cp(gb, 0xd1);
   if (!(F & FZ)) {
     CYCT(b_+28, b_+30);

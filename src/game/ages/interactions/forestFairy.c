@@ -206,11 +206,11 @@ outside:
   CYC(b_+54, b_+55); A = mem_rd(gb, HL);
   if (!(F & FZ)) { CYCT(b_+55, b_+57); goto animation; }
   CYC(b_+55, b_+57);
-  CYC(b_+57, b_+60); mem_wr(gb, HL, 0x5a);
-  CYC(b_+60, b_+62); L = 0x47;
-  CYC(b_+62, b_+64); mem_wr(gb, HL, alu_srl(gb, mem_rd(gb, HL)));
-  if (!(F & FC)) { CYCT(b_+64, b_+66); goto decrement; }
-  CYC(b_+64, b_+66);
+  CYC(b_+57, b_+59); mem_wr(gb, HL, 0x5a);
+  CYC(b_+59, b_+61); L = 0x47;
+  CYC(b_+61, b_+63); mem_wr(gb, HL, alu_srl(gb, mem_rd(gb, HL)));
+  if (!(F & FC)) { CYCT(b_+63, b_+65); goto decrement; }
+  CYC(b_+63, b_+65);
   CYC(b_+65, b_+66); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
 animation:
   CYC(b_+66, b_+68); alu_and(gb, 7);

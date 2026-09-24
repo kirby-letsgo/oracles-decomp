@@ -335,6 +335,8 @@
 #define OBJ_KNOCKBACK_COUNTER 0x2d
 #define OBJ_STUN_COUNTER 0x2e
 #define OBJ_VAR2F 0x2f
+#define OBJ_VAR30 0x30
+#define OBJ_VAR31 0x31
 #define OBJ_USE_TEXT_ID 0x30
 #define OBJ_PRESSED_A_BUTTON 0x31
 #define OBJ_TEXT_ID 0x32

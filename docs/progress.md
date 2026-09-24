@@ -448,6 +448,23 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-24 (later): merged Fable's Seasons milestone 3 batches 5b-7 (through `f947eb9`):
+  1,271 of 1,279 ranked Seasons-only routines hand-written, `tools/draft_rewrite.py`,
+  `audit_addr.py`, `audit_bounds.py`. Merge fixes: `ofsmap.py`/`gameconst.py` skip
+  `src/game/seasons/` (ofsmap had rewritten Fable's Seasons offsets as `O()`); a routine in
+  `rewritten_seasons.txt` never gets the shared hook in the Seasons table (kingMoblinBomb_state2
+  had both). Ages bugs Fable found, fixed: applyWarpTransition2 read wActiveRoom for
+  wLinkObjectIndex; lcdInterrupt_clearWXY wrote WY/WX one instruction early; circularSidescroll
+  platform speed 0xc0 for $1e. All 33 audit_bounds sites triaged, about 20 real: collapsed
+  `ld a,(hl+)`/`ld b,a` (giantGhini, swoop), jr burned as 3 bytes (ramrockArms, veranFinal x2,
+  ghini, twinrova, bipin), backwards ranges that burned nothing (ramrockArms x2, ghini), double
+  burns (harpOfAges x3, tuniNut, forestFairy), a missing ret-nc fall-through (tuniNut), ramrock
+  writing animParameter where the ROM writes angle, kingMoblinMinion_state7 offsets, misplaced
+  ret (shadowHag, roller), ganonRevival misassigned loads, endgame 0f; ramrockArm_subid4_substate2
+  rewritten from the disassembly. New `tools/audit_overlap.py` (burns overlapping across lines).
+  All eight audits 0. Gates: shadow verify 0 mismatches on both movies with --ref-check, ctest
+  10/10, native both, lint 0.
+
 - 2026-09-24: DIFFERENT batch 6, gated by `--verify-shadow`: checkCollisionForCompanion,
   companionTryToMount, companionCheckEnableTerrainEffects, interactionCodeac (Bipin & Blossom
   spawner), mapGetRoomTextOrReturn, shopItemState3 (anchor 30=37), shopkeeperState2, spawnBridge,

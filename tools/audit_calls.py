@@ -3,6 +3,8 @@
 must use CALL_C_CC (taken: 6 cycles), an unconditional one (cd) CALL_C.
 
 usage: tools/audit_calls.py ROM SYM [--fix]
+With the Seasons ROM and seasons.sym it checks the hand-written Seasons files (src/game/seasons/),
+otherwise the Ages-side files; a label both games share names different code in each.
 """
 import glob, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -11,11 +13,13 @@ from symfiles import rom_labels
 rom = open(sys.argv[1], 'rb').read()
 labels = rom_labels(sys.argv[2])
 fix = '--fix' in sys.argv
+SEASONS = 'seasons' in os.path.basename(sys.argv[2]).lower()
 def byte(bank, addr): return rom[(bank * 0x4000 + (addr & 0x3fff)) if addr >= 0x4000 else addr]
 SITE = re.compile(r'\b(CALL_C|CALL_C_CC|CALL_L|CALL_L_CC)\(\s*(b_\+(\d+)|\(SYM\((\w+)\) \+ (\d+)\)|SYM\((\w+)\)|b_)\s*,')
 bad = 0
 for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     if os.path.basename(path).startswith('gen_'): continue
+    if ('/seasons/' in path) != SEASONS: continue
     text = open(path, errors='replace').read()
     out = []
     base = None

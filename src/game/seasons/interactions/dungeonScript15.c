@@ -266,9 +266,9 @@ void s_D6spawnChestAfterCrystalTrapRoom_body_hook(GB *gb) {
   CYC(b_+0, b_+1); alu_xor(gb, A);
   CYC(b_+1, b_+4); mem_wr(gb, wTmpcfc0 + 0x10, A);
   CALL_C(b_+4, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+7);
-  CYC(b_+7, b_+9); SET_HL(HL + 1);
-  CYC(b_+9, b_+11); mem_wr(gb, HL, mem_rd(gb, HL) & 0xdf);
-  RET(b_+11); return;
+  CYC(b_+7, b_+8); SET_HL(HL + 1);
+  CYC(b_+8, b_+10); mem_wr(gb, HL, mem_rd(gb, HL) & 0xdf);
+  RET(b_+10); return;
 }
 
 void s_warpToD7Entrance_hook(GB *gb) {

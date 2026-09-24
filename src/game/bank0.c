@@ -13553,10 +13553,9 @@ void lcdInterrupt_clearLYC_hook(GB *gb) {
 
 void lcdInterrupt_clearWXY_hook(GB *gb) {
   BASE(lcdInterrupt_clearWXY);
-  A = 0xc7;
-  CYC(b_+0, b_+2); mem_wr(gb, IO_WY, A);
-  CYC(b_+2, b_+4); mem_wr(gb, IO_WX, A);
-  CYC(b_+4, b_+6);
+  CYC(b_+0, b_+2); A = 0xc7;
+  CYC(b_+2, b_+4); mem_wr(gb, IO_WY, A);
+  CYC(b_+4, b_+6); mem_wr(gb, IO_WX, A);
   TAIL(lcdInterrupt_clearLYC);
 }
 

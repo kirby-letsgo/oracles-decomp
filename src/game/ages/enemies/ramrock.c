@@ -716,8 +716,8 @@ void ramrock_seedPhase_substate2_hook(GB *gb) {
   CYC(b_+50, b_+52);
   goto setAnimation0;
 gotoNextSubstate:
-  CYC(b_+52, b_+55); mem_wr(gb, HL, 0x0e);
-  CYC(b_+55, b_+56); L = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+52, b_+54); mem_wr(gb, HL, 0x0e);
+  CYC(b_+54, b_+56); L = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+56, b_+58); mem_wr(gb, HL, 0x18);
   CALL_C(b_+58, ecom_incSubstate_b10_hook, SYM(ecom_incSubstate_b10), b_+61);
 setAnimation0:

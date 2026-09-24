@@ -103,9 +103,10 @@ void ganonRevivalCutscene_controller_hook(GB *gb) {
   CYC(b_+12, b_+14); L = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+14, b_+16); mem_wr(gb, HL, 0x28);
   CALL_C(b_+16, hideStatusBar_hook, SYM(hideStatusBar), b_+19);
-  CYC(b_+19, b_+21); D = hram_rd(gb, (uint8_t)hActiveObject);
-  CYC(b_+21, b_+22); A = 0x0e;
-  CALL_C(b_+22, fadeoutToBlackWithDelay_hook, SYM(fadeoutToBlackWithDelay), b_+27);
+  CYC(b_+19, b_+21); A = hram_rd(gb, (uint8_t)hActiveObject);
+  CYC(b_+21, b_+22); D = A;
+  CYC(b_+22, b_+24); A = 0x0e;
+  CALL_C(b_+24, fadeoutToBlackWithDelay_hook, SYM(fadeoutToBlackWithDelay), b_+27);
   CYC(b_+27, b_+28); alu_xor(gb, A);
   CYC(b_+28, b_+31); mem_wr(gb, wDirtyFadeSprPalettes, A);
   CYC(b_+31, b_+34); mem_wr(gb, wFadeSprPaletteSources, A);

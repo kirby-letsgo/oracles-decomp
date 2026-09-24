@@ -46,7 +46,7 @@ class Tool:
         self.files = {}
         self.file_macros = {}
         for f in sorted(glob.glob('src/game/**/*.c', recursive=True)):
-            if '/gen_' in f or f.endswith('syms.c'): continue
+            if '/gen_' in f or f.endswith('syms.c') or '/seasons/' in f: continue
             text = open(f, errors='replace').read()
             self.files[f] = text.split('\n')
             self.file_macros[f] = {m.group(1): m.group(2) for m in re.finditer(r'^#define (\w+) ((?:0x[0-9a-f]+|SYM\(\w+\)|\d+)(?: [+-] (?:0x[0-9a-f]+|\d+))?)\s*$', text, re.M)}

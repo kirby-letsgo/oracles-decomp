@@ -87,7 +87,7 @@ state0:
   CYC(b_+28, b_+29); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
   CYC(b_+29, b_+30); mem_wr(gb, HL, A);
   CYC(b_+30, b_+32); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(b_+32, b_+34); mem_wr(gb, HL, 0xc0); // SPEED_c0
+  CYC(b_+32, b_+34); mem_wr(gb, HL, 0x1e); // SPEED_c0
   CYC(b_+34, b_+36); L = INTERACTION_BASE + OBJ_COUNTER1;
   CYC(b_+36, b_+38); mem_wr(gb, HL, 0x07);
   CYC(b_+38, b_+40); E = INTERACTION_BASE + OBJ_SUBID;

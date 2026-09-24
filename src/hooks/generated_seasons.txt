@@ -3289,7 +3289,6 @@
 10:6bdd func_6e4a_hook -
 10:6be3 func_6e50_hook -
 10:6bf0 func_6e5d_hook -
-10:6ec5 kingMoblinBomb_state2_hook -
 10:6f1e kingMoblinBomb_state4_hook -
 10:6f25 kingMoblinBomb_state5_hook -
 10:6f3d kingMoblinBomb_state6_hook -

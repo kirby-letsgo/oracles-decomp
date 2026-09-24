@@ -140,7 +140,7 @@ justHit:
   if ((F & FZ)) { CYCT(b_+29, b_+31); goto normalStatus; } CYC(b_+29, b_+31);  // jr z,@normalStatus
   CYC(b_+31, b_+33); L = 0xb3;  // ld l,Enemy.var33
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x01);  // ld (hl),$01
-  CYCT(b_+35, b_+38); goto normalStatus;  // jr @normalStatus
+  CYC(b_+35, b_+37); goto normalStatus;  // jr @normalStatus
 notTurtleForm:
   CYC(b_+37, b_+39); L = 0xad;  // ld l,Enemy.knockbackCounter
   CYC(b_+39, b_+40); A = mem_rd(gb, HL);  // ld a,(hl)
@@ -1296,7 +1296,7 @@ void label_10_173_hook(GB *gb) {
   CYC(b_+4, b_+5); L = E;  // ld l,e
   if ((F & FZ)) { CYCT(b_+5, b_+7); goto setState02; } CYC(b_+5, b_+7);  // jr z,+
   CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl) [state]=$0b
-  CYC(b_+8, b_+11); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
+  CYC(b_+8, b_+10); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2
 setState02:
   CYC(b_+10, b_+12); mem_wr(gb, HL, 0x02);  // ld (hl),$02 [state]
   CYC(b_+12, b_+14); TAIL(veranFinal_beeForm_animate2);  // jr veranFinal_beeForm_animate2

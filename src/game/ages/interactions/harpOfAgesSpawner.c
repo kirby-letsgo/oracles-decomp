@@ -37,7 +37,7 @@ void interactionCodeb3__state0_hook(GB *gb) {
   CYC(b_+32, b_+33); L = alu_inc8(gb, L);
   CYC(b_+33, b_+35); mem_wr(gb, HL, 0x11);
   CYC(b_+35, b_+37); L = 0x4b;
-  CYC(b_+37, b_+40); mem_wr(gb, HL, 0x38);
+  CYC(b_+37, b_+39); mem_wr(gb, HL, 0x38);
   CYC(b_+39, b_+41); L = 0x4d;
   CYC(b_+41, b_+43); mem_wr(gb, HL, 0x58);
   CYC(b_+43, b_+44); B = H;
@@ -101,7 +101,7 @@ void interactionCodeb3__state3_hook(GB *gb) {
   CYC(b_+108, b_+110); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 1));
   CALL_C(b_+110, interactionIncState_hook, SYM(interactionIncState), b_+113);
   CYC(b_+113, b_+115); L = 0x46;
-  CYC(b_+115, b_+118); mem_wr(gb, HL, 0x28);
+  CYC(b_+115, b_+117); mem_wr(gb, HL, 0x28);
   CYC(b_+117, b_+119); A = 0x02;
   CALL_C(b_+119, fadeoutToBlackWithDelay_hook, SYM(fadeoutToBlackWithDelay), b_+122);
   CYC(b_+122, b_+124); A = 0xff;
@@ -142,7 +142,7 @@ void interactionCodeb3_hook(GB *gb) {
   BASE(interactionCodeb3);
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); E = 0x44;
-  CYC(b_+2, b_+4); A = mem_rd(gb, DE);
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (harp_of_ages_jump_table(gb));
     if (jt_ == b_+14) { interactionCodeb3__state0_hook(gb); return; }

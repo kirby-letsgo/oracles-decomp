@@ -249,18 +249,19 @@ void giantGhini_updateChargeTargetPosition_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   // Get Link's position, save that as the position we're charging toward
   CYC(b_+0, b_+3); SET_HL(w1Link_yh);
-  CYC(b_+3, b_+4); B = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+4, b_+5); L = alu_inc8(gb, L);
-  CYC(b_+5, b_+6); A = mem_rd(gb, HL);
-  CYC(b_+6, b_+7); C = A;
-  CALL_C(b_+7, getTileAtPosition_hook, SYM(getTileAtPosition), b_+10);
-  CYC(b_+10, b_+11); A = L;
-  CYC(b_+11, b_+12); E = ENEMY_BASE + OBJ_VAR35;
-  CYC(b_+12, b_+14); mem_wr(gb, DE, A);
-  CALL_C(b_+14, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+17);
-  CYC(b_+17, b_+18); E = ENEMY_BASE + OBJ_ANGLE;
-  CYC(b_+18, b_+20); mem_wr(gb, DE, A);
-  RET(b_+20); return; // ret
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+4, b_+5); B = A;
+  CYC(b_+5, b_+6); L = alu_inc8(gb, L);
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL);
+  CYC(b_+7, b_+8); C = A;
+  CALL_C(b_+8, getTileAtPosition_hook, SYM(getTileAtPosition), b_+11);
+  CYC(b_+11, b_+12); A = L;
+  CYC(b_+12, b_+14); E = ENEMY_BASE + OBJ_VAR35;
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CALL_C(b_+15, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+18);
+  CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_ANGLE;
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  RET(b_+21); return; // ret
 }
 
 // Charging toward Link

@@ -800,8 +800,8 @@ void endgameCutsceneHandler_0f__state0__substateD_hook(GB *gb) {
   CALL_C(b_+321, incCbc1_hook, SYM(incCbc1), b_+324);
   CYC(b_+324, b_+325); L = alu_inc8(gb, L);
   CYC(b_+325, b_+326); alu_xor(gb, A);
-  CYC(b_+326, b_+328); mem_wr(gb, HL, A);
-  CYC(b_+328, b_+329); A = 0x03;
+  CYC(b_+326, b_+327); mem_wr(gb, HL, A);
+  CYC(b_+327, b_+329); A = 0x03;
   CYC(b_+329, b_+332); TAIL(fadeoutToWhiteWithDelay);
 }
 

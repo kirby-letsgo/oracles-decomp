@@ -321,10 +321,11 @@ substate0:
 
   // Decide on target position to stomp at, store in var31
   CYC(b_+27, b_+30); SET_HL(w1Link_yh);
-  CYC(b_+30, b_+31); B = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+31, b_+32); L = alu_inc8(gb, L);
-  CYC(b_+32, b_+33); C = mem_rd(gb, HL); // [w1Link.xh]
-  CALL_C(b_+33, getTileAtPosition_hook, SYM(getTileAtPosition), b_+37);
+  CYC(b_+30, b_+31); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+31, b_+32); B = A;
+  CYC(b_+32, b_+33); L = alu_inc8(gb, L);
+  CYC(b_+33, b_+34); C = mem_rd(gb, HL); // [w1Link.xh]
+  CALL_C(b_+34, getTileAtPosition_hook, SYM(getTileAtPosition), b_+37);
   CYC(b_+37, b_+38); A = L;
   CYC(b_+38, b_+40); E = ENEMY_BASE + 0x31; // Enemy.var31
   CYC(b_+40, b_+41); mem_wr(gb, DE, A);

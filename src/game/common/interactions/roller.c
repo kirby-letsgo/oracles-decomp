@@ -207,8 +207,8 @@ afterCollisionCheck:
   CYC(b_+243, b_+244); L = alu_inc8(gb, L);
   CYC(b_+244, b_+246); mem_wr(gb, HL, 60);
   CYC(b_+246, b_+248); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(b_+248, b_+250); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
-  RET(b_+250); return; // ret
+  CYC(b_+248, b_+249); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
+  RET(b_+249); return; // ret
 
 rollerSound:
   CYC(b_+250, b_+252); mem_wr(gb, HL, 0x01);

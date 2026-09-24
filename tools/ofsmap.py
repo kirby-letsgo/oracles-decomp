@@ -195,6 +195,7 @@ def main():
     changed, unmapped = 0, []
     for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         if os.path.basename(path).startswith('gen_') or os.path.basename(path) in ('syms.c', 'ofs.c'): continue
+        if '/seasons/' in path: continue      # Seasons-only C burns Seasons offsets already
         text = open(path, errors='replace').read()
         lines = text.split('\n')
         base, out, n, ages_only_depth, seasons_depth = None, [], 0, 0, 0

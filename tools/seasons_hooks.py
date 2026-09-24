@@ -170,6 +170,12 @@ def main():
         return bool(ages_labels.get(base))
 
     real_hooks = set(l.split()[1] for l in open('src/hooks/generated.txt') if len(l.split()) >= 2)
+    # a routine rewritten by hand for Seasons (src/game/seasons/) is Seasons' own; the shared C stays Ages-only for it
+    rewritten_seasons = set()
+    if os.path.exists('src/hooks/rewritten_seasons.txt'):
+        for l in open('src/hooks/rewritten_seasons.txt'):
+            n = l.split('#')[0].strip()
+            if n: rewritten_seasons.add(n.replace('@', '__') + '_hook')
     hand_checked = set()
     for path in ('src/hooks/ofs_routines.txt', 'src/hooks/seasons_ok_manual.txt'):
         if os.path.exists(path):
@@ -264,6 +270,7 @@ def main():
             skipped['no seasons label'] += 1
             if '--why' in sys.argv: print(f'{fn}: no Seasons pair for {name} at {bank:02x}:{addr:04x}')
             continue
+        if fn in rewritten_seasons: skipped['rewritten for Seasons'] += 1; continue
         rows.append((s[0], s[1], fn, flags))
     rows.sort()
     with open('src/hooks/generated_seasons.txt', 'w') as f:

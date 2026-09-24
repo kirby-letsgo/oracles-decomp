@@ -276,18 +276,18 @@ void kingMoblinMinion_state7_hook(GB *gb) {
   CYC(b_+19, b_+21); A = 0x04;
   CALL_C(b_+21, objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+24);
   CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+25, b_+28); L = PART_BASE + OBJ_ANGLE;
-  CYC(b_+28, b_+30); mem_wr(gb, HL, B);
-  CYC(b_+30, b_+32); L = PART_BASE + OBJ_SPEED;
-  CYC(b_+32, b_+34); mem_wr(gb, HL, 0x37);
-  CYC(b_+34, b_+36); L = PART_BASE + OBJ_SPEED_Z;
-  CYC(b_+36, b_+37); A = 0x00;
-  CYC(b_+37, b_+39); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+39, b_+41); mem_wr(gb, HL, 0xff);
-  CYC(b_+41, b_+43); L = PART_BASE + OBJ_VISIBLE;
-  CYC(b_+43, b_+44); mem_wr(gb, HL, 0x81);
-  CYC(b_+44, b_+45); A = C;
-  CYC(b_+45, b_+48);
+  CYC(b_+25, b_+27); L = PART_BASE + OBJ_ANGLE;
+  CYC(b_+27, b_+28); mem_wr(gb, HL, B);
+  CYC(b_+28, b_+30); L = PART_BASE + OBJ_SPEED;
+  CYC(b_+30, b_+32); mem_wr(gb, HL, 0x37);
+  CYC(b_+32, b_+34); L = PART_BASE + OBJ_SPEED_Z;
+  CYC(b_+34, b_+36); A = 0x00;
+  CYC(b_+36, b_+37); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+37, b_+39); mem_wr(gb, HL, 0xff);
+  CYC(b_+39, b_+41); L = PART_BASE + OBJ_VISIBLE;
+  CYC(b_+41, b_+43); mem_wr(gb, HL, 0x81);
+  CYC(b_+43, b_+44); A = C;
+  CYC(b_+44, b_+47);
   TAIL(enemySetAnimation);
 }
 

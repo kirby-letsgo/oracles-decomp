@@ -195,7 +195,7 @@ substate0:
   CYC(b_+48, b_+49); L = alu_inc8(gb, L);
   CYC(b_+49, b_+51); A = H8(hEnemyTargetX);
   CYC(b_+51, b_+52); mem_wr(gb, HL, A);
-  RET(b_+53); return; // ret
+  RET(b_+52); return; // ret
 
 substate1:
   CYC(b_+53, b_+55); E = ENEMY_BASE + OBJ_XH;

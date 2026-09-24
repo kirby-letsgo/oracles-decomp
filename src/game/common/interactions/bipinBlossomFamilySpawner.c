@@ -180,7 +180,7 @@ static void bipin_need_essences(GB *gb, uint16_t from, uint8_t amount) {
 void interactionCodeac__need2Essences_hook(GB *gb) { bipin_need_essences(gb, SYM(interactionCodeac__need2Essences), 2); }
 void interactionCodeac__gotoNextState_2_hook(GB *gb) {
   BASE(interactionCodeac);
-  CYC(b_+82, b_+85);
+  CYC(b_+82, b_+84);
   bipin_goto_next_state(gb);
 }
 void interactionCodeac__need4Essences_hook(GB *gb) { bipin_need_essences(gb, SYM(interactionCodeac__need4Essences), 4); }

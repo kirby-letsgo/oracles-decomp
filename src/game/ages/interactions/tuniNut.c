@@ -18,10 +18,10 @@ void interactionCodeb2__state0_hook(GB *gb) {
   BASE(interactionCodeb2);
   uint16_t sp0_ = gb->sp;
   CYC(b_+60, b_+61); A = alu_inc8(gb, A);
-  CYC(b_+61, b_+63); mem_wr(gb, DE, A);
-  CYC(b_+62, b_+66); mem_wr(gb, wScreenShakeMagnitude, A);
+  CYC(b_+61, b_+62); mem_wr(gb, DE, A);
+  CYC(b_+62, b_+65); mem_wr(gb, wScreenShakeMagnitude, A);
   CYC(b_+65, b_+68); SET_HL(b_+117);
-  CYC(b_+68, b_+72); TAIL(interactionSetMiniScript);
+  CYC(b_+68, b_+71); TAIL(interactionSetMiniScript);
 }
 
 // interactionCodeb2@setRandomCounter1: counter1 = (random & var30) + var31.
@@ -100,9 +100,10 @@ update:
   CYC(b_+45, b_+46); C = A;
   CALL_C(b_+46, getFreePartSlot_hook, SYM(getFreePartSlot), b_+49);
   if (!(F & FZ)) { CYCT(b_+49, b_+50); ret_effect(gb); return; }
-  CYC(b_+50, b_+53); mem_wr(gb, HL, 0x11);
+  CYC(b_+49, b_+50);
+  CYC(b_+50, b_+52); mem_wr(gb, HL, 0x11);
   CYC(b_+52, b_+53); L = alu_inc8(gb, L);
-  CYC(b_+53, b_+56); mem_wr(gb, HL, 1);
+  CYC(b_+53, b_+55); mem_wr(gb, HL, 1);
   CYC(b_+55, b_+57); B = 0;
   CYC(b_+57, b_+60); TAIL(objectCopyPositionWithOffset);
 }

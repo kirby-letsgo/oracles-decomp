@@ -2,18 +2,20 @@
 """Check branch targets in the C against the ROM: after `CYCT(b_+N, b_+M); goto LABEL;` where
 the instruction at BASE+N is a jump, the ROM's target must be where LABEL's code starts (its
 first burn). A `goto` to a local that itself only jumps onward burns that extra jump.
-usage: tools/audit_jumps.py (Ages ROM and symbols)"""
-import glob, re
-ROM = open('roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc', 'rb').read()
+usage: tools/audit_jumps.py [--game=seasons] (Ages ROM and symbols; with --game=seasons the
+hand-written Seasons files against the Seasons ROM)"""
+import glob, re, sys
+SEASONS = '--game=seasons' in sys.argv
+ROM = open('roms/Legend of Zelda, The - Oracle of ' + ('Seasons' if SEASONS else 'Ages') + ' (USA, Australia).gbc', 'rb').read()
 h = open('src/game/syms.h').read(); c = open('src/game/syms.c').read()
 ids = re.findall(r'^\s+S_(\w+),', h, re.M)
-vals = re.findall(r'0x([0-9a-f]{8})', re.search(r'syms_ages\[SYM_COUNT\] = \{\n(.*?)\n\};', c, re.S).group(1))
+vals = re.findall(r'0x([0-9a-f]{8})', re.search(r'syms_' + ('seasons' if SEASONS else 'ages') + r'\[SYM_COUNT\] = \{\n(.*?)\n\};', c, re.S).group(1))
 sym = {i: int(v, 16) for i, v in zip(ids, vals)}
 JP = {0xc3, 0xc2, 0xca, 0xd2, 0xda}; JR = {0x18, 0x20, 0x28, 0x30, 0x38}
 FUNC = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int) \*?\w+\([^)]*\)\s*\{')
 bad = 0
 for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
-    if '/seasons/' in p or p.endswith(('syms.c', 'ofs.c')): continue
+    if ('/seasons/' in p) != SEASONS or '/gen_' in p or p.endswith(('syms.c', 'ofs.c')): continue
     lines = open(p, errors='replace').read().split('\n')
     i = 0
     while i < len(lines):

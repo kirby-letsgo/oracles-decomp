@@ -394,7 +394,7 @@ applySpeed:
 gotoState8:
   CYC(b_+106, b_+107); L = E;
   CYC(b_+107, b_+109); mem_wr(gb, HL, 0x08);
-  CYC(b_+109, b_+12); goto state8; // jr
+  CYC(b_+109, b_+111); goto state8; // jr
 }
 
 // 0d:55de, bare global; called via tail jump only (never a real call), so it never needs

@@ -303,7 +303,7 @@ substate0:
   CYC(b_+21, b_+23); mem_wr(gb, HL, 0x12);  // ld (hl),$12
   CYC(b_+23, b_+24); L = E;  // ld l,e
   CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));  // inc (hl)
-  CYCT(b_+25, b_+28); goto animate;  // jr @animate
+  CYC(b_+25, b_+27); goto animate;  // jr @animate
 substate1:
   CALL_C(b_+27, ecom_decCounter1_b10_hook, SYM(ecom_decCounter1_b10), b_+30);
   if (!(F & FZ)) { CYCT(b_+30, b_+32); goto applySpeed; } CYC(b_+30, b_+32);  // jr nz,@applySpeed
