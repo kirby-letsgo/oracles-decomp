@@ -107,9 +107,6 @@ L_77c2:
   CALL_C(b_+25, s_func_7a44_hook, SYM(func_7a44), b_+28);
 normalStatus:
   CALL_C(b_+28, s_ecom_getSubidAndCpStateTo08, SYM(ecom_getSubidAndCpStateTo08_b0d), b_+31);
-
-L_77c7:
-  CYC(b_+30, b_+31); B = H;
   if (!(F & FC)) { CYCT(b_+31, b_+33); goto L_77db; }
   CYC(b_+31, b_+33);
   CYC(b_+33, b_+34); push_effect(gb, b_+34);
@@ -117,8 +114,6 @@ L_77c7:
     if (jt_ == b_+65) goto state0;
     if (jt_ == b_+133) goto state1;
     if (jt_ == b_+205) goto stateStub;
-    if (jt_ == b_+92) goto L_7805;
-    if (jt_ == b_+30) goto L_77c7;
     HANDOFF(HL);
   } while (0);
 L_77db:
@@ -150,9 +145,6 @@ L_77f7:
   CYC(b_+86, b_+87); mem_wr(gb, DE, A);
   CALL_C(b_+87, s_enemySetAnimation, SYM(enemySetAnimation), b_+90);
   CALL_C(b_+90, s_ecom_setSpeedAndState8, SYM(ecom_setSpeedAndState8_b0d), b_+93);
-
-L_7805:
-  CYC(b_+92, b_+93); B = E;
   CYC(b_+93, b_+95); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+95, b_+96); A = mem_rd(gb, DE);
   CYC(b_+96, b_+98); alu_cp(gb, 0x03);

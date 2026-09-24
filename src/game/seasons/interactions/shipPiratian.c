@@ -140,7 +140,7 @@ void s_piratian_state1_hook(GB *gb) {
   if (F & FC) { CYCT(b_+8, b_+11); TAIL(interactionDelete); }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+14);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 }
 
 void s_piratian_state2_hook(GB *gb) {

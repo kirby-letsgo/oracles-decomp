@@ -350,6 +350,8 @@ subid1:
   do { uint16_t jt_ = (frypolar_jump_table(gb));
     if (jt_ == b_+423) goto subid1_stateA;
     if (jt_ == b_+364) goto subid0_stateB;
+    if (jt_ == b_+433) goto subid1_stateC;
+    if (jt_ == b_+454) goto subid1_stateD;
     HANDOFF(HL);
   } while (0);
 subid1_stateA:
@@ -360,6 +362,29 @@ subid1_stateA:
   CYC(b_+428, b_+430); mem_wr(gb, HL, 0x6e);
   CYC(b_+430, b_+433);
   TAIL_S(func_6326);
+subid1_stateC:
+  CALL_C(b_+433, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+436);
+  if (F & FZ) { CYCT(b_+436, b_+438); goto L_623f; }
+  CYC(b_+436, b_+438);
+  CALL_C(b_+438, s_func_62f3_hook, SYM(func_62f3), b_+441);
+  CYC(b_+441, b_+443);
+  goto subid1_animate;
+L_623f:
+  CALL_C(b_+443, s_func_62a8_hook, SYM(func_62a8), b_+446);
+  CYC(b_+446, b_+448); B = 0x3e;
+  CALL_C(b_+448, s_ecom_spawnProjectile, SYM(ecom_spawnProjectile_b0d), b_+451);
+subid1_animate:
+  CYC(b_+451, b_+454);
+  TAIL(enemyAnimate);
+subid1_stateD:
+  CALL_C(b_+454, s_ecom_decCounter1, SYM(ecom_decCounter1_b0d), b_+457);
+  if (!(F & FZ)) { CYCT(b_+457, b_+459); goto subid1_animate; }
+  CYC(b_+457, b_+459);
+  CYC(b_+459, b_+460); L = E;
+  CYC(b_+460, b_+462); mem_wr(gb, HL, 0x0b);
+  CALL_C(b_+462, s_func_6326_hook, SYM(func_6326), b_+465);
+  CYC(b_+465, b_+467);
+  goto subid1_animate;
 }
 
 void s_func_6257_hook(GB *gb) {

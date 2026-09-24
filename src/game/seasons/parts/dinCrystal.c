@@ -306,6 +306,7 @@ state6:
     if (jt_ == b_+391) goto state6_substate0;
     if (jt_ == b_+401) goto state6_substate1;
     if (jt_ == b_+157) goto state1_substate1;
+    if (jt_ == b_+419) goto state6_substate3;
     HANDOFF(HL);
   } while (0);
 state6_substate0:
@@ -329,7 +330,14 @@ state6_substate1:
 L_7b5a:
   CYC(b_+416, b_+419);
   TAIL(partAnimate);
-
+state6_substate3:
+  CYC(b_+419, b_+420); H = D;
+  CYC(b_+420, b_+422); L = PART_BASE + OBJ_STATE;
+  CYC(b_+422, b_+423); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+423, b_+425); L = PART_BASE + OBJ_COUNTER1;
+  CYC(b_+425, b_+427); A = 0x3c;
+  CYC(b_+427, b_+428); mem_wr(gb, HL, A);
+  CALL_C(b_+428, s_setScreenShakeCounter, SYM(setScreenShakeCounter), b_+431);
 state7:
   CALL_C(b_+431, s_partCommon_decCounter1IfNonzero, SYM(partCommon_decCounter1IfNonzero), b_+434);
   if (!(F & FZ)) { RET_TAKEN(b_+434); return; }

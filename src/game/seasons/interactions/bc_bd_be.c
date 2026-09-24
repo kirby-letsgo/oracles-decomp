@@ -565,7 +565,7 @@ subid4_state0:
 subid4_state1:
   CALL_C(b_+107, s_interactionRunScript, SYM(interactionRunScript), b_+110);
   CYC(b_+110, b_+113);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 }
 
 void s_decVar3c_hook(GB *gb) {

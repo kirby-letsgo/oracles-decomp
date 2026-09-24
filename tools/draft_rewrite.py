@@ -250,13 +250,13 @@ def draft(name, start=None, helper=None, pending=None, owner=None, hookname=None
                 ents, p = [], nxt
                 first = None
                 while p + 1 < hi and (first is None or p < first):
-                    if ents and ((bank, p) in locs or (bank, p) in name_at): break
+                    if ents and ((bank, p) in locs or (bank, p) in name_at or p in labels): break
                     t = rd(bank, p) | rd(bank, p + 1) << 8
                     tb = bank if t >= 0x4000 else 0
                     if not (lo <= t < hi) and ((tb, t) not in name_at and (tb, t) not in locs): break
                     ents.append(t)
                     if lo <= t < hi:
-                        first = t if first is None else min(first, t)
+                        if t > p: first = t if first is None else min(first, t)
                         labels.add(t); work.append(t)
                     p += 2
                     if len(ents) > 64: break

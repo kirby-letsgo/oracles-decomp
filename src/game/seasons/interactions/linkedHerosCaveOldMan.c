@@ -35,7 +35,7 @@ void s_interactionCodee4_hook(GB *gb) {
   if (F & FC) { CYCT(b_+8, b_+11); TAIL(interactionDelete); }
   CYC(b_+8, b_+11);
   CYC(b_+11, b_+14);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 L_6ef8:
   CALL_C(b_+14, s_getThisRoomFlags, SYM(getThisRoomFlags), b_+17);
   CYC(b_+17, b_+19); alu_and(gb, 0x40);
