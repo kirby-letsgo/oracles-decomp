@@ -656,17 +656,13 @@ void s_graveSecretEntrance_hook(GB *gb);
 void s_greenJoyRing_hook(GB *gb);
 void s_hardOre_hook(GB *gb);
 void s_horonVillagePortalBridgeSpawner_hook(GB *gb);
-void s_interaction7f_subid00(GB *gb);
 void s_interaction7f_subid00__state0(GB *gb);
-void s_interaction7f_subid00__afterCall49d6(GB *gb);
 void s_interaction7f_subid00__state1(GB *gb);
-void s_interaction7f_subid00__afterCall4a75(GB *gb);
 void s_interaction7f_subid00__state2(GB *gb);
 void s_interaction7f_subid00__state3(GB *gb);
 void s_interaction7f_subid00__state4(GB *gb);
 void s_interaction7f_subid00__state5(GB *gb);
 void s_interaction7f_subid00__state6(GB *gb);
-void s_interaction7f_subid00__afterCall4b29(GB *gb);
 void s_interaction7f_subid00__state7(GB *gb);
 void s_interaction7f_subid02__state0(GB *gb);
 void s_interaction7f_subid02__state1(GB *gb);
@@ -930,11 +926,9 @@ void s_interactionCode7d__counterClockwise(GB *gb);
 void s_interactionCode7d__clockwise(GB *gb);
 void s_interactionCode7d__state3(GB *gb);
 void s_interactionCode7d__state4(GB *gb);
-void s_interactionCode7e(GB *gb);
 void s_interactionCode7e__subid00(GB *gb);
 void s_interactionCode7e__minibossState0(GB *gb);
 void s_interactionCode7e__commonState0(GB *gb);
-void s_interactionCode7e__afterCall489a(GB *gb);
 void s_interactionCode7e__state1(GB *gb);
 void s_interactionCode7e__state2(GB *gb);
 void s_interactionCode7e__minibossState3(GB *gb);
@@ -946,7 +940,6 @@ void s_interactionCode7e__subid02(GB *gb);
 void s_interactionCode7e__herosCave2State0(GB *gb);
 void s_interactionCode7e__herosCave2State3(GB *gb);
 void s_interactionCode7e__initHerosCaveWarp(GB *gb);
-void s_interactionCode7f(GB *gb);
 void s_interactionCode80(GB *gb);
 void s_interactionCode80__afterCall76f6(GB *gb);
 void s_interactionCode80__state1(GB *gb);
@@ -4835,12 +4828,10 @@ void s_interactionCodeb3__postCutscene(GB *gb);
 void s_interactionCodeb3__state1(GB *gb);
 void s_interactionCodeb3__afterCall701c(GB *gb);
 void s_interactionCodeb4_hook(GB *gb);
-void s_interactionCodeb6(GB *gb);
 void s_interactionCodeb6__state0(GB *gb);
 void s_interactionCodeb6__unearthed(GB *gb);
 void s_interactionCodeb6__seedPlanted(GB *gb);
 void s_interactionCodeb6__killedEnoughEnemies(GB *gb);
-void s_interactionCodeb6__afterCall4720(GB *gb);
 void s_interactionCodeb6__state1(GB *gb);
 void s_interactionCodeb6__pressedAButton(GB *gb);
 void s_interactionCodeb6__state2(GB *gb);
@@ -4851,8 +4842,6 @@ void s_interactionCodeb6__state5(GB *gb);
 void s_interactionCodeb6__notPotion(GB *gb);
 void s_interactionCodeb6__decGashaMaturity(GB *gb);
 void s_interactionCodeb6__spawnTreasure(GB *gb);
-void s_interactionCodeb6__afterCall4834(GB *gb);
-void s_interactionCodeb6__afterCall4859(GB *gb);
 void s_interactionCodeb6__state6(GB *gb);
 void s_interactionCodeb6__state7(GB *gb);
 void s_interactionCodeb6__counter1Done(GB *gb);
@@ -6964,6 +6953,9 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_spinner_subid02 spinner_subid02_hook
 #define s_spinner_updateLinkPosition spinner_updateLinkPosition_hook
 #define s_spinner_setLinkRelativePosition spinner_setLinkRelativePosition_hook
+#define s_interactionCode7e interactionCode7e_hook
+#define s_interactionCode7f interactionCode7f_hook
+#define s_interaction7f_subid00 interaction7f_subid00_hook
 #define s_interaction7f_subid01 interaction7f_subid01_hook
 #define s_interaction7f_subid02 interaction7f_subid02_hook
 #define s_spawnBridge spawnBridge_hook
@@ -6982,6 +6974,7 @@ void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb);
 #define s_label_0b_006 label_0b_006_hook
 #define s_childSetVar38ToNumEssencesObtained childSetVar38ToNumEssencesObtained_hook
 #define s_spawnBipinBlossomFamilyObjects spawnBipinBlossomFamilyObjects_hook
+#define s_interactionCodeb6 interactionCodeb6_hook
 #define s_interactionCodeb7 interactionCodeb7_hook
 #define s_interactionCodeb7__afterCall48b5 interactionCodeb7__afterCall48b5_hook
 #define s_interactionCodec0 interactionCodec0_hook

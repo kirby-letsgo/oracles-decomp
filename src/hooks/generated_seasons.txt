@@ -2007,6 +2007,9 @@
 09:47bf spinner_subid02_hook -
 09:47fa spinner_updateLinkPosition_hook -
 09:4813 spinner_setLinkRelativePosition_hook -
+09:4865 interactionCode7e_hook -
+09:49ad interactionCode7f_hook -
+09:49bc interaction7f_subid00_hook -
 09:4b79 interaction7f_subid01_hook -
 09:4ba3 interaction7f_subid02_hook -
 09:65e5 spawnBridge_hook -
@@ -2039,6 +2042,7 @@
 0a:4420 label_0b_006_hook -
 0a:4448 childSetVar38ToNumEssencesObtained_hook -
 0a:445d spawnBipinBlossomFamilyObjects_hook -
+0a:469d interactionCodeb6_hook -
 0a:4b24 interactionCodeb7_hook -
 0a:4b32 interactionCodeb7__afterCall48b5_hook -
 0a:4b35 interactionCodec0_hook -

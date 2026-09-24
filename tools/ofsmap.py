@@ -107,6 +107,45 @@ def align(A, S, a, s, anchors=()):
     return pairs, ages_only, seasons_only, consts, 2.0 * matched / max(1, len(ta) + len(ts))
 
 
+_data_locals = None
+# instructions and code macros, as tools/label_kinds.py counts them
+CODE_WORDS = {'ld', 'ldh', 'ldi', 'ldd', 'push', 'pop', 'call', 'jp', 'jr', 'ret', 'reti', 'rst', 'nop', 'halt', 'stop', 'di', 'ei',
+              'add', 'adc', 'sub', 'sbc', 'and', 'or', 'xor', 'cp', 'inc', 'dec', 'daa', 'cpl', 'scf', 'ccf',
+              'rlca', 'rrca', 'rla', 'rra', 'rlc', 'rrc', 'rl', 'rr', 'sla', 'sra', 'swap', 'srl', 'bit', 'set', 'res',
+              'jpab', 'callab', 'jpba', 'callba', 'callhl', 'ldbc', 'ldde', 'ldhl', 'setrombank', 'callfrombank0',
+              'rst_jumptable', 'rst_addatohl', 'rst_adddoubleindex', 'lda'}
+
+
+def data_locals():
+    """The @local labels (spelled parent@x, parent@x@y) whose first directive in the disassembly
+    sources is data (.db/.dw/...), for either game."""
+    global _data_locals
+    if _data_locals is not None: return _data_locals
+    _data_locals = set()
+    skip = re.compile(r'^\s*(;|\.(ifdef|ifndef|if\b|else|endif))')
+    disasm = os.path.dirname(os.path.realpath('ref/oracles-disasm/ages.sym'))
+    for root in (os.path.join(disasm, 'code'), os.path.join(disasm, 'object_code')):
+        for dirpath, _, files in os.walk(root):
+            for f in files:
+                if not f.endswith('.s'): continue
+                lines = open(os.path.join(dirpath, f), errors='replace').read().split('\n')
+                parent, locals_ = None, []
+                for i, l in enumerate(lines):
+                    m = re.match(r'^([A-Za-z_][A-Za-z0-9_]*):', l)
+                    if m: parent, locals_ = m.group(1), []; continue
+                    m = re.match(r'^(@+)([A-Za-z0-9_]+):', l)
+                    if not m or not parent: continue
+                    depth = len(m.group(1))
+                    locals_ = locals_[:depth - 1] + [m.group(2)]
+                    j = i + 1
+                    while j < len(lines) and (not lines[j].strip() or skip.match(lines[j]) or re.match(r'^@+[A-Za-z0-9_]+:\s*$', lines[j].strip())): j += 1
+                    first = lines[j].split(';')[0].strip() if j < len(lines) else ''
+                    if not first: continue
+                    word = re.split(r'[\s,]', first)[0].lower()
+                    if word not in CODE_WORDS: _data_locals.add(parent + '@' + '@'.join(locals_))
+    return _data_locals
+
+
 def align_all(A, S, bare, a, s, anchors=()):
     """The routine and its call-only @locals aligned together: pairs/ends relative to the
     routine's base, and one (ages body, seasons body, aligned index pairs, ages delta, seasons
@@ -120,6 +159,9 @@ def align_all(A, S, bare, a, s, anchors=()):
         sl = S.labels[ln]
         if sl[0] != s[0] or not (0 <= la - a[1] < 0x400) or not (0 <= sl[1] - s[1] < 0x400): continue
         da, ds = la - a[1], sl[1] - s[1]
+        if ln in data_locals():      # a table: decoding it as code desyncs the code after it
+            pairs.setdefault(da, ds); ends.setdefault(da, ds)
+            continue
         lp, lao, lso, lc, lr = align(A, S, (lb, la), sl, [(x - da, y - ds) for x, y in anchors if x >= da])
         covered |= {x[0] for x in A.body(lb, la)}
         for k, v in lp.items(): pairs.setdefault(k + da, v + ds)

@@ -55,523 +55,525 @@ static void interactionCodeb6_addDoubleIndex(GB *gb, uint16_t return_address) {
 void interactionCodeb6_hook(GB *gb) {
   BASE(interactionCodeb6);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  CYC(b_+O(0), b_+OE(2)); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (interactionCodeb6_jump_table(gb));
-    if (jt_ == b_+20) { goto state0; }
-    else if (jt_ == b_+134) { goto state1; }
-    else if (jt_ == b_+158) { goto state2; }
-    else if (jt_ == b_+207) { goto state3; }
-    else if (jt_ == b_+250) { goto state4; }
-    else if (jt_ == b_+283) { goto state5; }
-    else if (jt_ == b_+467) { goto state6; }
-    else if (jt_ == b_+622) { goto state7; }
+    if (jt_ == b_+O(20)) { goto state0; }
+    else if (jt_ == b_+O(134)) { goto state1; }
+    else if (jt_ == b_+O(158)) { goto state2; }
+    else if (jt_ == b_+O(207)) { goto state3; }
+    else if (jt_ == b_+O(250)) { goto state4; }
+    else if (jt_ == b_+O(283)) { goto state5; }
+    else if (jt_ == b_+O(467)) { goto state6; }
+    else if (jt_ == b_+O(622)) { goto state7; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
 state0:
-  CYC(b_+20, b_+22); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
-  CYC(b_+23, b_+24); E = alu_inc8(gb, E);
-  CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+28); SET_HL(wGashaSpotsPlantedBitset);
-  CALL_C(b_+28, checkFlag_hook, SYM(checkFlag), b_+31);
-  if (!(F & FZ)) { CYCT(b_+31, b_+33); goto seedPlanted; } // jr nz
-  CYC(b_+31, b_+33);
-  CYC(b_+33, b_+35); E = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(b_+35, b_+36); A = mem_rd(gb, DE);
-  CYC(b_+36, b_+37); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+37, b_+39); goto l_442b; } // jr nz
-  CYC(b_+37, b_+39);
-  CYC(b_+39, b_+41); A = 0x28; // DISCOVERY_RING
-  CALL_C(b_+41, cpActiveRing_hook, SYM(cpActiveRing), b_+44);
-  if (!(F & FZ)) { CYCT(b_+44, b_+46); goto l_442b; } // jr nz
-  CYC(b_+44, b_+46);
-  CYC(b_+46, b_+48); A = 0xa2; // SND_COMPASS
-  CYC(b_+48, b_+50); E = INTERACTION_BASE + OBJ_VAR3C;
-  CYC(b_+50, b_+51); mem_wr(gb, DE, A);
-  CALL_C(b_+51, playSound_b00_hook, SYM(playSound_b00), b_+54);
+  CYC(b_+O(20), b_+OE(22)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(22), b_+OE(23)); A = mem_rd(gb, DE);
+  CYC(b_+O(23), b_+OE(24)); E = alu_inc8(gb, E);
+  CYC(b_+O(24), b_+OE(25)); mem_wr(gb, DE, A);
+  CYC(b_+O(25), b_+OE(28)); SET_HL(wGashaSpotsPlantedBitset);
+  CALL_C(b_+O(28), checkFlag_hook, SYM(checkFlag), b_+OE(31));
+  if (!(F & FZ)) { CYCT(b_+O(31), b_+OE(33)); goto seedPlanted; } // jr nz
+  CYC(b_+O(31), b_+OE(33));
+  CYC(b_+O(33), b_+OE(35)); E = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+O(35), b_+OE(36)); A = mem_rd(gb, DE);
+  CYC(b_+O(36), b_+OE(37)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(37), b_+OE(39)); goto l_442b; } // jr nz
+  CYC(b_+O(37), b_+OE(39));
+  CYC(b_+O(39), b_+OE(41)); A = 0x28; // DISCOVERY_RING
+  CALL_C(b_+O(41), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(44));
+  if (!(F & FZ)) { CYCT(b_+O(44), b_+OE(46)); goto l_442b; } // jr nz
+  CYC(b_+O(44), b_+OE(46));
+  CYC(b_+O(46), b_+OE(48)); A = 0xa2; // SND_COMPASS
+  CYC(b_+O(48), b_+OE(50)); E = INTERACTION_BASE + OBJ_VAR3C;
+  CYC(b_+O(50), b_+OE(51)); mem_wr(gb, DE, A);
+  CALL_C(b_+O(51), playSound_b00_hook, SYM(playSound_b00), b_+OE(54));
 
 l_442b:
-  CALL_C(b_+54, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+57);
-  CYC(b_+57, b_+59); alu_cp(gb, 0xd2); // TILEINDEX_SOFT_SOIL
-  if (!(F & FZ)) { CYCT(b_+59, b_+60); ret_effect(gb); return; } // ret nz
-  CYC(b_+59, b_+60);
+  CALL_C(b_+O(54), objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+OE(57));
+  CYC(b_+O(57), b_+OE(59)); alu_cp(gb, GV(0xd2, 0xe0)); // TILEINDEX_SOFT_SOIL
+  if (!(F & FZ)) { CYCT(b_+O(59), b_+OE(60)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(59), b_+OE(60));
 
   // @unearthed
-  CALL_C(b_+60, interactionIncState_hook, SYM(interactionIncState), b_+63);
-  CYC(b_+63, b_+65); A = 0x0a;
-  CALL_C(b_+65, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+68);
-  CYC(b_+68, b_+70); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
-  CYC(b_+70, b_+73); TAIL(objectAddToAButtonSensitiveObjectList); // jp
+  CALL_C(b_+O(60), interactionIncState_hook, SYM(interactionIncState), b_+OE(63));
+  CYC(b_+O(63), b_+OE(65)); A = 0x0a;
+  CALL_C(b_+O(65), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+OE(68));
+  CYC(b_+O(68), b_+OE(70)); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
+  CYC(b_+O(70), b_+OE(73)); TAIL(objectAddToAButtonSensitiveObjectList); // jp
 
 seedPlanted:
-  CYC(b_+73, b_+74); A = mem_rd(gb, DE);
-  CYC(b_+74, b_+77); SET_HL(wGashaSpotKillCounters);
-  CYC(b_+77, b_+78); interactionCodeb6_addAToHl(gb, b_+78);
-  CYC(b_+78, b_+79); A = mem_rd(gb, HL);
-  CYC(b_+79, b_+81); alu_cp(gb, 40);
-  if (F & FC) { CYCT(b_+81, b_+83); goto delete_; } // jr c
-  CYC(b_+81, b_+83);
+  CYC(b_+O(73), b_+OE(74)); A = mem_rd(gb, DE);
+  CYC(b_+O(74), b_+OE(77)); SET_HL(wGashaSpotKillCounters);
+  CYC(b_+O(77), b_+OE(78)); interactionCodeb6_addAToHl(gb, b_+O(78));
+  CYC(b_+O(78), b_+OE(79)); A = mem_rd(gb, HL);
+  CYC(b_+O(79), b_+OE(81)); alu_cp(gb, 40);
+  if (F & FC) { CYCT(b_+O(81), b_+OE(83)); goto delete_; } // jr c
+  CYC(b_+O(81), b_+OE(83));
 
   // @killedEnoughEnemies
-  CALL_C(b_+83, getFreePartSlot_hook, SYM(getFreePartSlot), b_+86);
-  if (!(F & FZ)) { CYCT(b_+86, b_+87); ret_effect(gb); return; } // ret nz
-  CYC(b_+86, b_+87);
-  CYC(b_+87, b_+89); mem_wr(gb, HL, 0x17); // PART_GASHA_TREE
-  CYC(b_+89, b_+90); L = alu_inc8(gb, L);
-  CYC(b_+90, b_+92); mem_wr(gb, HL, 0x01);
-  CYC(b_+92, b_+94); L = 0xd6; // Part.relatedObj1
-  CYC(b_+94, b_+96); A = INTERACTION_BASE; // Interaction.start
-  CYC(b_+96, b_+97); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+97, b_+98); mem_wr(gb, HL, D);
-  CYC(b_+98, b_+99); H = D;
-  CYC(b_+99, b_+101); L = INTERACTION_BASE + OBJ_VAR37;
-  CYC(b_+101, b_+103); E = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+103, b_+104); A = mem_rd(gb, DE);
-  CYC(b_+104, b_+105); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+105, b_+107); alu_add(gb, 0xf8);
-  CYC(b_+107, b_+108); mem_wr(gb, DE, A);
-  CYC(b_+108, b_+110); E = INTERACTION_BASE + OBJ_XH;
-  CYC(b_+110, b_+111); A = mem_rd(gb, DE);
-  CYC(b_+111, b_+112); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+112, b_+114); alu_add(gb, 0x08);
-  CYC(b_+114, b_+115); mem_wr(gb, DE, A);
-  CYC(b_+115, b_+117); A = 0x04;
-  CALL_C(b_+117, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+120);
-  CYC(b_+120, b_+122); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(b_+122, b_+124); mem_wr(gb, HL, 0x03);
-  CYC(b_+124, b_+126); L = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+126, b_+128); mem_wr(gb, HL, 0x0a);
-  CALL_C(b_+128, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+131);
-  CYC(b_+131, b_+134); TAIL(objectSetVisible83); // jp
+  CALL_C(b_+O(83), getFreePartSlot_hook, SYM(getFreePartSlot), b_+OE(86));
+  if (!(F & FZ)) { CYCT(b_+O(86), b_+OE(87)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(86), b_+OE(87));
+  CYC(b_+O(87), b_+OE(89)); mem_wr(gb, HL, 0x17); // PART_GASHA_TREE
+  CYC(b_+O(89), b_+OE(90)); L = alu_inc8(gb, L);
+  CYC(b_+O(90), b_+OE(92)); mem_wr(gb, HL, 0x01);
+  CYC(b_+O(92), b_+OE(94)); L = 0xd6; // Part.relatedObj1
+  CYC(b_+O(94), b_+OE(96)); A = INTERACTION_BASE; // Interaction.start
+  CYC(b_+O(96), b_+OE(97)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(97), b_+OE(98)); mem_wr(gb, HL, D);
+  CYC(b_+O(98), b_+OE(99)); H = D;
+  CYC(b_+O(99), b_+OE(101)); L = INTERACTION_BASE + OBJ_VAR37;
+  CYC(b_+O(101), b_+OE(103)); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+O(103), b_+OE(104)); A = mem_rd(gb, DE);
+  CYC(b_+O(104), b_+OE(105)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(105), b_+OE(107)); alu_add(gb, 0xf8);
+  CYC(b_+O(107), b_+OE(108)); mem_wr(gb, DE, A);
+  CYC(b_+O(108), b_+OE(110)); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+O(110), b_+OE(111)); A = mem_rd(gb, DE);
+  CYC(b_+O(111), b_+OE(112)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(112), b_+OE(114)); alu_add(gb, 0x08);
+  CYC(b_+O(114), b_+OE(115)); mem_wr(gb, DE, A);
+  CYC(b_+O(115), b_+OE(117)); A = 0x04;
+  CALL_C(b_+O(117), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+OE(120));
+  CYC(b_+O(120), b_+OE(122)); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+O(122), b_+OE(124)); mem_wr(gb, HL, 0x03);
+  CYC(b_+O(124), b_+OE(126)); L = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(126), b_+OE(128)); mem_wr(gb, HL, 0x0a);
+  CALL_C(b_+O(128), interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+OE(131));
+  CYC(b_+O(131), b_+OE(134)); TAIL(objectSetVisible83); // jp
 
 state1:
-  CYC(b_+134, b_+136); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
-  CYC(b_+136, b_+137); A = mem_rd(gb, DE);
-  CYC(b_+137, b_+138); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+138, b_+139); ret_effect(gb); return; } // ret z
-  CYC(b_+138, b_+139);
+  CYC(b_+O(134), b_+OE(136)); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
+  CYC(b_+O(136), b_+OE(137)); A = mem_rd(gb, DE);
+  CYC(b_+O(137), b_+OE(138)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(138), b_+OE(139)); ret_effect(gb); return; } // ret z
+  CYC(b_+O(138), b_+OE(139));
 
   // @pressedAButton
-  CYC(b_+139, b_+140); alu_xor(gb, A);
-  CYC(b_+140, b_+141); mem_wr(gb, DE, A);
-  CYC(b_+141, b_+144); SET_BC(0x3509); // TX_3509
-  CYC(b_+144, b_+147); A = mem_rd(gb, wNumGashaSeeds);
-  CYC(b_+147, b_+148); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+148, b_+150); goto l_4490; } // jr z
-  CYC(b_+148, b_+150);
-  CALL_C(b_+150, interactionIncState_hook, SYM(interactionIncState), b_+153);
-  CYC(b_+153, b_+155); C = 0x00; // <TX_3500
+  CYC(b_+O(139), b_+OE(140)); alu_xor(gb, A);
+  CYC(b_+O(140), b_+OE(141)); mem_wr(gb, DE, A);
+  CYC(b_+O(141), b_+OE(144)); SET_BC(0x3509); // TX_3509
+  CYC(b_+O(144), b_+OE(147)); A = mem_rd(gb, wNumGashaSeeds);
+  CYC(b_+O(147), b_+OE(148)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(148), b_+OE(150)); goto l_4490; } // jr z
+  CYC(b_+O(148), b_+OE(150));
+  CALL_C(b_+O(150), interactionIncState_hook, SYM(interactionIncState), b_+OE(153));
+  CYC(b_+O(153), b_+OE(155)); C = 0x00; // <TX_3500
 
 l_4490:
-  CYC(b_+155, b_+158); TAIL(showText); // jp
+  CYC(b_+O(155), b_+OE(158)); TAIL(showText); // jp
 
 state2:
-  CYC(b_+158, b_+161); A = mem_rd(gb, wSelectedTextOption);
-  CYC(b_+161, b_+162); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+162, b_+164); goto l_449d; } // jr z
-  CYC(b_+162, b_+164);
-  CYC(b_+164, b_+166); A = 0x01;
-  CYC(b_+166, b_+167); mem_wr(gb, DE, A); // [state]
-  RET(b_+167); return;
+  CYC(b_+O(158), b_+OE(161)); A = mem_rd(gb, wSelectedTextOption);
+  CYC(b_+O(161), b_+OE(162)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(162), b_+OE(164)); goto l_449d; } // jr z
+  CYC(b_+O(162), b_+OE(164));
+  CYC(b_+O(164), b_+OE(166)); A = 0x01;
+  CYC(b_+O(166), b_+OE(167)); mem_wr(gb, DE, A); // [state]
+  RET(b_+O(167)); return;
 
 l_449d:
-  CALL_C(b_+168, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+171);
-  CYC(b_+171, b_+172); C = L;
-  CYC(b_+172, b_+174); A = 0xf5; // TILEINDEX_SOFT_SOIL_PLANTED
-  CALL_C(b_+174, setTile_hook, SYM(setTile), b_+177);
-  CYC(b_+177, b_+179); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(b_+179, b_+180); A = mem_rd(gb, DE);
-  CYC(b_+180, b_+183); SET_HL(wGashaSpotsPlantedBitset);
-  CALL_C(b_+183, setFlag_hook, SYM(setFlag), b_+186);
-  CYC(b_+186, b_+187); A = mem_rd(gb, DE);
-  CYC(b_+187, b_+189); L = 0x4f; // wGashaSpotKillCounters low byte
-  CYC(b_+189, b_+190); interactionCodeb6_addAToHl(gb, b_+190);
-  CYC(b_+190, b_+192); mem_wr(gb, HL, 0x00);
-  CYC(b_+192, b_+194); L = 0xbe; // wNumGashaSeeds low byte
-  CYC(b_+194, b_+195); A = mem_rd(gb, HL);
-  CYC(b_+195, b_+197); alu_sub(gb, 0x01);
-  CYC(b_+197, b_+198); alu_daa(gb);
-  CYC(b_+198, b_+199); mem_wr(gb, HL, A);
-  CYC(b_+199, b_+201); A = 0x5e; // SND_GETSEED
-  CALL_C(b_+201, playSound_b00_hook, SYM(playSound_b00), b_+204);
+  CALL_C(b_+O(168), objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+OE(171));
+  CYC(b_+O(171), b_+OE(172)); C = L;
+  CYC(b_+O(172), b_+OE(174)); A = 0xf5; // TILEINDEX_SOFT_SOIL_PLANTED
+  CALL_C(b_+O(174), setTile_hook, SYM(setTile), b_+OE(177));
+  CYC(b_+O(177), b_+OE(179)); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+O(179), b_+OE(180)); A = mem_rd(gb, DE);
+  CYC(b_+O(180), b_+OE(183)); SET_HL(wGashaSpotsPlantedBitset);
+  CALL_C(b_+O(183), setFlag_hook, SYM(setFlag), b_+OE(186));
+  CYC(b_+O(186), b_+OE(187)); A = mem_rd(gb, DE);
+  CYC(b_+O(187), b_+OE(189)); L = GV(0x4f, 0x4c); // wGashaSpotKillCounters low byte
+  CYC(b_+O(189), b_+OE(190)); interactionCodeb6_addAToHl(gb, b_+O(190));
+  CYC(b_+O(190), b_+OE(192)); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(192), b_+OE(194)); L = GV(0xbe, 0xba); // wNumGashaSeeds low byte
+  CYC(b_+O(194), b_+OE(195)); A = mem_rd(gb, HL);
+  CYC(b_+O(195), b_+OE(197)); alu_sub(gb, 0x01);
+  CYC(b_+O(197), b_+OE(198)); alu_daa(gb);
+  CYC(b_+O(198), b_+OE(199)); mem_wr(gb, HL, A);
+  CYC(b_+O(199), b_+OE(201)); A = 0x5e; // SND_GETSEED
+  CALL_C(b_+O(201), playSound_b00_hook, SYM(playSound_b00), b_+OE(204));
 
 delete_:
-  CYC(b_+204, b_+207); TAIL(interactionDelete); // jp
+  CYC(b_+O(204), b_+OE(207)); TAIL(interactionDelete); // jp
 
 state3:
-  CYC(b_+207, b_+209); E = INTERACTION_BASE + OBJ_VAR2A;
-  CYC(b_+209, b_+210); A = mem_rd(gb, DE);
-  CYC(b_+210, b_+212); alu_cp(gb, 0xff);
-  if (!(F & FZ)) { CYCT(b_+212, b_+213); ret_effect(gb); return; } // ret nz
-  CYC(b_+212, b_+213);
-  CYC(b_+213, b_+215); A = 0x80; // DISABLE_ALL_BUT_INTERACTIONS
-  CYC(b_+215, b_+218); mem_wr(gb, wDisabledObjects, A);
-  CYC(b_+218, b_+221); mem_wr(gb, wMenuDisabled, A);
-  CYC(b_+221, b_+222); H = D;
-  CYC(b_+222, b_+224); L = INTERACTION_BASE + OBJ_STATE;
-  CYC(b_+224, b_+226); mem_wr(gb, HL, 0x04);
-  CYC(b_+226, b_+228); A = 0x06;
-  CALL_C(b_+228, objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+231);
-  CYC(b_+231, b_+234); SET_BC(0xfec0); // -$140
-  CALL_C(b_+234, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+237);
-  CYC(b_+237, b_+239); L = INTERACTION_BASE + OBJ_SPEED;
-  CYC(b_+239, b_+241); mem_wr(gb, HL, 0x28); // SPEED_100
-  CALL_C(b_+241, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+244);
-  CYC(b_+244, b_+246); E = INTERACTION_BASE + OBJ_ANGLE;
-  CYC(b_+246, b_+247); mem_wr(gb, DE, A);
-  CYC(b_+247, b_+250); TAIL(objectSetVisible80); // jp
+  CYC(b_+O(207), b_+OE(209)); E = INTERACTION_BASE + OBJ_VAR2A;
+  CYC(b_+O(209), b_+OE(210)); A = mem_rd(gb, DE);
+  CYC(b_+O(210), b_+OE(212)); alu_cp(gb, 0xff);
+  if (!(F & FZ)) { CYCT(b_+O(212), b_+OE(213)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(212), b_+OE(213));
+  CYC(b_+O(213), b_+OE(215)); A = 0x80; // DISABLE_ALL_BUT_INTERACTIONS
+  CYC(b_+O(215), b_+OE(218)); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+O(218), b_+OE(221)); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+O(221), b_+OE(222)); H = D;
+  CYC(b_+O(222), b_+OE(224)); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+O(224), b_+OE(226)); mem_wr(gb, HL, 0x04);
+  CYC(b_+O(226), b_+OE(228)); A = 0x06;
+  CALL_C(b_+O(228), objectSetCollideRadius_hook, SYM(objectSetCollideRadius), b_+OE(231));
+  CYC(b_+O(231), b_+OE(234)); SET_BC(0xfec0); // -$140
+  CALL_C(b_+O(234), objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+OE(237));
+  CYC(b_+O(237), b_+OE(239)); L = INTERACTION_BASE + OBJ_SPEED;
+  CYC(b_+O(239), b_+OE(241)); mem_wr(gb, HL, 0x28); // SPEED_100
+  CALL_C(b_+O(241), objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+OE(244));
+  CYC(b_+O(244), b_+OE(246)); E = INTERACTION_BASE + OBJ_ANGLE;
+  CYC(b_+O(246), b_+OE(247)); mem_wr(gb, DE, A);
+  CYC(b_+O(247), b_+OE(250)); TAIL(objectSetVisible80); // jp
 
 state4:
-  CYC(b_+250, b_+253); A = mem_rd(gb, wLinkDeathTrigger);
-  CYC(b_+253, b_+254); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+254, b_+257); interactionDelete_hook(gb); return; } // jp nz
-  CYC(b_+254, b_+257);
-  CALL_C(b_+257, objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+260);
-  if (F & FC) { CYCT(b_+260, b_+262); goto l_4503; } // jr c
-  CYC(b_+260, b_+262);
-  CALL_C(b_+262, objectApplySpeed_hook, SYM(objectApplySpeed), b_+265);
-  CYC(b_+265, b_+267); C = 0x20;
-  CYC(b_+267, b_+270); TAIL(objectUpdateSpeedZ_paramC); // jp
+  CYC(b_+O(250), b_+OE(253)); A = mem_rd(gb, wLinkDeathTrigger);
+  CYC(b_+O(253), b_+OE(254)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(254), b_+OE(257)); interactionDelete_hook(gb); return; } // jp nz
+  CYC(b_+O(254), b_+OE(257));
+  CALL_C(b_+O(257), objectCheckCollidedWithLink_notDeadAndNotGrabbing_hook, SYM(objectCheckCollidedWithLink_notDeadAndNotGrabbing), b_+OE(260));
+  if (F & FC) { CYCT(b_+O(260), b_+OE(262)); goto l_4503; } // jr c
+  CYC(b_+O(260), b_+OE(262));
+  CALL_C(b_+O(262), objectApplySpeed_hook, SYM(objectApplySpeed), b_+OE(265));
+  CYC(b_+O(265), b_+OE(267)); C = 0x20;
+  CYC(b_+O(267), b_+OE(270)); TAIL(objectUpdateSpeedZ_paramC); // jp
 
 l_4503:
-  CALL_C(b_+270, interactionIncState_hook, SYM(interactionIncState), b_+273);
-  CYC(b_+273, b_+275); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(b_+275, b_+277); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CYC(b_+277, b_+280); SET_BC(0x3501); // TX_3501
-  CYC(b_+280, b_+283); TAIL(showText); // jp
+  CALL_C(b_+O(270), interactionIncState_hook, SYM(interactionIncState), b_+OE(273));
+  CYC(b_+O(273), b_+OE(275)); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+O(275), b_+OE(277)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CYC(b_+O(277), b_+OE(280)); SET_BC(0x3501); // TX_3501
+  CYC(b_+O(280), b_+OE(283)); TAIL(showText); // jp
 
 state5:
-  CYC(b_+283, b_+286); SET_HL(wGashaSpotFlags);
-  CYC(b_+286, b_+288); alu_bit(gb, 0, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+288, b_+290); goto l_451d; } // jr nz
-  CYC(b_+288, b_+290);
-  CYC(b_+290, b_+292); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0))); // set 0,(hl)
-  CYC(b_+292, b_+294); B = 0x04; // GASHATREASURE_TIER3_RING
-  CYCT(b_+294, b_+296); goto spawnTreasure; // jr
+  CYC(b_+O(283), b_+OE(286)); SET_HL(wGashaSpotFlags);
+  CYC(b_+O(286), b_+OE(288)); alu_bit(gb, 0, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(288), b_+OE(290)); goto l_451d; } // jr nz
+  CYC(b_+O(288), b_+OE(290));
+  CYC(b_+O(290), b_+OE(292)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 0))); // set 0,(hl)
+  CYC(b_+O(292), b_+OE(294)); B = 0x04; // GASHATREASURE_TIER3_RING
+  CYCT(b_+O(294), b_+OE(296)); goto spawnTreasure; // jr
 
 l_451d:
-  CYC(b_+296, b_+298); C = 0x00;
-  CYC(b_+298, b_+301); SET_HL(wGashaMaturity + 1);
-  CYC(b_+301, b_+302); A = mem_rd(gb, HL); SET_HL(HL - 1); // ldd a,(hl)
-  CYC(b_+302, b_+304); A = alu_srl(gb, A);
-  if (!(F & FZ)) { CYCT(b_+304, b_+306); goto l_4533; } // jr nz
-  CYC(b_+304, b_+306);
-  CYC(b_+306, b_+307); A = mem_rd(gb, HL);
-  CYC(b_+307, b_+308); alu_rra(gb);
-  CYC(b_+308, b_+311); SET_HL(b_+774); // @gashaMaturityValues
+  CYC(b_+O(296), b_+OE(298)); C = 0x00;
+  CYC(b_+O(298), b_+OE(301)); SET_HL(wGashaMaturity + 1);
+  CYC(b_+O(301), b_+OE(302)); A = mem_rd(gb, HL); SET_HL(HL - 1); // ldd a,(hl)
+  CYC(b_+O(302), b_+OE(304)); A = alu_srl(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(304), b_+OE(306)); goto l_4533; } // jr nz
+  CYC(b_+O(304), b_+OE(306));
+  CYC(b_+O(306), b_+OE(307)); A = mem_rd(gb, HL);
+  CYC(b_+O(307), b_+OE(308)); alu_rra(gb);
+  CYC(b_+O(308), b_+OE(311)); SET_HL(b_+O(774)); // @gashaMaturityValues
 
 l_452c:
-  CYC(b_+311, b_+312); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FC)) { CYCT(b_+312, b_+314); goto l_4533; } // jr nc
-  CYC(b_+312, b_+314);
-  CYC(b_+314, b_+315); SET_HL(HL + 1); // inc hl
-  CYC(b_+315, b_+316); C = alu_inc8(gb, C);
-  CYCT(b_+316, b_+318); goto l_452c; // jr
+  CYC(b_+O(311), b_+OE(312)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FC)) { CYCT(b_+O(312), b_+OE(314)); goto l_4533; } // jr nc
+  CYC(b_+O(312), b_+OE(314));
+  CYC(b_+O(314), b_+OE(315)); SET_HL(HL + 1); // inc hl
+  CYC(b_+O(315), b_+OE(316)); C = alu_inc8(gb, C);
+  CYCT(b_+O(316), b_+OE(318)); goto l_452c; // jr
 
 l_4533:
-  CYC(b_+318, b_+320); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(b_+320, b_+321); A = mem_rd(gb, DE);
-  CYC(b_+321, b_+324); SET_HL(b_+799); // @gashaSpotRanks
-  CYC(b_+324, b_+325); interactionCodeb6_addAToHl(gb, b_+325);
-  CYC(b_+325, b_+326); A = mem_rd(gb, HL);
-  CYC(b_+326, b_+327); interactionCodeb6_addAToHl(gb, b_+327);
-  CYC(b_+327, b_+328); A = C;
-  CYC(b_+328, b_+329); alu_add(gb, A);
-  CYC(b_+329, b_+330); C = A;
-  CYC(b_+330, b_+331); alu_add(gb, A);
-  CYC(b_+331, b_+332); alu_add(gb, A);
-  CYC(b_+332, b_+333); alu_add(gb, C);
-  CYC(b_+333, b_+334); interactionCodeb6_addAToHl(gb, b_+334);
-  CALL_C(b_+334, getRandomIndexFromProbabilityDistribution_hook, SYM(getRandomIndexFromProbabilityDistribution), b_+337);
-  CYC(b_+337, b_+338); A = B;
-  CYC(b_+338, b_+340); alu_cp(gb, 0x06); // GASHATREASURE_POTION
-  if (!(F & FZ)) { CYCT(b_+340, b_+342); goto notPotion; } // jr nz
-  CYC(b_+340, b_+342);
-  CYC(b_+342, b_+344); A = 0x2f; // TREASURE_POTION
-  CALL_C(b_+344, checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+347);
-  if (!(F & FC)) { CYCT(b_+347, b_+349); goto decGashaMaturity; } // jr nc
-  CYC(b_+347, b_+349);
-  CYC(b_+349, b_+352); SET_HL(wLinkMaxHealth);
-  CYC(b_+352, b_+353); A = mem_rd(gb, HL); SET_HL(HL - 1); // ldd a,(hl)
-  CYC(b_+353, b_+354); mem_wr(gb, HL, A);
-  CYCT(b_+354, b_+356); goto decGashaMaturity; // jr
+  CYC(b_+O(318), b_+OE(320)); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+O(320), b_+OE(321)); A = mem_rd(gb, DE);
+  CYC(b_+O(321), b_+OE(324)); SET_HL(b_+O(799)); // @gashaSpotRanks
+  CYC(b_+O(324), b_+OE(325)); interactionCodeb6_addAToHl(gb, b_+O(325));
+  CYC(b_+O(325), b_+OE(326)); A = mem_rd(gb, HL);
+  CYC(b_+O(326), b_+OE(327)); interactionCodeb6_addAToHl(gb, b_+O(327));
+  CYC(b_+O(327), b_+OE(328)); A = C;
+  CYC(b_+O(328), b_+OE(329)); alu_add(gb, A);
+  CYC(b_+O(329), b_+OE(330)); C = A;
+  CYC(b_+O(330), b_+OE(331)); alu_add(gb, A);
+  CYC(b_+O(331), b_+OE(332)); alu_add(gb, A);
+  CYC(b_+O(332), b_+OE(333)); alu_add(gb, C);
+  CYC(b_+O(333), b_+OE(334)); interactionCodeb6_addAToHl(gb, b_+O(334));
+  CALL_C(b_+O(334), getRandomIndexFromProbabilityDistribution_hook, SYM(getRandomIndexFromProbabilityDistribution), b_+OE(337));
+  CYC(b_+O(337), b_+OE(338)); A = B;
+  CYC(b_+O(338), b_+OE(340)); alu_cp(gb, 0x06); // GASHATREASURE_POTION
+  if (!(F & FZ)) { CYCT(b_+O(340), b_+OE(342)); goto notPotion; } // jr nz
+  CYC(b_+O(340), b_+OE(342));
+  CYC(b_+O(342), b_+OE(344)); A = 0x2f; // TREASURE_POTION
+  CALL_C(b_+O(344), checkTreasureObtained_hook, SYM(checkTreasureObtained), b_+OE(347));
+  if (!(F & FC)) { CYCT(b_+O(347), b_+OE(349)); goto decGashaMaturity; } // jr nc
+  CYC(b_+O(347), b_+OE(349));
+  CYC(b_+O(349), b_+OE(352)); SET_HL(wLinkMaxHealth);
+  CYC(b_+O(352), b_+OE(353)); A = mem_rd(gb, HL); SET_HL(HL - 1); // ldd a,(hl)
+  CYC(b_+O(353), b_+OE(354)); mem_wr(gb, HL, A);
+  CYCT(b_+O(354), b_+OE(356)); goto decGashaMaturity; // jr
 
 notPotion:
-  CYC(b_+356, b_+358); alu_cp(gb, 0x00); // GASHATREASURE_HEART_PIECE
-  if (!(F & FZ)) { CYCT(b_+358, b_+360); goto decGashaMaturity; } // jr nz
-  CYC(b_+358, b_+360);
-  CYC(b_+360, b_+363); SET_HL(wGashaSpotFlags);
-  CYC(b_+363, b_+365); alu_bit(gb, 1, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+365, b_+367); goto l_4565; } // jr z
-  CYC(b_+365, b_+367);
-  CYC(b_+367, b_+368); B = alu_inc8(gb, B);
+  CYC(b_+O(356), b_+OE(358)); alu_cp(gb, 0x00); // GASHATREASURE_HEART_PIECE
+  if (!(F & FZ)) { CYCT(b_+O(358), b_+OE(360)); goto decGashaMaturity; } // jr nz
+  CYC(b_+O(358), b_+OE(360));
+  CYC(b_+O(360), b_+OE(363)); SET_HL(wGashaSpotFlags);
+  CYC(b_+O(363), b_+OE(365)); alu_bit(gb, 1, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(365), b_+OE(367)); goto l_4565; } // jr z
+  CYC(b_+O(365), b_+OE(367));
+  CYC(b_+O(367), b_+OE(368)); B = alu_inc8(gb, B);
 
 l_4565:
-  CYC(b_+368, b_+370); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1))); // set 1,(hl)
+  CYC(b_+O(368), b_+OE(370)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 1))); // set 1,(hl)
 
 decGashaMaturity:
-  CYC(b_+370, b_+373); SET_HL(wGashaMaturity);
-  CYC(b_+373, b_+374); A = mem_rd(gb, HL);
-  CYC(b_+374, b_+376); alu_sub(gb, 0xc8); // 200
-  CYC(b_+376, b_+377); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+377, b_+378); A = mem_rd(gb, HL);
-  CYC(b_+378, b_+380); alu_sbc(gb, 0x00);
-  CYC(b_+380, b_+381); mem_wr(gb, HL, A);
-  if (!(F & FC)) { CYCT(b_+381, b_+383); goto spawnTreasure; } // jr nc
-  CYC(b_+381, b_+383);
-  CYC(b_+383, b_+384); alu_xor(gb, A);
-  CYC(b_+384, b_+385); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
-  CYC(b_+385, b_+386); mem_wr(gb, HL, A);
+  CYC(b_+O(370), b_+OE(373)); SET_HL(wGashaMaturity);
+  CYC(b_+O(373), b_+OE(374)); A = mem_rd(gb, HL);
+  CYC(b_+O(374), b_+OE(376)); alu_sub(gb, 0xc8); // 200
+  CYC(b_+O(376), b_+OE(377)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(377), b_+OE(378)); A = mem_rd(gb, HL);
+  CYC(b_+O(378), b_+OE(380)); alu_sbc(gb, 0x00);
+  CYC(b_+O(380), b_+OE(381)); mem_wr(gb, HL, A);
+  if (!(F & FC)) { CYCT(b_+O(381), b_+OE(383)); goto spawnTreasure; } // jr nc
+  CYC(b_+O(381), b_+OE(383));
+  CYC(b_+O(383), b_+OE(384)); alu_xor(gb, A);
+  CYC(b_+O(384), b_+OE(385)); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
+  CYC(b_+O(385), b_+OE(386)); mem_wr(gb, HL, A);
 
 spawnTreasure:
-  CYC(b_+386, b_+387); A = B;
-  CYC(b_+387, b_+389); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+389, b_+390); mem_wr(gb, DE, A);
-  CYC(b_+390, b_+393); SET_HL(b_+779); // @gashaTreasures
-  CYC(b_+393, b_+394); interactionCodeb6_addDoubleIndex(gb, b_+394);
-  CYC(b_+394, b_+395); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+395, b_+396); C = mem_rd(gb, HL);
-  CYC(b_+396, b_+398); alu_cp(gb, 0x2d); // TREASURE_RING
-  if (!(F & FZ)) { CYCT(b_+398, b_+400); goto l_4588; } // jr nz
-  CYC(b_+398, b_+400);
-  CALL_C(b_+400, getRandomRingOfGivenTier_hook, SYM(getRandomRingOfGivenTier), b_+403);
+  CYC(b_+O(386), b_+OE(387)); A = B;
+  CYC(b_+O(387), b_+OE(389)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(389), b_+OE(390)); mem_wr(gb, DE, A);
+  CYC(b_+O(390), b_+OE(393)); SET_HL(b_+O(779)); // @gashaTreasures
+  CYC(b_+O(393), b_+OE(394)); interactionCodeb6_addDoubleIndex(gb, b_+O(394));
+  CYC(b_+O(394), b_+OE(395)); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+O(395), b_+OE(396)); C = mem_rd(gb, HL);
+  CYC(b_+O(396), b_+OE(398)); alu_cp(gb, 0x2d); // TREASURE_RING
+  if (!(F & FZ)) { CYCT(b_+O(398), b_+OE(400)); goto l_4588; } // jr nz
+  CYC(b_+O(398), b_+OE(400));
+  CALL_C(b_+O(400), getRandomRingOfGivenTier_hook, SYM(getRandomRingOfGivenTier), b_+OE(403));
 
 l_4588:
-  CYC(b_+403, b_+404); B = A;
-  CALL_C(b_+404, giveTreasure_hook, SYM(giveTreasure), b_+407);
-  CYC(b_+407, b_+410); SET_HL(wLinkForceState);
-  CYC(b_+410, b_+412); A = 0x04; // LINK_STATE_04
-  CYC(b_+412, b_+413); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+413, b_+415); mem_wr(gb, HL, 0x01); // [wcc50]
-  CYC(b_+415, b_+418); SET_HL(w1Link_yh);
-  CYC(b_+418, b_+421); SET_BC(0xf300);
-  CALL_C(b_+421, objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+424);
-  CALL_C(b_+424, interactionIncState_hook, SYM(interactionIncState), b_+427);
-  CYC(b_+427, b_+429); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(b_+429, b_+431); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+431, b_+433); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+433, b_+434); A = mem_rd(gb, DE);
-  CYC(b_+434, b_+436); alu_cp(gb, 0x00); // GASHATREASURE_HEART_PIECE
-  CYC(b_+436, b_+438); A = 0x4c; // SND_GETITEM
-  if (!(F & FZ)) { CALL_C_CC(b_+438, playSound_b00_hook, SYM(playSound_b00), b_+441); } else { CYC(b_+438, b_+441); } // call nz
-  CALL_C(b_+441, interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+444);
-  CYC(b_+444, b_+446); E = INTERACTION_BASE + OBJ_SUBID;
-  CYC(b_+446, b_+447); A = mem_rd(gb, DE);
-  CYC(b_+447, b_+450); SET_HL(b_+457); // @lowTextIndices
-  CYC(b_+450, b_+451); interactionCodeb6_addAToHl(gb, b_+451);
-  CYC(b_+451, b_+452); C = mem_rd(gb, HL);
-  CYC(b_+452, b_+454); B = 0x35; // >TX_3500
-  CYC(b_+454, b_+457); TAIL(showText); // jp
+  CYC(b_+O(403), b_+OE(404)); B = A;
+  CALL_C(b_+O(404), giveTreasure_hook, SYM(giveTreasure), b_+OE(407));
+  CYC(b_+O(407), b_+OE(410)); SET_HL(wLinkForceState);
+  CYC(b_+O(410), b_+OE(412)); A = 0x04; // LINK_STATE_04
+  CYC(b_+O(412), b_+OE(413)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(413), b_+OE(415)); mem_wr(gb, HL, 0x01); // [wcc50]
+  CYC(b_+O(415), b_+OE(418)); SET_HL(w1Link_yh);
+  CYC(b_+O(418), b_+OE(421)); SET_BC(0xf300);
+  CALL_C(b_+O(421), objectTakePositionWithOffset_hook, SYM(objectTakePositionWithOffset), b_+OE(424));
+  CALL_C(b_+O(424), interactionIncState_hook, SYM(interactionIncState), b_+OE(427));
+  CYC(b_+O(427), b_+OE(429)); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+O(429), b_+OE(431)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CYC(b_+O(431), b_+OE(433)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(433), b_+OE(434)); A = mem_rd(gb, DE);
+  CYC(b_+O(434), b_+OE(436)); alu_cp(gb, 0x00); // GASHATREASURE_HEART_PIECE
+  CYC(b_+O(436), b_+OE(438)); A = 0x4c; // SND_GETITEM
+  if (!(F & FZ)) { CALL_C_CC(b_+O(438), playSound_b00_hook, SYM(playSound_b00), b_+OE(441)); } else { CYC(b_+O(438), b_+OE(441)); } // call nz
+  CALL_C(b_+O(441), interactionInitGraphics_hook, SYM(interactionInitGraphics), b_+OE(444));
+  CYC(b_+O(444), b_+OE(446)); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+O(446), b_+OE(447)); A = mem_rd(gb, DE);
+  CYC(b_+O(447), b_+OE(450)); SET_HL(b_+O(457)); // @lowTextIndices
+  CYC(b_+O(450), b_+OE(451)); interactionCodeb6_addAToHl(gb, b_+O(451));
+  CYC(b_+O(451), b_+OE(452)); C = mem_rd(gb, HL);
+  CYC(b_+O(452), b_+OE(454)); B = 0x35; // >TX_3500
+  CYC(b_+O(454), b_+OE(457)); TAIL(showText); // jp
 
 state6:
-  CYC(b_+467, b_+470); SET_HL(wNumRupees);
-  CYC(b_+470, b_+473); A = mem_rd(gb, wDisplayedRupees);
-  CYC(b_+473, b_+474); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+474, b_+475); ret_effect(gb); return; } // ret nz
-  CYC(b_+474, b_+475);
-  CYC(b_+475, b_+476); L = alu_inc8(gb, L);
-  CYC(b_+476, b_+479); A = mem_rd(gb, wDisplayedRupees + 1);
-  CYC(b_+479, b_+480); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+480, b_+481); ret_effect(gb); return; } // ret nz
-  CYC(b_+480, b_+481);
-  CYC(b_+481, b_+483); L = 0xaa; // wLinkHealth low byte
-  CYC(b_+483, b_+486); A = mem_rd(gb, wDisplayedHearts);
-  CYC(b_+486, b_+487); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+487, b_+488); ret_effect(gb); return; } // ret nz
-  CYC(b_+487, b_+488);
-  CYC(b_+488, b_+490); A = 0x91; // SND_FAIRYCUTSCENE
-  CALL_C(b_+490, playSound_b00_hook, SYM(playSound_b00), b_+493);
-  CYC(b_+493, b_+495); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(b_+495, b_+496); A = mem_rd(gb, DE);
-  CYC(b_+496, b_+499); SET_HL(b_+1186); // @gfxHeaderToLoadWhenTreeDisappears
-  CYC(b_+499, b_+500); interactionCodeb6_addAToHl(gb, b_+500);
-  CYC(b_+500, b_+501); A = mem_rd(gb, HL);
-  CYC(b_+501, b_+502); push_effect(gb, AF); // push af
-  CYC(b_+502, b_+504); alu_sub(gb, 0x39); // GFXH_GASHA_TREE_DISAPPEARED - OBJ_GFXH_04
-  CYC(b_+504, b_+507); mem_wr(gb, wLoadedTreeGfxActive, A);
-  CYC(b_+507, b_+509); A = 0x3d; // GFXH_GASHA_TREE_DISAPPEARED
-  CALL_C(b_+509, loadGfxHeader_hook, SYM(loadGfxHeader), b_+512);
-  CYC(b_+512, b_+513); SET_AF(pop_effect(gb)); // pop af
-  CYC(b_+513, b_+515); alu_cp(gb, 0x3d);
-  if (!(F & FZ)) { CALL_C_CC(b_+515, loadGfxHeader_hook, SYM(loadGfxHeader), b_+518); } else { CYC(b_+515, b_+518); } // call nz
-  CYC(b_+518, b_+520); A = H8(hActiveObject); // ldh a,($ffaf)
-  CYC(b_+520, b_+521); D = A;
-  CYC(b_+521, b_+522); H = D;
-  CYC(b_+522, b_+524); L = INTERACTION_BASE + OBJ_VAR37;
-  CYC(b_+524, b_+526); E = INTERACTION_BASE + OBJ_YH;
-  CYC(b_+526, b_+527); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+527, b_+528); mem_wr(gb, DE, A);
-  CYC(b_+528, b_+530); E = INTERACTION_BASE + OBJ_XH;
-  CYC(b_+530, b_+531); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+531, b_+532); mem_wr(gb, DE, A);
-  CYC(b_+532, b_+534); L = INTERACTION_BASE + OBJ_VISIBLE;
-  CYC(b_+534, b_+536); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
-  CALL_C(b_+536, objectGetTileCollisions_hook, SYM(objectGetTileCollisions), b_+539);
-  CYC(b_+539, b_+540); alu_xor(gb, A);
-  CYC(b_+540, b_+541); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+541, b_+542); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
-  CYC(b_+542, b_+543); A = L;
-  CYC(b_+543, b_+545); alu_sub(gb, 0x10);
-  CYC(b_+545, b_+546); L = A;
-  CYC(b_+546, b_+547); alu_xor(gb, A);
-  CYC(b_+547, b_+548); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+548, b_+549); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
-  CYC(b_+549, b_+550); H = A;
-  CYC(b_+550, b_+551); E = L;
-  CYC(b_+551, b_+552); A = L;
-  CYC(b_+552, b_+554); alu_and(gb, 0xf0);
-  CYC(b_+554, b_+555); L = A;
-  CYC(b_+555, b_+556); A = E;
-  CYC(b_+556, b_+558); alu_and(gb, 0x0f);
-  CYC(b_+558, b_+560); L = alu_sla(gb, L);
-  CYC(b_+560, b_+562); H = alu_rl(gb, H);
-  CYC(b_+562, b_+563); alu_add(gb, L);
-  CYC(b_+563, b_+564); L = A;
-  CYC(b_+564, b_+566); L = alu_sla(gb, L);
-  CYC(b_+566, b_+568); H = alu_rl(gb, H);
-  CYC(b_+568, b_+571); SET_BC(w3VramTiles);
-  CYC(b_+571, b_+572); alu_add_hl(gb, BC);
-  CYC(b_+572, b_+574); E = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(b_+574, b_+575); A = L;
-  CYC(b_+575, b_+576); mem_wr(gb, DE, A);
-  CYC(b_+576, b_+577); E = alu_inc8(gb, E);
-  CYC(b_+577, b_+578); A = H;
-  CYC(b_+578, b_+579); mem_wr(gb, DE, A);
-  CYC(b_+579, b_+582); SET_BC(0x0400);
-  CYC(b_+582, b_+583); alu_add_hl(gb, BC);
-  CYC(b_+583, b_+585); A = hram_rd(gb, R_SVBK);
-  CYC(b_+585, b_+586); push_effect(gb, AF); // push af
-  CYC(b_+586, b_+588); A = 0x03; // :w3VramAttributes
-  CYC(b_+588, b_+590); hram_wr(gb, R_SVBK, A);
-  CYC(b_+590, b_+592); B = 0x04;
+  CYC(b_+O(467), b_+OE(470)); SET_HL(wNumRupees);
+  CYC(b_+O(470), b_+OE(473)); A = mem_rd(gb, wDisplayedRupees);
+  CYC(b_+O(473), b_+OE(474)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(474), b_+OE(475)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(474), b_+OE(475));
+  CYC(b_+O(475), b_+OE(476)); L = alu_inc8(gb, L);
+  CYC(b_+O(476), b_+OE(479)); A = mem_rd(gb, wDisplayedRupees + 1);
+  CYC(b_+O(479), b_+OE(480)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(480), b_+OE(481)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(480), b_+OE(481));
+  CYC(b_+O(481), b_+OE(483)); L = GV(0xaa, 0xa2); // wLinkHealth low byte
+  CYC(b_+O(483), b_+OE(486)); A = mem_rd(gb, wDisplayedHearts);
+  CYC(b_+O(486), b_+OE(487)); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+O(487), b_+OE(488)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(487), b_+OE(488));
+  CYC(b_+O(488), b_+OE(490)); A = 0x91; // SND_FAIRYCUTSCENE
+  CALL_C(b_+O(490), playSound_b00_hook, SYM(playSound_b00), b_+OE(493));
+  CYC(b_+O(493), b_+OE(495)); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+O(495), b_+OE(496)); A = mem_rd(gb, DE);
+  CYC(b_+O(496), b_+OE(499)); SET_HL(b_+O(1186)); // @gfxHeaderToLoadWhenTreeDisappears
+  CYC(b_+O(499), b_+OE(500)); interactionCodeb6_addAToHl(gb, b_+O(500));
+  CYC(b_+O(500), b_+OE(501)); A = mem_rd(gb, HL);
+  CYC(b_+O(501), b_+OE(502)); push_effect(gb, AF); // push af
+  CYC(b_+O(502), b_+OE(504)); alu_sub(gb, 0x39); // GFXH_GASHA_TREE_DISAPPEARED - OBJ_GFXH_04
+  CYC(b_+O(504), b_+OE(507)); mem_wr(gb, wLoadedTreeGfxActive, A);
+  CYC(b_+O(507), b_+OE(509)); A = 0x3d; // GFXH_GASHA_TREE_DISAPPEARED
+  CALL_C(b_+O(509), loadGfxHeader_hook, SYM(loadGfxHeader), b_+OE(512));
+  CYC(b_+O(512), b_+OE(513)); SET_AF(pop_effect(gb)); // pop af
+  CYC(b_+O(513), b_+OE(515)); alu_cp(gb, 0x3d);
+  if (!(F & FZ)) { CALL_C_CC(b_+O(515), loadGfxHeader_hook, SYM(loadGfxHeader), b_+OE(518)); } else { CYC(b_+O(515), b_+OE(518)); } // call nz
+  CYC(b_+O(518), b_+OE(520)); A = H8(hActiveObject); // ldh a,($ffaf)
+  CYC(b_+O(520), b_+OE(521)); D = A;
+  CYC(b_+O(521), b_+OE(522)); H = D;
+  CYC(b_+O(522), b_+OE(524)); L = INTERACTION_BASE + OBJ_VAR37;
+  CYC(b_+O(524), b_+OE(526)); E = INTERACTION_BASE + OBJ_YH;
+  CYC(b_+O(526), b_+OE(527)); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+O(527), b_+OE(528)); mem_wr(gb, DE, A);
+  CYC(b_+O(528), b_+OE(530)); E = INTERACTION_BASE + OBJ_XH;
+  CYC(b_+O(530), b_+OE(531)); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+O(531), b_+OE(532)); mem_wr(gb, DE, A);
+  CYC(b_+O(532), b_+OE(534)); L = INTERACTION_BASE + OBJ_VISIBLE;
+  CYC(b_+O(534), b_+OE(536)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 7))); // res 7,(hl)
+  CALL_C(b_+O(536), objectGetTileCollisions_hook, SYM(objectGetTileCollisions), b_+OE(539));
+  CYC(b_+O(539), b_+OE(540)); alu_xor(gb, A);
+  CYC(b_+O(540), b_+OE(541)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(541), b_+OE(542)); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
+  CYC(b_+O(542), b_+OE(543)); A = L;
+  CYC(b_+O(543), b_+OE(545)); alu_sub(gb, 0x10);
+  CYC(b_+O(545), b_+OE(546)); L = A;
+  CYC(b_+O(546), b_+OE(547)); alu_xor(gb, A);
+  CYC(b_+O(547), b_+OE(548)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(548), b_+OE(549)); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
+  CYC(b_+O(549), b_+OE(550)); H = A;
+  CYC(b_+O(550), b_+OE(551)); E = L;
+  CYC(b_+O(551), b_+OE(552)); A = L;
+  CYC(b_+O(552), b_+OE(554)); alu_and(gb, 0xf0);
+  CYC(b_+O(554), b_+OE(555)); L = A;
+  CYC(b_+O(555), b_+OE(556)); A = E;
+  CYC(b_+O(556), b_+OE(558)); alu_and(gb, 0x0f);
+  CYC(b_+O(558), b_+OE(560)); L = alu_sla(gb, L);
+  CYC(b_+O(560), b_+OE(562)); H = alu_rl(gb, H);
+  CYC(b_+O(562), b_+OE(563)); alu_add(gb, L);
+  CYC(b_+O(563), b_+OE(564)); L = A;
+  CYC(b_+O(564), b_+OE(566)); L = alu_sla(gb, L);
+  CYC(b_+O(566), b_+OE(568)); H = alu_rl(gb, H);
+  CYC(b_+O(568), b_+OE(571)); SET_BC(w3VramTiles);
+  CYC(b_+O(571), b_+OE(572)); alu_add_hl(gb, BC);
+  CYC(b_+O(572), b_+OE(574)); E = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+O(574), b_+OE(575)); A = L;
+  CYC(b_+O(575), b_+OE(576)); mem_wr(gb, DE, A);
+  CYC(b_+O(576), b_+OE(577)); E = alu_inc8(gb, E);
+  CYC(b_+O(577), b_+OE(578)); A = H;
+  CYC(b_+O(578), b_+OE(579)); mem_wr(gb, DE, A);
+  CYC(b_+O(579), b_+OE(582)); SET_BC(0x0400);
+  CYC(b_+O(582), b_+OE(583)); alu_add_hl(gb, BC);
+  CYC(b_+O(583), b_+OE(585)); A = hram_rd(gb, R_SVBK);
+  CYC(b_+O(585), b_+OE(586)); push_effect(gb, AF); // push af
+  CYC(b_+O(586), b_+OE(588)); A = 0x03; // :w3VramAttributes
+  CYC(b_+O(588), b_+OE(590)); hram_wr(gb, R_SVBK, A);
+  CYC(b_+O(590), b_+OE(592)); B = 0x04;
 
 l_4645:
-  CYC(b_+592, b_+594); C = 0x04;
-  CYC(b_+594, b_+595); push_effect(gb, BC); // push bc
+  CYC(b_+O(592), b_+OE(594)); C = 0x04;
+  CYC(b_+O(594), b_+OE(595)); push_effect(gb, BC); // push bc
 
 l_4648:
-  CYC(b_+595, b_+596); A = mem_rd(gb, HL);
-  CYC(b_+596, b_+598); alu_and(gb, 0xf0);
-  CYC(b_+598, b_+600); alu_or(gb, 0x04);
-  CYC(b_+600, b_+601); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+601, b_+602); C = alu_dec8(gb, C);
-  if (!(F & FZ)) { CYCT(b_+602, b_+604); goto l_4648; } // jr nz
-  CYC(b_+602, b_+604);
-  CYC(b_+604, b_+607); SET_BC(0x001c);
-  CYC(b_+607, b_+608); alu_add_hl(gb, BC);
-  CYC(b_+608, b_+609); SET_BC(pop_effect(gb)); // pop bc
-  CYC(b_+609, b_+610); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(b_+610, b_+612); goto l_4645; } // jr nz
-  CYC(b_+610, b_+612);
-  CYC(b_+612, b_+613); SET_AF(pop_effect(gb)); // pop af
-  CYC(b_+613, b_+615); hram_wr(gb, R_SVBK, A);
-  CALL_C(b_+615, interactionIncState_hook, SYM(interactionIncState), b_+618);
-  CYC(b_+618, b_+620); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(b_+620, b_+622); mem_wr(gb, HL, 0x08);
+  CYC(b_+O(595), b_+OE(596)); A = mem_rd(gb, HL);
+  CYC(b_+O(596), b_+OE(598)); alu_and(gb, 0xf0);
+  CYC(b_+O(598), b_+OE(600)); alu_or(gb, 0x04);
+  CYC(b_+O(600), b_+OE(601)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(601), b_+OE(602)); C = alu_dec8(gb, C);
+  if (!(F & FZ)) { CYCT(b_+O(602), b_+OE(604)); goto l_4648; } // jr nz
+  CYC(b_+O(602), b_+OE(604));
+  CYC(b_+O(604), b_+OE(607)); SET_BC(0x001c);
+  CYC(b_+O(607), b_+OE(608)); alu_add_hl(gb, BC);
+  CYC(b_+O(608), b_+OE(609)); SET_BC(pop_effect(gb)); // pop bc
+  CYC(b_+O(609), b_+OE(610)); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+O(610), b_+OE(612)); goto l_4645; } // jr nz
+  CYC(b_+O(610), b_+OE(612));
+  CYC(b_+O(612), b_+OE(613)); SET_AF(pop_effect(gb)); // pop af
+  CYC(b_+O(613), b_+OE(615)); hram_wr(gb, R_SVBK, A);
+  CALL_C(b_+O(615), interactionIncState_hook, SYM(interactionIncState), b_+OE(618));
+  CYC(b_+O(618), b_+OE(620)); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+O(620), b_+OE(622)); mem_wr(gb, HL, 0x08);
 
 state7:
-  CYC(b_+622, b_+623); H = D;
-  CYC(b_+623, b_+625); L = INTERACTION_BASE + OBJ_COUNTER1;
-  CYC(b_+625, b_+626); A = mem_rd(gb, HL);
-  CYC(b_+626, b_+627); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+627, b_+629); goto counter1Done; } // jr z
-  CYC(b_+627, b_+629);
-  CYC(b_+629, b_+630); A = alu_dec8(gb, A);
-  CYC(b_+630, b_+631); mem_wr(gb, HL, A);
-  if (!(F & FZ)) { CYCT(b_+631, b_+632); ret_effect(gb); return; } // ret nz
-  CYC(b_+631, b_+632);
+  CYC(b_+O(622), b_+OE(623)); H = D;
+  CYC(b_+O(623), b_+OE(625)); L = INTERACTION_BASE + OBJ_COUNTER1;
+  CYC(b_+O(625), b_+OE(626)); A = mem_rd(gb, HL);
+  CYC(b_+O(626), b_+OE(627)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(627), b_+OE(629)); goto counter1Done; } // jr z
+  CYC(b_+O(627), b_+OE(629));
+  CYC(b_+O(629), b_+OE(630)); A = alu_dec8(gb, A);
+  CYC(b_+O(630), b_+OE(631)); mem_wr(gb, HL, A);
+  if (!(F & FZ)) { CYCT(b_+O(631), b_+OE(632)); ret_effect(gb); return; } // ret nz
+  CYC(b_+O(631), b_+OE(632));
 
 counter1Done:
-  CYC(b_+632, b_+634); A = 0x08;
-  CYC(b_+634, b_+635); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+635, b_+636); A = mem_rd(gb, HL);
-  CYC(b_+636, b_+637); A = alu_inc8(gb, A);
-  CYC(b_+637, b_+638); mem_wr(gb, HL, A);
-  CYC(b_+638, b_+640); alu_cp(gb, 0x0a);
-  if (!(F & FC)) { CYCT(b_+640, b_+642); goto counter2Done; } // jr nc
-  CYC(b_+640, b_+642);
-  CYC(b_+642, b_+645); SET_HL(b_+1064); // @treeDisappearanceFrames - 1
-  CYC(b_+645, b_+646); interactionCodeb6_addAToHl(gb, b_+646);
-  CYC(b_+646, b_+647); A = mem_rd(gb, HL);
-  CYC(b_+647, b_+648); interactionCodeb6_addAToHl(gb, b_+648);
-  CYC(b_+648, b_+650); E = INTERACTION_BASE + OBJ_VAR3A;
-  CYC(b_+650, b_+651); A = mem_rd(gb, DE);
-  CYC(b_+651, b_+652); C = A;
-  CYC(b_+652, b_+653); E = alu_inc8(gb, E);
-  CYC(b_+653, b_+654); A = mem_rd(gb, DE);
-  CYC(b_+654, b_+655); D = A;
-  CYC(b_+655, b_+656); E = C;
-  CYC(b_+656, b_+657); push_effect(gb, HL); // push hl
-  CYC(b_+657, b_+658); push_effect(gb, DE); // push de
-  CYC(b_+658, b_+659); SET_HL(pop_effect(gb)); // pop hl
-  CYC(b_+659, b_+660); SET_DE(pop_effect(gb)); // pop de
-  CYC(b_+660, b_+662); A = hram_rd(gb, R_SVBK);
-  CYC(b_+662, b_+663); push_effect(gb, AF); // push af
-  CYC(b_+663, b_+665); A = 0x03; // :w3VramTiles
-  CYC(b_+665, b_+667); hram_wr(gb, R_SVBK, A);
-  CYC(b_+667, b_+669); B = 0x04;
+  CYC(b_+O(632), b_+OE(634)); A = 0x08;
+  CYC(b_+O(634), b_+OE(635)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(635), b_+OE(636)); A = mem_rd(gb, HL);
+  CYC(b_+O(636), b_+OE(637)); A = alu_inc8(gb, A);
+  CYC(b_+O(637), b_+OE(638)); mem_wr(gb, HL, A);
+  CYC(b_+O(638), b_+OE(640)); alu_cp(gb, 0x0a);
+  if (!(F & FC)) { CYCT(b_+O(640), b_+OE(642)); goto counter2Done; } // jr nc
+  CYC(b_+O(640), b_+OE(642));
+  CYC(b_+O(642), b_+OE(645)); SET_HL(SYM(interactionCodeb6__treeDisappearanceFrames) - 1);
+  CYC(b_+O(645), b_+OE(646)); interactionCodeb6_addAToHl(gb, b_+O(646));
+  CYC(b_+O(646), b_+OE(647)); A = mem_rd(gb, HL);
+  CYC(b_+O(647), b_+OE(648)); interactionCodeb6_addAToHl(gb, b_+O(648));
+  CYC(b_+O(648), b_+OE(650)); E = INTERACTION_BASE + OBJ_VAR3A;
+  CYC(b_+O(650), b_+OE(651)); A = mem_rd(gb, DE);
+  CYC(b_+O(651), b_+OE(652)); C = A;
+  CYC(b_+O(652), b_+OE(653)); E = alu_inc8(gb, E);
+  CYC(b_+O(653), b_+OE(654)); A = mem_rd(gb, DE);
+  CYC(b_+O(654), b_+OE(655)); D = A;
+  CYC(b_+O(655), b_+OE(656)); E = C;
+  CYC(b_+O(656), b_+OE(657)); push_effect(gb, HL); // push hl
+  CYC(b_+O(657), b_+OE(658)); push_effect(gb, DE); // push de
+  CYC(b_+O(658), b_+OE(659)); SET_HL(pop_effect(gb)); // pop hl
+  CYC(b_+O(659), b_+OE(660)); SET_DE(pop_effect(gb)); // pop de
+  CYC(b_+O(660), b_+OE(662)); A = hram_rd(gb, R_SVBK);
+  CYC(b_+O(662), b_+OE(663)); push_effect(gb, AF); // push af
+  CYC(b_+O(663), b_+OE(665)); A = 0x03; // :w3VramTiles
+  CYC(b_+O(665), b_+OE(667)); hram_wr(gb, R_SVBK, A);
+  CYC(b_+O(667), b_+OE(669)); B = 0x04;
 
 l_4692:
-  CYC(b_+669, b_+671); C = 0x04;
-  CYC(b_+671, b_+672); push_effect(gb, BC); // push bc
+  CYC(b_+O(669), b_+OE(671)); C = 0x04;
+  CYC(b_+O(671), b_+OE(672)); push_effect(gb, BC); // push bc
 
 l_4695:
-  CYC(b_+672, b_+673); A = mem_rd(gb, DE);
-  CYC(b_+673, b_+674); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+674, b_+675); SET_DE(DE + 1); // inc de
-  CYC(b_+675, b_+676); C = alu_dec8(gb, C);
-  if (!(F & FZ)) { CYCT(b_+676, b_+678); goto l_4695; } // jr nz
-  CYC(b_+676, b_+678);
-  CYC(b_+678, b_+681); SET_BC(0x001c);
-  CYC(b_+681, b_+682); alu_add_hl(gb, BC);
-  CYC(b_+682, b_+683); SET_BC(pop_effect(gb)); // pop bc
-  CYC(b_+683, b_+684); B = alu_dec8(gb, B);
-  if (!(F & FZ)) { CYCT(b_+684, b_+686); goto l_4692; } // jr nz
-  CYC(b_+684, b_+686);
-  CYC(b_+686, b_+687); SET_AF(pop_effect(gb)); // pop af
-  CYC(b_+687, b_+689); hram_wr(gb, R_SVBK, A);
-  CYC(b_+689, b_+691); A = 0x29; // UNCMP_GFXH_29
-  CALL_C(b_+691, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+694);
-  CYC(b_+694, b_+696); A = H8(hActiveObject); // ldh a,($ffaf)
-  CYC(b_+696, b_+697); D = A;
-  CYC(b_+697, b_+699); E = INTERACTION_BASE + OBJ_COUNTER2;
-  CYC(b_+699, b_+700); A = mem_rd(gb, DE);
-  CYC(b_+700, b_+702); alu_add(gb, 0x1f); // UNCMP_GFXH_20 - 1
-  CALL_C(b_+702, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+705);
-  CALL_C(b_+705, reloadTileMap_hook, SYM(reloadTileMap), b_+708);
-  CYC(b_+708, b_+710); A = H8(hActiveObject); // ldh a,($ffaf)
-  CYC(b_+710, b_+711); D = A;
-  RET(b_+711); return;
+  CYC(b_+O(672), b_+OE(673)); A = mem_rd(gb, DE);
+  CYC(b_+O(673), b_+OE(674)); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+  CYC(b_+O(674), b_+OE(675)); SET_DE(DE + 1); // inc de
+  CYC(b_+O(675), b_+OE(676)); C = alu_dec8(gb, C);
+  if (!(F & FZ)) { CYCT(b_+O(676), b_+OE(678)); goto l_4695; } // jr nz
+  CYC(b_+O(676), b_+OE(678));
+  CYC(b_+O(678), b_+OE(681)); SET_BC(0x001c);
+  CYC(b_+O(681), b_+OE(682)); alu_add_hl(gb, BC);
+  CYC(b_+O(682), b_+OE(683)); SET_BC(pop_effect(gb)); // pop bc
+  CYC(b_+O(683), b_+OE(684)); B = alu_dec8(gb, B);
+  if (!(F & FZ)) { CYCT(b_+O(684), b_+OE(686)); goto l_4692; } // jr nz
+  CYC(b_+O(684), b_+OE(686));
+  CYC(b_+O(686), b_+OE(687)); SET_AF(pop_effect(gb)); // pop af
+  CYC(b_+O(687), b_+OE(689)); hram_wr(gb, R_SVBK, A);
+  CYC(b_+O(689), b_+OE(691)); A = 0x29; // UNCMP_GFXH_29
+  CALL_C(b_+O(691), loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+OE(694));
+  CYC(b_+O(694), b_+OE(696)); A = H8(hActiveObject); // ldh a,($ffaf)
+  CYC(b_+O(696), b_+OE(697)); D = A;
+  CYC(b_+O(697), b_+OE(699)); E = INTERACTION_BASE + OBJ_COUNTER2;
+  CYC(b_+O(699), b_+OE(700)); A = mem_rd(gb, DE);
+  CYC(b_+O(700), b_+OE(702)); alu_add(gb, 0x1f); // UNCMP_GFXH_20 - 1
+  CALL_C(b_+O(702), loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+OE(705));
+  CALL_C(b_+O(705), reloadTileMap_hook, SYM(reloadTileMap), b_+OE(708));
+  CYC(b_+O(708), b_+OE(710)); A = H8(hActiveObject); // ldh a,($ffaf)
+  CYC(b_+O(710), b_+OE(711)); D = A;
+  RET(b_+O(711)); return;
 
 counter2Done:
-  CYC(b_+712, b_+713); alu_xor(gb, A);
-  CYC(b_+713, b_+716); mem_wr(gb, wDisabledObjects, A);
-  CYC(b_+716, b_+719); mem_wr(gb, wMenuDisabled, A);
-  CYC(b_+719, b_+721); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(b_+721, b_+722); A = mem_rd(gb, DE);
-  CYC(b_+722, b_+725); SET_HL(wGashaSpotsPlantedBitset);
-  CALL_C(b_+725, unsetFlag_hook, SYM(unsetFlag), b_+728);
-  CYC(b_+728, b_+730); A = 0x4e; // TILEINDEX_GASHA_TREE_TL
-  CALL_C(b_+730, findTileInRoom_hook, SYM(findTileInRoom), b_+733);
-  if (!(F & FZ)) { CYCT(b_+733, b_+734); ret_effect(gb); return; } // ret nz
-  CYC(b_+733, b_+734);
-  CYC(b_+734, b_+736); E = INTERACTION_BASE + OBJ_VAR03;
-  CYC(b_+736, b_+737); A = mem_rd(gb, DE);
-  CYC(b_+737, b_+740); SET_BC(b_+758); // @tileReplacements
-  CALL_C(b_+740, addAToBc_hook, 0x006d, b_+743);
-  CYC(b_+743, b_+744); A = mem_rd(gb, BC);
-  CYC(b_+744, b_+745); B = A;
-  CYC(b_+745, b_+746); A = B;
-  CYC(b_+746, b_+747); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+747, b_+748); mem_wr(gb, HL, A);
-  CYC(b_+748, b_+750); A = 0x0f;
-  CYC(b_+750, b_+751); alu_add(gb, L);
-  CYC(b_+751, b_+752); L = A;
-  CYC(b_+752, b_+753); A = B;
-  CYC(b_+753, b_+754); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
-  CYC(b_+754, b_+755); mem_wr(gb, HL, A);
-  CYC(b_+755, b_+758); TAIL(interactionDelete); // jp
+  CYC(b_+O(712), b_+OE(713)); alu_xor(gb, A);
+  CYC(b_+O(713), b_+OE(716)); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+O(716), b_+OE(719)); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+O(719), b_+OE(721)); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+O(721), b_+OE(722)); A = mem_rd(gb, DE);
+  CYC(b_+O(722), b_+OE(725)); SET_HL(wGashaSpotsPlantedBitset);
+  CALL_C(b_+O(725), unsetFlag_hook, SYM(unsetFlag), b_+OE(728));
+  if (!game_seasons) {
+    CYC(b_+728, b_+730); A = 0x4e; // TILEINDEX_GASHA_TREE_TL
+    CALL_C(b_+730, findTileInRoom_hook, SYM(findTileInRoom), b_+733);
+    if (!(F & FZ)) { CYCT(b_+733, b_+734); ret_effect(gb); return; } // ret nz
+    CYC(b_+733, b_+734);
+    CYC(b_+734, b_+736); E = INTERACTION_BASE + OBJ_VAR03;
+    CYC(b_+736, b_+737); A = mem_rd(gb, DE);
+    CYC(b_+737, b_+740); SET_BC(b_+758); // @tileReplacements
+    CALL_C(b_+740, addAToBc_hook, 0x006d, b_+743);
+    CYC(b_+743, b_+744); A = mem_rd(gb, BC);
+    CYC(b_+744, b_+745); B = A;
+    CYC(b_+745, b_+746); A = B;
+    CYC(b_+746, b_+747); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+    CYC(b_+747, b_+748); mem_wr(gb, HL, A);
+    CYC(b_+748, b_+750); A = 0x0f;
+    CYC(b_+750, b_+751); alu_add(gb, L);
+    CYC(b_+751, b_+752); L = A;
+    CYC(b_+752, b_+753); A = B;
+    CYC(b_+753, b_+754); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi (hl),a
+    CYC(b_+754, b_+755); mem_wr(gb, HL, A);
+  }
+  CYC(b_+O(755), b_+OE(758)); TAIL(interactionDelete); // jp
 }

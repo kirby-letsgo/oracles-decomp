@@ -40,6 +40,7 @@ getTileMappingData
 giveTreasure_body
 initializeAnimations
 initializeFile_b07
+interaction7f_subid00
 interaction7f_subid01
 interactionCode0f
 interactionCode12
@@ -50,7 +51,9 @@ interactionCode60
 interactionCode6b
 interactionCode6c
 interactionCode71
+interactionCode7e 240=242 270=252 288=289
 interactionCodeb5
+interactionCodeb6
 interactionCodece
 interactionCoded0
 interactionCodedc

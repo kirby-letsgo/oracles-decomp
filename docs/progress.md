@@ -4,6 +4,15 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-24, Seasons 4 batch 3: `tools/ofsmap.py` no longer aligns a data `@local` as code.
+  `data_locals()` reads the disassembly sources (resolved through the `ref/oracles-disasm`
+  symlinks) and treats a local whose first line is not an instruction or code macro (the
+  `label_kinds.py` rule, so `.db`/`.dw`/`dbrel` count as data) as a table: only its own offset
+  is paired. Regenerating every table changed no existing mapping's value (entries decoded from
+  data were dropped, data-label offsets added). This unblocked interaction7f_subid00 (essence),
+  interactionCode7e (miniboss portal; Seasons subid 2 in Hero's Cave, anchors 240=242 270=252
+  288=289) and interactionCodeb6 (gasha spot). Eligible hooks 3,743 -> 3,747. A local more than
+  0x400 bytes into its routine is outside ofsmap's local range; name it with `SYM(parent__local)`.
 - 2026-09-24, Seasons 4 batch 2: 12 more routines (shopItemState0, shopkeeperState1, itemCode20
   (slingshot), pushblock (Seasons state 2 slides until blocked), flute parent (the song-address
   helper is based on its own label), bipin, feather parent (Roc's Cape double jump),
