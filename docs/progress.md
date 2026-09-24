@@ -460,6 +460,17 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-25: DIFFERENT batch 8 (engine and specialObjects): dimitriUpdateMovement/State5 (Ages
+  hazard hand-off), overworldSwimmingState1, linkUpdateSwimming_sidescroll and
+  linkUpdateInAir_sidescroll (mermaid suit Ages-only; Seasons' tile-$10 transition), unblocking
+  linkState01_sidescroll, screenTransitionState5Substate0 (Seasons fades by group),
+  updateSeedTreeRefillData (8 trees, WRAM bank 3), replaceShutterForLinkEntering (Seasons
+  dungeon-only), mapleStateB. Tools: gameconst skips Ages-only code (it had written GV from the
+  aligner's wrong pairings into three Ages blocks); seasons_hooks treats the locals of an
+  offset-mapped routine as covered. Shared Seasons hooks 3,698 -> 3,719. Gates: shadow verify 0
+  mismatches on Seasons 142k and the whole Ages movie with --ref-check, ctest 10/10, native both,
+  audits and lint 0.
+
 - 2026-09-24 (night): merged Fable's `33124fb` (Seasons milestone 3 complete: all 1,279 ranked
   Seasons-only routines hand-written). Seasons playthrough extended to the full 142,176-frame
   recording (reference re-recorded; first 87,496 frames identical). Shadow verify on the merged

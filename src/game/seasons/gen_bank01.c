@@ -2221,77 +2221,6 @@ L_5ecc:
   RET(0x5ecd); return;  // ret
 }
 
-// 01:4336
-void s_screenTransitionState5Substate0(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x4336, 4); A = mem_rd(gb, 0xc4ab);  // ld a,($c4ab)
-  I(0x4339, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x433a); return; } I(0x433a, 2);  // ret nz
-  I(0x433b, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x433e, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { CALL(0x433f, checkAndApplyPaletteFadeTransition_hook, 0x47d6, 0x4342); } else I(0x433f, 3);  // call z,$47d6
-  I(0x4342, 4); A = mem_rd(gb, 0xcd01);  // ld a,($cd01)
-  I(0x4345, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4347, 1); L = A;  // ld l,a
-  I(0x4348, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x434b, 1); alu_add(gb, A);  // add a
-  I(0x434c, 1); alu_add(gb, A);  // add a
-  I(0x434d, 1); alu_add(gb, L);  // add l
-  I(0x434e, 3); SET_HL(0x4389);  // ld hl,$4389
-  RST_PUSH(0x4351, 0x4352);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x4352, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4353, 4); mem_wr(gb, 0xcd10, A);  // ld ($cd10),a
-  I(0x4356, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x4357, 4); mem_wr(gb, 0xcd11, A);  // ld ($cd11),a
-  I(0x435a, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x435b, 4); mem_wr(gb, 0xcd12, A);  // ld ($cd12),a
-  I(0x435e, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x435f, 4); mem_wr(gb, 0xcd14, A);  // ld ($cd14),a
-  CALL(0x4362, resetCamera_hook, 0x128c, 0x4365);  // call $128c
-  I(0x4365, 1); alu_xor(gb, A);  // xor a
-  I(0x4366, 4); mem_wr(gb, 0xcd06, A);  // ld ($cd06),a
-  CALL(0x4369, setScreenShakeCounter_hook, 0x24a7, 0x436c);  // call $24a7
-  I(0x436c, 4); A = mem_rd(gb, 0xcd02);  // ld a,($cd02)
-  I(0x436f, 2); alu_and(gb, 0x01);  // and $01
-  if ((F & FZ)) { I(0x4371, 3); goto L_437e; } I(0x4371, 2);  // jr z,$437e
-L_4373:
-  I(0x4373, 2); A = 0x14;  // ld a,$14
-  I(0x4375, 4); mem_wr(gb, 0xcd13, A);  // ld ($cd13),a
-  I(0x4378, 2); A = 0x02;  // ld a,$02
-  I(0x437a, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  RET(0x437d); return;  // ret
-L_437e:
-  I(0x437e, 2); A = 0x10;  // ld a,$10
-  I(0x4380, 4); mem_wr(gb, 0xcd13, A);  // ld ($cd13),a
-  I(0x4383, 2); A = 0x01;  // ld a,$01
-  I(0x4385, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  RET(0x4388); return;  // ret
-}
-
-// 01:4373
-void s_screenTransitionState5Substate0__horizontal(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4373:
-  I(0x4373, 2); A = 0x14;  // ld a,$14
-  I(0x4375, 4); mem_wr(gb, 0xcd13, A);  // ld ($cd13),a
-  I(0x4378, 2); A = 0x02;  // ld a,$02
-  I(0x437a, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  RET(0x437d); return;  // ret
-}
-
-// 01:437e
-void s_screenTransitionState5Substate0__vertical(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_437e:
-  I(0x437e, 2); A = 0x10;  // ld a,$10
-  I(0x4380, 4); mem_wr(gb, 0xcd13, A);  // ld ($cd13),a
-  I(0x4383, 2); A = 0x01;  // ld a,$01
-  I(0x4385, 4); mem_wr(gb, 0xcd05, A);  // ld ($cd05),a
-  RET(0x4388); return;  // ret
-}
-
 // 01:5d6c
 void s_updateActiveRoom__dungeon(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2341,31 +2270,5 @@ L_5d00:
   I(0x5d04, 2); A = mem_rd(gb, HL);  // ld a,(hl)
   I(0x5d05, 4); mem_wr(gb, 0xcc52, A);  // ld ($cc52),a
   RET(0x5d08); return;  // ret
-}
-
-// 01:5ece
-void s_updateSeedTreeRefillData(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5ece, 4); A = mem_rd(gb, 0xcc49);  // ld a,($cc49)
-  I(0x5ed1, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { RET_TAKEN(0x5ed2); return; } I(0x5ed2, 2);  // ret nz
-  I(0x5ed3, 2); A = 0x03;  // ld a,$03
-  I(0x5ed5, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  I(0x5ed7, 3); SET_HL(0x5eed);  // ld hl,$5eed
-  I(0x5eda, 2); B = 0x08;  // ld b,$08
-L_5edc:
-  PUSH(0x5edc, BC);  // push bc
-  I(0x5edd, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x5ede, 1); C = A;  // ld c,a
-  I(0x5edf, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5ee0, 1); E = A;  // ld e,a
-  CALL(0x5ee1, s_checkSeedTreeRefillIndex, 0x5efd, 0x5ee4);  // call $5efd
-  I(0x5ee4, 2); SET_HL(HL + 1);  // inc hl
-  SET_BC(POP(0x5ee5));  // pop bc
-  I(0x5ee6, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x5ee7, 3); goto L_5edc; } I(0x5ee7, 2);  // jr nz,$5edc
-  I(0x5ee9, 1); alu_xor(gb, A);  // xor a
-  I(0x5eea, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x5eec); return;  // ret
 }
 

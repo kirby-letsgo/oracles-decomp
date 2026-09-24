@@ -143,8 +143,15 @@ def main():
         local_cache[name] = v
         return v
 
+    ofs_parents = set()
+    if os.path.exists('src/hooks/ofs_routines.txt'):
+        for l in open('src/hooks/ofs_routines.txt'):
+            n = l.split('#')[0].split()
+            if n: ofs_parents.add(n[0].split(':')[0])
+
     def label_verdict(sid):
         name = re.sub(r'_b[0-9a-f]{2}$', '', sid).replace('__', '@')
+        if '@' in name and name.split('@')[0] in ofs_parents and name in seasons_names: return 'IDENTICAL'   # the mapped C covers its locals
         if unpairable.match(name): return local_verdict(name) if name in ages_labels else 'AGES_ONLY'
         if name not in seasons_names: return 'AGES_ONLY'
         if name in verdict: return verdict[name]

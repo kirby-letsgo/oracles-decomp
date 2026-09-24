@@ -584,51 +584,51 @@ animate:
 void dimitriState5_hook(GB *gb) {
   BASE(dimitriState5);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); C = 0x40;
-  CALL_C(b_+2, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+5);
-  if (!(F & FZ)) { CYCT(b_+5, b_+6); ret_effect(gb); return; }
-  CYC(b_+5, b_+6);
-  CYC(b_+6, b_+9); A = W8(wForceCompanionDismount);
-  CYC(b_+9, b_+10); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(2)); C = 0x40;
+  CALL_C(b_+O(2), objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+OE(5));
+  if (!(F & FZ)) { CYCT(b_+O(5), b_+OE(6)); ret_effect(gb); return; }
+  CYC(b_+O(5), b_+OE(6));
+  CYC(b_+O(6), b_+OE(9)); A = W8(wForceCompanionDismount);
+  CYC(b_+O(9), b_+OE(10)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+10, b_+12);
+    CYCT(b_+O(10), b_+OE(12));
     goto check_dismount;
   }
-  CYC(b_+10, b_+12);
-  CYC(b_+12, b_+15); A = W8(wGameKeysJustPressed);
-  CYC(b_+15, b_+17); alu_bit(gb, 0, A);
+  CYC(b_+O(10), b_+OE(12));
+  CYC(b_+O(12), b_+OE(15)); A = W8(wGameKeysJustPressed);
+  CYC(b_+O(15), b_+OE(17)); alu_bit(gb, 0, A);
   if (!(F & FZ)) {
-    CYCT(b_+17, b_+19);
+    CYCT(b_+O(17), b_+OE(19));
     TAIL(dimitriGotoEatingState);
   }
-  CYC(b_+17, b_+19);
-  CYC(b_+19, b_+21); alu_bit(gb, 1, A);
+  CYC(b_+O(17), b_+OE(19));
+  CYC(b_+O(19), b_+OE(21)); alu_bit(gb, 1, A);
 
 check_dismount:
   if (!(F & FZ)) {
-    CYCT(b_+21, b_+24);
+    CYCT(b_+O(21), b_+OE(24));
     TAIL(companionGotoDismountState);
   }
-  CYC(b_+21, b_+24);
-  CYC(b_+24, b_+27); A = W8(wLinkAngle);
-  CYC(b_+27, b_+29); alu_bit(gb, 7, A);
+  CYC(b_+O(21), b_+OE(24));
+  CYC(b_+O(24), b_+OE(27)); A = W8(wLinkAngle);
+  CYC(b_+O(27), b_+OE(29)); alu_bit(gb, 7, A);
   if (!(F & FZ)) {
-    CYCT(b_+29, b_+31);
+    CYCT(b_+O(29), b_+OE(31));
     goto check_hazards;
   }
-  CYC(b_+29, b_+31);
-  CYC(b_+31, b_+34); SET_HL(w1Companion_angle);
-  CYC(b_+34, b_+35); alu_cp(gb, mem_rd(gb, HL));
-  CYC(b_+35, b_+36); mem_wr(gb, HL, A);
-  CYC(b_+36, b_+38); C = 0x00;
+  CYC(b_+O(29), b_+OE(31));
+  CYC(b_+O(31), b_+OE(34)); SET_HL(w1Companion_angle);
+  CYC(b_+O(34), b_+OE(35)); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+O(35), b_+OE(36)); mem_wr(gb, HL, A);
+  CYC(b_+O(36), b_+OE(38)); C = 0x00;
   if (!(F & FZ)) {
-    CYCT(b_+38, b_+41);
+    CYCT(b_+O(38), b_+OE(41));
     TAIL(companionUpdateDirectionAndAnimate);
   }
-  CYC(b_+38, b_+41);
-  CALL_C(b_+41, companionCheckHopDownCliff_hook, SYM(companionCheckHopDownCliff), b_+44);
-  if (F & FZ) { CYCT(b_+44, b_+45); ret_effect(gb); return; }
-  CYC(b_+44, b_+45);
+  CYC(b_+O(38), b_+OE(41));
+  CALL_C(b_+O(41), companionCheckHopDownCliff_hook, SYM(companionCheckHopDownCliff), b_+OE(44));
+  if (F & FZ) { CYCT(b_+O(44), b_+OE(45)); ret_effect(gb); return; }
+  CYC(b_+O(44), b_+OE(45));
   TAIL(dimitriUpdateMovement);
 
 check_hazards:
@@ -682,74 +682,75 @@ set_water_status:
 void dimitriUpdateMovement_hook(GB *gb) {
   BASE(dimitriUpdateMovement);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); H = D;
-  CYC(b_+1, b_+3); L = 0x21;
-  CYC(b_+3, b_+4); A = mem_rd(gb, HL);
-  CYC(b_+4, b_+5); alu_rlca(gb);
-  CYC(b_+5, b_+7); A = 0x88;
+  CYC(b_+O(0), b_+OE(1)); H = D;
+  CYC(b_+O(1), b_+OE(3)); L = 0x21;
+  CYC(b_+O(3), b_+OE(4)); A = mem_rd(gb, HL);
+  CYC(b_+O(4), b_+OE(5)); alu_rlca(gb);
+  CYC(b_+O(5), b_+OE(7)); A = 0x88;
   if (F & FC) {
-    CALL_C_CC(b_+7, playSound_b00_hook, SYM(playSound_b00), b_+10);
+    CALL_C_CC(b_+O(7), playSound_b00_hook, SYM(playSound_b00), b_+OE(10));
   } else {
-    CYC(b_+7, b_+10);
+    CYC(b_+O(7), b_+OE(10));
   }
-  CYC(b_+10, b_+12); L = 0x38;
-  CYC(b_+12, b_+13); A = mem_rd(gb, HL);
-  CYC(b_+13, b_+14); alu_or(gb, A);
-  CYC(b_+14, b_+16); A = 0x1e;
+  CYC(b_+O(10), b_+OE(12)); L = 0x38;
+  CYC(b_+O(12), b_+OE(13)); A = mem_rd(gb, HL);
+  CYC(b_+O(13), b_+OE(14)); alu_or(gb, A);
+  CYC(b_+O(14), b_+OE(16)); A = 0x1e;
   if (F & FZ) {
-    CYCT(b_+16, b_+18);
+    CYCT(b_+O(16), b_+OE(18));
   } else {
-    CYC(b_+16, b_+18);
-    CYC(b_+18, b_+20); A = 0x28;
+    CYC(b_+O(16), b_+OE(18));
+    CYC(b_+O(18), b_+OE(20)); A = 0x28;
   }
-  CYC(b_+20, b_+22); L = 0x10;
-  CYC(b_+22, b_+23); mem_wr(gb, HL, A);
-  CALL_C(b_+23, companionUpdateMovement_hook, SYM(companionUpdateMovement), b_+26);
-  CALL_C(b_+26, specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+29);
-  CALL_C(b_+29, companionCheckHazards_hook, SYM(companionCheckHazards), b_+32);
-  CYC(b_+32, b_+33); H = D;
+  CYC(b_+O(20), b_+OE(22)); L = 0x10;
+  CYC(b_+O(22), b_+OE(23)); mem_wr(gb, HL, A);
+  CALL_C(b_+O(23), companionUpdateMovement_hook, SYM(companionUpdateMovement), b_+OE(26));
+  CALL_C(b_+O(26), specialObjectAnimate_hook, SYM(specialObjectAnimate), b_+OE(29));
+  CALL_C(b_+O(29), companionCheckHazards_hook, SYM(companionCheckHazards), b_+OE(32));
+  CYC(b_+O(32), b_+OE(33)); H = D;
   if (!(F & FC)) {
-    CYCT(b_+33, b_+35);
+    CYCT(b_+O(33), b_+OE(35));
     goto not_in_water;
   }
-  CYC(b_+33, b_+35);
-  CYC(b_+35, b_+37); alu_cp(gb, 0x02);
-  if (F & FZ) { CYCT(b_+37, b_+38); ret_effect(gb); return; }
-  CYC(b_+37, b_+38);
-  CYC(b_+38, b_+40); L = 0x04;
-  CYC(b_+40, b_+42); mem_wr(gb, HL, 0x05);
-  CYC(b_+42, b_+45); A = W8(wLinkForceState);
-  CYC(b_+45, b_+47); alu_cp(gb, 0x02);
-  if (!(F & FZ)) {
-    CYCT(b_+47, b_+49);
-    goto waterfall;
+  CYC(b_+O(33), b_+OE(35));
+  CYC(b_+O(35), b_+OE(37)); alu_cp(gb, 0x02);
+  if (F & FZ) { CYCT(b_+O(37), b_+OE(38)); ret_effect(gb); return; }
+  CYC(b_+O(37), b_+OE(38));
+  CYC(b_+O(38), b_+OE(40)); L = 0x04;
+  CYC(b_+O(40), b_+OE(42)); mem_wr(gb, HL, 0x05);
+  if (!game_seasons) {      // Ages only: Link's forced state 2 hands Dimitri to the hazard handler
+    CYC(b_+42, b_+45); A = W8(wLinkForceState);
+    CYC(b_+45, b_+47); alu_cp(gb, 0x02);
+    if (!(F & FZ)) {
+      CYCT(b_+47, b_+49);
+      goto waterfall;
+    }
+    CYC(b_+47, b_+49);
+    CYC(b_+49, b_+50); alu_xor(gb, A);
+    CYC(b_+50, b_+53); W8(wLinkForceState) = A;
+    CYC(b_+53, b_+56); TAIL(companionGotoHazardHandlingState);
   }
-  CYC(b_+47, b_+49);
-  CYC(b_+49, b_+50); alu_xor(gb, A);
-  CYC(b_+50, b_+53); W8(wLinkForceState) = A;
-  CYC(b_+53, b_+56); companionGotoHazardHandlingState_hook(gb);
-  return;
 
 waterfall:
-  CALL_C(b_+56, dimitriAddWaterfallResistance_hook, SYM(dimitriAddWaterfallResistance), b_+59);
-  CYC(b_+59, b_+61); B = 0x04;
-  CYC(b_+61, b_+63);
+  CALL_C(b_+O(56), dimitriAddWaterfallResistance_hook, SYM(dimitriAddWaterfallResistance), b_+OE(59));
+  CYC(b_+O(59), b_+OE(61)); B = 0x04;
+  CYC(b_+O(61), b_+OE(63));
   goto set_water_status;
 
 not_in_water:
-  CYC(b_+63, b_+65); B = 0x00;
+  CYC(b_+O(63), b_+OE(65)); B = 0x00;
 
 set_water_status:
-  CYC(b_+65, b_+67); L = 0x38;
-  CYC(b_+67, b_+68); A = mem_rd(gb, HL);
-  CYC(b_+68, b_+69); alu_cp(gb, B);
-  CYC(b_+69, b_+70); mem_wr(gb, HL, B);
-  CYC(b_+70, b_+72); C = 0x00;
+  CYC(b_+O(65), b_+OE(67)); L = 0x38;
+  CYC(b_+O(67), b_+OE(68)); A = mem_rd(gb, HL);
+  CYC(b_+O(68), b_+OE(69)); alu_cp(gb, B);
+  CYC(b_+O(69), b_+OE(70)); mem_wr(gb, HL, B);
+  CYC(b_+O(70), b_+OE(72)); C = 0x00;
   if (!(F & FZ)) {
-    CYCT(b_+72, b_+75);
+    CYCT(b_+O(72), b_+OE(75));
     TAIL(companionUpdateDirectionAndSetAnimation);
   }
-  CYC(b_+72, b_+75);
+  CYC(b_+O(72), b_+OE(75));
   TAIL(dimitriState9);
 }
 

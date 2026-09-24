@@ -625,105 +625,107 @@ void replaceJabuTilesIfUnderwater_hook(GB *gb) {
 
 static void replace_shutter_tail(GB *gb, uint16_t entry, uint16_t sp0_) {
   BASE(replaceShutterForLinkEntering);
-  if (entry == b_+17) {
-    CYC(b_+17, b_+20); SET_DE(b_+135);
-    CALL_C(b_+20, addDoubleIndexToDe_hook, 0x0072, b_+23);
-    CYC(b_+23, b_+24); A = mem_rd(gb, DE);
-    CYC(b_+24, b_+26); H8(hFF8B) = A;
-    CYC(b_+26, b_+27); SET_DE(DE + 1);
-    CYC(b_+27, b_+28); A = mem_rd(gb, DE);
-    CYC(b_+28, b_+29); E = A;
-    CYC(b_+29, b_+32); A = W8(wScrollMode);
-    CYC(b_+32, b_+34); alu_and(gb, 0x08);
-    if (F & FZ) { CYCT(b_+34, b_+36); goto done; }
-    CYC(b_+34, b_+36);
-    CYC(b_+36, b_+39); A = W8(wLinkObjectIndex);
-    CYC(b_+39, b_+40); H = A;
-    CYC(b_+40, b_+43); A = W8(wScreenTransitionDirection);
-    CYC(b_+43, b_+45); alu_xor(gb, 0x02);
-    CYC(b_+45, b_+46); D = A;
-    CYC(b_+46, b_+47); A = E;
-    CYC(b_+47, b_+49); alu_and(gb, 0x03);
-    CYC(b_+49, b_+50); alu_cp(gb, D);
-    if (!(F & FZ)) { CYCT(b_+50, b_+51); ret_effect(gb); return; }
-    CYC(b_+50, b_+51);
-    CYC(b_+51, b_+54); A = W8(wScreenTransitionDirection);
-    CYC(b_+54, b_+56); alu_bit(gb, 0, A);
-    if (!(F & FZ)) { CYCT(b_+56, b_+58); goto horizontal; }
-    CYC(b_+56, b_+58);
-    CYC(b_+58, b_+60); alu_and(gb, 0x02);
-    CYC(b_+60, b_+62); L = 0x0d;
-    CYC(b_+62, b_+63); A = mem_rd(gb, HL);
-    if (!(F & FZ)) { CYCT(b_+63, b_+65); goto down; }
-    CYC(b_+63, b_+65);
+  if (entry == b_+O(17)) {
+    CYC(b_+O(17), b_+OE(20)); SET_DE(b_+O(135));
+    CALL_C(b_+O(20), addDoubleIndexToDe_hook, 0x0072, b_+OE(23));
+    CYC(b_+O(23), b_+OE(24)); A = mem_rd(gb, DE);
+    CYC(b_+O(24), b_+OE(26)); H8(hFF8B) = A;
+    CYC(b_+O(26), b_+OE(27)); SET_DE(DE + 1);
+    CYC(b_+O(27), b_+OE(28)); A = mem_rd(gb, DE);
+    CYC(b_+O(28), b_+OE(29)); E = A;
+    CYC(b_+O(29), b_+OE(32)); A = W8(wScrollMode);
+    CYC(b_+O(32), b_+OE(34)); alu_and(gb, 0x08);
+    if (F & FZ) { CYCT(b_+O(34), b_+OE(36)); goto done; }
+    CYC(b_+O(34), b_+OE(36));
+    CYC(b_+O(36), b_+OE(39)); A = W8(wLinkObjectIndex);
+    CYC(b_+O(39), b_+OE(40)); H = A;
+    CYC(b_+O(40), b_+OE(43)); A = W8(wScreenTransitionDirection);
+    CYC(b_+O(43), b_+OE(45)); alu_xor(gb, 0x02);
+    CYC(b_+O(45), b_+OE(46)); D = A;
+    CYC(b_+O(46), b_+OE(47)); A = E;
+    CYC(b_+O(47), b_+OE(49)); alu_and(gb, 0x03);
+    CYC(b_+O(49), b_+OE(50)); alu_cp(gb, D);
+    if (!(F & FZ)) { CYCT(b_+O(50), b_+OE(51)); ret_effect(gb); return; }
+    CYC(b_+O(50), b_+OE(51));
+    CYC(b_+O(51), b_+OE(54)); A = W8(wScreenTransitionDirection);
+    CYC(b_+O(54), b_+OE(56)); alu_bit(gb, 0, A);
+    if (!(F & FZ)) { CYCT(b_+O(56), b_+OE(58)); goto horizontal; }
+    CYC(b_+O(56), b_+OE(58));
+    CYC(b_+O(58), b_+OE(60)); alu_and(gb, 0x02);
+    CYC(b_+O(60), b_+OE(62)); L = 0x0d;
+    CYC(b_+O(62), b_+OE(63)); A = mem_rd(gb, HL);
+    if (!(F & FZ)) { CYCT(b_+O(63), b_+OE(65)); goto down; }
+    CYC(b_+O(63), b_+OE(65));
     goto up;
   }
-  if (entry == b_+65) goto up;
-  if (entry == b_+73) goto down;
-  if (entry == b_+79) goto horizontal;
-  if (entry == b_+86) goto right;
-  if (entry == b_+90) goto left;
-  if (entry == b_+94) goto do_replacement;
+  if (entry == b_+O(65)) goto up;
+  if (entry == b_+O(73)) goto down;
+  if (entry == b_+O(79)) goto horizontal;
+  if (entry == b_+O(86)) goto right;
+  if (entry == b_+O(90)) goto left;
+  if (entry == b_+O(94)) goto do_replacement;
   goto done;
 
 up:
-  CYC(b_+65, b_+67); alu_and(gb, 0xf0);
-  CYC(b_+67, b_+69); alu_swap_a(gb);
-  CYC(b_+69, b_+71); alu_or(gb, 0xa0);
-  CYC(b_+71, b_+73); goto do_replacement;
+  CYC(b_+O(65), b_+OE(67)); alu_and(gb, 0xf0);
+  CYC(b_+O(67), b_+OE(69)); alu_swap_a(gb);
+  CYC(b_+O(69), b_+OE(71)); alu_or(gb, 0xa0);
+  CYC(b_+O(71), b_+OE(73)); goto do_replacement;
 down:
-  CYC(b_+73, b_+75); alu_and(gb, 0xf0);
-  CYC(b_+75, b_+77); alu_swap_a(gb);
-  CYC(b_+77, b_+79); goto do_replacement;
+  CYC(b_+O(73), b_+OE(75)); alu_and(gb, 0xf0);
+  CYC(b_+O(75), b_+OE(77)); alu_swap_a(gb);
+  CYC(b_+O(77), b_+OE(79)); goto do_replacement;
 horizontal:
-  CYC(b_+79, b_+81); alu_and(gb, 0x02);
-  CYC(b_+81, b_+83); L = 0x0b;
-  CYC(b_+83, b_+84); A = mem_rd(gb, HL);
-  if (!(F & FZ)) { CYCT(b_+84, b_+86); goto left; }
-  CYC(b_+84, b_+86);
+  CYC(b_+O(79), b_+OE(81)); alu_and(gb, 0x02);
+  CYC(b_+O(81), b_+OE(83)); L = 0x0b;
+  CYC(b_+O(83), b_+OE(84)); A = mem_rd(gb, HL);
+  if (!(F & FZ)) { CYCT(b_+O(84), b_+OE(86)); goto left; }
+  CYC(b_+O(84), b_+OE(86));
 right:
-  CYC(b_+86, b_+88); alu_and(gb, 0xf0);
-  CYC(b_+88, b_+90); goto do_replacement;
+  CYC(b_+O(86), b_+OE(88)); alu_and(gb, 0xf0);
+  CYC(b_+O(88), b_+OE(90)); goto do_replacement;
 left:
-  CYC(b_+90, b_+92); alu_and(gb, 0xf0);
-  CYC(b_+92, b_+94); alu_or(gb, 0x0e);
+  CYC(b_+O(90), b_+OE(92)); alu_and(gb, 0xf0);
+  CYC(b_+O(92), b_+OE(94)); alu_or(gb, 0x0e);
 do_replacement:
-  CYC(b_+94, b_+95); alu_cp(gb, C);
-  if (!(F & FZ)) { CYCT(b_+95, b_+97); goto done; }
-  CYC(b_+95, b_+97);
-  CYC(b_+97, b_+98); push_effect(gb, BC);
-  CYC(b_+98, b_+99); C = A;
-  CYC(b_+99, b_+100); A = mem_rd(gb, BC);
-  CYC(b_+100, b_+102); alu_sub(gb, 0x78);
-  CYC(b_+102, b_+104); alu_cp(gb, 0x08);
+  CYC(b_+O(94), b_+OE(95)); alu_cp(gb, C);
+  if (!(F & FZ)) { CYCT(b_+O(95), b_+OE(97)); goto done; }
+  CYC(b_+O(95), b_+OE(97));
+  CYC(b_+O(97), b_+OE(98)); push_effect(gb, BC);
+  CYC(b_+O(98), b_+OE(99)); C = A;
+  CYC(b_+O(99), b_+OE(100)); A = mem_rd(gb, BC);
+  CYC(b_+O(100), b_+OE(102)); alu_sub(gb, 0x78);
+  CYC(b_+O(102), b_+OE(104)); alu_cp(gb, 0x08);
   if (!(F & FC)) {
-    CYCT(b_+104, b_+106);
+    CYCT(b_+O(104), b_+OE(106));
   } else {
-    CYC(b_+104, b_+106);
-    CYC(b_+106, b_+108); A = H8(hFF8B);
-    CYC(b_+108, b_+109); mem_wr(gb, BC, A);
+    CYC(b_+O(104), b_+OE(106));
+    CYC(b_+O(106), b_+OE(108)); A = H8(hFF8B);
+    CYC(b_+O(108), b_+OE(109)); mem_wr(gb, BC, A);
   }
-  CYC(b_+109, b_+110); SET_BC(pop_effect(gb));
+  CYC(b_+O(109), b_+OE(110)); SET_BC(pop_effect(gb));
 done:
-  CYC(b_+110, b_+111); A = E;
-  CYC(b_+111, b_+113); alu_bit(gb, 7, A);
-  if (!(F & FZ)) { CYCT(b_+113, b_+114); ret_effect(gb); return; }
-  CYC(b_+113, b_+114);
-  CYC(b_+114, b_+116); alu_and(gb, 0x7f);
-  CYC(b_+116, b_+117); E = A;
-  CYC(b_+117, b_+120); A = W8(wTilesetFlags);
-  CYC(b_+120, b_+122); alu_bit(gb, 3, A);
-  if (F & FZ) { CYCT(b_+122, b_+123); ret_effect(gb); return; }
-  CYC(b_+122, b_+123);
-  CALL_C(b_+123, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+126);
-  if (!(F & FZ)) { CYCT(b_+126, b_+127); ret_effect(gb); return; }
-  CYC(b_+126, b_+127);
-  CYC(b_+127, b_+129); mem_wr(gb, HL, 0x1e);
-  CYC(b_+129, b_+130); L = alu_inc8(gb, L);
-  CYC(b_+130, b_+131); mem_wr(gb, HL, E);
-  CYC(b_+131, b_+133); L = 0x4b;
-  CYC(b_+133, b_+134); mem_wr(gb, HL, C);
-  CYC(b_+134, b_+135); ret_effect(gb);
+  CYC(b_+O(110), b_+OE(111)); A = E;
+  CYC(b_+O(111), b_+OE(113)); alu_bit(gb, 7, A);
+  if (!(F & FZ)) { CYCT(b_+O(113), b_+OE(114)); ret_effect(gb); return; }
+  CYC(b_+O(113), b_+OE(114));
+  CYC(b_+O(114), b_+OE(116)); alu_and(gb, 0x7f);
+  CYC(b_+O(116), b_+OE(117)); E = A;
+  if (!game_seasons) {
+    CYC(b_+117, b_+120); A = W8(wTilesetFlags);
+    CYC(b_+120, b_+122); alu_bit(gb, 3, A);
+    if (F & FZ) { CYCT(b_+122, b_+123); ret_effect(gb); return; }
+    CYC(b_+122, b_+123);
+  }
+  CALL_C(b_+O(123), getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+OE(126));
+  if (!(F & FZ)) { CYCT(b_+O(126), b_+OE(127)); ret_effect(gb); return; }
+  CYC(b_+O(126), b_+OE(127));
+  CYC(b_+O(127), b_+OE(129)); mem_wr(gb, HL, 0x1e);
+  CYC(b_+O(129), b_+OE(130)); L = alu_inc8(gb, L);
+  CYC(b_+O(130), b_+OE(131)); mem_wr(gb, HL, E);
+  CYC(b_+O(131), b_+OE(133)); L = 0x4b;
+  CYC(b_+O(133), b_+OE(134)); mem_wr(gb, HL, C);
+  CYC(b_+O(134), b_+OE(135)); ret_effect(gb);
 }
 
 void replaceShutterForLinkEntering__temporarilyOpenDoor61e9_hook(GB *gb) { uint16_t sp0_ = gb->sp; replace_shutter_tail(gb, SYM(replaceShutterForLinkEntering__temporarilyOpenDoor), sp0_); }
@@ -738,19 +740,25 @@ void replaceShutterForLinkEntering__doneReplacement6246_hook(GB *gb) { uint16_t 
 void replaceShutterForLinkEntering_hook(GB *gb) {
   BASE(replaceShutterForLinkEntering);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+0, b_+3); SET_BC(wRoomLayout + 0xae);
+  if (game_seasons) {      // Seasons returns outside dungeons
+    CYC(b_+S(0), b_+S(3)); A = W8(wDungeonIndex);
+    CYC(b_+S(3), b_+S(4)); A = alu_inc8(gb, A);
+    if (F & FZ) { CYCT(b_+S(4), b_+S(5)); ret_effect(gb); return; }
+    CYC(b_+S(4), b_+S(5));
+  }
+  CYC(b_+O(0), b_+OE(3)); SET_BC(wRoomLayout + 0xae);
   for (;;) {
-    CYC(b_+3, b_+4); A = mem_rd(gb, BC);
-    CYC(b_+4, b_+5); push_effect(gb, BC);
-    CYC(b_+5, b_+7); alu_sub(gb, 0x78);
-    CYC(b_+7, b_+9); alu_cp(gb, 0x08);
-    if (F & FC) CALL_C_CC(b_+9, replaceShutterForLinkEntering__temporarilyOpenDoor61e9_hook, b_+17, b_+12);
-    else CYC(b_+9, b_+12);
-    CYC(b_+12, b_+13); SET_BC(pop_effect(gb));
-    CYC(b_+13, b_+14); C = alu_dec8(gb, C);
-    if (!(F & FZ)) { CYCT(b_+14, b_+16); continue; }
-    CYC(b_+14, b_+16);
-    CYC(b_+16, b_+17); ret_effect(gb);
+    CYC(b_+O(3), b_+OE(4)); A = mem_rd(gb, BC);
+    CYC(b_+O(4), b_+OE(5)); push_effect(gb, BC);
+    CYC(b_+O(5), b_+OE(7)); alu_sub(gb, 0x78);
+    CYC(b_+O(7), b_+OE(9)); alu_cp(gb, 0x08);
+    if (F & FC) CALL_C_CC(b_+O(9), replaceShutterForLinkEntering__temporarilyOpenDoor61e9_hook, b_+O(17), b_+OE(12));
+    else CYC(b_+O(9), b_+OE(12));
+    CYC(b_+O(12), b_+OE(13)); SET_BC(pop_effect(gb));
+    CYC(b_+O(13), b_+OE(14)); C = alu_dec8(gb, C);
+    if (!(F & FZ)) { CYCT(b_+O(14), b_+OE(16)); continue; }
+    CYC(b_+O(14), b_+OE(16));
+    CYC(b_+O(16), b_+OE(17)); ret_effect(gb);
     return;
   }
 }

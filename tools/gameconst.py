@@ -44,6 +44,7 @@ class Tool:
         for m in re.finditer(r'^#define (\w+) ((?:0x[0-9a-f]+|SYM\(\w+\)|\d+)(?: [+-] (?:0x[0-9a-f]+|\d+))?)\s*$', open('src/game/game.h').read(), re.M):
             self.macros[m.group(1)] = m.group(2)
         self.files = {}
+        self.seasons_lines = {}
         self.file_macros = {}
         for f in sorted(glob.glob('src/game/**/*.c', recursive=True)):
             if '/gen_' in f or f.endswith('syms.c') or '/seasons/' in f: continue
@@ -180,7 +181,15 @@ class Tool:
                 while code.count('(') > code.count(')') and j + 1 <= e:
                     j += 1; code += ' ' + lines[j].split('//')[0].strip()
                 return code
-            anchor = [i for i in range(s, e + 1) if re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+(?:OE?\()?{off}\b', lines[i].split('//')[0])]
+            if f not in self.seasons_lines:
+                from symfiles import seasons_code
+                self.seasons_lines[f] = seasons_code(lines)
+            sl = self.seasons_lines[f]
+            # a burn inside Ages-only code (`if (!game_seasons)`, the else of `if (game_seasons)`)
+            # never runs under Seasons: its constant needs no Seasons value
+            anchor = [i for i in range(s, e + 1) if re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+(?:OE?\()?{off}\b', lines[i].split('//')[0]) and sl[i].strip()]
+            if not anchor and any(re.search(rf'\b(CYCT?|CALL_C|CALL_C_CC|CALL_ROM|CALL_ROM_CC)\(b_\+(?:OE?\()?{off}\b', lines[i].split('//')[0]) for i in range(s, e + 1)):
+                return True
             if not anchor:
                 for i in range(s, e + 1):
                     for m in re.finditer(r'\bCYCT?\(b_\+(?:OE?\()?(\d+)\)?, b_\+(?:OE?\()?(\d+)\)?\)', lines[i].split('//')[0]):

@@ -1360,79 +1360,81 @@ void mapleDeleteSelf_hook(GB *gb) {
 void mapleStateB_hook(GB *gb) {
   BASE(mapleStateB);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+1); E = alu_inc8(gb, E);
-  CYC(b_+1, b_+2); A = mem_rd(gb, DE);
-  CYC(b_+2, b_+3); alu_or(gb, A);
+  CYC(b_+O(0), b_+OE(1)); E = alu_inc8(gb, E);
+  CYC(b_+O(1), b_+OE(2)); A = mem_rd(gb, DE);
+  CYC(b_+O(2), b_+OE(3)); alu_or(gb, A);
   if (!(F & FZ)) {
-    CYCT(b_+3, b_+5);
+    CYCT(b_+O(3), b_+OE(5));
     goto substate1;
   }
-  CYC(b_+3, b_+5);
-  CALL_C(b_+5, mapleUpdateOscillation_hook, SYM(mapleUpdateOscillation), b_+8);
-  CYC(b_+8, b_+10); E = 0x08;
-  CYC(b_+10, b_+11); A = mem_rd(gb, DE);
-  CYC(b_+11, b_+13); alu_bit(gb, 7, A);
-  if (F & FZ) {
-    CYCT(b_+13, b_+15);
-    goto face_link;
+  CYC(b_+O(3), b_+OE(5));
+  CALL_C(b_+O(5), mapleUpdateOscillation_hook, SYM(mapleUpdateOscillation), b_+OE(8));
+  if (!game_seasons) {      // Ages keeps a direction fixed by bit 7 of the direction byte
+    CYC(b_+8, b_+10); E = 0x08;
+    CYC(b_+10, b_+11); A = mem_rd(gb, DE);
+    CYC(b_+11, b_+13); alu_bit(gb, 7, A);
+    if (F & FZ) {
+      CYCT(b_+13, b_+15);
+      goto face_link;
+    }
+    CYC(b_+13, b_+15);
+    CYC(b_+15, b_+17); alu_and(gb, 0x03);
+    CYC(b_+17, b_+19);
+    goto determine_animation;
   }
-  CYC(b_+13, b_+15);
-  CYC(b_+15, b_+17); alu_and(gb, 0x03);
-  CYC(b_+17, b_+19);
-  goto determine_animation;
 
 face_link:
-  CALL_C(b_+19, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+22);
-  CALL_C(b_+22, convertAngleToDirection_hook, SYM(convertAngleToDirection), b_+25);
-  CYC(b_+25, b_+26); H = D;
-  CYC(b_+26, b_+28); L = 0x08;
-  CYC(b_+28, b_+29); alu_cp(gb, mem_rd(gb, HL));
-  CYC(b_+29, b_+30); mem_wr(gb, HL, A);
+  CALL_C(b_+O(19), objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+OE(22));
+  CALL_C(b_+O(22), convertAngleToDirection_hook, SYM(convertAngleToDirection), b_+OE(25));
+  CYC(b_+O(25), b_+OE(26)); H = D;
+  CYC(b_+O(26), b_+OE(28)); L = 0x08;
+  CYC(b_+O(28), b_+OE(29)); alu_cp(gb, mem_rd(gb, HL));
+  CYC(b_+O(29), b_+OE(30)); mem_wr(gb, HL, A);
   if (F & FZ) {
-    CYCT(b_+30, b_+32);
+    CYCT(b_+O(30), b_+OE(32));
     goto wait_for_text;
   }
-  CYC(b_+30, b_+32);
+  CYC(b_+O(30), b_+OE(32));
 
 determine_animation:
-  CYC(b_+32, b_+34); alu_add(gb, 0x04);
-  CYC(b_+34, b_+35); B = A;
-  CYC(b_+35, b_+37); E = 0x28;
-  CYC(b_+37, b_+38); A = mem_rd(gb, DE);
-  CYC(b_+38, b_+39); alu_add(gb, A);
-  CYC(b_+39, b_+40); alu_add(gb, A);
-  CYC(b_+40, b_+41); alu_add(gb, B);
-  CALL_C(b_+41, specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+44);
+  CYC(b_+O(32), b_+OE(34)); alu_add(gb, 0x04);
+  CYC(b_+O(34), b_+OE(35)); B = A;
+  CYC(b_+O(35), b_+OE(37)); E = 0x28;
+  CYC(b_+O(37), b_+OE(38)); A = mem_rd(gb, DE);
+  CYC(b_+O(38), b_+OE(39)); alu_add(gb, A);
+  CYC(b_+O(39), b_+OE(40)); alu_add(gb, A);
+  CYC(b_+O(40), b_+OE(41)); alu_add(gb, B);
+  CALL_C(b_+O(41), specialObjectSetAnimation_hook, SYM(specialObjectSetAnimation), b_+OE(44));
 
 wait_for_text:
-  CALL_C(b_+44, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+47);
-  CYC(b_+47, b_+50); SET_HL(wMapleState);
-  CYC(b_+50, b_+52); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x20));
-  CYC(b_+52, b_+54); E = 0x09;
-  CYC(b_+54, b_+55); A = mem_rd(gb, DE);
-  CYC(b_+55, b_+56); alu_rlca(gb);
+  CALL_C(b_+O(44), retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+OE(47));
+  CYC(b_+O(47), b_+OE(50)); SET_HL(wMapleState);
+  CYC(b_+O(50), b_+OE(52)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | 0x20));
+  CYC(b_+O(52), b_+OE(54)); E = 0x09;
+  CYC(b_+O(54), b_+OE(55)); A = mem_rd(gb, DE);
+  CYC(b_+O(55), b_+OE(56)); alu_rlca(gb);
   if (!(F & FC)) {
-    CYCT(b_+56, b_+59);
+    CYCT(b_+O(56), b_+OE(59));
     TAIL(objectApplySpeed);
   }
-  CYC(b_+56, b_+59);
-  CYC(b_+59, b_+60); ret_effect(gb); return;
+  CYC(b_+O(56), b_+OE(59));
+  CYC(b_+O(59), b_+OE(60)); ret_effect(gb); return;
 
 substate1:
-  CYC(b_+60, b_+61); A = alu_dec8(gb, A);
-  CYC(b_+61, b_+62); mem_wr(gb, DE, A);
+  CYC(b_+O(60), b_+OE(61)); A = alu_dec8(gb, A);
+  CYC(b_+O(61), b_+OE(62)); mem_wr(gb, DE, A);
   if (!(F & FZ)) {
-    CYCT(b_+62, b_+63); ret_effect(gb); return;
+    CYCT(b_+O(62), b_+OE(63)); ret_effect(gb); return;
   }
-  CYC(b_+62, b_+63);
-  CYC(b_+63, b_+66); SET_BC(0x0711);
-  CALL_C(b_+66, showText_hook, SYM(showText), b_+69);
-  CYC(b_+69, b_+71); E = 0x09;
-  CYC(b_+71, b_+73); A = 0x18;
-  CYC(b_+73, b_+74); mem_wr(gb, DE, A);
-  CALL_C(b_+74, itemIncState_hook, SYM(itemIncState), b_+77);
-  CYC(b_+77, b_+79); L = 0x10;
-  CYC(b_+79, b_+81); mem_wr(gb, HL, 0x78);
+  CYC(b_+O(62), b_+OE(63));
+  CYC(b_+O(63), b_+OE(66)); SET_BC(GV(0x0711, 0x070b));
+  CALL_C(b_+O(66), showText_hook, SYM(showText), b_+OE(69));
+  CYC(b_+O(69), b_+OE(71)); E = 0x09;
+  CYC(b_+O(71), b_+OE(73)); A = 0x18;
+  CYC(b_+O(73), b_+OE(74)); mem_wr(gb, DE, A);
+  CALL_C(b_+O(74), itemIncState_hook, SYM(itemIncState), b_+OE(77));
+  CYC(b_+O(77), b_+OE(79)); L = 0x10;
+  CYC(b_+O(79), b_+OE(81)); mem_wr(gb, HL, 0x78);
   TAIL(mapleStateC);
 }
 

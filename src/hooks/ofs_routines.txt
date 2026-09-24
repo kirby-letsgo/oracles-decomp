@@ -20,6 +20,8 @@ cutscene01
 cutscene05
 cutscene09
 decideItemDrop_body
+dimitriState5
+dimitriUpdateMovement
 dragonfly_state0
 drawAllSpritesUnconditionally
 drawAllSpritesUnconditionally@drawObject
@@ -56,6 +58,8 @@ linkApplyTileTypes 233=227 234=228
 linkCutscene0
 linkState01 149=148
 linkState01_sidescroll
+linkUpdateInAir_sidescroll
+linkUpdateSwimming_sidescroll
 linkedNpc_calcLowTextIndex
 loadItemIconGfx
 loadScreenMusic
@@ -67,7 +71,9 @@ mapGetRoomTextOrReturn
 mapMenu_checkRoomVisited
 mapMenu_drawSpriteAtRoomIndex
 mapMenu_loadPopupData
+mapleStateB
 objectCheckIsOverHazard
+overworldSwimmingState1
 paletteFadeHandler
 paletteFadeHandler05
 parentItemCode_bombchu
@@ -79,8 +85,10 @@ partCode09
 partCode13
 partCode27
 playCompassSoundIfKeyInRoom
+replaceShutterForLinkEntering
 rickyStateA
 screenTransitionState2
+screenTransitionState5Substate0
 scriptCmd_initNpcHitbox
 scriptCmd_jumpRandom
 scriptCmd_loadScript
@@ -89,6 +97,7 @@ shopkeeperState2
 specialObjectCode_linkInCutscene_b06
 standardGameState
 updateInteraction
+updateSeedTreeRefillData
 updateSpecialObjects
 updateStatusBar_body
 vire_batForm_stateA
