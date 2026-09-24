@@ -13991,8 +13991,20 @@ static void thread_resume_pops(GB *gb) {
 
 // The kernel side of a switch: run the active thread until it yields or ends; a reset request
 // from the thread unwinds the kernel to the dispatcher at the address the thread chose.
+// A thread without a fiber (a loaded state) resumes from its saved stack: a new fiber starts at
+// the ROM code after `ld sp,hl`, which pops its registers and returns into it.
+static uint16_t thread_resume_pc;
+static void thread_resume(GB *gb) {
+  cpu_set_pc(gb, thread_resume_pc);
+  for (;;) {
+    if (gb->hung) fiber_back(gb, FIBER_EXIT);
+    gb->step(gb);
+  }
+}
+
 static void kernel_run_thread(GB *gb, void (*start)(GB *), uint16_t fallback) {
   int n = (uint8_t)(H8(hActiveThread) - (wThreadStateBuffer & 0xff)) / 8;
+  if (!start && !fiber_live(gb, n)) { thread_resume_pc = fallback; start = thread_resume; }
   int r = fiber_run(gb, n, start, fallback);
   if (r == FIBER_RESET) { fibers_reset(gb); hook_handoff(gb, cpu_pc(gb)); return; }
   cpu_set_pc(gb, SYM(_nextThread) + 3);

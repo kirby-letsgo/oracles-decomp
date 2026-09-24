@@ -110,6 +110,7 @@ static void fiber_main(void *arg) {
 }
 
 bool fiber_in_thread(const GB *gb) { return gb->fib && gb->fib->current >= 0; }
+bool fiber_live(const GB *gb, int n) { return gb->fib && n >= 0 && n < NFIBERS && gb->fib->f[n].live; }
 
 void fibers_reset(GB *gb) {
   struct Fibers *F = fibers(gb);

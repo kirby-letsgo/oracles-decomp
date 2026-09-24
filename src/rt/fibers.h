@@ -15,5 +15,7 @@ int fiber_run(GB *gb, int n, void (*start)(GB *), uint16_t fallback_pc);
 // never return. In verify mode this is hook_handoff(gb, gb->pc).
 void fiber_back(GB *gb, int request);
 bool fiber_in_thread(const GB *gb);
+// Thread n has a fiber to resume (false after fibers_reset, e.g. once a saved state is loaded).
+bool fiber_live(const GB *gb, int n);
 // Drop every thread fiber (reset paths); the kernel is current afterwards.
 void fibers_reset(GB *gb);

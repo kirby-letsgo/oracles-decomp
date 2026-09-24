@@ -5,6 +5,7 @@
 #include "hw/render.h"
 #include "platform/setup.h"
 #include "hooks/hooks.h"
+#include "rt/fibers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -90,6 +91,40 @@ static void rec_write(void) {
   fwrite(rec_buf, 1, rec_len, f);
   fclose(f);
   rec_state_write();
+}
+
+// Save states (Cmd+S / Cmd+R): one slot next to the ROM (FILE.savestate), or next to the recording
+// while recording. A state ends with the core frame it was taken at; loading one during a
+// recording cuts the recorded inputs back to that frame, so the movie still replays from power-on.
+static void savestate_path(const char *rom_path, char *out, size_t n) {
+  if (rec_path) { snprintf(out, n, "%s.savestate", rec_path); return; }
+  snprintf(out, n, "%s", rom_path);
+  char *dot = strrchr(out, '.');
+  if (dot) *dot = 0;
+  strncat(out, ".savestate", n - strlen(out) - 1);
+}
+
+static bool savestate_write(GB *gb, const char *path) {
+  if (!oracles_save_boot_state(gb, path)) return false;
+  FILE *f = fopen(path, "ab");
+  if (!f) return false;
+  uint64_t frame = GRID_FRAME(gb->cycles);
+  bool ok = fwrite(&frame, sizeof frame, 1, f) == 1;
+  fclose(f);
+  return ok;
+}
+
+static bool savestate_read(GB *gb, const char *path) {
+  FILE *f = fopen(path, "rb");
+  if (!f) return false;
+  uint64_t frame = 0;
+  bool ok = fseek(f, -(long)sizeof frame, SEEK_END) == 0 && fread(&frame, sizeof frame, 1, f) == 1;
+  fclose(f);
+  if (!ok || (rec_path && frame > rec_len)) return false;
+  if (!oracles_load_boot_state(gb, path)) return false;
+  fibers_reset(gb);
+  if (rec_path) rec_len = frame;
+  return true;
 }
 
 #define SCALE 4
@@ -203,13 +238,26 @@ int main(int argc, char **argv) {
   gb->input_at = live_input;
   uint64_t frames = 0;
   bool muted = false;
+  uint64_t title_reset = 0;
   while (running) {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       switch (ev.type) {
       case SDL_EVENT_QUIT: running = false; break;
       case SDL_EVENT_KEY_DOWN:
-        if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
+        if ((ev.key.mod & SDL_KMOD_GUI) && (ev.key.scancode == SDL_SCANCODE_S || ev.key.scancode == SDL_SCANCODE_R)) {
+          if (ev.key.repeat) break;
+          char path[1024];
+          savestate_path(argv[1], path, sizeof path);
+          bool saving = ev.key.scancode == SDL_SCANCODE_S;
+          bool ok = GRID_FRAME(gb->cycles) >= rec_resume && (saving ? savestate_write(gb, path) : savestate_read(gb, path));
+          if (ok && !saving) live_joy = 0;
+          SDL_SetWindowTitle(win, ok ? (saving ? "Oracles - state saved" : "Oracles - state loaded")
+                                     : (saving ? "Oracles - could not save state" : "Oracles - no state to load"));
+          title_reset = frames + 120;
+          fprintf(stderr, "%s %s %s\n", saving ? "save state" : "load state", ok ? "ok:" : "failed:", path);
+        }
+        else if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
           muted = !muted;
           if (audio) SDL_SetAudioStreamGain(audio, muted ? 0.0f : 1.0f);
         }
@@ -230,6 +278,7 @@ int main(int argc, char **argv) {
     if (!fast_forward && audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
     gb_run_frame(gb);
     frames++;
+    if (title_reset && frames >= title_reset) { SDL_SetWindowTitle(win, "Oracles"); title_reset = 0; }
     if (rec_path && !fast_forward && frames % 3600 == 0) rec_write();
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (fast_forward) {

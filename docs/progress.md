@@ -494,6 +494,13 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-25: save states in the SDL app (Cmd+S / Cmd+R, one slot: ROM.savestate, or
+  FILE.inputs.savestate while recording, where loading cuts the recorded inputs back to the
+  state's frame). A loaded state has no thread fibers: kernel_run_thread now starts a fresh
+  fiber at the resume code when the thread's fiber is gone (it used to hang). `--reload-at F` in
+  oracles-run saves and reloads at frame F with every fiber dropped; Seasons 60k and Ages 100k
+  reloads end on the same state hash as an uninterrupted run.
+
 - 2026-09-25: merged Fable's Seasons 4 work (`bc4ec6a`..`9258bc0`: audit_jumptables triage with
   frypolar, gleeok, dinCrystal and manhandla fixed; 34 DIFFERENT shared routines in enemies,
   parts, interactions and items; ofsmap.py records data locals as table starts only). Merge

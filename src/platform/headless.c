@@ -7,6 +7,7 @@
 #include "game/game.h"
 #include "assets/assets.h"
 #include "hooks/hooks.h"
+#include "rt/fibers.h"
 #include "core/hash.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -183,6 +184,7 @@ int main(int argc, char **argv) {
   if (init_ram && !oracles_load_init_ram(gb, init_ram)) { fprintf(stderr, "cannot read %s\n", init_ram); return 2; }
   gb_reset(gb);
   if ((p = arg_value(argc, argv, "--boot-state")) && !oracles_load_boot_state(gb, p)) { fprintf(stderr, "cannot read %s\n", p); return 2; }
+  uint64_t reload_at = (p = arg_value(argc, argv, "--reload-at")) ? strtoull(p, NULL, 10) : 0;
   if ((p = arg_value(argc, argv, "--boot-state-out")) && !oracles_save_boot_state(gb, p)) { fprintf(stderr, "cannot write %s\n", p); return 2; }
   if ((p = arg_value(argc, argv, "--boot-ly"))) {
     int ly = atoi(p);
@@ -301,6 +303,11 @@ int main(int argc, char **argv) {
       continue;
     }
     if (getenv("INTLOG")) dbg_log_ints = (frame >= il_a && frame <= il_b);
+    if (reload_at && frame == reload_at) {
+      // a save state round trip: every thread fiber is dropped, as when the app loads a state
+      if (!oracles_save_boot_state(gb, "/tmp/oracles-reload.state") || !oracles_load_boot_state(gb, "/tmp/oracles-reload.state")) return 2;
+      fibers_reset(gb);
+    }
     frame = gb_run_frame(gb);
     if (gb->hung) { fprintf(stderr, "cpu hung at frame %llu pc %04x\n", (unsigned long long)frame, gb->pc); return 1; }
 
