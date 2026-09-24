@@ -61,7 +61,7 @@ class Tool:
                 m = re.search(r'\bBASE\((\w+)\)', l)
                 if m and start is not None:
                     j = i
-                    while j < len(lines) and lines[j] != '}': j += 1
+                    while j < len(lines) - 1 and lines[j] != '}' and not (j > start and FUNC_START.match(lines[j + 1])): j += 1
                     self.funcs[m.group(1)].append((f, start, j))
                     fm = re.match(r'^(?:static )?\w+ \*?(\w+)\(', lines[start])
                     if fm: self.func_base[fm.group(1)] = (m.group(1), f, start, j)     # function name -> its BASE label
@@ -203,7 +203,7 @@ class Tool:
             order = []
             for i0 in anchor:
                 for i in (i0, i0 - 1, i0 + 1, i0 - 2):
-                    if s <= i <= e and i not in order: order.append(i)
+                    if s <= i <= e and i not in order and sl[i].strip(): order.append(i)
             found_ok = False
             for i in order:
                 code = joined(i)

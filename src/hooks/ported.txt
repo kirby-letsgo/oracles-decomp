@@ -6744,3 +6744,4 @@ updateSound__ret
 updateSound__stopSound
 updateSound__updateChannels
 vblankFunctionsStart
+func_03_7619__state1__cbb3_02

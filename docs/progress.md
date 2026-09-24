@@ -4,6 +4,40 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-24, Seasons 4 batch 3: `tools/ofsmap.py` no longer aligns a data `@local` as code.
+  `data_locals()` reads the disassembly sources (resolved through the `ref/oracles-disasm`
+  symlinks) and treats a local whose first line is not an instruction or code macro (the
+  `label_kinds.py` rule, so `.db`/`.dw`/`dbrel` count as data) as a table: only its own offset
+  is paired. Regenerating every table changed no existing mapping's value (entries decoded from
+  data were dropped, data-label offsets added). This unblocked interaction7f_subid00 (essence),
+  interactionCode7e (miniboss portal; Seasons subid 2 in Hero's Cave, anchors 240=242 270=252
+  288=289) and interactionCodeb6 (gasha spot). Eligible hooks 3,743 -> 3,747. A local more than
+  0x400 bytes into its routine is outside ofsmap's local range; name it with `SYM(parent__local)`.
+- 2026-09-24, Seasons 4 batch 2: 12 more routines (shopItemState0, shopkeeperState1, itemCode20
+  (slingshot), pushblock (Seasons state 2 slides until blocked), flute parent (the song-address
+  helper is based on its own label), bipin, feather parent (Roc's Cape double jump),
+  companionTutorial, doorController, dungeonStuff (subid 5 magnet ball), seedsOnTree
+  (season-gated trees), businessScrub). Eligible hooks 3,731 -> 3,743. What is left in my
+  directories with ratio >= 0.7: interaction7f_subid00, interactionCode7e and
+  interactionCodeb6, whose Ages body holds a data table that `ofsmap.py` decodes as
+  instructions, so the alignment desyncs after it (anchors do not help); they need an ofsmap
+  change or label-relative bases. The rest of the DIFFERENT list pairs unrelated routines by
+  name (ratio < 0.7).
+- 2026-09-24, Seasons 4 (DIFFERENT shared routines under Seasons, object code) batch 1: 19
+  routines mapped with `ofsmap.py --apply` plus per-game blocks (satchel, bomb and bracelet
+  parents, sword, boomerang parent and item, bracelet item, seedItemState1, galeSeedTryToWarpLink,
+  itemUpdateThrowingVertically, parentItemLoadAnimationAndIncState, itemDrop, hardhat beetle,
+  moldorm, pincer stateA, essence subid 1, objectOscillateZ_body, shopkeeperState0 and
+  GotoState1). interactionCode46's state chain is guarded with `hook_is`; locals whose only
+  differences were already GV (vasu, ringHelpBook, switch, sidescroll platform/conveyor, fairy
+  sparkles, sparkle bc) are listed in `seasons_ok_manual.txt`. Eligible hooks 3,698 -> 3,731.
+  Idioms new here: a jump-table target whose first instruction is per-game is spelled
+  `b_+(game_seasons ? S(n) : m)`; a shared routine calls a Seasons-only hook by declaring
+  `s_<label>_hook` in the file; a block that Seasons labels as its own routine keeps identity
+  offsets as `S(n)` (itemUpdateThrowingVertically's gravity tail). A `call`ed jump table whose
+  fallback would return into the middle of the routine uses `asm_call(gb, HL, b_+ret)` and
+  continues in C (interactionCode46: the native build has no entry at +6). Step 0 before it: the
+  audit_jumptables triage (bc4ec6a).
 - 2026-09-24, Seasons milestone 3 complete (worktree `m5-step0`): every one of the 1,279 ranked
   Seasons-only routines is hand-written C. 1,277 are hooks in `src/hooks/rewritten_seasons.txt`
   (1,420 entries in all); `wRamFunction` and `setCpuToDoubleSpeed` were already hand-written
@@ -459,6 +493,56 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-25: merged Fable's Seasons 4 work (`bc4ec6a`..`9258bc0`: audit_jumptables triage with
+  frypolar, gleeok, dinCrystal and manhandla fixed; 34 DIFFERENT shared routines in enemies,
+  parts, interactions and items; ofsmap.py records data locals as table starts only). Merge
+  fixes: gameconst.py ended a function at the next function start when its `}` shares a line
+  (bombsBraceletParent.c ran it past the file end), and no longer edits a neighbouring line
+  that is Ages-only (it had written a GV into swordParent.c's Ages block). Shared Seasons hooks
+  3,840 -> 3,887. Jump-table audit: audit_jumptables.py now reads O()/ternary/SYM+n cases,
+  nested chains to their matching close, index-based (`substate == k`) chains, and credits a
+  chain's default (HANDOFF covers hooked entries; goto/TAIL/fall-through covers one entry):
+  266 hits -> 16, all in Seasons hand files. The shared/Ages files had two real misses, both
+  fixed: miscPuzzles_subid00 state 1 fell through state 0's interactionIncState, and the
+  clean-seas cutscene's @state1@cbb3_02 (reached from five tables) was never ported, so a
+  native run through it would have died at 03:76cb; it is now a hook.
+- 2026-09-25: DIFFERENT batches 11 to 13 (engine, Link, companions, map menu): warps
+  (findWarpSourceAndDest, applyWarpDest_b04 with the Seasons group-2 room offset, label_04_033
+  with the Seasons room-pack check), applyAllTileSubstitutions (Subrosia gfx), fileSelectMode6
+  locals; linkState02 (Seasons dungeon 9 hole triggers cutscene $13), linkState12 (landing
+  alignment on tile $20), linkState0d, warpTransitionB, warpTransition5_01 (trampoline);
+  func_410d (raft entry Ages-only), companionRespawn, companionCheckCanSpawn,
+  companionDismountAndSavePosition (Seasons flute/essence/flippers checks), rickyState0,
+  dimitriState0, mooshState0; checkDarkenRoom, checkAndSpawnMaple, inventorySubmenu1_drawCursor,
+  reloadGraphicsOnExitMenu_body (Seasons afterCall label added to extra_seasons.sym),
+  paletteFadeHandler06, mapMenu_state0 (pirate ship), mapMenu_state1 (Subrosia cursor bounds).
+  seasons_hooks checks the manual list before rating an unnamed `label_XX_N`. Shared Seasons
+  hooks 3,816 -> 3,840. Gates per batch: shadow verify 0 mismatches on Seasons 142k and the
+  whole Ages movie with --ref-check, ctest 10/10, native both, audits and lint 0.
+
+- 2026-09-25: DIFFERENT batch 10 (menus and engine): inventoryMenuState1 (Seasons bars ring
+  changes while boxing), inventoryMenuDrawSprites, inventorySubscreen2_drawTreasures (season
+  blurb), inventorySubmenu2CheckDirectionButtons, func_02_5a35 (seed counts), mapGetRoomText,
+  mapMenu_clearUnvisitedTiles (Subrosia map), drawTreasureExtraTiles (Ages harp vs Seasons
+  polarity/season icons via TAIL), getWarpTreeData, fileSelectMode6, intro_titlescreen,
+  checkSeedTreeRefillIndex (bitTable in Seasons), func_131f, func_3539 (Seasons skips item/part
+  updates), initializeRoom and updateGrassAnimationModifier (Seasons bodies written out),
+  clearAllItemsAndPutLinkOnGround, interactionRunSimpleScript (Seasons commands 5 and 7),
+  checkItemDropAvailable_body (Subrosia drop set), checkDisplayEraOrSeasonInfo,
+  tryToBreakTile_body, nextToPushableBlock. Tools: `seasons_code` blanks `AGES_ONLY()` functions
+  (gameconst had written a GV into one); seasons_hooks rates a call-only local whose constants
+  differ as SAME_SHAPE and accepts it for a gameconst-resolved hook. Shared Seasons hooks
+  3,742 -> 3,816 (Seasons readable share 57.6% -> 58.4%). Gates: shadow verify 0 mismatches on
+  Seasons 142k and the whole Ages movie with --ref-check, ctest 10/10, native both, audits and
+  lint 0.
+
+- 2026-09-25: DIFFERENT batch 9 (engine): scriptFunc_jump and scriptFunc_jump_scf (Seasons
+  script jump path), checkUpdateDungeonMinimap, checkPlayRoomMusic (Seasons flag $0b swaps music
+  $28 for $27), loadObjectGfx2 (Ages-only wcc20 check), initializeGame (Seasons warp position
+  init, wcc05 Ages-only), func_5cfe (Seasons companion placement on tile $20). Shared Seasons
+  hooks 3,719 -> 3,742. Gates: shadow verify 0 mismatches on Seasons 142k and the whole Ages
+  movie with --ref-check, ctest 10/10, native both, audits and lint 0.
 
 - 2026-09-25: DIFFERENT batch 8 (engine and specialObjects): dimitriUpdateMovement/State5 (Ages
   hazard hand-off), overworldSwimmingState1, linkUpdateSwimming_sidescroll and

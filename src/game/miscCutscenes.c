@@ -31,6 +31,7 @@ void func_6f44__cbb8_01_hook(GB *gb);
 void func_6f44__cbb8_02_hook(GB *gb);
 void func_712f_hook(GB *gb);
 void func_03_7619__state1_hook(GB *gb);
+void func_03_7619__state1__cbb3_02_hook(GB *gb);
 void func_03_7619__state2_hook(GB *gb);
 void func_03_7619__state3_hook(GB *gb);
 void func_03_7619__state4_hook(GB *gb);
@@ -4293,6 +4294,26 @@ void func_03_7619__state0_hook(GB *gb) {
   TAIL(func_03_7619__func_764a);
 }
 
+void func_03_7619__state1__cbb3_02_hook(GB *gb) {
+  BASE(func_03_7619);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+178, b_+181); A = mem_rd(gb, wPaletteThread_mode);
+  CYC(b_+181, b_+182); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+182, b_+183); ret_effect(gb); return; }
+  CYC(b_+182, b_+183);
+  CALL_C(b_+183, func_782a_hook, SYM(func_782a), b_+186);
+  CALL_C(b_+186, func_782a_hook, SYM(func_782a), b_+189);
+  CALL_C(b_+189, func_782a_hook, SYM(func_782a), b_+192);
+  CALL_C(b_+192, func_782a_hook, SYM(func_782a), b_+195);
+  if (F & FZ) { CYCT(b_+195, b_+196); ret_effect(gb); return; }
+  CYC(b_+195, b_+196);
+  CYC(b_+196, b_+198); A = 0x04;
+  CALL_C(b_+198, fadeinFromWhiteWithDelay_hook, SYM(fadeinFromWhiteWithDelay), b_+201);
+  CYC(b_+201, b_+203); A = 0x91;
+  CALL_C(b_+203, playSound_b00_hook, SYM(playSound_b00), b_+206);
+  CYC(b_+206, b_+209); TAIL(cleanSeas_incCBB3);
+}
+
 void func_03_7619__state1__cbb3_00_hook(GB *gb) {
   BASE(func_03_7619);
   CYC(b_+111, b_+114); A = mem_rd(gb, wPaletteThread_mode);
@@ -4505,6 +4526,7 @@ void func_03_7619__state1_hook(GB *gb) {
     if (jt_ == b_+111) { func_03_7619__state1__cbb3_00_hook(gb); return; }
     else if (jt_ == b_+124) { func_03_7619__state1__cbb3_01_hook(gb); return; }
     else if (jt_ == b_+209) { func_03_7619__state1__cbb3_03_hook(gb); return; }
+    else if (jt_ == SYM(func_03_7619__state1__cbb3_02) && hook_is(gb, SYM(func_03_7619__state1__cbb3_02), func_03_7619__state1__cbb3_02_hook)) { func_03_7619__state1__cbb3_02_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -4518,6 +4540,7 @@ void func_03_7619__state2_hook(GB *gb) {
     if (jt_ == b_+111) { func_03_7619__state1__cbb3_00_hook(gb); return; }
     else if (jt_ == b_+124) { func_03_7619__state1__cbb3_01_hook(gb); return; }
     else if (jt_ == b_+245) { func_03_7619__state2__cbb3_03_hook(gb); return; }
+    else if (jt_ == SYM(func_03_7619__state1__cbb3_02) && hook_is(gb, SYM(func_03_7619__state1__cbb3_02), func_03_7619__state1__cbb3_02_hook)) { func_03_7619__state1__cbb3_02_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -4531,6 +4554,7 @@ void func_03_7619__state3_hook(GB *gb) {
     if (jt_ == b_+111) { func_03_7619__state1__cbb3_00_hook(gb); return; }
     else if (jt_ == b_+124) { func_03_7619__state1__cbb3_01_hook(gb); return; }
     else if (jt_ == b_+287) { func_03_7619__state3__cbb3_03_hook(gb); return; }
+    else if (jt_ == SYM(func_03_7619__state1__cbb3_02) && hook_is(gb, SYM(func_03_7619__state1__cbb3_02), func_03_7619__state1__cbb3_02_hook)) { func_03_7619__state1__cbb3_02_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -4544,6 +4568,7 @@ void func_03_7619__state4_hook(GB *gb) {
     if (jt_ == b_+111) { func_03_7619__state1__cbb3_00_hook(gb); return; }
     else if (jt_ == b_+124) { func_03_7619__state1__cbb3_01_hook(gb); return; }
     else if (jt_ == b_+336) { func_03_7619__state4__cbb3_03_hook(gb); return; }
+    else if (jt_ == SYM(func_03_7619__state1__cbb3_02) && hook_is(gb, SYM(func_03_7619__state1__cbb3_02), func_03_7619__state1__cbb3_02_hook)) { func_03_7619__state1__cbb3_02_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -4578,6 +4603,7 @@ dispatch:
     if (jt_ == b_+111) { func_03_7619__state1__cbb3_00_hook(gb); return; }
     else if (jt_ == b_+124) { func_03_7619__state1__cbb3_01_hook(gb); return; }
     else if (jt_ == b_+421) { func_03_7619__state5__cbb3_03_hook(gb); return; }
+    else if (jt_ == SYM(func_03_7619__state1__cbb3_02) && hook_is(gb, SYM(func_03_7619__state1__cbb3_02), func_03_7619__state1__cbb3_02_hook)) { func_03_7619__state1__cbb3_02_hook(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }

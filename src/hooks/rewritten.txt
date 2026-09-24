@@ -6848,3 +6848,4 @@ updateSound__nextChannel
 updateSound__ret
 updateSound__stopSound
 updateSound__updateChannels
+func_03_7619__state1__cbb3_02

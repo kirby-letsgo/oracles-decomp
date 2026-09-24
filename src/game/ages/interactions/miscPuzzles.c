@@ -144,6 +144,7 @@ void miscPuzzles_subid00_hook(GB *gb) {
   {
     CYC(b_+3, b_+4); push_effect(gb, b_+4);
     uint16_t target = miscPuzzles_jump_table(gb);
+    if (target == b_+15) goto state1;
     if (target == b_+87) goto state2;
     if (target == b_+98) goto state3;
   }
@@ -152,6 +153,7 @@ void miscPuzzles_subid00_hook(GB *gb) {
   CALL_C(b_+12, interactionIncState_hook, SYM(interactionIncState), b_+15);
 
   // miscPuzzles_subid00@state1
+state1:
   CYC(b_+15, b_+18); SET_HL(wLever1PullDistance); // wLever1PullDistance
   CYC(b_+18, b_+20); alu_bit(gb, 7, mem_rd(gb, HL));
   if (!(F & FZ)) { CYCT(b_+20, b_+22); goto checkAlreadyOpened; } // jr nz

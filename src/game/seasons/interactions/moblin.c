@@ -172,7 +172,7 @@ state1_subid1_substate0:
   CYC(b_+169, b_+171); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+171, b_+172); A = mem_rd(gb, DE);
   CYC(b_+172, b_+173); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+173, b_+176); TAIL_SG(npcFaceLinkAndAnimate); }
+  if (F & FZ) { CYCT(b_+173, b_+176); TAIL(npcFaceLinkAndAnimate); }
   CYC(b_+173, b_+176);
   CYC(b_+176, b_+178); E = INTERACTION_BASE + OBJ_COUNTER2;
   CYC(b_+178, b_+179); A = mem_rd(gb, DE);
@@ -208,7 +208,7 @@ state1_subid1_substate2:
   CYC(b_+227, b_+230); SET_HL(wTmpcfc0 + 0x11);
   CYC(b_+230, b_+231); A = mem_rd(gb, HL);
   CYC(b_+231, b_+232); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+232, b_+235); TAIL_SG(npcFaceLinkAndAnimate); }
+  if (F & FZ) { CYCT(b_+232, b_+235); TAIL(npcFaceLinkAndAnimate); }
   CYC(b_+232, b_+235);
   CALL_C(b_+235, s_interactionIncSubstate, SYM(interactionIncSubstate), b_+238);
   CYC(b_+238, b_+240); L = INTERACTION_BASE + OBJ_SUBID;
@@ -233,7 +233,7 @@ state1_subid1_substate4:
   CYC(b_+262, b_+265); SET_HL(wTmpcfc0 + 0x11);
   CYC(b_+265, b_+266); A = mem_rd(gb, HL);
   CYC(b_+266, b_+267); alu_cp(gb, B);
-  if (!(F & FZ)) { CYCT(b_+267, b_+270); TAIL_SG(npcFaceLinkAndAnimate); }
+  if (!(F & FZ)) { CYCT(b_+267, b_+270); TAIL(npcFaceLinkAndAnimate); }
   CYC(b_+267, b_+270);
   CALL_C(b_+270, s_interactionIncSubstate, SYM(interactionIncSubstate), b_+273);
   CYC(b_+273, b_+275); L = INTERACTION_BASE + OBJ_SPEED;

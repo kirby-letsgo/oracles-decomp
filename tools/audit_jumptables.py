@@ -14,6 +14,9 @@ def syms(game):
     vals = re.findall(r'0x([0-9a-f]{8})', re.search(rf'syms_{game}\[SYM_COUNT\] = \{{\n(.*?)\n\}};', c, re.S).group(1))
     return {i: int(v, 16) for i, v in zip(ids, vals) if v != 'ffffffff'}
 SYMS = {'ages': syms('ages'), 'seasons': syms('seasons')}
+def hooked(path):
+    return set((int(b, 16), int(a, 16)) for b, a in re.findall(r'^HOOK\(0x(\w+), 0x(\w+),', open(path).read(), re.M))
+HOOKED = {'ages': hooked('src/hooks/table.h'), 'seasons': hooked('src/hooks/table_seasons.h')}
 FUNC = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int) \*?\w+\([^)]*\)\s*\{')
 bad = 0
 for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
@@ -37,13 +40,45 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         except Exception: continue
         if not ins or ins[0][2] != 'jumptable': continue
         targets = sorted(set(v for _, v in ins[0][4]))
-        chain = ' '.join(x.split('//')[0] for x in L[i:i + 80])
-        chain = chain[:chain.find('} while (0)') if '} while (0)' in chain else len(chain)]
+        text = ' '.join(x.split('//')[0] for x in L[i:i + 400])
+        d0 = text.find('do {')
+        if d0 != -1 and d0 < text.find('jump_table'):
+            # a do { } while (0) chain, possibly with nested chains: read to its matching close
+            depth, k = 0, d0 + 3
+            while k < len(text):
+                if text[k] == '{': depth += 1
+                elif text[k] == '}':
+                    depth -= 1
+                    if depth == 0: break
+                k += 1
+            chain = text[:k + 1]
+        else:
+            chain = ' '.join(x.split('//')[0] for x in L[i:i + 80])
+            chain = chain[:chain.find('} while (0)') if '} while (0)' in chain else len(chain)]
         have = set()
-        for n in re.findall(r'(?:jt_|target) == b_\+(\d+)', chain): have.add((base & 0xffff) + int(n))
-        for n in re.findall(r'(?:jt_|target) == SYM\((\w+)\)', chain):
-            if n in sym: have.add(sym[n] & 0xffff)
+        for n in re.findall(r'(?:jt_|target) == b_\+(?:OE?\()?(\d+)', chain): have.add((base & 0xffff) + int(n))
+        for n in re.findall(r'(?:jt_|target) == b_\+\(game_seasons \? S\(\d+\) : (\d+)\)', chain): have.add((base & 0xffff) + int(n))
+        for n, off in re.findall(r'(?:jt_|target) == \(?SYM\((\w+)\)(?: \+ (\d+))?', chain):
+            if n in sym: have.add((sym[n] + int(off or 0)) & 0xffff)
+        for n in re.findall(r'jump_table\(gb\)\)? [!=]= b_\+(\d+)', chain): have.add((base & 0xffff) + int(n))
         miss = [t for t in targets if t not in have]
+        # a chain that branches on the index it dispatched (`substate == k`) instead of the target
+        idx_have = set(int(n) for n in re.findall(r'\b(?:substate|state|subid) == (\d+)', ' '.join(L[i:i + 60])))
+        entries = [v for _, v in ins[0][4]]
+        miss = [t for t in miss if not all(k in idx_have for k, v in enumerate(entries) if v == t)]
+        # the chain's default: a fallback (HANDOFF/hook_continue) dispatches whatever is hooked at the
+        # target, so a hooked entry is covered; any other default (goto, TAIL, falling through) is
+        # the case for exactly one entry
+        body = []
+        for x in L[i + 1:i + 40]:
+            if re.match(r'^\s*\w+:\s*$', x) or not x.strip(): break
+            body.append(x.split('//')[0])
+            if '} while (0)' in x: break
+        body = ' '.join(body)
+        if re.search(r'\b(HANDOFF|hook_continue|hook_handoff)\(', body):
+            miss = [t for t in miss if (bank if t >= 0x4000 else 0, t) not in HOOKED[game]]
+        elif len(miss) == 1:
+            miss = []
         if miss:
             bad += 1
             print(f'{p}:{i + 1}: jump table at {bank:02x}:{addr:04x} has entries {", ".join(f"{t:04x}" for t in miss)} with no case')

@@ -1,6 +1,8 @@
 #include "game/game.h"
 #include "game/gen.h"
 
+void s_itemDrop_pullOreChunksWithMagnetGloves_hook(GB *gb);
+
 #undef CYC
 #undef CYCT
 #define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
@@ -77,272 +79,285 @@ void partCode01_hook(GB *gb) {
   BASE(partCode01);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   if (F & FZ) {
-    CYCT(b_+0, b_+2); // jr z,@normalStatus
+    CYCT(b_+O(0), b_+OE(2)); // jr z,@normalStatus
   } else {
-    CYC(b_+0, b_+2);
-    CYC(b_+2, b_+4); alu_cp(gb, 0x02); // cp PARTSTATUS_DEAD
+    CYC(b_+O(0), b_+OE(2));
+    CYC(b_+O(2), b_+OE(4)); alu_cp(gb, 0x02); // cp PARTSTATUS_DEAD
     if (F & FZ) {
-      CYCT(b_+4, b_+7); // jp z,@linkCollectedItem
+      CYCT(b_+O(4), b_+OE(7)); // jp z,@linkCollectedItem
       TAIL(partCode01__linkCollectedItem);
     }
-    CYC(b_+4, b_+7);
-    CYC(b_+7, b_+9); E = 0xc4; // Part.state
-    CYC(b_+9, b_+11); A = 0x03;
-    CYC(b_+11, b_+12); mem_wr(gb, DE, A);
+    CYC(b_+O(4), b_+OE(7));
+    CYC(b_+O(7), b_+OE(9)); E = 0xc4; // Part.state
+    CYC(b_+O(9), b_+OE(11)); A = 0x03;
+    CYC(b_+O(11), b_+OE(12)); mem_wr(gb, DE, A);
   }
 
   // @normalStatus
-  CYC(b_+12, b_+15); push_effect(gb, b_+15);
+  CYC(b_+O(12), b_+OE(15)); push_effect(gb, b_+OE(15));
   TAIL(partCode01__checkCollidedWithLink);
 }
 
 void partCode01__afterCollisionCheck_hook(GB *gb) {
   BASE(partCode01);
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+15, b_+17); E = 0xc4; // Part.state
-  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  uint16_t sp0_ = gb->sp;
+  CYC(b_+O(15), b_+OE(17)); E = 0xc4; // Part.state
+  CYC(b_+O(17), b_+OE(18)); A = mem_rd(gb, DE);
   {
-    CYC(b_+18, b_+19); push_effect(gb, b_+19);
+    CYC(b_+O(18), b_+OE(19)); push_effect(gb, b_+OE(19));
     uint16_t target = itemDrop_jump_table(gb);
-    if (target == b_+27) goto state0;
-    if (target == b_+104) goto state1;
-    if (target == b_+161) goto state2;
-    goto state3;
+    if (target == b_+O(27)) goto state0;
+    if (target == b_+O(104)) goto state1;
+    if (target == b_+O(161)) goto state2;
+    if (target == b_+O(198)) goto state3;
+    hook_continue(gb, target, sp0_); return;
   }
 
 state0:
-  CYC(b_+27, b_+30); A = W8(wIsMaplePresent);
-  CYC(b_+30, b_+31); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+31, b_+34); partDelete_hook(gb); return; } // jp nz
-  CYC(b_+31, b_+34);
-  CYC(b_+34, b_+36); E = 0xc2; // Part.subid
-  CYC(b_+36, b_+37); A = mem_rd(gb, DE);
-  CYC(b_+37, b_+39); alu_cp(gb, 0x0f); // ITEM_DROP_100_RUPEES_OR_ENEMY
+  CYC(b_+O(27), b_+OE(30)); A = W8(wIsMaplePresent);
+  CYC(b_+O(30), b_+OE(31)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(31), b_+OE(34)); partDelete_hook(gb); return; } // jp nz
+  CYC(b_+O(31), b_+OE(34));
+  CYC(b_+O(34), b_+OE(36)); E = 0xc2; // Part.subid
+  CYC(b_+O(36), b_+OE(37)); A = mem_rd(gb, DE);
+  CYC(b_+O(37), b_+OE(39)); alu_cp(gb, 0x0f); // ITEM_DROP_100_RUPEES_OR_ENEMY
   if (!(F & FZ)) {
-    CYCT(b_+39, b_+41); // jr nz,@normalItem
+    CYCT(b_+O(39), b_+OE(41)); // jr nz,@normalItem
   } else {
-    CYC(b_+39, b_+41);
-    CALL_C(b_+41, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+44);
-    CYC(b_+44, b_+46); alu_cp(gb, 0xe0);
-    if (F & FC) { CYCT(b_+46, b_+49); itemDrop_spawnEnemy_hook(gb); return; } // jp c
-    CYC(b_+46, b_+49);
+    CYC(b_+O(39), b_+OE(41));
+    CALL_C(b_+O(41), getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+OE(44));
+    CYC(b_+O(44), b_+OE(46)); alu_cp(gb, 0xe0);
+    if (F & FC) { CYCT(b_+O(46), b_+OE(49)); itemDrop_spawnEnemy_hook(gb); return; } // jp c
+    CYC(b_+O(46), b_+OE(49));
+    if (game_seasons) {
+      CYC(b_+S(49), b_+S(52)); A = W8(wTilesetFlags);
+      CYC(b_+S(52), b_+S(54)); alu_cp(gb, 0x81); // TILESETFLAG_SUBROSIA|TILESETFLAG_OUTDOORS
+      if (F & FZ) { CYCT(b_+S(54), b_+S(57)); partDelete_hook(gb); return; } // jp z
+      CYC(b_+S(54), b_+S(57));
+    }
   }
 
   // @normalItem
-  CALL_C(b_+49, itemDrop_initGfx_hook, SYM(itemDrop_initGfx), b_+52);
-  CYC(b_+52, b_+53); H = D;
-  CYC(b_+53, b_+55); L = 0xd4; // Part.speedZ
-  CYC(b_+55, b_+57); A = 0xa0; // <(-$160)
-  CYC(b_+57, b_+58); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+58, b_+60); mem_wr(gb, HL, 0xfe); // >(-$160)
-  CYC(b_+60, b_+62); L = 0xc4; // Part.state
-  CYC(b_+62, b_+63); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+63, b_+66); A = W8(wTilesetFlags);
-  CYC(b_+66, b_+68); alu_and(gb, 0x20); // TILESETFLAG_SIDESCROLL
+  CALL_C(b_+O(49), itemDrop_initGfx_hook, SYM(itemDrop_initGfx), b_+OE(52));
+  CYC(b_+O(52), b_+OE(53)); H = D;
+  CYC(b_+O(53), b_+OE(55)); L = 0xd4; // Part.speedZ
+  CYC(b_+O(55), b_+OE(57)); A = 0xa0; // <(-$160)
+  CYC(b_+O(57), b_+OE(58)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+O(58), b_+OE(60)); mem_wr(gb, HL, 0xfe); // >(-$160)
+  CYC(b_+O(60), b_+OE(62)); L = 0xc4; // Part.state
+  CYC(b_+O(62), b_+OE(63)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(63), b_+OE(66)); A = W8(wTilesetFlags);
+  CYC(b_+O(66), b_+OE(68)); alu_and(gb, 0x20); // TILESETFLAG_SIDESCROLL
   if (F & FZ) {
-    CYCT(b_+68, b_+70); // jr z,@label_11_008
+    CYCT(b_+O(68), b_+OE(70)); // jr z,@label_11_008
     goto label_11_008;
   }
-  CYC(b_+68, b_+70);
-  CYC(b_+70, b_+71); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 2
-  CYC(b_+71, b_+73); L = 0xe4; // Part.collisionType
-  CYC(b_+73, b_+75); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
-  CYC(b_+75, b_+77); L = 0xc6; // Part.counter1
-  CYC(b_+77, b_+79); mem_wr(gb, HL, 0xf0);
-  CALL_C(b_+79, objectCheckIsOnHazard_hook, SYM(objectCheckIsOnHazard), b_+82);
-  if (!(F & FC)) { CYCT(b_+82, b_+84); goto label_11_008; } // jr nc
-  CYC(b_+82, b_+84);
-  CYC(b_+84, b_+85); alu_rrca(gb);
-  if (!(F & FC)) { CYCT(b_+85, b_+87); goto label_11_008; } // jr nc
-  CYC(b_+85, b_+87);
-  CYC(b_+87, b_+89); E = 0xf4; // Part.var34
-  CYC(b_+89, b_+91); A = 0x01;
-  CYC(b_+91, b_+92); mem_wr(gb, DE, A);
+  CYC(b_+O(68), b_+OE(70));
+  CYC(b_+O(70), b_+OE(71)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state] = 2
+  CYC(b_+O(71), b_+OE(73)); L = 0xe4; // Part.collisionType
+  CYC(b_+O(73), b_+OE(75)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x80);
+  CYC(b_+O(75), b_+OE(77)); L = 0xc6; // Part.counter1
+  CYC(b_+O(77), b_+OE(79)); mem_wr(gb, HL, 0xf0);
+  CALL_C(b_+O(79), objectCheckIsOnHazard_hook, SYM(objectCheckIsOnHazard), b_+OE(82));
+  if (!(F & FC)) { CYCT(b_+O(82), b_+OE(84)); goto label_11_008; } // jr nc
+  CYC(b_+O(82), b_+OE(84));
+  CYC(b_+O(84), b_+OE(85)); alu_rrca(gb);
+  if (!(F & FC)) { CYCT(b_+O(85), b_+OE(87)); goto label_11_008; } // jr nc
+  CYC(b_+O(85), b_+OE(87));
+  CYC(b_+O(87), b_+OE(89)); E = 0xf4; // Part.var34
+  CYC(b_+O(89), b_+OE(91)); A = 0x01;
+  CYC(b_+O(91), b_+OE(92)); mem_wr(gb, DE, A);
 
 label_11_008:
-  CYC(b_+92, b_+94); E = 0xc2; // Part.subid
-  CYC(b_+94, b_+95); A = mem_rd(gb, DE);
-  CALL_C(b_+95, itemDrop_initSpeed_hook, SYM(itemDrop_initSpeed), b_+98);
-  CYC(b_+98, b_+100); E = 0xc2; // Part.subid
-  CYC(b_+100, b_+101); A = mem_rd(gb, DE);
-  CYC(b_+101, b_+104); TAIL(partSetAnimation); // jp
+  CYC(b_+O(92), b_+OE(94)); E = 0xc2; // Part.subid
+  CYC(b_+O(94), b_+OE(95)); A = mem_rd(gb, DE);
+  CALL_C(b_+O(95), itemDrop_initSpeed_hook, SYM(itemDrop_initSpeed), b_+OE(98));
+  CYC(b_+O(98), b_+OE(100)); E = 0xc2; // Part.subid
+  CYC(b_+O(100), b_+OE(101)); A = mem_rd(gb, DE);
+  CYC(b_+O(101), b_+OE(104)); TAIL(partSetAnimation); // jp
 
 state1:
-  CALL_C(b_+104, partCommon_getTileCollisionInFront_allowHoles_hook, SYM(partCommon_getTileCollisionInFront_allowHoles), b_+107);
+  CALL_C(b_+O(104), partCommon_getTileCollisionInFront_allowHoles_hook, SYM(partCommon_getTileCollisionInFront_allowHoles), b_+OE(107));
   if (!(F & FC)) {
-    CALL_C_CC(b_+107, itemDrop_updateSpeed_hook, SYM(itemDrop_updateSpeed), b_+110); // call nc
+    CALL_C_CC(b_+O(107), itemDrop_updateSpeed_hook, SYM(itemDrop_updateSpeed), b_+OE(110)); // call nc
   } else {
-    CYC(b_+107, b_+110);
+    CYC(b_+O(107), b_+OE(110));
   }
-  CYC(b_+110, b_+112); C = 0x20;
-  CALL_C(b_+112, objectUpdateSpeedZAndBounce_hook, SYM(objectUpdateSpeedZAndBounce), b_+115);
-  if (F & FC) { CYCT(b_+115, b_+117); goto doneBouncing; } // jr c
-  CYC(b_+115, b_+117);
-  CALL_C(b_+117, itemDrop_checkHitGround_hook, SYM(itemDrop_checkHitGround), b_+120);
-  if (!(F & FC)) { CYCT(b_+120, b_+122); goto label_11_010; } // jr nc
-  CYC(b_+120, b_+122);
+  CYC(b_+O(110), b_+OE(112)); C = 0x20;
+  CALL_C(b_+O(112), objectUpdateSpeedZAndBounce_hook, SYM(objectUpdateSpeedZAndBounce), b_+OE(115));
+  if (F & FC) { CYCT(b_+O(115), b_+OE(117)); goto doneBouncing; } // jr c
+  CYC(b_+O(115), b_+OE(117));
+  CALL_C(b_+O(117), itemDrop_checkHitGround_hook, SYM(itemDrop_checkHitGround), b_+OE(120));
+  if (!(F & FC)) { CYCT(b_+O(120), b_+OE(122)); goto label_11_010; } // jr nc
+  CYC(b_+O(120), b_+OE(122));
 
 doneBouncing:
-  CYC(b_+122, b_+123); H = D;
-  CYC(b_+123, b_+125); L = 0xc4; // Part.state
-  CYC(b_+125, b_+126); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  CYC(b_+126, b_+128); L = 0xc6; // Part.counter1
-  CYC(b_+128, b_+130); mem_wr(gb, HL, 0xf0);
-  CALL_C(b_+130, objectSetVisiblec3_hook, SYM(objectSetVisiblec3), b_+133);
+  CYC(b_+O(122), b_+OE(123)); H = D;
+  CYC(b_+O(123), b_+OE(125)); L = 0xc4; // Part.state
+  CYC(b_+O(125), b_+OE(126)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+O(126), b_+OE(128)); L = 0xc6; // Part.counter1
+  CYC(b_+O(128), b_+OE(130)); mem_wr(gb, HL, 0xf0);
+  CALL_C(b_+O(130), objectSetVisiblec3_hook, SYM(objectSetVisiblec3), b_+OE(133));
 
 label_11_010:
-  CALL_C(b_+133, itemDrop_checkOnHazard_hook, SYM(itemDrop_checkOnHazard), b_+136);
-  if (F & FC) { RET_TAKEN(b_+136); return; } // ret c
-  CYC(b_+136, b_+137);
-  CYC(b_+137, b_+139); E = 0xcf; // Part.zh
-  CYC(b_+139, b_+140); A = mem_rd(gb, DE);
-  CYC(b_+140, b_+141); alu_rlca(gb);
-  if (F & FC) { RET_TAKEN(b_+141); return; } // ret c
-  CYC(b_+141, b_+142);
-  CYC(b_+142, b_+145); SET_BC(0x0500);
-  CALL_C(b_+145, objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+148);
-  CYC(b_+148, b_+151); SET_HL(SYM(itemDropConveyorTilesTable)); // itemDropConveyorTilesTable
-  CALL_C(b_+151, lookupCollisionTable_hook, SYM(lookupCollisionTable), b_+154);
-  if (!(F & FC)) { RET_TAKEN(b_+154); return; } // ret nc
-  CYC(b_+154, b_+155);
-  CYC(b_+155, b_+156); C = A;
-  CYC(b_+156, b_+158); B = 0x14; // SPEED_80
-  CYC(b_+158, b_+161); TAIL(itemDrop_applySpeed); // jp
+  if (game_seasons) {
+    CALL_C(b_+S(141), s_itemDrop_pullOreChunksWithMagnetGloves_hook, SYM(itemDrop_pullOreChunksWithMagnetGloves), b_+S(144));
+    if (F & FC) { CYCT(b_+S(144), b_+S(146)); goto on_ground; } // jr c
+    CYC(b_+S(144), b_+S(146));
+  }
+  CALL_C(b_+O(133), itemDrop_checkOnHazard_hook, SYM(itemDrop_checkOnHazard), b_+OE(136));
+  if (F & FC) { RET_TAKEN(b_+O(136)); return; } // ret c
+  CYC(b_+O(136), b_+OE(137));
+on_ground:
+  CYC(b_+O(137), b_+OE(139)); E = 0xcf; // Part.zh
+  CYC(b_+O(139), b_+OE(140)); A = mem_rd(gb, DE);
+  CYC(b_+O(140), b_+OE(141)); alu_rlca(gb);
+  if (F & FC) { RET_TAKEN(b_+O(141)); return; } // ret c
+  CYC(b_+O(141), b_+OE(142));
+  CYC(b_+O(142), b_+OE(145)); SET_BC(0x0500);
+  CALL_C(b_+O(145), objectGetRelativeTile_hook, SYM(objectGetRelativeTile), b_+OE(148));
+  CYC(b_+O(148), b_+OE(151)); SET_HL(SYM(itemDropConveyorTilesTable)); // itemDropConveyorTilesTable
+  CALL_C(b_+O(151), lookupCollisionTable_hook, SYM(lookupCollisionTable), b_+OE(154));
+  if (!(F & FC)) { RET_TAKEN(b_+O(154)); return; } // ret nc
+  CYC(b_+O(154), b_+OE(155));
+  CYC(b_+O(155), b_+OE(156)); C = A;
+  CYC(b_+O(156), b_+OE(158)); B = 0x14; // SPEED_80
+  CYC(b_+O(158), b_+OE(161)); TAIL(itemDrop_applySpeed); // jp
 
 state2:
-  CALL_C(b_+161, itemDrop_checkSidescrollingConditions_hook, SYM(itemDrop_checkSidescrollingConditions), b_+164);
-  CALL_C(b_+164, itemDrop_moveTowardPoint_hook, SYM(itemDrop_moveTowardPoint), b_+167);
-  if (F & FC) { CYCT(b_+167, b_+170); goto reachedPoint; } // jp c
-  CYC(b_+167, b_+170);
-  CALL_C(b_+170, itemDrop_countdownToDisappear_hook, SYM(itemDrop_countdownToDisappear), b_+173);
-  if (F & FC) { CYCT(b_+173, b_+176); partDelete_hook(gb); return; } // jp c
-  CYC(b_+173, b_+176);
-  CYC(b_+176, b_+178); E = 0xc2; // Part.subid
-  CYC(b_+178, b_+179); A = mem_rd(gb, DE);
-  CYC(b_+179, b_+180); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+180, b_+182); goto label_11_010; } // jr nz
-  CYC(b_+180, b_+182);
-  CYC(b_+182, b_+185); TAIL(itemDrop_updateFairyMovement); // jp
+  CALL_C(b_+O(161), itemDrop_checkSidescrollingConditions_hook, SYM(itemDrop_checkSidescrollingConditions), b_+OE(164));
+  CALL_C(b_+O(164), itemDrop_moveTowardPoint_hook, SYM(itemDrop_moveTowardPoint), b_+OE(167));
+  if (F & FC) { CYCT(b_+O(167), b_+OE(170)); goto reachedPoint; } // jp c
+  CYC(b_+O(167), b_+OE(170));
+  CALL_C(b_+O(170), itemDrop_countdownToDisappear_hook, SYM(itemDrop_countdownToDisappear), b_+OE(173));
+  if (F & FC) { CYCT(b_+O(173), b_+OE(176)); partDelete_hook(gb); return; } // jp c
+  CYC(b_+O(173), b_+OE(176));
+  CYC(b_+O(176), b_+OE(178)); E = 0xc2; // Part.subid
+  CYC(b_+O(178), b_+OE(179)); A = mem_rd(gb, DE);
+  CYC(b_+O(179), b_+OE(180)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(180), b_+OE(182)); goto label_11_010; } // jr nz
+  CYC(b_+O(180), b_+OE(182));
+  CYC(b_+O(182), b_+OE(185)); TAIL(itemDrop_updateFairyMovement); // jp
 
 reachedPoint:
-  CYC(b_+185, b_+186); H = D;
-  CYC(b_+186, b_+188); L = 0xf1; // Part.var31
-  CYC(b_+188, b_+189); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+189, b_+190); C = mem_rd(gb, HL); // Part.var32
-  CYC(b_+190, b_+192); L = 0xcb; // Part.yh
+  CYC(b_+O(185), b_+OE(186)); H = D;
+  CYC(b_+O(186), b_+OE(188)); L = 0xf1; // Part.var31
+  CYC(b_+O(188), b_+OE(189)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(189), b_+OE(190)); C = mem_rd(gb, HL); // Part.var32
+  CYC(b_+O(190), b_+OE(192)); L = 0xcb; // Part.yh
   mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+192, b_+193);
-  CYC(b_+193, b_+194); L = L + 1; // Part.xh
-  CYC(b_+194, b_+195); mem_wr(gb, HL, C);
-  CYC(b_+195, b_+198); TAIL(partDelete); // jp
+  CYC(b_+O(192), b_+OE(193));
+  CYC(b_+O(193), b_+OE(194)); L = L + 1; // Part.xh
+  CYC(b_+O(194), b_+OE(195)); mem_wr(gb, HL, C);
+  CYC(b_+O(195), b_+OE(198)); TAIL(partDelete); // jp
 
 state3:
-  CYC(b_+198, b_+200); E = 0xc5; // Part.substate
-  CYC(b_+200, b_+201); A = mem_rd(gb, DE);
-  CYC(b_+201, b_+202); alu_or(gb, A);
+  CYC(b_+O(198), b_+OE(200)); E = 0xc5; // Part.substate
+  CYC(b_+O(200), b_+OE(201)); A = mem_rd(gb, DE);
+  CYC(b_+O(201), b_+OE(202)); alu_or(gb, A);
   if (F & FZ) {
-    CYCT(b_+202, b_+205); // call z
-    push_effect(gb, b_+205);
+    CYCT(b_+O(202), b_+OE(205)); // call z
+    push_effect(gb, b_+OE(205));
     partCode01__getRelatedObj1ID_hook(gb);
   } else {
-    CYC(b_+202, b_+205);
+    CYC(b_+O(202), b_+OE(205));
   }
-  CALL_C(b_+205, objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+208);
-  if (F & FC) { CYCT(b_+208, b_+211); partCode01__linkCollectedItem_hook(gb); return; } // jp c
-  CYC(b_+208, b_+211);
-  CYC(b_+211, b_+213); A = 0x00; // Object.enabled
-  CALL_C(b_+213, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+216);
-  CYC(b_+216, b_+217); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+217, b_+218); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+218, b_+220); goto label_11_006; } // jr z
-  CYC(b_+218, b_+220);
-  CYC(b_+220, b_+222); E = 0xf0; // Part.var30
-  CYC(b_+222, b_+223); A = mem_rd(gb, DE);
-  CYC(b_+223, b_+224); alu_cp(gb, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+224, b_+227); objectTakePosition_hook(gb); return; } // jp z
-  CYC(b_+224, b_+227);
+  CALL_C(b_+O(205), objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+OE(208));
+  if (F & FC) { CYCT(b_+O(208), b_+OE(211)); partCode01__linkCollectedItem_hook(gb); return; } // jp c
+  CYC(b_+O(208), b_+OE(211));
+  CYC(b_+O(211), b_+OE(213)); A = 0x00; // Object.enabled
+  CALL_C(b_+O(213), objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+OE(216));
+  CYC(b_+O(216), b_+OE(217)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(217), b_+OE(218)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(218), b_+OE(220)); goto label_11_006; } // jr z
+  CYC(b_+O(218), b_+OE(220));
+  CYC(b_+O(220), b_+OE(222)); E = 0xf0; // Part.var30
+  CYC(b_+O(222), b_+OE(223)); A = mem_rd(gb, DE);
+  CYC(b_+O(223), b_+OE(224)); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+O(224), b_+OE(227)); objectTakePosition_hook(gb); return; } // jp z
+  CYC(b_+O(224), b_+OE(227));
 
 label_11_006:
-  CYC(b_+227, b_+230); TAIL(partDelete); // jp
+  CYC(b_+O(227), b_+OE(230)); TAIL(partDelete); // jp
 }
 
 void partCode01__getRelatedObj1ID_hook(GB *gb) {
   BASE(partCode01);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+230, b_+231); H = D;
-  CYC(b_+231, b_+232); L = E;
-  CYC(b_+232, b_+233); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
-  CYC(b_+233, b_+235); L = 0xcf; // Part.zh
-  CYC(b_+235, b_+237); mem_wr(gb, HL, 0x00);
-  CYC(b_+237, b_+239); A = 0x01; // Object.id
-  CALL_C(b_+239, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+242);
-  CYC(b_+242, b_+243); A = mem_rd(gb, HL);
-  CYC(b_+243, b_+245); E = 0xf0; // Part.var30
-  CYC(b_+245, b_+246); mem_wr(gb, DE, A);
-  CYC(b_+246, b_+249); TAIL(objectSetVisible80);// jp, real ret happens inside its chain
+  CYC(b_+O(230), b_+OE(231)); H = D;
+  CYC(b_+O(231), b_+OE(232)); L = E;
+  CYC(b_+O(232), b_+OE(233)); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [substate]
+  CYC(b_+O(233), b_+OE(235)); L = 0xcf; // Part.zh
+  CYC(b_+O(235), b_+OE(237)); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(237), b_+OE(239)); A = 0x01; // Object.id
+  CALL_C(b_+O(239), objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+OE(242));
+  CYC(b_+O(242), b_+OE(243)); A = mem_rd(gb, HL);
+  CYC(b_+O(243), b_+OE(245)); E = 0xf0; // Part.var30
+  CYC(b_+O(245), b_+OE(246)); mem_wr(gb, DE, A);
+  CYC(b_+O(246), b_+OE(249)); TAIL(objectSetVisible80);// jp, real ret happens inside its chain
 }
 
 void partCode01__checkCollidedWithLink_hook(GB *gb) {
   BASE(partCode01);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+249, b_+251); E = 0xe4; // Part.collisionType
-  CYC(b_+251, b_+252); A = mem_rd(gb, DE);
-  CYC(b_+252, b_+253); alu_rlca(gb);
-  if (!(F & FC)) { RET_TAKEN(b_+253); partCode01__afterCollisionCheck_hook(gb); return; } // ret nc
-  CYC(b_+253, b_+254);
-  CALL_C(b_+254, objectCheckCollidedWithLink_hook, SYM(objectCheckCollidedWithLink), b_+257);
-  if (!(F & FC)) { RET_TAKEN(b_+257); partCode01__afterCollisionCheck_hook(gb); return; } // ret nc
-  CYC(b_+257, b_+258);
-  CYC(b_+258, b_+259); SET_HL(pop_effect(gb)); // pop hl (discard return address)
+  CYC(b_+O(249), b_+OE(251)); E = 0xe4; // Part.collisionType
+  CYC(b_+O(251), b_+OE(252)); A = mem_rd(gb, DE);
+  CYC(b_+O(252), b_+OE(253)); alu_rlca(gb);
+  if (!(F & FC)) { RET_TAKEN(b_+O(253)); partCode01__afterCollisionCheck_hook(gb); return; } // ret nc
+  CYC(b_+O(253), b_+OE(254));
+  CALL_C(b_+O(254), objectCheckCollidedWithLink_hook, SYM(objectCheckCollidedWithLink), b_+OE(257));
+  if (!(F & FC)) { RET_TAKEN(b_+O(257)); partCode01__afterCollisionCheck_hook(gb); return; } // ret nc
+  CYC(b_+O(257), b_+OE(258));
+  CYC(b_+O(258), b_+OE(259)); SET_HL(pop_effect(gb)); // pop hl (discard return address)
   TAIL(partCode01__linkCollectedItem);
 }
 
 void partCode01__linkCollectedItem_hook(GB *gb) {
   BASE(partCode01);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  CYC(b_+259, b_+262); A = W8(wLinkDeathTrigger);
-  CYC(b_+262, b_+263); alu_or(gb, A);
-  if (!(F & FZ)) { CYCT(b_+263, b_+265); goto deleteSelf; } // jr nz
-  CYC(b_+263, b_+265);
-  CYC(b_+265, b_+267); E = 0xc2; // Part.subid
-  CYC(b_+267, b_+268); A = mem_rd(gb, DE);
-  CYC(b_+268, b_+269); alu_add(gb, A);
-  CYC(b_+269, b_+272); SET_HL(GV(b_+315, 0x425b)); // @itemDropTreasureTable
-  CYC(b_+272, b_+273); itemDrop_addDoubleIndexToHl_from_rst(gb, b_+273);
-  CYC(b_+273, b_+274); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+274, b_+275); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+275, b_+277); goto deleteSelf; } // jr z
-  CYC(b_+275, b_+277);
-  CYC(b_+277, b_+278); B = A;
-  CYC(b_+278, b_+280); A = 0x26; // GOLD_JOY_RING
-  CALL_C(b_+280, cpActiveRing_hook, SYM(cpActiveRing), b_+283);
-  CYC(b_+283, b_+284); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  if (F & FZ) { CYCT(b_+284, b_+286); goto doubleDrop; } // jr z
-  CYC(b_+284, b_+286);
-  CYC(b_+286, b_+287); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+287, b_+289); goto giveDrop; } // jr z
-  CYC(b_+287, b_+289);
-  CALL_C(b_+289, cpActiveRing_hook, SYM(cpActiveRing), b_+292);
-  if (!(F & FZ)) { CYCT(b_+292, b_+294); goto giveDrop; } // jr nz
-  CYC(b_+292, b_+294);
+  CYC(b_+O(259), b_+OE(262)); A = W8(wLinkDeathTrigger);
+  CYC(b_+O(262), b_+OE(263)); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(263), b_+OE(265)); goto deleteSelf; } // jr nz
+  CYC(b_+O(263), b_+OE(265));
+  CYC(b_+O(265), b_+OE(267)); E = 0xc2; // Part.subid
+  CYC(b_+O(267), b_+OE(268)); A = mem_rd(gb, DE);
+  CYC(b_+O(268), b_+OE(269)); alu_add(gb, A);
+  CYC(b_+O(269), b_+OE(272)); SET_HL(GV(b_+O(315), 0x425b)); // @itemDropTreasureTable
+  CYC(b_+O(272), b_+OE(273)); itemDrop_addDoubleIndexToHl_from_rst(gb, b_+OE(273));
+  CYC(b_+O(273), b_+OE(274)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+O(274), b_+OE(275)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(275), b_+OE(277)); goto deleteSelf; } // jr z
+  CYC(b_+O(275), b_+OE(277));
+  CYC(b_+O(277), b_+OE(278)); B = A;
+  CYC(b_+O(278), b_+OE(280)); A = 0x26; // GOLD_JOY_RING
+  CALL_C(b_+O(280), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(283));
+  CYC(b_+O(283), b_+OE(284)); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  if (F & FZ) { CYCT(b_+O(284), b_+OE(286)); goto doubleDrop; } // jr z
+  CYC(b_+O(284), b_+OE(286));
+  CYC(b_+O(286), b_+OE(287)); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+O(287), b_+OE(289)); goto giveDrop; } // jr z
+  CYC(b_+O(287), b_+OE(289));
+  CALL_C(b_+O(289), cpActiveRing_hook, SYM(cpActiveRing), b_+OE(292));
+  if (!(F & FZ)) { CYCT(b_+O(292), b_+OE(294)); goto giveDrop; } // jr nz
+  CYC(b_+O(292), b_+OE(294));
 
 doubleDrop:
-  CYC(b_+294, b_+295); SET_HL(HL + 1);
+  CYC(b_+O(294), b_+OE(295)); SET_HL(HL + 1);
 
 giveDrop:
-  CYC(b_+295, b_+296); C = mem_rd(gb, HL);
-  CYC(b_+296, b_+297); A = B;
-  CALL_C(b_+297, giveTreasure_hook, SYM(giveTreasure), b_+300);
-  CYC(b_+300, b_+302); E = 0xc2; // Part.subid
-  CYC(b_+302, b_+303); A = mem_rd(gb, DE);
-  CYC(b_+303, b_+305); alu_cp(gb, 0x0e); // ITEM_DROP_50_ORE_CHUNKS
-  if (!(F & FZ)) { CYCT(b_+305, b_+307); goto deleteSelf; } // jr nz
-  CYC(b_+305, b_+307);
-  CALL_C(b_+307, getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+310);
-  CYC(b_+310, b_+312); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
+  CYC(b_+O(295), b_+OE(296)); C = mem_rd(gb, HL);
+  CYC(b_+O(296), b_+OE(297)); A = B;
+  CALL_C(b_+O(297), giveTreasure_hook, SYM(giveTreasure), b_+OE(300));
+  CYC(b_+O(300), b_+OE(302)); E = 0xc2; // Part.subid
+  CYC(b_+O(302), b_+OE(303)); A = mem_rd(gb, DE);
+  CYC(b_+O(303), b_+OE(305)); alu_cp(gb, 0x0e); // ITEM_DROP_50_ORE_CHUNKS
+  if (!(F & FZ)) { CYCT(b_+O(305), b_+OE(307)); goto deleteSelf; } // jr nz
+  CYC(b_+O(305), b_+OE(307));
+  CALL_C(b_+O(307), getThisRoomFlags_hook, SYM(getThisRoomFlags), b_+OE(310));
+  CYC(b_+O(310), b_+OE(312)); mem_wr(gb, HL, mem_rd(gb, HL) | 0x20);
 
 deleteSelf:
-  CYC(b_+312, b_+315); TAIL(partDelete); // jp
+  CYC(b_+O(312), b_+OE(315)); TAIL(partDelete); // jp
 }
 
 void itemDrop_initGfx_hook(GB *gb) {

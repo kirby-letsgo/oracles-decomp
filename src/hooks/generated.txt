@@ -2748,6 +2748,7 @@
 03:5153 introCinematic_inTemple_state0__doneSpawningTriforce_hook -
 03:5139 introCinematic_inTemple_state0__nextTriforce_hook -
 03:4f70 introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook -
+03:76cb func_03_7619__state1__cbb3_02_hook -
 04:60ea applyStandardTileSubstitutions__locFunc_hook -
 04:6dd6 getAdjustedRoomGroup_hook -
 04:6de7 checkTilesetOverride_hook -

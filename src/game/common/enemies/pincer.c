@@ -201,40 +201,42 @@ void pincer_head_state9_hook(GB *gb) {
 void pincer_head_stateA_hook(GB *gb) {
   BASE(pincer_head_stateA);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
-  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
-  CYC(b_+3, b_+4); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+4, b_+7); enemyAnimate_hook(gb); return; } // jp nz
-  CYC(b_+4, b_+7);
-  CALL_C(b_+7, ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+10);
-  CYC(b_+10, b_+12); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(b_+12, b_+14); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
-  CYC(b_+14, b_+16); L = ENEMY_BASE + OBJ_VAR33;
-  CYC(b_+16, b_+18); mem_wr(gb, HL, 0x00);
-  CYC(b_+18, b_+20); L = ENEMY_BASE + OBJ_YH;
-  CYC(b_+20, b_+21); B = mem_rd(gb, HL);
-  CYC(b_+21, b_+23); L = ENEMY_BASE + OBJ_XH;
-  CYC(b_+23, b_+24); C = mem_rd(gb, HL);
-  CYC(b_+24, b_+26); A = 0x06; // BREAKABLETILESOURCE_SHOVEL
-  CALL_C(b_+26, tryToBreakTile_hook, SYM(tryToBreakTile), b_+29);
-  CALL_C(b_+29, objectCheckTileAtPositionIsWater_hook, SYM(objectCheckTileAtPositionIsWater), b_+32);
-  if (!(F & FC)) { CYCT(b_+32, b_+34); goto attack; } // jr nc
-  CYC(b_+32, b_+34);
-  CALL_C(b_+34, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+37);
-  if (!(F & FZ)) { CYCT(b_+37, b_+39); goto attack; } // jr nz
-  CYC(b_+37, b_+39);
-  CYC(b_+39, b_+41); mem_wr(gb, HL, 0x03); // INTERAC_SPLASH
-  CYC(b_+41, b_+44); SET_BC(0xfa00);
-  CALL_C(b_+44, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+47);
+  CYC(b_+O(0), b_+OE(2)); E = ENEMY_BASE + OBJ_ANIM_PARAMETER;
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
+  CYC(b_+O(3), b_+OE(4)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(4), b_+OE(7)); enemyAnimate_hook(gb); return; } // jp nz
+  CYC(b_+O(4), b_+OE(7));
+  CALL_C(b_+O(7), ecom_incState_b0e_hook, SYM(ecom_incState_b0e), b_+OE(10));
+  CYC(b_+O(10), b_+OE(12)); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
+  CYC(b_+O(12), b_+OE(14)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 7))); // set 7,(hl)
+  CYC(b_+O(14), b_+OE(16)); L = ENEMY_BASE + OBJ_VAR33;
+  CYC(b_+O(16), b_+OE(18)); mem_wr(gb, HL, 0x00);
+  CYC(b_+O(18), b_+OE(20)); L = ENEMY_BASE + OBJ_YH;
+  CYC(b_+O(20), b_+OE(21)); B = mem_rd(gb, HL);
+  CYC(b_+O(21), b_+OE(23)); L = ENEMY_BASE + OBJ_XH;
+  CYC(b_+O(23), b_+OE(24)); C = mem_rd(gb, HL);
+  CYC(b_+O(24), b_+OE(26)); A = 0x06; // BREAKABLETILESOURCE_SHOVEL
+  CALL_C(b_+O(26), tryToBreakTile_hook, SYM(tryToBreakTile), b_+OE(29));
+  if (!game_seasons) {
+    CALL_C(b_+29, objectCheckTileAtPositionIsWater_hook, SYM(objectCheckTileAtPositionIsWater), b_+32);
+    if (!(F & FC)) { CYCT(b_+32, b_+34); goto attack; } // jr nc
+    CYC(b_+32, b_+34);
+    CALL_C(b_+34, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+37);
+    if (!(F & FZ)) { CYCT(b_+37, b_+39); goto attack; } // jr nz
+    CYC(b_+37, b_+39);
+    CYC(b_+39, b_+41); mem_wr(gb, HL, 0x03); // INTERAC_SPLASH
+    CYC(b_+41, b_+44); SET_BC(0xfa00);
+    CALL_C(b_+44, objectCopyPositionWithOffset_hook, SYM(objectCopyPositionWithOffset), b_+47);
+  }
 
 attack:
-  CALL_C(b_+47, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+50);
-  CYC(b_+50, b_+52); alu_add(gb, 0x02);
-  CYC(b_+52, b_+54); alu_and(gb, 0x1c);
-  CYC(b_+54, b_+55); alu_rrca(gb);
-  CYC(b_+55, b_+56); alu_rrca(gb);
-  CYC(b_+56, b_+57); A = alu_inc8(gb, A);
-  CYC(b_+57, b_+60); TAIL(enemySetAnimation); // jp
+  CALL_C(b_+O(47), ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+OE(50));
+  CYC(b_+O(50), b_+OE(52)); alu_add(gb, 0x02);
+  CYC(b_+O(52), b_+OE(54)); alu_and(gb, 0x1c);
+  CYC(b_+O(54), b_+OE(55)); alu_rrca(gb);
+  CYC(b_+O(55), b_+OE(56)); alu_rrca(gb);
+  CYC(b_+O(56), b_+OE(57)); A = alu_inc8(gb, A);
+  CYC(b_+O(57), b_+OE(60)); TAIL(enemySetAnimation); // jp
 }
 
 // 0e:5f21, bare global; jump-table target from pincer_head. Extending toward target.

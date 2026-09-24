@@ -93,7 +93,7 @@ state1:
   if (!(F & FZ)) { RET_TAKEN(b_+75); return; }
   CYC(b_+75, b_+76);
   CYC(b_+76, b_+79);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 state2:
   CALL_C(b_+79, s_func_79df_hook, SYM(func_79df), b_+82);
   CALL_C(b_+82, s_interactionDecCounter1, SYM(interactionDecCounter1), b_+85);

@@ -2751,6 +2751,7 @@ void twinrovaRevealCutsceneHandler__state9__afterCall6d05_hook(GB *gb);
 void introCinematic_inTemple_state0__doneSpawningTriforce_hook(GB *gb);
 void introCinematic_inTemple_state0__nextTriforce_hook(GB *gb);
 void introCinematic_ridingHorse_state4__drawLinkOnHorseAndScrollScreen_hook(GB *gb);
+void func_03_7619__state1__cbb3_02_hook(GB *gb);
 void applyStandardTileSubstitutions__locFunc_hook(GB *gb);
 void getAdjustedRoomGroup_hook(GB *gb);
 void checkTilesetOverride_hook(GB *gb);

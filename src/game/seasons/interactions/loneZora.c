@@ -56,6 +56,6 @@ state0:
 state1:
   CALL_C(b_+35, s_interactionRunScript, SYM(interactionRunScript), b_+38);
   CYC(b_+38, b_+41);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 }
 

@@ -14875,6 +14875,7 @@ enum {
   S_treeWarps,
   S_itemSubmenu2EssencePositions,
   S_table_5ae5,
+  S_func_03_7619__state1__cbb3_02,
   SYM_COUNT
 };
 enum {

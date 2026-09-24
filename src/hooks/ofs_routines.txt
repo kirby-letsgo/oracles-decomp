@@ -41,6 +41,9 @@ endgameCutsceneHandler_body
 enemyBoss_initializeRoomWithoutExtraGfx_b0f
 enemyBoss_initializeRoomWithoutExtraGfx_b10
 enemyCode37
+enemyCode4d
+enemyCode4f
+enemyCode5a
 enemyCode79
 findWarpSourceAndDest
 func_02_5a35
@@ -50,6 +53,7 @@ func_5a60
 func_5c18
 func_5cfe
 functionCaller_b02
+galeSeedTryToWarpLink
 generateVramTilesWithRoomChanges
 getTileMappingData
 getWarpTreeData
@@ -57,12 +61,22 @@ giveTreasure_body
 initializeAnimations
 initializeFile_b07
 initializeGame
+interaction7f_subid00
+interaction7f_subid01
 interactionCode0f
+interactionCode12
+interactionCode14
+interactionCode1e
+interactionCode28
 interactionCode60
 interactionCode6b
 interactionCode6c
 interactionCode71
+interactionCode7e 240=242 270=252 288=289
 interactionCodeb5
+interactionCodeb6
+interactionCodece
+interactionCoded0
 interactionCodedc
 interactionCodee0
 interactionRunSimpleScript
@@ -76,8 +90,12 @@ inventoryMenuState3
 inventorySubmenu1_drawCursor
 inventorySubmenu2CheckDirectionButtons
 inventorySubscreen2_drawTreasures
+itemCode06
+itemCode16
+itemCode20
 itemDrop_spawnEnemy
 itemInitializeFromLinkPosition
+itemUpdateThrowingVertically
 kingMoblinBomb_explode
 kingMoblinBomb_state2
 linkApplyTileTypes 233=227 234=228
@@ -109,17 +127,28 @@ mapleStateB
 mooshState0
 nextToPushableBlock
 objectCheckIsOverHazard
+objectOscillateZ_body
 overworldSwimmingState1
 paletteFadeHandler
 paletteFadeHandler05
+parentItemCode_bomb
 parentItemCode_bombchu
+parentItemCode_boomerang
+parentItemCode_bracelet
+parentItemCode_feather
+parentItemCode_flute
 parentItemCode_foolsOre
 parentItemCode_punch
+parentItemCode_satchel
+parentItemCode_sword
+parentItemLoadAnimationAndIncState
 parseGivenObjectData_b12
 parseStaticObjects
+partCode01
 partCode09
 partCode13
 partCode27
+pincer_head_stateA
 playCompassSoundIfKeyInRoom
 reloadGraphicsOnExitMenu_body
 replaceShutterForLinkEntering
@@ -130,7 +159,12 @@ screenTransitionState5Substate0
 scriptCmd_initNpcHitbox
 scriptCmd_jumpRandom
 scriptCmd_loadScript
+seedItemState1
+shopItemState0
 shopItemState3 30=37
+shopkeeperGotoState1
+shopkeeperState0
+shopkeeperState1
 shopkeeperState2
 specialObjectCode_linkInCutscene_b06
 standardGameState

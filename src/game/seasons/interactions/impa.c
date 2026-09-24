@@ -258,11 +258,11 @@ L_5e82:
   TAIL(objectSetPriorityRelativeToLink_withTerrainEffects);
 state1_faceLinkAndAnimate:
   CYC(b_+349, b_+352);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 state1_subid3:
   CYC(b_+352, b_+354); A = 0x26;
   CALL_C(b_+354, s_checkGlobalFlag, SYM(checkGlobalFlag), b_+357);
-  if (!(F & FZ)) { CYCT(b_+357, b_+360); TAIL_SG(npcFaceLinkAndAnimate); }
+  if (!(F & FZ)) { CYCT(b_+357, b_+360); TAIL(npcFaceLinkAndAnimate); }
   CYC(b_+357, b_+360);
 state1_animateAsNPC:
   CYC(b_+360, b_+363);

@@ -116,7 +116,7 @@ state1:
   if (!(F & FZ)) { CYCT(b_+92, b_+94); goto animate; }
   CYC(b_+92, b_+94);
   CYC(b_+94, b_+97);
-  TAIL_SG(npcFaceLinkAndAnimate);
+  TAIL(npcFaceLinkAndAnimate);
 animate:
   CYC(b_+97, b_+100);
   TAIL(interactionAnimate);

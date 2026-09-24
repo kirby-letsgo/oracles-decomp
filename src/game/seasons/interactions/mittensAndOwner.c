@@ -120,7 +120,7 @@ state1:
   CALL_C(b_+117, s_interactionRunScript, SYM(interactionRunScript), b_+120);
   CYC(b_+120, b_+123); A = mem_rd(gb, wccd4);
   CYC(b_+123, b_+124); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+124, b_+127); TAIL_SG(npcFaceLinkAndAnimate); }
+  if (F & FZ) { CYCT(b_+124, b_+127); TAIL(npcFaceLinkAndAnimate); }
   CYC(b_+124, b_+127);
   CALL_C(b_+127, s_func_5a99_hook, SYM(func_5a99), b_+130);
   CYC(b_+130, b_+133);

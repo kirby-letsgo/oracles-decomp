@@ -1266,61 +1266,6 @@ L_5a66:
   I(0x5a77, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9);  // jp $3ad9
 }
 
-// 3f:5a7a
-void s_interac11_subid01(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x5a7a, 2); E = 0x44;  // ld e,$44
-  I(0x5a7c, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x5a7d, 0x5a7e);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) { case 0x5a86: goto L_5a86; case 0x5ab0: goto L_5ab0; case 0x5abd: goto L_5abd; case 0x5acd: goto L_5acd; default: HANDOFF(HL); }
-L_5a86:
-  I(0x5a86, 2); E = 0x42;  // ld e,$42
-  I(0x5a88, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x5a89, 2); A = alu_swap(gb, A);  // swap a
-  I(0x5a8b, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x5a8d, 3); SET_HL(0x5aa8);  // ld hl,$5aa8
-  RST_PUSH(0x5a90, 0x5a91);  // rst $10 (addAToHl)
-  I(0x0010, 1); alu_add(gb, L); I(0x0011, 1); L = A;
-  if (!(F & FC)) { I(0x0012, 5); pop_effect(gb); } else { I(0x0012, 2); I(0x0013, 1); H = alu_inc8(gb, H); I(0x0014, 4); pop_effect(gb); }
-  I(0x5a91, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x5a92, 2); E = 0x49;  // ld e,$49
-  I(0x5a94, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5a95, 2); E = 0x50;  // ld e,$50
-  I(0x5a97, 2); A = 0x28;  // ld a,$28
-  I(0x5a99, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5a9a, 2); E = 0x46;  // ld e,$46
-  I(0x5a9c, 2); A = 0x30;  // ld a,$30
-  I(0x5a9e, 2); mem_wr(gb, DE, A);  // ld (de),a
-  CALL(0x5a9f, interactionInitGraphics_hook, 0x15e9, 0x5aa2);  // call $15e9
-L_5aa2:
-  CALL(0x5aa2, objectSetVisible80_hook, 0x1e15, 0x5aa5);  // call $1e15
-  I(0x5aa5, 4); if (hook_is(gb, 0x239b, interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(0x239b);  // jp $239b
-L_5ab0:
-  CALL(0x5ab0, objectApplySpeed_hook, 0x1fdb, 0x5ab3);  // call $1fdb
-  CALL(0x5ab3, interactionAnimate_hook, 0x25b8, 0x5ab6);  // call $25b8
-  CALL(0x5ab6, interactionDecCounter1_hook, 0x2387, 0x5ab9);  // call $2387
-  if (!(F & FZ)) { RET_TAKEN(0x5ab9); return; } I(0x5ab9, 2);  // ret nz
-  I(0x5aba, 4); if (hook_is(gb, 0x239b, interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(0x239b);  // jp $239b
-L_5abd:
-  CALL(0x5abd, s_interac11_subid01__interac11_updateSparkle, 0x5ada, 0x5ac0);  // call $5ada
-  I(0x5ac0, 4); A = mem_rd(gb, 0xcfd9);  // ld a,($cfd9)
-  I(0x5ac3, 1); alu_or(gb, A);  // or a
-  if ((F & FZ)) { RET_TAKEN(0x5ac4); return; } I(0x5ac4, 2);  // ret z
-  I(0x5ac5, 2); E = 0x50;  // ld e,$50
-  I(0x5ac7, 2); A = 0x50;  // ld a,$50
-  I(0x5ac9, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x5aca, 4); if (hook_is(gb, 0x239b, interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(0x239b);  // jp $239b
-L_5acd:
-  CALL(0x5acd, objectApplySpeed_hook, 0x1fdb, 0x5ad0);  // call $1fdb
-  CALL(0x5ad0, interactionAnimate_hook, 0x25b8, 0x5ad3);  // call $25b8
-  CALL(0x5ad3, objectCheckWithinScreenBoundary_hook, 0x2142, 0x5ad6);  // call $2142
-  if ((F & FC)) { RET_TAKEN(0x5ad6); return; } I(0x5ad6, 2);  // ret c
-  I(0x5ad7, 4); if (hook_is(gb, 0x3ad9, interactionDelete_hook)) { interactionDelete_hook(gb); return; } HANDOFF(0x3ad9);  // jp $3ad9
-}
-
 // 3f:5a86
 void s_interac11_subid01__interac11_01_state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -1343,15 +1288,6 @@ L_5a86:
   I(0x5a9c, 2); A = 0x30;  // ld a,$30
   I(0x5a9e, 2); mem_wr(gb, DE, A);  // ld (de),a
   CALL(0x5a9f, interactionInitGraphics_hook, 0x15e9, 0x5aa2);  // call $15e9
-L_5aa2:
-  CALL(0x5aa2, objectSetVisible80_hook, 0x1e15, 0x5aa5);  // call $1e15
-  I(0x5aa5, 4); if (hook_is(gb, 0x239b, interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(0x239b);  // jp $239b
-}
-
-// 3f:5aa2
-void s_interac11_subid01__afterCall5aa2(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5aa2:
   CALL(0x5aa2, objectSetVisible80_hook, 0x1e15, 0x5aa5);  // call $1e15
   I(0x5aa5, 4); if (hook_is(gb, 0x239b, interactionIncState_hook)) { interactionIncState_hook(gb); return; } HANDOFF(0x239b);  // jp $239b
 }

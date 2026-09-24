@@ -34,45 +34,47 @@ static uint16_t hardhatBeetle_jump_table(GB *gb) {
 void enemyCode4d_hook(GB *gb) {
   BASE(enemyCode4d);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+3);
-  if (F & FZ) { CYCT(b_+3, b_+5); goto normalStatus; } // jr z
-  CYC(b_+3, b_+5);
-  CYC(b_+5, b_+7); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(b_+7); return; } // ret c
-  CYC(b_+7, b_+8);
-  if (F & FZ) { CYCT(b_+8, b_+11); enemyDie_hook(gb); return; } // jp z
-  CYC(b_+8, b_+11);
-  CYC(b_+11, b_+12); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+12, b_+15); ecom_updateKnockbackAndCheckHazards_b0e_hook(gb); return; } // jp nz
-  CYC(b_+12, b_+15);
-  RET(b_+15); return; // ret
+  CALL_C(b_+O(0), ecom_checkHazards_b0e_hook, SYM(ecom_checkHazards_b0e), b_+OE(3));
+  if (F & FZ) { CYCT(b_+O(3), b_+OE(5)); goto normalStatus; } // jr z
+  CYC(b_+O(3), b_+OE(5));
+  CYC(b_+O(5), b_+OE(7)); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+O(7)); return; } // ret c
+  CYC(b_+O(7), b_+OE(8));
+  if (F & FZ) { CYCT(b_+O(8), b_+OE(11)); enemyDie_hook(gb); return; } // jp z
+  CYC(b_+O(8), b_+OE(11));
+  CYC(b_+O(11), b_+OE(12)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(12), b_+OE(15)); ecom_updateKnockbackAndCheckHazards_b0e_hook(gb); return; } // jp nz
+  CYC(b_+O(12), b_+OE(15));
+  RET(b_+O(15)); return; // ret
 
 normalStatus:
-  CYC(b_+16, b_+18); E = ENEMY_BASE + OBJ_STATE;
-  CYC(b_+18, b_+19); A = mem_rd(gb, DE);
+  CYC(b_+O(16), b_+OE(18)); E = ENEMY_BASE + OBJ_STATE;
+  CYC(b_+O(18), b_+OE(19)); A = mem_rd(gb, DE);
   {
-    CYC(b_+19, b_+20); push_effect(gb, b_+20);
+    CYC(b_+O(19), b_+OE(20)); push_effect(gb, b_+OE(20));
     uint16_t target = hardhatBeetle_jump_table(gb);
-    if (target == b_+38) goto state_uninitialized;
-    if (target == b_+53) { RET(b_+53); return; } // ret (state_stub)
+    if (target == b_+(game_seasons ? S(38) : 38)) goto state_uninitialized;
+    if (target == b_+O(53)) { RET(b_+O(53)); return; } // ret (state_stub)
     if (target == SYM(ecom_blownByGaleSeedState_b0e)) { ecom_blownByGaleSeedState_b0e_hook(gb); return; }
-    if (target == b_+54) goto state8;
+    if (target == b_+O(54)) goto state8;
     HANDOFF(target);
   }
 
 state_uninitialized:
-  CYC(b_+38, b_+40); E = ENEMY_BASE + OBJ_ID;
-  CYC(b_+40, b_+41); A = mem_rd(gb, DE);
-  CYC(b_+41, b_+43); alu_cp(gb, 0x5f); // ENEMY_HARMLESS_HARDHAT_BEETLE
-  CYC(b_+43, b_+45); A = 0x8d; // PALH_8d
-  if (F & FZ) CALL_C_CC(b_+45, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+48); else CYC(b_+45, b_+48); // call z
-  CYC(b_+48, b_+50); A = 0x0f; // SPEED_60
-  CYC(b_+50, b_+53); TAIL(ecom_setSpeedAndState8AndVisible_b0e); // jp
+  if (!game_seasons) {
+    CYC(b_+38, b_+40); E = ENEMY_BASE + OBJ_ID;
+    CYC(b_+40, b_+41); A = mem_rd(gb, DE);
+    CYC(b_+41, b_+43); alu_cp(gb, 0x5f); // ENEMY_HARMLESS_HARDHAT_BEETLE
+    CYC(b_+43, b_+45); A = 0x8d; // PALH_8d
+    if (F & FZ) CALL_C_CC(b_+45, loadPaletteHeader_hook, SYM(loadPaletteHeader), b_+48); else CYC(b_+45, b_+48); // call z
+  }
+  CYC(b_+O(48), b_+OE(50)); A = 0x0f; // SPEED_60
+  CYC(b_+O(50), b_+OE(53)); TAIL(ecom_setSpeedAndState8AndVisible_b0e); // jp
 
 state8:
-  CALL_C(b_+54, ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+57);
-  CALL_C(b_+57, ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+60);
-  CYC(b_+60, b_+63); TAIL(enemyAnimate); // jp
+  CALL_C(b_+O(54), ecom_updateAngleTowardTarget_b0e_hook, SYM(ecom_updateAngleTowardTarget_b0e), b_+OE(57));
+  CALL_C(b_+O(57), ecom_applyVelocityForSideviewEnemyNoHoles_b0e_hook, SYM(ecom_applyVelocityForSideviewEnemyNoHoles_b0e), b_+OE(60));
+  CYC(b_+O(60), b_+OE(63)); TAIL(enemyAnimate); // jp
 }
 
 // 0e:60bb, alias of enemyCode4d (ENEMY_HARMLESS_HARDHAT_BEETLE, ages only): identical bytes at

@@ -437,6 +437,7 @@ subid2_incStateWhenCounter1Is0:
   RET(b_+557); return;
 subid2_stateA:
   CYC(b_+558, b_+560); B = 0x04;
+subid2_func_6905:
   CYC(b_+560, b_+562); A = 0x38;
   CALL_C(b_+562, s_objectGetRelatedObject1Var, SYM(objectGetRelatedObject1Var), b_+565);
   CYC(b_+565, b_+566); A = mem_rd(gb, HL);
@@ -739,8 +740,11 @@ subid2_stateB_var03_03:
   CYC(b_+955, b_+956); push_effect(gb, b_+956);
   do { uint16_t jt_ = (gleeok_jump_table(gb));
     if (jt_ == b_+670) goto subid2_stateB_var03_00_substate0;
+    if (jt_ == b_+960) goto subid2_stateB_var03_03_ret;
     HANDOFF(HL);
   } while (0);
+subid2_stateB_var03_03_ret:
+  RET(b_+960); return;
 subid2_stateB_var03_04:
   CALL_L(b_+961, gleeok_subid2_stateB_func_6a9f, b_+964);
   if (F & FZ) CALL_C_CC(b_+964, s_func_6cf6_hook, SYM(func_6cf6), b_+967);
@@ -884,6 +888,13 @@ subid3:
   do { uint16_t jt_ = (gleeok_jump_table(gb));
     if (jt_ == b_+1176) goto subid3_state8;
     if (jt_ == b_+549) goto subid2_incStateWhenCounter1Is0;
+    if (jt_ == b_+1184) goto subid3_stateA;
+    if (jt_ == b_+644) goto subid2_stateB;
+    if (jt_ == b_+978) goto subid2_stateC;
+    if (jt_ == b_+1004) goto subid2_stateD;
+    if (jt_ == b_+1013) goto subid2_stateE;
+    if (jt_ == b_+1036) goto subid2_stateF;
+    if (jt_ == b_+1115) goto subid2_stateH;
     HANDOFF(HL);
   } while (0);
 subid3_state8:
@@ -892,7 +903,10 @@ subid3_state8:
   CYC(b_+1179, b_+1181); mem_wr(gb, HL, 0x0c);
   CYC(b_+1181, b_+1184);
   goto subid2_incStateEnableCollisionsSetCounterAndSpeed;
-
+subid3_stateA:
+  CYC(b_+1184, b_+1186); B = 0x02;
+  CYC(b_+1186, b_+1189);
+  goto subid2_func_6905;
 subid4:
   CYC(b_+1189, b_+1190); A = mem_rd(gb, DE);
   CYC(b_+1190, b_+1192); alu_sub(gb, 0x08);

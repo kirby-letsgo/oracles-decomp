@@ -53,66 +53,79 @@ static uint16_t moldorm_jump_table(GB *gb) {
 void enemyCode4f_hook(GB *gb) {
   BASE(enemyCode4f);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+0, moldorm_checkHazards_hook, SYM(moldorm_checkHazards), b_+3);
-  if (F & FZ) { CYCT(b_+3, b_+5); goto normalStatus; } // jr z
-  CYC(b_+3, b_+5);
-  CYC(b_+5, b_+7); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
-  if (F & FC) { RET_TAKEN(b_+7); return; } // ret c
-  CYC(b_+7, b_+8);
-  if (F & FZ) { CYCT(b_+8, b_+10); goto dead; } // jr z
-  CYC(b_+8, b_+10);
-  CYC(b_+10, b_+11); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+11, b_+13); goto knockback; } // jr nz
-  CYC(b_+11, b_+13);
-  CYC(b_+13, b_+15); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+15, b_+16); A = mem_rd(gb, DE);
-  CYC(b_+16, b_+17); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+17, b_+19); goto normalStatus; } // jr nz
-  CYC(b_+17, b_+19);
-  CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
-  CYC(b_+21, b_+22); L = E;
-  CYC(b_+22, b_+23); A = mem_rd(gb, DE);
-  CYC(b_+23, b_+24); B = A;
-  CYC(b_+24, b_+26); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(b_+26, b_+27); A = mem_rd(gb, DE);
-  CYC(b_+27, b_+28); H = A;
-  CYC(b_+28, b_+29); mem_wr(gb, HL, B);
-  CYC(b_+29, b_+30); E = alu_inc8(gb, E);
-  CYC(b_+30, b_+31); A = mem_rd(gb, DE);
-  CYC(b_+31, b_+32); H = A;
-  CYC(b_+32, b_+33); mem_wr(gb, HL, B);
-  RET(b_+33); return; // ret
+  CALL_C(b_+O(0), moldorm_checkHazards_hook, SYM(moldorm_checkHazards), b_+OE(3));
+  if (F & FZ) { CYCT(b_+O(3), b_+OE(5)); goto normalStatus; } // jr z
+  CYC(b_+O(3), b_+OE(5));
+  CYC(b_+O(5), b_+OE(7)); alu_sub(gb, 0x03); // ENEMYSTATUS_NO_HEALTH
+  if (F & FC) { RET_TAKEN(b_+O(7)); return; } // ret c
+  CYC(b_+O(7), b_+OE(8));
+  if (F & FZ) { CYCT(b_+O(8), b_+OE(10)); goto dead; } // jr z
+  CYC(b_+O(8), b_+OE(10));
+  CYC(b_+O(10), b_+OE(11)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(11), b_+OE(13)); goto knockback; } // jr nz
+  CYC(b_+O(11), b_+OE(13));
+  CYC(b_+O(13), b_+OE(15)); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+O(15), b_+OE(16)); A = mem_rd(gb, DE);
+  CYC(b_+O(16), b_+OE(17)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(17), b_+OE(19)); goto normalStatus; } // jr nz
+  CYC(b_+O(17), b_+OE(19));
+  CYC(b_+O(19), b_+OE(21)); E = ENEMY_BASE + OBJ_INVINCIBILITY_COUNTER;
+  CYC(b_+O(21), b_+OE(22)); L = E;
+  CYC(b_+O(22), b_+OE(23)); A = mem_rd(gb, DE);
+  CYC(b_+O(23), b_+OE(24)); B = A;
+  CYC(b_+O(24), b_+OE(26)); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+O(26), b_+OE(27)); A = mem_rd(gb, DE);
+  CYC(b_+O(27), b_+OE(28)); H = A;
+  CYC(b_+O(28), b_+OE(29)); mem_wr(gb, HL, B);
+  CYC(b_+O(29), b_+OE(30)); E = alu_inc8(gb, E);
+  CYC(b_+O(30), b_+OE(31)); A = mem_rd(gb, DE);
+  CYC(b_+O(31), b_+OE(32)); H = A;
+  CYC(b_+O(32), b_+OE(33)); mem_wr(gb, HL, B);
+  RET(b_+O(33)); return; // ret
 
 dead:
-  CYC(b_+34, b_+36); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+36, b_+37); A = mem_rd(gb, DE);
-  CYC(b_+37, b_+38); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+38, b_+41); moldorm_tail_delete_hook(gb); return; } // jp nz
-  CYC(b_+38, b_+41);
-  CYC(b_+41, b_+43); E = ENEMY_BASE + 0x30; // Enemy.var30
-  CYC(b_+43, b_+44); A = mem_rd(gb, DE);
-  CYC(b_+44, b_+45); H = A;
-  CALL_C(b_+45, ecom_killObjectH_b0e_hook, SYM(ecom_killObjectH_b0e), b_+48);
-  CYC(b_+48, b_+49); E = alu_inc8(gb, E);
-  CYC(b_+49, b_+50); A = mem_rd(gb, DE);
-  CYC(b_+50, b_+51); H = A;
-  CALL_C(b_+51, ecom_killObjectH_b0e_hook, SYM(ecom_killObjectH_b0e), b_+54);
-  CYC(b_+54, b_+57); TAIL(enemyDie); // jp
+  CYC(b_+O(34), b_+OE(36)); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+O(36), b_+OE(37)); A = mem_rd(gb, DE);
+  CYC(b_+O(37), b_+OE(38)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(38), b_+OE(41)); moldorm_tail_delete_hook(gb); return; } // jp nz
+  CYC(b_+O(38), b_+OE(41));
+  CYC(b_+O(41), b_+OE(43)); E = ENEMY_BASE + 0x30; // Enemy.var30
+  CYC(b_+O(43), b_+OE(44)); A = mem_rd(gb, DE);
+  CYC(b_+O(44), b_+OE(45)); H = A;
+  CALL_C(b_+O(45), ecom_killObjectH_b0e_hook, SYM(ecom_killObjectH_b0e), b_+OE(48));
+  CYC(b_+O(48), b_+OE(49)); E = alu_inc8(gb, E);
+  CYC(b_+O(49), b_+OE(50)); A = mem_rd(gb, DE);
+  CYC(b_+O(50), b_+OE(51)); H = A;
+  CALL_C(b_+O(51), ecom_killObjectH_b0e_hook, SYM(ecom_killObjectH_b0e), b_+OE(54));
+  if (game_seasons) {
+    CYC(b_+S(54), b_+S(57)); A = W8(wActiveRoom);
+    CYC(b_+S(57), b_+S(59)); alu_cp(gb, 0xf4); // <ROOM_SEASONS_0f4
+    if (!(F & FZ)) { CYCT(b_+S(59), b_+S(61)); goto die; }
+    CYC(b_+S(59), b_+S(61));
+    CYC(b_+S(61), b_+S(64)); A = W8(wActiveGroup);
+    CYC(b_+S(64), b_+S(65)); alu_or(gb, A);
+    if (!(F & FZ)) { CYCT(b_+S(65), b_+S(67)); goto die; }
+    CYC(b_+S(65), b_+S(67));
+    CYC(b_+S(67), b_+S(68)); A = alu_inc8(gb, A);
+    CYC(b_+S(68), b_+S(71)); W8(wRoomLayoutEnd) = A;
+  }
+die:
+  CYC(b_+O(54), b_+OE(57)); TAIL(enemyDie); // jp
 
 knockback:
-  CYC(b_+57, b_+59); E = ENEMY_BASE + OBJ_SUBID;
-  CYC(b_+59, b_+60); A = mem_rd(gb, DE);
-  CYC(b_+60, b_+61); A = alu_dec8(gb, A);
-  if (!(F & FZ)) { CYCT(b_+61, b_+63); goto normalStatus; } // jr nz
-  CYC(b_+61, b_+63);
-  CYC(b_+63, b_+66); TAIL(ecom_updateKnockbackAndCheckHazards_b0e); // jp
+  CYC(b_+O(57), b_+OE(59)); E = ENEMY_BASE + OBJ_SUBID;
+  CYC(b_+O(59), b_+OE(60)); A = mem_rd(gb, DE);
+  CYC(b_+O(60), b_+OE(61)); A = alu_dec8(gb, A);
+  if (!(F & FZ)) { CYCT(b_+O(61), b_+OE(63)); goto normalStatus; } // jr nz
+  CYC(b_+O(61), b_+OE(63));
+  CYC(b_+O(63), b_+OE(66)); TAIL(ecom_updateKnockbackAndCheckHazards_b0e); // jp
 
 normalStatus:
-  CALL_C(b_+66, ecom_getSubidAndCpStateTo08_b0e_hook, SYM(ecom_getSubidAndCpStateTo08_b0e), b_+69);
-  if (!(F & FC)) { CYCT(b_+69, b_+71); goto normalState; } // jr nc
-  CYC(b_+69, b_+71);
+  CALL_C(b_+O(66), ecom_getSubidAndCpStateTo08_b0e_hook, SYM(ecom_getSubidAndCpStateTo08_b0e), b_+OE(69));
+  if (!(F & FC)) { CYCT(b_+O(69), b_+OE(71)); goto normalState; } // jr nc
+  CYC(b_+O(69), b_+OE(71));
   {
-    CYC(b_+71, b_+72); push_effect(gb, b_+72);
+    CYC(b_+O(71), b_+OE(72)); push_effect(gb, b_+OE(72));
     uint16_t target = moldorm_jump_table(gb);
     if (target == SYM(moldorm_state_uninitialized)) { moldorm_state_uninitialized_hook(gb); return; }
     if (target == SYM(moldorm_state1)) { moldorm_state1_hook(gb); return; }
@@ -121,10 +134,10 @@ normalStatus:
   }
 
 normalState:
-  CYC(b_+88, b_+89); B = alu_dec8(gb, B);
-  CYC(b_+89, b_+90); A = B;
+  CYC(b_+O(88), b_+OE(89)); B = alu_dec8(gb, B);
+  CYC(b_+O(89), b_+OE(90)); A = B;
   {
-    CYC(b_+90, b_+91); push_effect(gb, b_+91);
+    CYC(b_+O(90), b_+OE(91)); push_effect(gb, b_+OE(91));
     uint16_t target = moldorm_jump_table(gb);
     if (target == SYM(moldorm_head)) { moldorm_head_hook(gb); return; }
     if (target == SYM(moldorm_tail)) { moldorm_tail_hook(gb); return; }
