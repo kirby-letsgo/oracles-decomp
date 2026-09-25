@@ -736,7 +736,7 @@ void ecom_bounceOffScreenBoundary_common_b10_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b10);
+    ecom_bounceOffScreenBoundary__reverseDirection_b10_hook(gb); return;
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);
@@ -1952,7 +1952,7 @@ void ecom_bounceOffScreenBoundary_common_b0d_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b0d);
+    ecom_bounceOffScreenBoundary__reverseDirection_b0d_hook(gb); return;
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);
@@ -3169,7 +3169,7 @@ void ecom_bounceOffScreenBoundary_common_b0e_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b0e);
+    ecom_bounceOffScreenBoundary__reverseDirection_b0e_hook(gb); return;
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);
@@ -4386,7 +4386,7 @@ void ecom_bounceOffScreenBoundary_common_b0f_hook(GB *gb) {
   CYC(b_+11, b_+13); alu_cp(gb, 0x05);
   if (F & FZ) {
     CYCT(b_+13, b_+15);
-    TAIL(ecom_bounceOffScreenBoundary__reverseDirection_b0f);
+    ecom_bounceOffScreenBoundary__reverseDirection_b0f_hook(gb); return;
   }
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+18); SET_HL(b_+74);

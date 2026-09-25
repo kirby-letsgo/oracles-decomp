@@ -497,9 +497,41 @@ if names and names[0] == '--out':
                 spans.append((m.end(), i))
             return spans
         FALLBACK = re.compile(r'\b(?:HANDOFF|hook_continue|asm_call|CALL_ASM|CALL_C\w*\([^,]+, \w+,|CALL\([^,]+, \w+,|CALL_ROM\w*\([^,]+,)\s*\(?(?:gb, )?\(?(?:b_ ?\+ ?(\d+)|SYM\((\w+)\)(?: ?\+ ?(\d+))?)')
+        # strict: only C that can run in Seasons counts: the functions the Seasons table hooks
+        # (shared hooks and every hand file), and whatever they call directly
+        FUNC = re.compile(r'^(?:static )?(?:inline )?\w+ \*?(\w+)\(GB \*gb[^;]*$')
+        funcs = {}
         for p in glob.glob('src/game/**/*.c', recursive=True):
             if _os.path.basename(p).startswith('gen_'): continue
-            s = open(p, errors='replace').read()
+            cur = None
+            for line in open(p, errors='replace'):
+                m = FUNC.match(line)
+                if m: cur = (p, m.group(1)); funcs.setdefault(cur, [])
+                if cur: funcs[cur].append(line.rstrip('\n'))
+                if line.startswith('}'): cur = None
+        live_names = set()
+        if STRICT:
+            if _os.path.exists('src/hooks/generated_seasons.txt'):
+                live_names.update(l.split()[1] for l in open('src/hooks/generated_seasons.txt') if len(l.split()) >= 2)
+            live_names.update(n for (fp, n) in funcs if fp.startswith('src/game/seasons/'))
+            calls = collections.defaultdict(set)
+            for (fp, n), body in funcs.items():
+                if any('AGES_ONLY()' in l for l in body): continue
+                # any function the body names (called, or passed to CALL_L_ and the like), except where
+                # only a hooked, so already live, callee can run: behind hook_is/hook_enabled_at, CALL_C/CALL
+                for l in body[1:]:
+                    if 'hook_is(' in l or 'hook_enabled_at(' in l: continue
+                    calls[n].update(re.findall(r'\b(\w+)\b', re.sub(r'\bCALL(?:_C\w*)?\(([^,]+), \w+,', r'CALL(\1, ,', l)))
+            todo = list(live_names)
+            while todo:
+                for c in calls.get(todo.pop(), ()):
+                    if c not in live_names: live_names.add(c); todo.append(c)
+        texts = collections.defaultdict(list)
+        for (fp, n), body in funcs.items():
+            if not STRICT or (n in live_names and not any('AGES_ONLY()' in l for l in body)): texts[fp].extend(body)
+        for p in glob.glob('src/game/**/*.c', recursive=True):
+            if _os.path.basename(p).startswith('gen_'): continue
+            s = '\n'.join(texts.get(p, [])) if STRICT else open(p, errors='replace').read()
             c_refs.ctx = reach.ctx = p
             # strict: a SYM(x) loaded into a register, inside GV() or compared with == is an address
             # (a table, a pointer, a jump-table case), not a place the C hands control to
@@ -514,10 +546,11 @@ if names and names[0] == '--out':
                     c_refs.add(msym.group(1))
             c_refs.update(m[:-5] if m.endswith('_hook') else m for m in re.findall(r'\bs_(\w+)', s))
             # a hook passed to CALL_C falls back to its address; a hook defined or called directly only
-            # matters where a jump-table chain may HANDOFF instead of calling it
+            # matters where a jump-table chain may HANDOFF instead of calling it (any C hook, live or not:
+            # a live chain can hand any of its entries to the dispatcher)
             for mh in re.finditer(r'\b(\w+)_hook\b(\s*[(;]?)', s):
                 if not STRICT or not mh.group(2).strip(): c_refs.add(mh.group(1))
-                else: hook_named.add(mh.group(1))
+            if STRICT: hook_named.update(re.findall(r'\b(\w+)_hook\b\s*[(;]', open(p, errors='replace').read()))
             base = None
             for line in s.split('\n'):
                 mb = re.search(r'\bBASE\((\w+)\)', line)
@@ -621,6 +654,8 @@ if names and names[0] == '--out':
             if (PRUNE and (b, a) not in externs and (any(i in shared_hooks for i in instances.get(n, [])) or (STRICT and n in alias_labels))
                     and not reachable(b, a, n)):     # an alias copy of a shared routine, or an Ages spelling, that nothing reaches
                 pruned.append(cname_at(b, a)); continue
+            if STRICT and any((sb, sa) == (b, a) for lo, hi, sb, sa in relocs) and not reachable(b, a, n):
+                pruned.append(cname_at(b, a)); continue     # the ROM source of code copied to RAM runs as its RAM copy
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)[2:] if SEASONS and (b, a) in externs else cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
             for la, ln in locals_for(b, a, n):
