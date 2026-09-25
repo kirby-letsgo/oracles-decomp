@@ -13,6 +13,23 @@ from symfiles import ram_map
 fix = '--fix' in sys.argv
 from routine_equiv import Game
 AGES = Game("roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc", 'ref/oracles-disasm/ages.sym')
+SEASONS = Game("roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", 'ref/oracles-disasm/seasons.sym')
+
+def far_end_ok(G, bank, fr, to):
+    """A range ending at another label is fine only when the burn from fr reaches to exactly on an
+    instruction boundary without running past an unconditional jump (burn_rom burns while the address
+    is below the end: a backward end burns nothing, and an end past a jr/jp/ret aborts the run).
+    Returns None when it is fine, else what the burn does instead."""
+    if to <= fr: return 'ends before it starts (burns nothing)'
+    a = fr
+    for _ in range(64):
+        ln, kind, tmpl, ops = G.decode(bank, a)
+        a += ln
+        if a == to: return None
+        if a > to: return f'passes its end (+{to - fr}) inside an instruction'
+        if kind in ('jp', 'ret', 'jphl') and tmpl.split()[0] in ('jp', 'jr', 'ret', 'reti'):
+            return f'runs past the {tmpl.split()[0]} ending +{a - fr} toward an end at +{to - fr}'
+    return 'does not reach its end'
 
 def burn_length(bank, fr, to):
     """How far burn_rom would get from fr before to, or before it would refuse to run past a jump."""
@@ -59,6 +76,16 @@ for f in sorted(glob.glob('src/game/**/*.c', recursive=True)):
             if not mf or not mt: continue
             lf, lt = mf.group(1) or base, mt.group(1) or base
             if lf == lt: continue
+            games = [(AGES, 0, ba, bank)]
+            if '/ages/' not in f and tool.syms[base][1] != 0xffffffff and 'O(' not in fr + to:
+                games.append((SEASONS, 1, tool.syms[base][1] & 0xffff, tool.syms[base][1] >> 16))
+            for G, gi, gba, gbank in games:
+                ga, gb_ = tool.eval_expr(fr, gi, gba), tool.eval_expr(to, gi, gba)
+                if ga is None or gb_ is None: continue
+                why = far_end_ok(G, gbank, ga, gb_)
+                if why:
+                    bad += 1
+                    print(f'{f}:{i + 1}: CYC({fr}, {to}) in {"Seasons" if gi else "Ages"}: the burn {why}')
             va, vb = tool.eval_expr(fr, 0, ba), tool.eval_expr(to, 0, ba)
             if va is None or vb is None: continue
             length = (vb - va) & 0xffff

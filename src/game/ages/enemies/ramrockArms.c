@@ -386,7 +386,7 @@ void ramrockArm_subid0_substate4_hook(GB *gb) {
   CYC(b_+25, b_+27); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+27, b_+28); A = mem_rd(gb, DE);
   CYC(b_+28, b_+30); alu_add(gb, 0x02);
-  CYC(b_+30, (SYM(ramrockArm_subid0_setAngleTowardRamrock) + 10));
+  CYC(b_+30, b_+33);
   TAIL(enemySetAnimation);
 }
 
@@ -890,7 +890,7 @@ checkSubid:
   CYC(b_+40, b_+42); E = ENEMY_BASE + OBJ_SUBSTATE;
   CYC(b_+42, b_+44); A = 0x02;
   CYC(b_+44, b_+45); mem_wr(gb, DE, A);
-  CYC(b_+45, (SYM(ramrockArm_subid4_substate2__updateXPosition) + 11));
+  CYC(b_+45, b_+47);
   TAIL(ramrockArm_subid4_updateXPosition);
 }
 
