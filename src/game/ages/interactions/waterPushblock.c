@@ -219,7 +219,7 @@ l_55d7:
   if (!(F & FZ)) { CYCT(b_+100, b_+101); ret_effect(gb); return; } // ret nz
   CYC(b_+100, b_+101);
   CYC(b_+101, b_+103); E = INTERACTION_BASE + OBJ_DIRECTION;
-  CYC(b_+103, b_+105); A = (uint8_t)(mem_rd(gb, DE) ^ 0x04);
+  CYC(b_+103, b_+105); alu_xor(gb, 0x04);
   CYC(b_+105, b_+106); mem_wr(gb, DE, A);
   CYC(b_+106, b_+107); H = D;
   CYC(b_+107, b_+109); L = INTERACTION_BASE + OBJ_DIRECTION;

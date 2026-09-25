@@ -123,13 +123,13 @@ static void on_frame(GB *gb, const GBSample *sm, void *ctx) {
     if ((movie_frame + 1) % 60 == 0) {
       uint32_t h = 0xcbf29ce4u;
       for (int i = 0x300; i < 0x1000; i++) { h ^= sm->wram[0][i]; h *= 16777619u; }
-      fprintf(c->dump, "%llu %02x %02x %02x %02x %02x %d %08x\n", (unsigned long long)movie_frame, sm->wram[0][0xc2d], sm->wram[0][0xc30], sm->wram[0][0xc00], sm->hram[0x14], sm->hram[0x15], (sm->joy_latched || sm->joy_read) ? 0 : 1, h);
+      fprintf(c->dump, "%llu %02x %02x %02x %02x %02x %d %08x\n", (unsigned long long)movie_frame, sm->wram[0][wActiveGroup & 0xfff], sm->wram[0][wActiveRoom & 0xfff], sm->wram[0][0xc00], sm->hram[0x14], sm->hram[0x15], (sm->joy_latched || sm->joy_read) ? 0 : 1, h);
     } else {
-      fprintf(c->dump, "%llu %02x %02x %02x %02x %02x %d\n", (unsigned long long)movie_frame, sm->wram[0][0xc2d], sm->wram[0][0xc30], sm->wram[0][0xc00], sm->hram[0x14], sm->hram[0x15], (sm->joy_latched || sm->joy_read) ? 0 : 1);
+      fprintf(c->dump, "%llu %02x %02x %02x %02x %02x %d\n", (unsigned long long)movie_frame, sm->wram[0][wActiveGroup & 0xfff], sm->wram[0][wActiveRoom & 0xfff], sm->wram[0][0xc00], sm->hram[0x14], sm->hram[0x15], (sm->joy_latched || sm->joy_read) ? 0 : 1);
     }
   }
   if (c->probe) {
-    RoomKey k = {sm->wram[0][0x0c2d], sm->wram[0][0x0c30]};
+    RoomKey k = {sm->wram[0][wActiveGroup & 0xfff], sm->wram[0][wActiveRoom & 0xfff]};
     bool known = false;
     for (int j = 0; j < c->nseen; j++) if (c->seen[j].group == k.group && c->seen[j].room == k.room) { known = true; break; }
     if (!known && c->nseen < 4096) {

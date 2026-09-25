@@ -679,11 +679,9 @@ void itemDrop_moveTowardPoint_hook(GB *gb) {
   CYC(b_+2, b_+3); H = D;
   CYC(b_+3, b_+4); alu_xor(gb, A);
   CYC(b_+4, b_+5); B = mem_rd(gb, HL); // [var31]
-  mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+5, b_+6);
+  CYC(b_+5, b_+6); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+6, b_+7); C = mem_rd(gb, HL); // [var32]
-  mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+7, b_+8);
+  CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+8, b_+9); alu_or(gb, B);
   if (F & FZ) { RET_TAKEN(b_+9); return; } // ret z
   CYC(b_+9, b_+10);
