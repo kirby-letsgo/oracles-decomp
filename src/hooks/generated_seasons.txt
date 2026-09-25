@@ -559,6 +559,7 @@
 00:32dc loadScreenMusicAndSetRoomPack_hook -
 00:32f1 dismountCompanionAndSetRememberedPositionToScreenCenter_hook -
 00:3382 updateAllObjects_hook -
+00:33d4 updateAllObjects__jump34ad_hook -
 00:3420 updateSpecialObjectsAndInteractions_hook -
 00:3445 updateInteractionsAndDrawAllSprites_hook -
 00:3460 func_3539_hook -
@@ -714,6 +715,8 @@
 01:4bcb cutscene15__state1__substate0_hook -
 01:4be3 cutscene15__state1__initWaveScrollValuesInverted_hook -
 01:4bfb cutscene15__state1__substate1_hook -
+01:4c0f cutscene15__state1__substate2_hook -
+01:4c3f cutscene15__state1__substate2__afterCall4ca4_hook -
 01:4c8c cutscene15__state2_hook -
 01:4c94 cutscene15__state2__substate1_hook -
 01:4cb1 cutscene18_hook -
@@ -846,6 +849,7 @@
 02:413b getFileDisplayVariableAddress_paramE_hook -
 02:4145 fileSelectMode0_hook -
 02:4161 fileSelectMode1_hook -
+02:416a fileSelectMode1__subModes_hook -
 02:4176 fileSelectMode1__state0_hook -
 02:4196 fileSelectMode1__state1_hook -
 02:41be fileSelectMode1__getNextFileSelectMode_hook -
@@ -983,6 +987,7 @@
 02:5029 menuStateFadeIntoMenu__openMenu_hook -
 02:5038 saveGraphicsOnEnterMenu_body_hook -
 02:5083 menuStateFadeOutOfMenu_hook -
+02:508b menuStateFadeOutOfMenu__afterCall_hook -
 02:5092 reloadGraphicsOnExitMenu_body_hook -
 02:50ce reloadGraphicsOnExitMenu_body__afterCall_hook -
 02:50fc menuStateFadeIntoGame_hook -
@@ -1186,6 +1191,9 @@
 02:681d dungeonMap_getTileForRoom__ret_hook -
 02:6820 dungeonMap_checkCanViewFloor_hook -
 02:6833 dungeonMap_checkCompassTile_hook -
+02:6848 dungeonMap_checkCompassTile__treasure68e3_hook -
+02:684f dungeonMap_checkCompassTile__nothing68ea_hook -
+02:6851 dungeonMap_checkCompassTile__ret68ec_hook -
 02:6854 dungeonMap_getFloorAddress_hook -
 02:6c67 runRingMenu_hook -
 02:6c82 runRingMenu__runStateCode_hook -
