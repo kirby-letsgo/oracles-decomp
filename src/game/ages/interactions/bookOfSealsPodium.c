@@ -26,14 +26,23 @@ static void book_add_a_to_hl(GB *gb, uint16_t ra) {
   else burn_rom(gb,0,0x12,0x13,true); ret_effect(gb);
 }
 
+// @param[out] c subid; the interaction's script pointer is set to that podium's path list.
 void interactionCodeb4__func_69ce_hook(GB *gb) {
   BASE(interactionCodeb4);
-  uint16_t sp0_ = gb->sp;
-  CYC(b_+279,b_+281); E=0x42; CYC(b_+281,b_+282); A=mem_rd(gb,DE); CYC(b_+282,b_+283); C=A;
-  CYC(b_+283,b_+286); SET_HL(b_+334); CYC(b_+286,b_+287); book_add_a_to_hl(gb,b_+287);
-  CYC(b_+287,b_+289); A=mem_rd(gb,HL); CYC(b_+288,b_+289); book_add_a_to_hl(gb,b_+289);
-  CYC(b_+289,b_+291); E=0x58; CYC(b_+291,b_+292); A=L; CYC(b_+292,b_+294); mem_wr(gb,DE,A);
-  CYC(b_+293,b_+294); E=alu_inc8(gb,E); CYC(b_+294,b_+295); A=H; CYC(b_+295,b_+297); mem_wr(gb,DE,A); CYC(b_+296,b_+297); ret_effect(gb);
+  CYC(b_+279, b_+281); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+281, b_+282); A = mem_rd(gb, DE);
+  CYC(b_+282, b_+283); C = A;
+  CYC(b_+283, b_+286); SET_HL(b_+334); // @bookPathLists
+  CYC(b_+286, b_+287); book_add_a_to_hl(gb, b_+287);
+  CYC(b_+287, b_+288); A = mem_rd(gb, HL);
+  CYC(b_+288, b_+289); book_add_a_to_hl(gb, b_+289);
+  CYC(b_+289, b_+291); E = INTERACTION_BASE + OBJ_SCRIPT_PTR;
+  CYC(b_+291, b_+292); A = L;
+  CYC(b_+292, b_+293); mem_wr(gb, DE, A);
+  CYC(b_+293, b_+294); E = alu_inc8(gb, E);
+  CYC(b_+294, b_+295); A = H;
+  CYC(b_+295, b_+296); mem_wr(gb, DE, A);
+  CYC(b_+296, b_+297); ret_effect(gb);
 }
 
 void interactionCodeb4__state0_hook(GB *gb) {
@@ -49,9 +58,29 @@ void interactionCodeb4__state0_hook(GB *gb) {
 
 void interactionCodeb4__activatedBook_hook(GB *gb) {
   BASE(interactionCodeb4);
-  uint16_t sp0_=gb->sp; CYC(b_+80,b_+82); A=1; CALL_C(b_+82,interactionSetAnimation_hook,SYM(interactionSetAnimation),b_+85); CALL_C(b_+85,interactionCodeb4__func_69ce_hook,b_+279,b_+88);
-  CYC(b_+88,b_+89); A=C; CYC(b_+89,b_+92); mem_wr(gb,wTmpcfc0_armosStatue_killedArmosPositions,A); CYC(b_+92,b_+95); SET_HL(b_+123); CYC(b_+95,b_+96); book_add_a_to_hl(gb,b_+96); CYC(b_+96,b_+98); C=mem_rd(gb,HL); CYC(b_+97,b_+99); B=0x12; CALL_C(b_+99,showText_hook,SYM(showText),b_+102);
-  CYC(b_+102,b_+106); A=0x81; CYC(b_+104,b_+108); mem_wr(gb,wMenuDisabled,A); CYC(b_+107,b_+111); mem_wr(gb,wDisabledObjects,A); CYC(b_+110,b_+112); H=D; CYC(b_+111,b_+113); L=0x43; CYC(b_+113,b_+115); A=0xd3; CYC(b_+115,b_+117); mem_wr(gb,HL,A); CYC(b_+116,b_+118); A=3; CYC(b_+118,b_+120); mem_wr(gb,HL,A); CYC(b_+119,b_+120); L=alu_inc8(gb,L); CYC(b_+120,b_+123); mem_wr(gb,HL,2); CYC(b_+122,b_+123); ret_effect(gb);
+  uint16_t sp0_ = gb->sp;
+  CYC(b_+80, b_+82); A = 0x01;
+  CALL_C(b_+82, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+85);
+  CALL_C(b_+85, interactionCodeb4__func_69ce_hook, b_+279, b_+88);
+  CYC(b_+88, b_+89); A = C;
+  CYC(b_+89, b_+92); mem_wr(gb, wTmpcfc0_armosStatue_killedArmosPositions, A);
+  CYC(b_+92, b_+95); SET_HL(b_+123); // @textTable
+  CYC(b_+95, b_+96); book_add_a_to_hl(gb, b_+96);
+  CYC(b_+96, b_+97); C = mem_rd(gb, HL);
+  CYC(b_+97, b_+99); B = 0x12;
+  CALL_C(b_+99, showText_hook, SYM(showText), b_+102);
+  CYC(b_+102, b_+104); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
+  CYC(b_+104, b_+107); mem_wr(gb, wMenuDisabled, A);
+  CYC(b_+107, b_+110); mem_wr(gb, wDisabledObjects, A);
+  CYC(b_+110, b_+111); H = D;
+  CYC(b_+111, b_+113); L = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+113, b_+115); A = 0xd3;
+  CYC(b_+115, b_+116); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+116, b_+118); A = 0x03;
+  CYC(b_+118, b_+119); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+119, b_+120); L = alu_inc8(gb, L);
+  CYC(b_+120, b_+122); mem_wr(gb, HL, 0x02);
+  CYC(b_+122, b_+123); ret_effect(gb);
 }
 
 // interactionCodeb4@spawnAllPodiums: subid 0 spawns the five podiums from @podiumPositions.
@@ -156,26 +185,89 @@ void interactionCodeb4__state1_hook(GB *gb) {
   uint16_t sp0_=gb->sp; CYC(b_+66,b_+67); E=alu_inc8(gb,E); CYC(b_+67,b_+68); A=mem_rd(gb,DE); CYC(b_+68,b_+69); alu_or(gb,A); if (F&FZ) { CYCT(b_+69,b_+72); push_effect(gb,b_+72); book_of_seals_spawn_all_podiums(gb); } else CYC(b_+69,b_+72); CALL_C(b_+72,objectSetPriorityRelativeToLink_withTerrainEffects_hook,SYM(objectSetPriorityRelativeToLink_withTerrainEffects),b_+75); CYC(b_+75,b_+77); E=0x71; CYC(b_+77,b_+78); A=mem_rd(gb,DE); CYC(b_+78,b_+79); alu_or(gb,A); if (F&FZ) { CYCT(b_+79,b_+80); ret_effect(gb); return; } CYC(b_+79,b_+80); interactionCodeb4__activatedBook_hook(gb); return;
 }
 
+// Waits for the script (the player placing the book), then plays the jingle and takes the book.
 void interactionCodeb4__state2_hook(GB *gb) {
   BASE(interactionCodeb4);
-  uint16_t sp0_=gb->sp; CYC(b_+129,b_+130); E=alu_inc8(gb,E); CYC(b_+130,b_+131); A=mem_rd(gb,DE); CYC(b_+131,b_+132); alu_or(gb,A); if (F&FZ) { CYCT(b_+132,b_+135); push_effect(gb,b_+135); book_of_seals_spawn_all_podiums(gb); } else CYC(b_+132,b_+135); CALL_C(b_+135,interactionRunScript_hook,SYM(interactionRunScript),b_+138); if (!(F&FC)) { CYCT(b_+138,b_+139); ret_effect(gb); return; } CYC(b_+138,b_+139); CALL_C(b_+139,objectSetPriorityRelativeToLink_withTerrainEffects_hook,SYM(objectSetPriorityRelativeToLink_withTerrainEffects),b_+142); CYC(b_+142,b_+144); A=0x4d; CALL_C(b_+144,playSound_b00_hook,SYM(playSound_b00),b_+147); CYC(b_+147,b_+149); A=0x55; CALL_C(b_+149,loseTreasure_hook,SYM(loseTreasure),b_+152); CYC(b_+152,b_+155); interactionCodeb4__activatedBook_hook(gb); return;
+  uint16_t sp0_ = gb->sp;
+  CYC(b_+129, b_+130); E = alu_inc8(gb, E);
+  CYC(b_+130, b_+131); A = mem_rd(gb, DE);
+  CYC(b_+131, b_+132); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+132, b_+135); push_effect(gb, b_+135); book_of_seals_spawn_all_podiums(gb); }
+  else CYC(b_+132, b_+135);
+  CALL_C(b_+135, interactionRunScript_hook, SYM(interactionRunScript), b_+138);
+  if (!(F & FC)) { CYCT(b_+138, b_+139); ret_effect(gb); return; }
+  CYC(b_+138, b_+139);
+  CALL_C(b_+139, objectSetPriorityRelativeToLink_withTerrainEffects_hook, SYM(objectSetPriorityRelativeToLink_withTerrainEffects), b_+142);
+  CYC(b_+142, b_+144); A = 0x4d; // SND_SOLVEPUZZLE
+  CALL_C(b_+144, playSound_b00_hook, SYM(playSound_b00), b_+147);
+  CYC(b_+147, b_+149); A = 0x55; // TREASURE_BOOK_OF_SEALS
+  CALL_C(b_+149, loseTreasure_hook, SYM(loseTreasure), b_+152);
+  CYC(b_+152, b_+154);
+  interactionCodeb4__activatedBook_hook(gb);
 }
 
 void interactionCodeb4__state3_hook(GB *gb) {
   BASE(interactionCodeb4);
-  uint16_t sp0_=gb->sp; CALL_C(b_+154,retIfTextIsActive_hook,SYM(retIfTextIsActive),b_+157); CYC(b_+157,b_+160); push_effect(gb,b_+160); book_of_seals_replace_tiles(gb); CYC(b_+160,b_+163); A=mem_rd(gb,wDisabledObjects); CYC(b_+163,b_+164); alu_or(gb,A); if (!(F&FZ)) { CYCT(b_+164,b_+165); ret_effect(gb); return; } CYC(b_+164,b_+165); CYC(b_+165,b_+167); E=0x43; CYC(b_+167,b_+169); A=0xf4; CYC(b_+169,b_+170); mem_wr(gb,DE,A); CYC(b_+170,b_+174); interactionCodeb4__func_69ce_hook(gb); return;
+  uint16_t sp0_ = gb->sp;
+  CALL_C(b_+154, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+157);
+  CYC(b_+157, b_+160); push_effect(gb, b_+160); book_of_seals_replace_tiles(gb);
+  CYC(b_+160, b_+163); A = mem_rd(gb, wDisabledObjects);
+  CYC(b_+163, b_+164); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+164, b_+165); ret_effect(gb); return; }
+  CYC(b_+164, b_+165);
+  CYC(b_+165, b_+167); E = INTERACTION_BASE + OBJ_VAR03;
+  CYC(b_+167, b_+169); A = 0xf4;
+  CYC(b_+169, b_+170); mem_wr(gb, DE, A);
+  CYC(b_+170, b_+173);
+  interactionCodeb4__func_69ce_hook(gb);
 }
 
 void interactionCodeb4__state4_hook(GB *gb) {
   BASE(interactionCodeb4);
-  uint16_t sp0_=gb->sp; CALL_C(b_+223,objectSetPriorityRelativeToLink_withTerrainEffects_hook,SYM(objectSetPriorityRelativeToLink_withTerrainEffects),b_+226); CYC(b_+226,b_+228); E=0x71; CYC(b_+228,b_+229); A=mem_rd(gb,DE); CYC(b_+229,b_+230); alu_or(gb,A); if (F&FZ) goto after_prompt; CYC(b_+230,b_+232); alu_xor(gb,A); CYC(b_+233,b_+235); mem_wr(gb,DE,A); CYC(b_+234,b_+236); E=0x42; CYC(b_+236,b_+237); A=mem_rd(gb,DE); CYC(b_+237,b_+240); SET_HL(b_+123); CYC(b_+240,b_+241); book_add_a_to_hl(gb,b_+241); CYC(b_+241,b_+243); C=mem_rd(gb,HL); CYC(b_+242,b_+244); B=0x12; CYC(b_+244,b_+248); showText_hook(gb); return;
-after_prompt:
-  CYC(b_+247,b_+250); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions); CYC(b_+250,b_+252); E=0x42; CYC(b_+252,b_+253); A=mem_rd(gb,DE); CYC(b_+253,b_+254); alu_cp(gb,mem_rd(gb,HL)); if (F&FZ) { CYCT(b_+254,b_+255); ret_effect(gb); return; } CYC(b_+254,b_+255); CALL_C(b_+255,retIfTextIsActive_hook,SYM(retIfTextIsActive),b_+258); CYC(b_+258,b_+261); push_effect(gb,b_+261); book_of_seals_replace_tiles(gb); CYC(b_+261,b_+265); A=mem_rd(gb,wDisabledObjects); CYC(b_+264,b_+265); alu_or(gb,A); if (!(F&FZ)) { CYCT(b_+265,b_+266); ret_effect(gb); return; } CYC(b_+265,b_+266); CALL_C(b_+266,interactionSetAnimation_hook,SYM(interactionSetAnimation),b_+269); CYC(b_+269,b_+271); E=0x44; CYC(b_+271,b_+273); A=1; CYC(b_+273,b_+275); mem_wr(gb,DE,A); CYC(b_+274,b_+276); E=0x71; CYC(b_+276,b_+277); alu_xor(gb,A); CYC(b_+277,b_+279); mem_wr(gb,DE,A); CYC(b_+278,b_+279); ret_effect(gb);
+  uint16_t sp0_ = gb->sp;
+  CALL_C(b_+223, objectSetPriorityRelativeToLink_withTerrainEffects_hook, SYM(objectSetPriorityRelativeToLink_withTerrainEffects), b_+226);
+  CYC(b_+226, b_+228); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
+  CYC(b_+228, b_+229); A = mem_rd(gb, DE);
+  CYC(b_+229, b_+230); alu_or(gb, A);
+  if (!(F & FZ)) {
+    CYC(b_+230, b_+232);
+    CYC(b_+232, b_+233); alu_xor(gb, A);
+    CYC(b_+233, b_+234); mem_wr(gb, DE, A);
+    CYC(b_+234, b_+236); E = INTERACTION_BASE + OBJ_SUBID;
+    CYC(b_+236, b_+237); A = mem_rd(gb, DE);
+    CYC(b_+237, b_+240); SET_HL(b_+123); // @textTable
+    CYC(b_+240, b_+241); book_add_a_to_hl(gb, b_+241);
+    CYC(b_+241, b_+242); C = mem_rd(gb, HL);
+    CYC(b_+242, b_+244); B = 0x12;
+    CYC(b_+244, b_+247);
+    TAIL(showText);
+  }
+  CYCT(b_+230, b_+232);
+  CYC(b_+247, b_+250); SET_HL(wTmpcfc0_armosStatue_killedArmosPositions);
+  CYC(b_+250, b_+252); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+252, b_+253); A = mem_rd(gb, DE);
+  CYC(b_+253, b_+254); alu_cp(gb, mem_rd(gb, HL));
+  if (F & FZ) { CYCT(b_+254, b_+255); ret_effect(gb); return; }
+  CYC(b_+254, b_+255);
+  CALL_C(b_+255, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+258);
+  CYC(b_+258, b_+261); push_effect(gb, b_+261); book_of_seals_replace_tiles(gb);
+  CYC(b_+261, b_+264); A = mem_rd(gb, wDisabledObjects);
+  CYC(b_+264, b_+265); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+265, b_+266); ret_effect(gb); return; }
+  CYC(b_+265, b_+266);
+  CALL_C(b_+266, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+269);
+  CYC(b_+269, b_+271); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+271, b_+273); A = 0x01;
+  CYC(b_+273, b_+274); mem_wr(gb, DE, A);
+  CYC(b_+274, b_+276); E = INTERACTION_BASE + OBJ_PRESSED_A_BUTTON;
+  CYC(b_+276, b_+277); alu_xor(gb, A);
+  CYC(b_+277, b_+278); mem_wr(gb, DE, A);
+  CYC(b_+278, b_+279); ret_effect(gb);
 }
 
 void interactionCodeb4_hook(GB *gb) {
   BASE(interactionCodeb4);
-  uint16_t sp0_=gb->sp; CYC(b_+0,b_+2); E=0x44; CYC(b_+2,b_+4); A=mem_rd(gb,DE); CYC(b_+3,b_+4); push_effect(gb,b_+4); do { uint16_t jt_ = (book_of_seals_jump_table(gb));
+  uint16_t sp0_=gb->sp; CYC(b_+0,b_+2); E=0x44; CYC(b_+2,b_+3); A=mem_rd(gb,DE); CYC(b_+3,b_+4); push_effect(gb,b_+4); do { uint16_t jt_ = (book_of_seals_jump_table(gb));
     if (jt_ == b_+14) { interactionCodeb4__state0_hook(gb); return; }
     else if (jt_ == b_+66) { interactionCodeb4__state1_hook(gb); return; }
     else if (jt_ == b_+129) { interactionCodeb4__state2_hook(gb); return; }
