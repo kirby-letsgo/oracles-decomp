@@ -15,20 +15,3 @@ L_4306:
   RET(0x430f); return;  // ret
 }
 
-// 0c:4310
-void s_ecom_bounceOffScreenBoundary__getDirectionsHit_b0c(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4310:
-  I(0x4310, 2); C = 0x00;  // ld c,$00
-  I(0x4312, 1); B = A;  // ld b,a
-  I(0x4313, 2); alu_and(gb, 0x03);  // and $03
-  if ((F & FZ)) { I(0x4315, 3); goto L_4318; } I(0x4315, 2);  // jr z,$4318
-  I(0x4317, 1); C = alu_inc8(gb, C);  // inc c
-L_4318:
-  I(0x4318, 1); A = B;  // ld a,b
-  I(0x4319, 2); alu_and(gb, 0x0c);  // and $0c
-  if ((F & FZ)) { RET_TAKEN(0x431b); return; } I(0x431b, 2);  // ret z
-  I(0x431c, 2); C = (uint8_t)(C | (1 << 2));  // set 2,c
-  RET(0x431e); return;  // ret
-}
-

@@ -2,28 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 07:4313
-void s_enemyCheckCollisions__checkFlag(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4313:
-  I(0x4313, 1); B = A;  // ld b,a
-  I(0x4314, 2); alu_and(gb, 0xf8);  // and $f8
-  I(0x4316, 1); alu_rlca(gb);  // rlca
-  I(0x4317, 2); A = alu_swap(gb, A);  // swap a
-  I(0x4319, 1); C = A;  // ld c,a
-  I(0x431a, 1); A = B;  // ld a,b
-  I(0x431b, 2); alu_and(gb, 0x07);  // and $07
-  I(0x431d, 2); B = 0x00;  // ld b,$00
-  I(0x431f, 2); alu_add_hl(gb, BC);  // add hl,bc
-  I(0x4320, 2); C = mem_rd(gb, HL);  // ld c,(hl)
-  I(0x4321, 3); SET_HL(0x00f8);  // ld hl,$00f8
-  I(0x4324, 1); alu_add(gb, L);  // add l
-  I(0x4325, 1); L = A;  // ld l,a
-  I(0x4326, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4327, 1); alu_and(gb, C);  // and c
-  RET(0x4328); return;  // ret
-}
-
 // 07:409f
 void s_eraseFile__clearFile_b07(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -36,49 +14,5 @@ L_409f:
   I(0x40a9, 1); alu_xor(gb, A);  // xor a
   I(0x40aa, 4); mem_wr(gb, 0x1111, A);  // ld ($1111),a
   RET(0x40ad); return;  // ret
-}
-
-// 07:5b99
-void s_itemCode1d__ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5b99:
-  RET(0x5b99); return;  // ret
-}
-
-// 07:4aa0
-void s_itemUpdateThrowingVertically__unsetCollision(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4aa0:
-  I(0x4aa0, 2); L = 0x3b;  // ld l,$3b
-  I(0x4aa2, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 4)));  // res 4,(hl)
-  I(0x4aa4, 1); alu_or(gb, D);  // or d
-  RET(0x4aa5); return;  // ret
-}
-
-// 07:4aec
-void s_updateGravity(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  goto L_4aec;
-L_4aa0:
-  I(0x4aa0, 2); L = 0x3b;  // ld l,$3b
-  I(0x4aa2, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & ~(1 << 4)));  // res 4,(hl)
-  I(0x4aa4, 1); alu_or(gb, D);  // or d
-  RET(0x4aa5); return;  // ret
-L_4aec:
-  I(0x4aec, 2); L = 0x14;  // ld l,$14
-  I(0x4aee, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4aef, 1); alu_add(gb, C);  // add c
-  I(0x4af0, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
-  I(0x4af1, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x4af2, 2); alu_adc(gb, 0x00);  // adc $00
-  I(0x4af4, 2); mem_wr(gb, HL, A);  // ld (hl),a
-  I(0x4af5, 2); alu_bit(gb, 7, A);  // bit 7,a
-  if (!(F & FZ)) { I(0x4af7, 3); goto L_4aa0; } I(0x4af7, 2);  // jr nz,$4aa0
-  I(0x4af9, 1); alu_cp(gb, B);  // cp b
-  if ((F & FC)) { I(0x4afa, 3); goto L_4aa0; } I(0x4afa, 2);  // jr c,$4aa0
-  I(0x4afc, 2); mem_wr(gb, HL, B);  // ld (hl),b
-  I(0x4afd, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x4afe, 3); mem_wr(gb, HL, 0x00);  // ld (hl),$00
-  I(0x4b00, 3); goto L_4aa0;  // jr $4aa0
 }
 

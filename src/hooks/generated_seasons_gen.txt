@@ -115,8 +115,6 @@
 15:6ddc s_interactionCodee1_hook -
 15:6e28 s_interactionCodee3_hook -
 15:6eea s_interactionCodee4_hook -
-15:4d74 s_interactionCodee5__state0 L
-15:4da0 s_interactionCodee5__state1 L
 15:6f5e s_interactionCodee6_hook -
 15:6f66 s_interactionCodee6_state0_hook -
 15:6fe8 s_interactionCodee6_state1_hook -
@@ -284,7 +282,6 @@
 00:3e07 s_checkIfHoronVillageNPCShouldBeSeen_hook -
 00:1cde s_checkLinkID0AndControlNormal_hook -
 00:3ab2 s_checkRoomPackAfterWarp_hook -
-00:1994 s_clearAllItemsAndPutLinkOnGround__nextItem L
 00:1734 s_cpOreChunkValue_hook -
 00:3d30 s_createSokraSnore_hook -
 00:3346 s_flameOfDestructionsCutsceneCaller_hook -
@@ -308,7 +305,6 @@
 00:2ce9 s_specialObjectCode_linkInCutscene_b00 -
 00:2cf6 s_specialObjectCode_linkInCutscene__afterCall2cf6_b00 L
 00:3276 s_updateAnimationsAfterCutscene_hook -
-00:3b24 s_updateInteractions__next L
 00:c4b7 wRamFunction -
 00:335a s_zeldaAndVillagersCutsceneCaller_hook -
 00:336e s_zeldaKidnappedCutsceneCaller_hook -
@@ -514,8 +510,6 @@
 01:5e6b s_screenTransitionSwordUpgrade_hook -
 01:7e2c s_setHoronVillageSeason_hook -
 01:7e1e s_setSeason_b01_hook -
-3f:47ae s_checkItemDropAvailable_body__done L
-3f:4539 s_giveTreasure_body__ret L
 3f:4731 s_loadTreasureDisplayData__getTableIndices_b3f L
 11:58b5 s_parseObjectData -
 11:58c7 s_parseObjectData__afterCall58c7 L
@@ -657,7 +651,6 @@
 0e:6a54 s_dodongo_updateAnimationWhileHeld_hook -
 0e:695b s_dodongo_updateAnimationWhileSlimmingDown_hook -
 0e:4306 s_ecom_bounceOffScreenBoundary__reverseDirection_b0e L
-0e:4310 s_ecom_bounceOffScreenBoundary__getDirectionsHit_b0e L
 0e:4446 s_ecom_seasonsFunc_4446_b0e_hook -
 0e:45a2 s_enemyCode70_hook -
 0e:4834 s_enemyCode71_hook -
@@ -1055,9 +1048,6 @@
 05:50a5 s_bounceLinkOffTrampolineAfterFalling_hook -
 05:5e74 s_checkLinkPushingAgainstTreeStump_hook -
 05:7678 s_dimitriStateA_hook -
-05:7529 s_dimitriUpdateMovement__checkHazards L
-05:753d s_dimitriUpdateMovement__setNotInWater L
-05:753f s_dimitriUpdateMovement__setWaterStatus L
 05:7dc2 s_fixXYWithinDancingGrid_hook -
 05:7dcb s_fixXYWithinDancingGrid_helper_hook -
 05:4fc4 s_linkState09_hook -
@@ -1078,9 +1068,6 @@
 05:7b26 s_mooshStateASubstateA_hook -
 05:7b38 s_mooshStateASubstateB_hook -
 05:7b61 s_mooshStateASubstateC_hook -
-05:5656 s_overworldSwimmingState1__drown L
-05:565a s_overworldSwimmingState1__drownWithLessInvincibility L
-05:567a s_overworldSwimmingState1__splashAndSetAnimation L
 05:569b s_overworldSwimmingState3_hook -
 05:705c s_rickyStateASubstate2_hook -
 05:70a8 s_rickyStateASubstate3_hook -
@@ -1145,12 +1132,9 @@
 08:7e20 s_func_7e20_hook -
 08:7e2c s_func_7e2c_hook -
 08:7e38 s_func_7e38_hook -
-08:7f55 s_func_7f55 -
 08:5866 s_getSunkenCityNPCVisibleSubId_hook -
 08:5874 s_getSunkenCityNPCVisibleSubId__main_hook -
 08:4147 s_interactionCode11_caller_hook -
-08:41c9 s_interactionCode12__subid01__substate0 L
-08:41d2 s_interactionCode12__runScript L
 08:5138 s_interactionCode15_hook -
 08:45a0 s_interactionCode1d_hook -
 08:516c s_interactionCode1f_hook -
@@ -1287,22 +1271,17 @@
 04:63d6 s_tileReplacement_group5Map86_hook -
 04:650d s_tileReplacement_group5Map8e_hook -
 04:663a s_tileReplacement_group5Map9e_hook -
-07:4313 s_enemyCheckCollisions__checkFlag L
 07:409f s_eraseFile__clearFile_b07 L
 07:5bc0 s_foolsOreRet_hook -
 07:5b49 s_itemCode07_hook -
 07:5bc1 s_itemCode08_hook -
 07:5bfb s_itemCode0c_hook -
 07:5ba6 s_itemCode13_hook -
-07:5b99 s_itemCode1d__ret L
 07:5be4 s_itemCode1e_hook -
 07:56a6 s_itemCode29_hook -
-07:4aa0 s_itemUpdateThrowingVertically__unsetCollision L
 07:5638 s_magicBoomerangTryToBreakTile_hook -
 07:4fdf s_slingshotCheckCanPassSolidTile_hook -
-07:4aec s_updateGravity -
 0d:4306 s_ecom_bounceOffScreenBoundary__reverseDirection_b0d L
-0d:4310 s_ecom_bounceOffScreenBoundary__getDirectionsHit_b0d L
 0d:4446 s_ecom_seasonsFunc_4446_b0d_hook -
 0d:6bbd s_enemyCode3c_hook -
 0d:6d8a s_enemyCode46_hook -
@@ -1367,7 +1346,6 @@
 0d:7986 s_seasonsFunc_0d_7986_hook -
 0c:68f2 s_copyVar03ToVar30_hook -
 0c:4306 s_ecom_bounceOffScreenBoundary__reverseDirection_b0c L
-0c:4310 s_ecom_bounceOffScreenBoundary__getDirectionsHit_b0c L
 0c:4446 s_ecom_seasonsFunc_4446_b0c_hook -
 0c:681c s_enemyCode0f_hook -
 0c:6a14 s_enemyCode11_hook -
@@ -1553,7 +1531,6 @@
 0f:61ef s_dragonOnox_rightShoulder_hook -
 0f:64ea s_dragonOnox_rightShoulderSphere_hook -
 0f:4306 s_ecom_bounceOffScreenBoundary__reverseDirection_b0f L
-0f:4310 s_ecom_bounceOffScreenBoundary__getDirectionsHit_b0f L
 0f:4446 s_ecom_seasonsFunc_4446_b0f_hook -
 0f:5835 s_enemyCode02_hook -
 0f:5c9b s_enemyCode05_hook -

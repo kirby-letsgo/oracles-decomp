@@ -9,23 +9,6 @@ void s__label_331c(GB *gb) {
   if (hook_is(gb, 0x31de, _setDarkeningVariables_hook)) { _setDarkeningVariables_hook(gb); return; } HANDOFF(0x31de);  // fallthrough
 }
 
-// 00:1994
-void s_clearAllItemsAndPutLinkOnGround__nextItem(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_1994:
-  I(0x1994, 1); H = D;  // ld h,d
-L_1995:
-  I(0x1995, 1); L = E;  // ld l,e
-  I(0x1996, 2); B = 0x40;  // ld b,$40
-  CALL(0x1998, clearMemory_hook, 0x044b, 0x199b);  // call $044b
-  I(0x199b, 1); D = alu_inc8(gb, D);  // inc d
-  I(0x199c, 1); A = D;  // ld a,d
-  I(0x199d, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x199f, 3); goto L_1994; } I(0x199f, 2);  // jr c,$1994
-  SET_DE(POP(0x19a1));  // pop de
-  I(0x19a2, 4); if (hook_is(gb, 0x29d3, putLinkOnGround_hook)) { putLinkOnGround_hook(gb); return; } HANDOFF(0x29d3);  // jp $29d3
-}
-
 // 00:3870
 void s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -88,22 +71,5 @@ L_2cf6:
   I(0x2cf7, 3); mem_wr(gb, 0xff97, A);  // ldh ($ff97),a
   I(0x2cf9, 4); mem_wr(gb, 0x2222, A);  // ld ($2222),a
   RET(0x2cfc); return;  // ret
-}
-
-// 00:3b24
-void s_updateInteractions__next(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_3b24:
-  I(0x3b24, 3); mem_wr(gb, 0xffad, A);  // ldh ($ffad),a
-  I(0x3b26, 1); D = A;  // ld d,a
-  I(0x3b27, 2); E = 0x40;  // ld e,$40
-  I(0x3b29, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  I(0x3b2a, 1); alu_or(gb, A);  // or a
-  if (!(F & FZ)) { CALL(0x3b2b, updateInteraction_hook, 0x3b36, 0x3b2e); } else I(0x3b2b, 3);  // call nz,$3b36
-  I(0x3b2e, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
-  I(0x3b30, 1); A = alu_inc8(gb, A);  // inc a
-  I(0x3b31, 2); alu_cp(gb, 0xe0);  // cp $e0
-  if ((F & FC)) { I(0x3b33, 3); goto L_3b24; } I(0x3b33, 2);  // jr c,$3b24
-  RET(0x3b35); return;  // ret
 }
 

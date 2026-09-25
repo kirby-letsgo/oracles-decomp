@@ -25,6 +25,7 @@ for line in open(sys.argv[2]):
 relocs = []
 externs = set()
 extra_names = set()
+alias_labels = set()
 import os as _os
 for extra_path in (['src/hooks/extra_seasons.sym', 'src/hooks/alias_seasons.sym'] if SEASONS else ['src/hooks/extra.sym']):
     if not _os.path.exists(extra_path): continue
@@ -34,6 +35,7 @@ for extra_path in (['src/hooks/extra_seasons.sym', 'src/hooks/alias_seasons.sym'
         if not m: continue
         b, a, n = int(m.group(1), 16), int(m.group(2), 16), m.group(3)
         labels.setdefault(n, (b, a)); by_addr.setdefault((b, a), n); instances.setdefault(n, [(b, a)]); extra_names.add(n)
+        if extra_path.endswith('alias_seasons.sym'): alias_labels.add(n)
         if m.group(4): relocs.append((a, a + 0x80, int(m.group(4), 16), int(m.group(5), 16)))
         if m.group(6): externs.add((b, a))
 def in_reloc(a): return any(lo <= a < hi for lo, hi, sb, sa in relocs)
@@ -436,8 +438,16 @@ if names and names[0] == '--out':
     # dispatches); hand-written and shared C reach other code only through names (SYM, TAIL*, s_x,
     # x_hook) or a constant fallback address (HANDOFF/hook_continue/asm_call on b_+N or SYM(x) + N),
     # which are read from the C. Resume points and extra/alias labels are always kept.
-    reach = set()
-    c_refs = set()
+    class WhySet(set):     # PRUNE_WHY=1 prints what keeps each generated local
+        ctx = ''
+        def add(self, x):
+            if x not in self: self.why[x] = self.ctx
+            set.add(self, x)
+        def update(self, xs):
+            for x in xs: self.add(x)
+    reach = WhySet(); reach.why = {}
+    c_refs = WhySet(); c_refs.why = {}
+    hook_named = set()
     PRUNE = SEASONS and _os.environ.get('SEASONS_PRUNE', '2') != '0'
     # SEASONS_PRUNE=1 keeps the looser rules (every routine's ROM code walked, every jump-table
     # entry kept, every SYM mention counted); 0 turns pruning off
@@ -445,7 +455,8 @@ if names and names[0] == '--out':
     if PRUNE:
         for n2 in names:
             for (b2, a2) in instances.get(n2, []):
-                if (b2, a2) in externs or (STRICT and is_rewritten(n2, b2, a2)): continue
+                if (b2, a2) in externs or (STRICT and (is_rewritten(n2, b2, a2) or n2 in alias_labels)): continue
+                reach.ctx = 'generated ' + n2
                 body = routine_body(b2, a2)
                 banks_at = infer_banks(b2, body)
                 addrs2 = set(x[0] for x in body)
@@ -467,22 +478,46 @@ if names and names[0] == '--out':
         for l in open('src/hooks/syms_used.txt'):
             w = l.split()
             if len(w) >= 2: ident_label.setdefault(w[0], w[1])
+        seasons_sym = {}     # syms.c holds each ident's Seasons address, the right copy of a banked label
+        if _os.path.exists('src/game/syms.c'):
+            idents = re.findall(r'^  S_(\w+),$', open('src/game/syms.h').read().split('SYM_COUNT')[0], re.M)
+            vals = re.findall(r'0x([0-9a-f]{8})', open('src/game/syms.c').read().split('syms_seasons')[1].split('};')[0])
+            if len(idents) == len(vals):
+                seasons_sym = {i: (int(v, 16) >> 16, int(v, 16) & 0xffff) for i, v in zip(idents, vals) if v != 'ffffffff'}
         def sym_addr(ident):
+            if ident in seasons_sym: return seasons_sym[ident]
             lab = ident_label.get(ident, ident.replace('__', '@'))
             return labels.get(lab)
-        FALLBACK = re.compile(r'\b(?:HANDOFF|hook_continue|asm_call|CALL_ASM|CALL_C\w*\([^,]+, \w+,|CALL\([^,]+, \w+,)\s*\(?(?:gb, )?\(?(?:b_ ?\+ ?(\d+)|SYM\((\w+)\)(?: ?\+ ?(\d+))?)')
+        def cyc_spans(line):     # a burn names the instructions it charges, not a place control goes
+            spans = []
+            for m in re.finditer(r'\bCYC\w*\(', line):
+                depth, i = 1, m.end()
+                while i < len(line) and depth:
+                    depth += {'(': 1, ')': -1}.get(line[i], 0); i += 1
+                spans.append((m.end(), i))
+            return spans
+        FALLBACK = re.compile(r'\b(?:HANDOFF|hook_continue|asm_call|CALL_ASM|CALL_C\w*\([^,]+, \w+,|CALL\([^,]+, \w+,|CALL_ROM\w*\([^,]+,)\s*\(?(?:gb, )?\(?(?:b_ ?\+ ?(\d+)|SYM\((\w+)\)(?: ?\+ ?(\d+))?)')
         for p in glob.glob('src/game/**/*.c', recursive=True):
             if _os.path.basename(p).startswith('gen_'): continue
             s = open(p, errors='replace').read()
+            c_refs.ctx = reach.ctx = p
             # strict: a SYM(x) loaded into a register, inside GV() or compared with == is an address
             # (a table, a pointer, a jump-table case), not a place the C hands control to
             c_refs.update(re.findall(r'\bTAIL\w*\((\w+)\)', s))
             for line in s.split('\n'):
+                burns = cyc_spans(line) if STRICT else []
                 for msym in re.finditer(r'\bSYM\((\w+)\)', line):
                     if STRICT and re.search(r'(SET_(?:HL|BC|DE)\(|GV\(|== )\(*$', line[:msym.start()]): continue
+                    if any(a <= msym.start() < b for a, b in burns): continue
+                    if STRICT and re.match(r'\)? ?\+ ?\d', line[msym.end():]): continue     # SYM(x) + N is another address; FALLBACK reads it
+                    if STRICT and re.search(r'\bCALL\w*\(\(*$', line[:msym.start()]): continue     # the call site, not the callee
                     c_refs.add(msym.group(1))
             c_refs.update(m[:-5] if m.endswith('_hook') else m for m in re.findall(r'\bs_(\w+)', s))
-            c_refs.update(re.findall(r'\b(\w+)_hook\b', s))     # a CALL_C whose hook_is fails falls back to that address
+            # a hook passed to CALL_C falls back to its address; a hook defined or called directly only
+            # matters where a jump-table chain may HANDOFF instead of calling it
+            for mh in re.finditer(r'\b(\w+)_hook\b(\s*[(;]?)', s):
+                if not STRICT or not mh.group(2).strip(): c_refs.add(mh.group(1))
+                else: hook_named.add(mh.group(1))
             base = None
             for line in s.split('\n'):
                 mb = re.search(r'\bBASE\((\w+)\)', line)
@@ -493,19 +528,35 @@ if names and names[0] == '--out':
                         la = sym_addr(ident)
                         if la: at = (la[0], la[1] + int(off2 or 0))
                     if at: reach.add((at[0] if at[1] >= 0x4000 else 0, at[1]))
+        if STRICT:
+            jt_targets = set()
+            starts = [i for n2 in names for i in instances.get(n2, []) if i not in externs]
+            starts += [i for i in local_by_addr if i in code_targets]
+            for (b2, a2) in starts:
+                for ia, m, ln, cy, kind, info in routine_body(b2, a2):
+                    if kind == 'jumptable': jt_targets.update((b2, t) for t in info[0])
+            for ident in hook_named - c_refs:
+                la = sym_addr(ident)
+                if la and (la[0] if la[1] >= 0x4000 else 0, la[1]) in jt_targets:
+                    reach.ctx = 'jump-table entry with C hook ' + ident
+                    reach.add((la[0] if la[1] >= 0x4000 else 0, la[1]))
         for ident in list(c_refs):     # C spells labels the Ages way; reach the Seasons address too
+            reach.ctx = 'name %s in %s' % (ident, c_refs.why.get(ident))
             la = sym_addr(ident)
             if la: reach.add((la[0] if la[1] >= 0x4000 else 0, la[1]))
     def reachable(b, a, n):
-        return ((b, a) in reach or (b, a) in resume_points or n in extra_names
+        return ((b, a) in reach or (b, a) in resume_points or (n in extra_names and not (STRICT and n in alias_labels))
                 or n.replace('@', '__') in c_refs or cname_at(b, a)[2:] in c_refs)
     if PRUNE:     # a kept local is generated code of its own: whatever it reaches needs an entry too
         walked = set()
         while True:
-            todo = [(lb, la) for (lb, la), ln in local_by_addr.items() if (lb, la) not in walked and (lb, la) not in by_addr and reachable(lb, la, ln)]
+            todo = [(lb, la) for (lb, la), ln in local_by_addr.items() if (lb, la) not in walked and (lb, la) not in by_addr
+                    and (lb, la) in code_targets and (lb, la) not in shared_hooks and reachable(lb, la, ln)]
+            if STRICT: todo += [labels[n2] for n2 in alias_labels if labels[n2] not in walked and labels[n2] not in shared_hooks and reachable(*labels[n2], n2)]
             if not todo: break
             for lb, la in todo:
                 walked.add((lb, la))
+                reach.ctx = 'kept local ' + (local_by_addr.get((lb, la)) or by_addr.get((lb, la)))
                 body = routine_body(lb, la)
                 banks_at = infer_banks(lb, body)
                 addrs2 = set(x[0] for x in body)
@@ -547,6 +598,8 @@ if names and names[0] == '--out':
                     for la, ln in locals_for(b, a, n):
                         if (b, la) in shared_hooks or (b, la) in entries or not body_ok(b, la): continue
                         if PRUNE and not reachable(b, la, ln): pruned.append(ln); continue
+                        if PRUNE and _os.environ.get('PRUNE_WHY'):
+                            print('kept', ln, '<-', reach.why.get((b, la)) or c_refs.why.get(ln.replace('@', '__')) or c_refs.why.get(cname_at(b, la)[2:]) or 'resume/extra', file=sys.stderr)
                         entries[(b, la)] = cname_at(b, la)
                         items_by_bank[b].append((ln, b, la))
                 # A rewritten routine still gets generated resume tails at its post-yield return
@@ -565,8 +618,8 @@ if names and names[0] == '--out':
                     entries[(b, la)] = cname_at(b, la)
                     items_by_bank[b].append((ln, b, la))
                 continue
-            if (PRUNE and (b, a) not in externs and any(i in shared_hooks for i in instances.get(n, []))
-                    and not reachable(b, a, n)):     # an alias copy of a shared routine that nothing reaches
+            if (PRUNE and (b, a) not in externs and (any(i in shared_hooks for i in instances.get(n, [])) or (STRICT and n in alias_labels))
+                    and not reachable(b, a, n)):     # an alias copy of a shared routine, or an Ages spelling, that nothing reaches
                 pruned.append(cname_at(b, a)); continue
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)[2:] if SEASONS and (b, a) in externs else cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
