@@ -6,14 +6,29 @@ Used as deterministic playthrough scripts for the verification suite.
 |---|---|---|---|---|---|
 | `ages-consoleverified.bk2` | Ages (USA) | scorpianman42, resynced by alyosha | https://github.com/alyosha-tas/GB-C_replay_files | BizHawk GBHawk, GBA-on-CGB mode | 289,518 |
 | `ages-gambatte.bk2` | Ages (USA) | scorpianman42 | https://tasvideos.org/3127M | BizHawk 1.11.5 Gambatte, GBA-on-CGB mode | 289,340 |
+| `seasons-consoleverified.bk2` | Seasons (USA) | SwordlessLink and Tompa, resynced by alyosha | https://github.com/alyosha-tas/GB-C_replay_files | BizHawk GBHawk, GBA-on-CGB mode | 321,712 |
 
-Both expect ROM SHA1 `880374fb978b18af4aa529e2e32f7ffb4d7dd2f4`.
+The Ages movies expect ROM SHA1 `880374fb978b18af4aa529e2e32f7ffb4d7dd2f4`, the Seasons one
+`ba1268290fb2b1b70505d2d7b5825fc8a4816a4b`.
 
-Seasons has no usable movie yet. `seasons.vbm` (SwordlessLink and Tompa 2012, VBA-rr, 309,433
+`seasons-consoleverified.inputs` (from the `.bk2` with `tools/bk2_to_inputs.py`) plays the whole
+game. Unlike the Ages movie it expects WRAM and HRAM cleared at power-on (the replay repository's
+README lists both Oracles under "Games requiring RAM clear"), so it runs without `--init-ram`:
+
+    oracles-run --rom <seasons> --boot roms/cgb_boot.bin --tas seasons-consoleverified.inputs \
+        --frames 321712 --verify-shadow --ref-check seasons.ref
+
+`seasons.ref` is the interpreter's (`--no-hooks`) state every 60 frames over the whole movie, and
+`seasons-consoleverified-boot.state` the post-boot state with cleared RAM that the native build
+starts from. `tests/test_tas.c` replays the first 60,000 frames with hooks (`TAS_FRAMES` lifts it)
+and `tests/test_native_tas.c` the whole movie on the native build.
+
+Older attempts: `seasons.vbm` (SwordlessLink and Tompa 2012, VBA-rr, 309,433
 frames; `tools/vbm_to_inputs.py` converts it) reaches the file-select menu with ~220 blank
 frames prepended to account for VBA-rr skipping the boot ROM, then desyncs. `seasons.bk2` is a
-Gambatte movie of the Japanese ROM. Egobuff's 2005 submission has the same problems. The plan is
-to record a playthrough on our own core: `oracles ROM roms/cgb_boot.bin --record FILE.inputs`
+Gambatte movie of the Japanese ROM. Egobuff's 2005 submission has the same problems.
+
+`oracles ROM roms/cgb_boot.bin --record FILE.inputs` records a playthrough on our own core: it
 boots exactly like the headless runner (AGB patch, `gbhawk-wram0.txt`, fresh SRAM), writes the
 file every 60 seconds and on quit, and fast-forwards through an existing file before appending.
 
