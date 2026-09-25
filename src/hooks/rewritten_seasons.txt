@@ -1590,3 +1590,7 @@ endgameCutsceneHandler_body
 applySingleTileChanges
 tileReplacement_group0Map54
 tileReplacement_group0Map61
+parseObjectData
+parseObjectData__afterCall58c7
+parseObjectData__afterCall58ca
+loadTreasureDisplayData__getTableIndices_b3f

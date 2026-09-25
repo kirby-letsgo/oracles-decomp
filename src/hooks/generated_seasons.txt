@@ -1878,6 +1878,7 @@
 07:4051 saveFile_b07_hook -
 07:407d loadFile_b07_hook -
 07:4096 eraseFile_b07_hook -
+07:409f eraseFile__clearFile_b07_hook -
 07:40ae clearFileAtHl_hook -
 07:40b4 verifyFileCopies_hook -
 07:40d4 verifyFileCopies__copy2Invalid_hook -

@@ -47,3 +47,7 @@
 02:6848 dungeonMap_checkCompassTile__treasure68e3
 02:684f dungeonMap_checkCompassTile__nothing68ea
 02:6851 dungeonMap_checkCompassTile__ret68ec
+07:409f eraseFile__clearFile_b07
+11:58c7 parseObjectData__afterCall58c7
+11:58ca parseObjectData__afterCall58ca
+3f:4731 loadTreasureDisplayData__getTableIndices_b3f

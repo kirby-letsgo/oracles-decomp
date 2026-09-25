@@ -514,10 +514,10 @@ void s_screenTransitionOnoxDungeon_hook(GB *gb);
 void s_screenTransitionSwordUpgrade_hook(GB *gb);
 void s_setHoronVillageSeason_hook(GB *gb);
 void s_setSeason_b01_hook(GB *gb);
-void s_loadTreasureDisplayData__getTableIndices_b3f(GB *gb);
-void s_parseObjectData(GB *gb);
-void s_parseObjectData__afterCall58c7(GB *gb);
-void s_parseObjectData__afterCall58ca(GB *gb);
+void s_loadTreasureDisplayData__getTableIndices_b3f_hook(GB *gb);
+void s_parseObjectData_hook(GB *gb);
+void s_parseObjectData__afterCall58c7_hook(GB *gb);
+void s_parseObjectData__afterCall58ca_hook(GB *gb);
 void s_common_kingMoblinBomb_state1_hook(GB *gb);
 void s_func_6515_hook(GB *gb);
 void s_func_65a6_hook(GB *gb);
@@ -1275,7 +1275,6 @@ void s_tileReplacement_group5Map7a_hook(GB *gb);
 void s_tileReplacement_group5Map86_hook(GB *gb);
 void s_tileReplacement_group5Map8e_hook(GB *gb);
 void s_tileReplacement_group5Map9e_hook(GB *gb);
-void s_eraseFile__clearFile_b07(GB *gb);
 void s_foolsOreRet_hook(GB *gb);
 void s_itemCode07_hook(GB *gb);
 void s_itemCode08_hook(GB *gb);
@@ -3152,6 +3151,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_saveFile saveFile_b07_hook
 #define s_loadFile loadFile_b07_hook
 #define s_eraseFile eraseFile_b07_hook
+#define s_eraseFile__clearFile_b07 eraseFile__clearFile_b07_hook
 #define s_clearFileAtHl clearFileAtHl_hook
 #define s_verifyFileCopies verifyFileCopies_hook
 #define s_copyFileFromHlToDe copyFileFromHlToDe_hook

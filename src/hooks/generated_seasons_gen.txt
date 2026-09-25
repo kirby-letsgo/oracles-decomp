@@ -510,10 +510,10 @@
 01:5e6b s_screenTransitionSwordUpgrade_hook -
 01:7e2c s_setHoronVillageSeason_hook -
 01:7e1e s_setSeason_b01_hook -
-3f:4731 s_loadTreasureDisplayData__getTableIndices_b3f L
-11:58b5 s_parseObjectData -
-11:58c7 s_parseObjectData__afterCall58c7 L
-11:58ca s_parseObjectData__afterCall58ca L
+3f:4731 s_loadTreasureDisplayData__getTableIndices_b3f_hook -
+11:58b5 s_parseObjectData_hook -
+11:58c7 s_parseObjectData__afterCall58c7_hook -
+11:58ca s_parseObjectData__afterCall58ca_hook -
 10:6fb8 s_common_kingMoblinBomb_state1_hook -
 10:6515 s_func_6515_hook -
 10:65a6 s_func_65a6_hook -
@@ -1271,7 +1271,6 @@
 04:63d6 s_tileReplacement_group5Map86_hook -
 04:650d s_tileReplacement_group5Map8e_hook -
 04:663a s_tileReplacement_group5Map9e_hook -
-07:409f s_eraseFile__clearFile_b07 L
 07:5bc0 s_foolsOreRet_hook -
 07:5b49 s_itemCode07_hook -
 07:5bc1 s_itemCode08_hook -
