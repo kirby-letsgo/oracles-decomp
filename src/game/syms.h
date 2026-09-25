@@ -14972,6 +14972,9 @@ enum {
   S_table_70f3,
   S_objectData7e40,
   S_paletteTransitionSeasonData,
+  S_gfx_key_orechunk,
+  S_introTempleSprites,
+  S_linkOnHorseCloseupSprites_2,
   SYM_COUNT
 };
 enum {

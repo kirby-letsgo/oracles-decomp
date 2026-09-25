@@ -459,3 +459,55 @@ void s_setSeason_b00_hook(GB *gb) {
   CYC(b_+18, b_+21); mem_wr(gb, wcc4c, A);
   RET(b_+21); return;
 }
+
+void s_func_1383_hook(GB *gb) {
+  BASE(func_1383);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+1); push_effect(gb, DE);
+  CYC(b_+1, b_+4); mem_wr(gb, wActiveRoom, A);
+  CYC(b_+4, b_+5); A = B;
+  CYC(b_+5, b_+8); mem_wr(gb, wScreenTransitionDirection, A);
+  CYC(b_+8, b_+10); A = mem_rd(gb, IO_SVBK);
+  CYC(b_+10, b_+11); C = A;
+  CYC(b_+11, b_+13); A = mem_rd(gb, hRomBank);
+  CYC(b_+13, b_+14); B = A;
+  CYC(b_+14, b_+15); push_effect(gb, BC);
+  CYC(b_+15, b_+17); A = 0x08;
+  CYC(b_+17, b_+20); mem_wr(gb, wScrollMode, A);
+  CYC(b_+20, b_+22); A = 0x03;
+  CYC(b_+22, b_+25); mem_wr(gb, wScreenTransitionState, A);
+  CYC(b_+25, b_+26); alu_xor(gb, A);
+  CYC(b_+26, b_+29); mem_wr(gb, wScreenTransitionState2, A);
+  CYC(b_+29, b_+32); mem_wr(gb, wScreenTransitionState3, A);
+  CYC(b_+32, b_+34); A = 0x01;
+  CYC(b_+34, b_+36); mem_wr(gb, hRomBank, A);
+  CYC(b_+36, b_+39); mem_wr(gb, MBC_ROM_BANK, A);
+  CALL_C(b_+39, s_func_49c9, SYM(func_49c9), b_+42);
+  CALL_C(b_+42, s_setObjectsEnabledTo2, SYM(setObjectsEnabledTo2), b_+45);
+  CALL_C(b_+45, s_loadScreenMusic, SYM(loadScreenMusic), b_+48);
+  CALL_C(b_+48, s_loadTilesetData, SYM(loadTilesetData), b_+51);
+  CYC(b_+51, b_+54); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+54, b_+57); mem_wr(gb, wLoadingRoom, A);
+  CALL_C(b_+57, s_loadTilesetAndRoomLayout, SYM(loadTilesetAndRoomLayout), b_+60);
+  CALL_C(b_+60, s_loadRoomCollisions, SYM(loadRoomCollisions), b_+63);
+  CALL_C(b_+63, s_generateVramTilesWithRoomChanges, SYM(generateVramTilesWithRoomChanges), b_+66);
+  CYC(b_+66, b_+67); SET_BC(pop_effect(gb));
+  CYC(b_+67, b_+68); A = B;
+  CYC(b_+68, b_+70); mem_wr(gb, hRomBank, A);
+  CYC(b_+70, b_+73); mem_wr(gb, MBC_ROM_BANK, A);
+  CYC(b_+73, b_+74); A = C;
+  CYC(b_+74, b_+76); mem_wr(gb, IO_SVBK, A);
+  CYC(b_+76, b_+77); SET_DE(pop_effect(gb));
+  RET(b_+77); return;
+}
+
+void s_checkLinkID0AndControlNormal_hook(GB *gb) {
+  BASE(checkLinkID0AndControlNormal);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, w1Link_id);
+  CYC(b_+3, b_+4); alu_or(gb, A);
+  if (F & FZ) { CYCT(b_+4, b_+6); TAIL_SG(checkLinkVulnerableAndIDZero); }
+  CYC(b_+4, b_+6);
+  CYC(b_+6, b_+7); alu_xor(gb, A);
+  RET(b_+7); return;
+}

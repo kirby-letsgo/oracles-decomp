@@ -4,7 +4,7 @@ routine's src/game/ofs.c table) and by a Seasons-only line (`b_+S(u), b_+S(v)`) 
 function. That is how a wrong ofsmap pairing shows (the shared line lands on an instruction the
 Seasons block also burns); cycles often still match, so shadow verify only notices when a value
 differs. Lines the Seasons run never reaches (after a Seasons branch that always returns) also
-show up. usage: tools/audit_ofsburns.py"""
+show up; list those in src/hooks/ofsburns_ok.txt once reviewed. usage: tools/audit_ofsburns.py"""
 import glob, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from symfiles import seasons_code
@@ -12,6 +12,11 @@ tabs = {}
 for m in re.finditer(r'ofs_(\w+)\[\d+\] = \{([^}]*)\}', open('src/game/ofs.c').read()):
     v = [int(x, 0) for x in m.group(2).split(',')]; n = v[0]; tabs[m.group(1)] = (v[1:n + 1], v[n + 1:])
 FUNC = re.compile(r'^(?:static )?\w+ \*?(\w+)\([^)]*\)\s*\{')
+OK = set()
+if os.path.exists('src/hooks/ofsburns_ok.txt'):
+    for l in open('src/hooks/ofsburns_ok.txt'):
+        f = l.split('#')[0].split()
+        if len(f) == 2: OK.add((f[0], f[1]))
 hits = 0
 for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     if '/seasons/' in p or '/gen_' in p or p.endswith(('ofs.c', 'syms.c')): continue
@@ -23,6 +28,7 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         for x, y, a, b, ln in O:
             for u, v, ln2 in S_:
                 if x < v and u < y:
+                    if (fn, f'O({a})') in OK: break
                     hits += 1; print(f'{p}:{ln}: {fn}: O({a})..OE({b}) is Seasons {x}..{y}, also burned by S({u})..S({v}) at line {ln2}'); break
     for i, (line, sc) in enumerate(zip(src, live), 1):
         m = FUNC.match(line)

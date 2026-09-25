@@ -7,6 +7,17 @@
 #define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
+static void tiles_add_double_index(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0018, 0x0019, false); push_effect(gb, BC);
+  burn_rom(gb, 0x00, 0x0019, 0x001a, false); C = A;
+  burn_rom(gb, 0x00, 0x001a, 0x001c, false); B = 0x00;
+  burn_rom(gb, 0x00, 0x001c, 0x001d, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001d, 0x001e, false); alu_add_hl(gb, BC);
+  burn_rom(gb, 0x00, 0x001e, 0x001f, false); SET_BC(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x001f, 0x0020, false); ret_effect(gb);
+}
+
 // ref/oracles-disasm/code/seasons/roomSpecificTileChanges.s, bank $04: per-room layout patches
 // applied after the room loads.
 
@@ -928,4 +939,71 @@ next:
     break;
   }
   RET(b_+20); return;
+}
+
+void s_applySingleTileChanges_hook(GB *gb) {
+  BASE(applySingleTileChanges);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+3, b_+4); B = A;
+  CALL_C(b_+4, s_getThisRoomFlags, SYM(getThisRoomFlags), b_+7);
+  CYC(b_+7, b_+8); C = A;
+  CYC(b_+8, b_+10); D = 0xcf;
+  CYC(b_+10, b_+13); A = mem_rd(gb, wActiveGroup);
+  CYC(b_+13, b_+16); SET_HL(SYM(singleTileChangeGroupTable));
+  CYC(b_+16, b_+17); tiles_add_double_index(gb, b_+17);
+  CYC(b_+17, b_+18); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+18, b_+19); H = mem_rd(gb, HL);
+  CYC(b_+19, b_+20); L = A;
+next:
+  CYC(b_+20, b_+21); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+21, b_+22); alu_cp(gb, B);
+  if (!(F & FZ)) { CYCT(b_+22, b_+24); goto notMatch; }
+  CYC(b_+22, b_+24);
+  CYC(b_+24, b_+25); A = mem_rd(gb, HL);
+  CYC(b_+25, b_+26); alu_and(gb, C);
+  if (F & FZ) { CYCT(b_+26, b_+28); goto notMatch; }
+  CYC(b_+26, b_+28);
+  CYC(b_+28, b_+29); SET_HL(HL + 1);
+  CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+30, b_+31); E = A;
+  CYC(b_+31, b_+32); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+32, b_+33); mem_wr(gb, DE, A);
+  CYC(b_+33, b_+35);
+  goto next;
+notMatch:
+  CYC(b_+35, b_+36); A = mem_rd(gb, HL);
+  CYC(b_+36, b_+37); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+37); return; }
+  CYC(b_+37, b_+38);
+  CYC(b_+38, b_+39); SET_HL(HL + 1);
+  CYC(b_+39, b_+40); SET_HL(HL + 1);
+  CYC(b_+40, b_+41); SET_HL(HL + 1);
+  CYC(b_+41, b_+43);
+  goto next;
+}
+
+void s_tileReplacement_group0Map54_hook(GB *gb) {
+  BASE(tileReplacement_group0Map54);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); A = mem_rd(gb, wRickyState);
+  CYC(b_+3, b_+5); alu_bit(gb, 6, A);
+  if (F & FZ) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+9); SET_HL(wRoomLayout + 0x34);
+  CYC(b_+9, b_+11); mem_wr(gb, HL, 0xf2);
+  RET(b_+11); return;
+}
+
+void s_tileReplacement_group0Map61_hook(GB *gb) {
+  BASE(tileReplacement_group0Map61);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); A = 0x81;
+  CALL_C(b_+2, s_getARoomFlags, SYM(getARoomFlags), b_+5);
+  CYC(b_+5, b_+7); alu_bit(gb, 7, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+7); return; }
+  CYC(b_+7, b_+8);
+  CYC(b_+8, b_+11); SET_HL(b_+14 /* @rect */);
+  CYC(b_+11, b_+14);
+  TAIL(fillRectInRoomLayout);
 }

@@ -4,6 +4,29 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-25, generator, stricter pruning now the default (SEASONS_PRUNE=1 keeps the looser
+  rules, 0 turns it off): only generated code is walked in the ROM; a shared routine's C is
+  trusted with its own jump table (audit_jumptables); hand/shared C counts through the names it
+  hands control to (TAIL*, x_hook, s_x, a SYM(x) that is not loaded into a register, used in
+  GV() or compared with ==) and through constant fallback targets (HANDOFF/hook_continue/
+  asm_call/CALL_C/CALL/CALL_ROM on b_+N or SYM(x)+N), all resolved to the Seasons address. Seasons
+  readable share 79.3% -> 97.0% (table 5,615 entries, 168 generated: banks 00-04 112, the rest
+  58: enemyCode15/58 and 25 locals awaiting local_call_ok, 25 shared-routine locals C reaches,
+  parseObjectData and its two resume points, three alias tails). Native Seasons playthrough
+  passes; every entry the 142k run enters is still generated.
+- 2026-09-25, generator: `tools/transliterate.py --game=seasons` no longer emits an entry into
+  a shared routine (one of its @locals, or an alias copy of it in another bank) that nothing can
+  reach. Kept when: a call, jump, fall-through or jump-table entry from another routine lands on
+  it; any jump-table entry lands on it (a shared chain's fallback dispatches it); it is a resume
+  point or an extra/alias label; C names it (SYM, TAIL*, s_x, x_hook); or a kept entry's own
+  generated code calls it (fixed point; a call into its own body counts, a jump becomes a goto).
+  SEASONS_PRUNE=0 turns it off. 1,190 entries dropped (generated_seasons_gen 4,163 -> 2,973);
+  Seasons readable share 67.6% -> 79.3% (table 8,056 -> 6,866, generated 2,611 -> 1,421). The
+  native Seasons playthrough passes, and every entry the 142k run entered is kept. Also:
+  tools/audit_mispair.py (an ofsmap pairing whose Seasons bytes differ while another Seasons
+  instruction in the routine matches the Ages bytes; RAM variables that moved show up as review
+  items), and partCode09's +12..+20 burns are explicit (ofsmap paired them with the magnet-ball
+  copy at +23/+26).
 - 2026-09-25, Seasons 5 batch 3 (bank 10): the 14 top-level routines still generated there are
   Seasons hand C (partCode38/49/48/47/45/41/3d/3c/3b/33/2f/2e/2b, loadRememberedCompanion; the
   latter's Ages C is in bank2.c at ratio 0.72, so the Seasons copy is its own). The bank's other
@@ -529,6 +552,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
   the scratchpad that dump memory or PC timestamps per frame.
 
 ## Done
+
+- 2026-09-25: merged Fable's Seasons generator pruning (2afdc3b, bc3ebed, eb8b50d): generated
+  entries into shared routines that nothing reaches are no longer emitted (kept: targets of
+  generated code, jump-table entries, resume points, extra/alias labels, and every address C
+  names or falls back to). 18 more Seasons routines as hand C from my banks: inventoryMenuState2,
+  loadCommonGraphics_body, loadMinimapDisplayRoom, mapGetRoomIndexWithoutUnusedColumns,
+  minimapPopupType_shop (bank 2), func_1383, checkLinkID0AndControlNormal,
+  roomTileChangesAfterLoad02, the riding-horse / temple intro cinematic states and
+  endgameCutsceneHandler_body (bank 3), applySingleTileChanges and two tileReplacement routines.
+  Seasons hook table: 3,895 shared + 1,590 hand + 76 generated = 98.6% readable.
 
 - 2026-09-25: Seasons playthrough extended to 265,064 frames (first dungeon done and beyond);
   tas/seasons-play.ref re-recorded with --no-hooks, identical to the old one for the first

@@ -430,6 +430,93 @@ if names and names[0] == '--out':
             new_locals = [(lb, la) for (lb, la) in local_by_addr if (lb, la) in code_targets and (lb, la) not in by_addr and (lb, la) not in done]
             if not new_locals: break
             for lb, la in new_locals: done.add((lb, la)); targets_of(lb, la)
+    # Seasons: an entry into the middle of a shared routine (one of its @locals, or an alias copy of
+    # it in another bank) is only needed when something outside that routine's own C lands there.
+    # Generated code is walked in the ROM (its calls, jumps, fall-throughs and jump tables become
+    # dispatches); hand-written and shared C reach other code only through names (SYM, TAIL*, s_x,
+    # x_hook) or a constant fallback address (HANDOFF/hook_continue/asm_call on b_+N or SYM(x) + N),
+    # which are read from the C. Resume points and extra/alias labels are always kept.
+    reach = set()
+    c_refs = set()
+    PRUNE = SEASONS and _os.environ.get('SEASONS_PRUNE', '2') != '0'
+    # SEASONS_PRUNE=1 keeps the looser rules (every routine's ROM code walked, every jump-table
+    # entry kept, every SYM mention counted); 0 turns pruning off
+    STRICT = PRUNE and _os.environ.get('SEASONS_PRUNE', '2') == '2'
+    if PRUNE:
+        for n2 in names:
+            for (b2, a2) in instances.get(n2, []):
+                if (b2, a2) in externs or (STRICT and is_rewritten(n2, b2, a2)): continue
+                body = routine_body(b2, a2)
+                banks_at = infer_banks(b2, body)
+                addrs2 = set(x[0] for x in body)
+                for ia, m, ln, cy, kind, info in body:
+                    if kind not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported') and ia + ln not in addrs2:
+                        reach.add((b2, ia + ln))     # falls through into the next label
+                    if kind == 'jumptable':
+                        for t in info[0]:
+                            o = owner.get((b2, t))
+                            if not (STRICT and (b2, a2) in shared_hooks and o is not None and o[1] == a2): reach.add((b2, t))
+                        continue
+                    if kind not in ('jp', 'jpcc', 'call', 'callcc'): continue
+                    tb = target_bank(b2, info[0])
+                    if tb is None: tb = banks_at.get(ia)
+                    if tb is None: continue
+                    o = owner.get((tb, info[0]))
+                    if o is None or tb != b2 or o[1] != a2 or kind in ('call', 'callcc'): reach.add((tb, info[0]))
+        ident_label = {}
+        for l in open('src/hooks/syms_used.txt'):
+            w = l.split()
+            if len(w) >= 2: ident_label.setdefault(w[0], w[1])
+        def sym_addr(ident):
+            lab = ident_label.get(ident, ident.replace('__', '@'))
+            return labels.get(lab)
+        FALLBACK = re.compile(r'\b(?:HANDOFF|hook_continue|asm_call|CALL_ASM|CALL_C\w*\([^,]+, \w+,|CALL\([^,]+, \w+,)\s*\(?(?:gb, )?\(?(?:b_ ?\+ ?(\d+)|SYM\((\w+)\)(?: ?\+ ?(\d+))?)')
+        for p in glob.glob('src/game/**/*.c', recursive=True):
+            if _os.path.basename(p).startswith('gen_'): continue
+            s = open(p, errors='replace').read()
+            # strict: a SYM(x) loaded into a register, inside GV() or compared with == is an address
+            # (a table, a pointer, a jump-table case), not a place the C hands control to
+            c_refs.update(re.findall(r'\bTAIL\w*\((\w+)\)', s))
+            for line in s.split('\n'):
+                for msym in re.finditer(r'\bSYM\((\w+)\)', line):
+                    if STRICT and re.search(r'(SET_(?:HL|BC|DE)\(|GV\(|== )\(*$', line[:msym.start()]): continue
+                    c_refs.add(msym.group(1))
+            c_refs.update(m[:-5] if m.endswith('_hook') else m for m in re.findall(r'\bs_(\w+)', s))
+            c_refs.update(re.findall(r'\b(\w+)_hook\b', s))     # a CALL_C whose hook_is fails falls back to that address
+            base = None
+            for line in s.split('\n'):
+                mb = re.search(r'\bBASE\((\w+)\)', line)
+                if mb: base = sym_addr(mb.group(1))
+                for off, ident, off2 in FALLBACK.findall(line):
+                    at = (base[0], base[1] + int(off)) if off and base else None
+                    if ident:
+                        la = sym_addr(ident)
+                        if la: at = (la[0], la[1] + int(off2 or 0))
+                    if at: reach.add((at[0] if at[1] >= 0x4000 else 0, at[1]))
+        for ident in list(c_refs):     # C spells labels the Ages way; reach the Seasons address too
+            la = sym_addr(ident)
+            if la: reach.add((la[0] if la[1] >= 0x4000 else 0, la[1]))
+    def reachable(b, a, n):
+        return ((b, a) in reach or (b, a) in resume_points or n in extra_names
+                or n.replace('@', '__') in c_refs or cname_at(b, a)[2:] in c_refs)
+    if PRUNE:     # a kept local is generated code of its own: whatever it reaches needs an entry too
+        walked = set()
+        while True:
+            todo = [(lb, la) for (lb, la), ln in local_by_addr.items() if (lb, la) not in walked and (lb, la) not in by_addr and reachable(lb, la, ln)]
+            if not todo: break
+            for lb, la in todo:
+                walked.add((lb, la))
+                body = routine_body(lb, la)
+                banks_at = infer_banks(lb, body)
+                addrs2 = set(x[0] for x in body)
+                for ia, m, ln, cy, kind, info in body:
+                    if kind not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported') and ia + ln not in addrs2: reach.add((lb, ia + ln))
+                    if kind == 'jumptable': reach.update((lb, t) for t in info[0]); continue
+                    # a jump inside the body becomes a goto; a call to a labelled address needs its entry
+                    if kind in ('call', 'callcc') or (kind in ('jp', 'jpcc') and info[0] not in addrs2):
+                        tb = target_bank(lb, info[0])
+                        if tb is None: tb = banks_at.get(ia)
+                        if tb is not None: reach.add((tb, info[0]))
     locals_of = collections.defaultdict(list)
     for (lb, la), ln in local_by_addr.items():
         if (lb, la) not in by_addr and (not SEASONS or (lb, la) in code_targets): locals_of[(lb, ln.split('@')[0])].append((la, ln))
@@ -443,6 +530,7 @@ if names and names[0] == '--out':
         return sorted(out)
     items_by_bank = collections.OrderedDict()
     seen_addrs = set()
+    pruned = []
     for n in names:
         for (b, a) in instances.get(n, []):
             if (b, a) in seen_addrs: continue
@@ -458,6 +546,7 @@ if names and names[0] == '--out':
                 if (b, a) in shared_hooks:     # a shared routine's @locals that no shared hook covers are generated
                     for la, ln in locals_for(b, a, n):
                         if (b, la) in shared_hooks or (b, la) in entries or not body_ok(b, la): continue
+                        if PRUNE and not reachable(b, la, ln): pruned.append(ln); continue
                         entries[(b, la)] = cname_at(b, la)
                         items_by_bank[b].append((ln, b, la))
                 # A rewritten routine still gets generated resume tails at its post-yield return
@@ -476,6 +565,9 @@ if names and names[0] == '--out':
                     entries[(b, la)] = cname_at(b, la)
                     items_by_bank[b].append((ln, b, la))
                 continue
+            if (PRUNE and (b, a) not in externs and any(i in shared_hooks for i in instances.get(n, []))
+                    and not reachable(b, a, n)):     # an alias copy of a shared routine that nothing reaches
+                pruned.append(cname_at(b, a)); continue
             if body_ok(b, a): entries[(b, a)] = cname_at(b, a)[2:] if SEASONS and (b, a) in externs else cname_at(b, a)
             items_by_bank.setdefault(b, []).append((n, b, a))
             for la, ln in locals_for(b, a, n):
@@ -549,7 +641,7 @@ if names and names[0] == '--out':
                     if cname(n) not in gen_names: h.write(f'#define {cname(n)} {hook}\n')
     with open('src/hooks/generated_seasons_gen.txt' if SEASONS else 'src/hooks/generated.txt', 'w') as g:
         for b, a, cn, fl in generated: g.write(f'{b:02x}:{a:04x} {cn} {fl}\n')
-    print(f'{len(generated)} routines in {len(bank_outputs)} bank files')
+    print(f'{len(generated)} routines in {len(bank_outputs)} bank files' + (f'; {len(pruned)} unreachable entries into shared routines not generated' if pruned else ''))
 elif names and names[0] == '--report':
     import glob
     src_files = sorted(glob.glob('ref/oracles-disasm/code/**/*.s', recursive=True) + glob.glob('ref/oracles-disasm/object_code/**/*.s', recursive=True))

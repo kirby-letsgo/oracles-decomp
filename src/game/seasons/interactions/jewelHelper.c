@@ -101,7 +101,7 @@ static void jewelHelper_insertJewel(GB *gb) {
 static void jewelHelper_checkJewelInserted(GB *gb) {
   BASE(interactionCode90);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
-  CALL_C(b_+556, s_checkLinkID0AndControlNormal, SYM(checkLinkID0AndControlNormal), b_+559);
+  CALL_C(b_+556, s_checkLinkID0AndControlNormal_hook, SYM(checkLinkID0AndControlNormal), b_+559);
   if (!(F & FC)) { RET_TAKEN(b_+559); return; }
   CYC(b_+559, b_+560);
   CYC(b_+560, b_+563); SET_HL(w1Link_direction);
