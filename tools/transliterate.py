@@ -431,36 +431,71 @@ if names and names[0] == '--out':
             if not new_locals: break
             for lb, la in new_locals: done.add((lb, la)); targets_of(lb, la)
     # Seasons: an entry into the middle of a shared routine (one of its @locals, or an alias copy of
-    # it in another bank) is only needed when something outside the routine's own C lands there:
-    # a call, jump or jump-table entry from another routine's code, a jump-table entry anywhere (a
-    # shared chain's HANDOFF/hook_continue default dispatches it), a resume point, an extra label,
-    # or C that names it (SYM(parent__local), s_parent__local).
+    # it in another bank) is only needed when something outside that routine's own C lands there.
+    # Generated code is walked in the ROM (its calls, jumps, fall-throughs and jump tables become
+    # dispatches); hand-written and shared C reach other code only through names (SYM, TAIL*, s_x,
+    # x_hook) or a constant fallback address (HANDOFF/hook_continue/asm_call on b_+N or SYM(x) + N),
+    # which are read from the C. Resume points and extra/alias labels are always kept.
     reach = set()
     c_refs = set()
     PRUNE = SEASONS and _os.environ.get('SEASONS_PRUNE', '1') != '0'
+    # SEASONS_PRUNE=2 (not yet the default): walk only generated code, and trust a shared routine's
+    # C to dispatch its own jump table's entries
+    STRICT = PRUNE and _os.environ.get('SEASONS_PRUNE', '1') == '2'
     if PRUNE:
         for n2 in names:
             for (b2, a2) in instances.get(n2, []):
-                if (b2, a2) in externs: continue
+                if (b2, a2) in externs or (STRICT and is_rewritten(n2, b2, a2)): continue
                 body = routine_body(b2, a2)
                 banks_at = infer_banks(b2, body)
                 addrs2 = set(x[0] for x in body)
                 for ia, m, ln, cy, kind, info in body:
                     if kind not in ('ret', 'reti', 'jp', 'jphl', 'jumptable', 'unsupported') and ia + ln not in addrs2:
                         reach.add((b2, ia + ln))     # falls through into the next label
-                    if kind == 'jumptable': reach.update((b2, t) for t in info[0]); continue
+                    if kind == 'jumptable':
+                        for t in info[0]:
+                            o = owner.get((b2, t))
+                            if not (STRICT and (b2, a2) in shared_hooks and o is not None and o[1] == a2): reach.add((b2, t))
+                        continue
                     if kind not in ('jp', 'jpcc', 'call', 'callcc'): continue
                     tb = target_bank(b2, info[0])
                     if tb is None: tb = banks_at.get(ia)
                     if tb is None: continue
                     o = owner.get((tb, info[0]))
-                    if o is None or tb != b2 or o[1] != a2: reach.add((tb, info[0]))
+                    if o is None or tb != b2 or o[1] != a2 or kind in ('call', 'callcc'): reach.add((tb, info[0]))
+        ident_label = {}
+        for l in open('src/hooks/syms_used.txt'):
+            w = l.split()
+            if len(w) >= 2: ident_label.setdefault(w[0], w[1])
+        def sym_addr(ident):
+            lab = ident_label.get(ident, ident.replace('__', '@'))
+            return labels.get(lab)
+        FALLBACK = re.compile(r'\b(?:HANDOFF|hook_continue|asm_call|CALL_ASM|CALL_C\w*\([^,]+, \w+,|CALL\([^,]+, \w+,)\s*\(?(?:gb, )?\(?(?:b_ ?\+ ?(\d+)|SYM\((\w+)\)(?: ?\+ ?(\d+))?)')
         for p in glob.glob('src/game/**/*.c', recursive=True):
             if _os.path.basename(p).startswith('gen_'): continue
             s = open(p, errors='replace').read()
-            c_refs.update(re.findall(r'\b(?:SYM|TAIL\w*)\((\w+)\)', s))
+            # strict: a SYM(x) loaded into a register, inside GV() or compared with == is an address
+            # (a table, a pointer, a jump-table case), not a place the C hands control to
+            c_refs.update(re.findall(r'\bTAIL\w*\((\w+)\)', s))
+            for line in s.split('\n'):
+                for msym in re.finditer(r'\bSYM\((\w+)\)', line):
+                    if STRICT and re.search(r'(SET_(?:HL|BC|DE)\(|GV\(|== )\(*$', line[:msym.start()]): continue
+                    c_refs.add(msym.group(1))
             c_refs.update(m[:-5] if m.endswith('_hook') else m for m in re.findall(r'\bs_(\w+)', s))
             c_refs.update(re.findall(r'\b(\w+)_hook\b', s))     # a CALL_C whose hook_is fails falls back to that address
+            base = None
+            for line in s.split('\n'):
+                mb = re.search(r'\bBASE\((\w+)\)', line)
+                if mb: base = sym_addr(mb.group(1))
+                for off, ident, off2 in FALLBACK.findall(line):
+                    at = (base[0], base[1] + int(off)) if off and base else None
+                    if ident:
+                        la = sym_addr(ident)
+                        if la: at = (la[0], la[1] + int(off2 or 0))
+                    if at: reach.add((at[0] if at[1] >= 0x4000 else 0, at[1]))
+        for ident in list(c_refs):     # C spells labels the Ages way; reach the Seasons address too
+            la = sym_addr(ident)
+            if la: reach.add((la[0] if la[1] >= 0x4000 else 0, la[1]))
     def reachable(b, a, n):
         return ((b, a) in reach or (b, a) in resume_points or n in extra_names
                 or n.replace('@', '__') in c_refs or cname_at(b, a)[2:] in c_refs)

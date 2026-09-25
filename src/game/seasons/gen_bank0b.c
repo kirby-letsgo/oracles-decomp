@@ -2,16 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 0b:419d
-void s_scriptCmd_jump(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-  I(0x419d, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x419e, 2); L = mem_rd(gb, HL);  // ld l,(hl)
-  I(0x419f, 1); H = A;  // ld h,a
-  I(0x41a0, 1); alu_scf(gb);  // scf
-  RET(0x41a1); return;  // ret
-}
-
 // 0b:4132
 void s_scriptCmd_showPasswordScreen__askForSecret(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

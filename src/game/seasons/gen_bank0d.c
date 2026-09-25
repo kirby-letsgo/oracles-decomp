@@ -1247,6 +1247,38 @@ L_6854:
   RET(0x6865); return;  // ret
 }
 
+// 0d:68d0
+void s_enemyCode5a__addSeed(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_68d0:
+  I(0x68d0, 3); SET_HL(0x68f5);  // ld hl,$68f5
+  RST_PUSH(0x68d3, 0x68d4);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+  I(0x68d4, 2); E = 0x8b;  // ld e,$8b
+  I(0x68d6, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x68d7, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x68d8, 2); SET_HL(HL + 1);  // inc hl
+  I(0x68d9, 1); B = A;  // ld b,a
+  I(0x68da, 2); E = 0x8d;  // ld e,$8d
+  I(0x68dc, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x68dd, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x68de, 1); C = A;  // ld c,a
+  CALL(0x68df, getFreePartSlot_hook, 0x3ea7, 0x68e2);  // call $3ea7
+  I(0x68e2, 3); mem_wr(gb, HL, 0x10);  // ld (hl),$10
+  I(0x68e4, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x68e5, 3); A = mem_rd(gb, 0xff8b);  // ldh a,($ff8b)
+  I(0x68e7, 2); mem_wr(gb, HL, A);  // ld (hl),a
+  I(0x68e8, 2); L = 0xcb;  // ld l,$cb
+  I(0x68ea, 2); mem_wr(gb, HL, B);  // ld (hl),b
+  I(0x68eb, 2); L = 0xcd;  // ld l,$cd
+  I(0x68ed, 2); mem_wr(gb, HL, C);  // ld (hl),c
+  I(0x68ee, 2); L = 0xd8;  // ld l,$d8
+  I(0x68f0, 3); mem_wr(gb, HL, 0x80);  // ld (hl),$80
+  I(0x68f2, 1); L = alu_inc8(gb, L);  // inc l
+  I(0x68f3, 2); mem_wr(gb, HL, D);  // ld (hl),d
+  RET(0x68f4); return;  // ret
+}
+
 // 0d:693f
 void s_enemyCode5d__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

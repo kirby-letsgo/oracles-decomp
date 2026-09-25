@@ -47,6 +47,18 @@ void s_applyPaletteFadeTransitionData(GB *gb) {
   I(0x4842, 4); if (hook_is(gb, 0x3217, startFadeBetweenTwoPalettes_hook)) { startFadeBetweenTwoPalettes_hook(gb); return; } HANDOFF(0x3217);  // jp $3217
 }
 
+// 01:602a
+void s_checkLinkCloseEnoughToWarpTileCenter__func_618f(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_602a:
+  I(0x602a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
+  I(0x602b, 1); alu_add(gb, B);  // add b
+  I(0x602c, 2); alu_and(gb, 0x0f);  // and $0f
+  I(0x602e, 2); alu_sub(gb, 0x04);  // sub $04
+  I(0x6030, 2); alu_cp(gb, 0x0a);  // cp $0a
+  RET(0x6032); return;  // ret
+}
+
 // 01:7dec
 void s_checkRoomPack(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

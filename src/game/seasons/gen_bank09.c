@@ -2920,6 +2920,17 @@ L_4986:
   RET(0x49a0); return;  // ret
 }
 
+// 09:4820
+void s_spinner_setLinkRelativePosition__func(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4820:
+  I(0x4820, 2); A = mem_rd(gb, DE);  // ld a,(de)
+  I(0x4821, 2); alu_add(gb, mem_rd(gb, HL));  // add (hl)
+  I(0x4822, 2); SET_HL(HL + 1);  // inc hl
+  I(0x4823, 2); mem_wr(gb, BC, A);  // ld (bc),a
+  RET(0x4824); return;  // ret
+}
+
 // 09:47c7
 void s_spinner_subid02__state0(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

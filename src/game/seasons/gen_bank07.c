@@ -2072,6 +2072,23 @@ L_5d45:
   I(0x5d4b, 4); if (hook_is(gb, 0x2c29, itemDelete_hook)) { itemDelete_hook(gb); return; } HANDOFF(0x2c29);  // jp $2c29
 }
 
+// 07:5aab
+void s_itemCode28__calculatePosition(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_5aab:
+  I(0x5aab, 4); A = mem_rd(gb, 0xd101);  // ld a,($d101)
+  I(0x5aae, 2); alu_cp(gb, 0x0b);  // cp $0b
+  I(0x5ab0, 3); SET_HL(0x5ad0);  // ld hl,$5ad0
+  if (!(F & FZ)) { I(0x5ab3, 3); goto L_5abd; } I(0x5ab3, 2);  // jr nz,$5abd
+  I(0x5ab5, 4); A = mem_rd(gb, 0xd108);  // ld a,($d108)
+  I(0x5ab8, 1); alu_add(gb, A);  // add a
+  I(0x5ab9, 3); SET_HL(0x5ac0);  // ld hl,$5ac0
+  RST_PUSH(0x5abc, 0x5abd);  // rst $18 (addDoubleIndexToHl)
+  PUSH(0x0018, BC); I(0x0019, 1); C = A; I(0x001a, 2); B = 0x00; I(0x001c, 2); alu_add_hl(gb, BC); I(0x001d, 2); alu_add_hl(gb, BC); SET_BC(POP(0x001e)); I(0x001f, 4); pop_effect(gb);
+L_5abd:
+  I(0x5abd, 4); if (hook_is(gb, 0x5e5a, itemInitializeFromLinkPosition_hook)) { itemInitializeFromLinkPosition_hook(gb); return; } HANDOFF(0x5e5a);  // jp $5e5a
+}
+
 // 07:5ad4
 void s_itemCode28__tryToBreakTiles(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -2204,6 +2221,15 @@ L_4b11:
   I(0x4b21, 4); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 6)));  // set 6,(hl)
 L_4b23:
   RET(0x4b23); return;  // ret
+}
+
+// 07:4b5f
+void s_itemUpdateThrowingVerticallyAndCheckHazards__createSplash(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4b5f:
+  CALL(0x4b5f, objectCreateInteractionWithSubid00_hook, 0x24af, 0x4b62);  // call $24af
+  I(0x4b62, 1); alu_scf(gb);  // scf
+  RET(0x4b63); return;  // ret
 }
 
 // 07:4db4

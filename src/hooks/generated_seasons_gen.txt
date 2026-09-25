@@ -359,6 +359,7 @@
 00:1360 s_func_1383__afterCall1360 L
 00:35ec s_func_35ec_hook -
 00:3e8f s_getLinkedHerosCaveSideEntranceRoom_hook -
+00:20f1 s_getScaledPositionOffsetForVelocity__scaleComponent L
 00:3e3e s_getSunkenCityNPCVisibleSubId_caller_hook -
 00:3d87 s_interactionRunSimpleScript__runCommand L
 00:3d9c s_interactionRunSimpleScript__command0 L
@@ -391,6 +392,7 @@
 00:22a9 s_objectSetPriorityRelativeToLink_withTerrainEffects__getPriority L
 00:1d69 s_preventObjectHFromPassingObjectD__checkCollisionDirection L
 00:1d9c s_preventObjectHFromPassingObjectD__setBothObjectVariables L
+00:106c s_queueDrawEverything__func L
 00:174c s_removeOreChunkValue_hook -
 00:18d6 s_retrieveTextCharacter__func_18fd L
 00:364f s_roomTileChangesAfterLoad02 -
@@ -400,14 +402,17 @@
 00:34a0 s_seasonsFunc_34a0_hook -
 00:35cc s_seasonsFunc_35cc_hook -
 00:3e20 s_setMakuTreeStageAndMapText_hook -
+00:11da s_setRoomFlagsForUnlockedKeyDoor__setRoomFlag L
 00:3a9c s_setSeason_b00_hook -
 00:3e52 s_setUpCharactersAfterMoblinKeepDestroyed_hook -
 00:2ce9 s_specialObjectCode_linkInCutscene_b00 -
 00:2cf6 s_specialObjectCode_linkInCutscene__afterCall2cf6_b00 L
 00:3276 s_updateAnimationsAfterCutscene_hook -
+00:0aff s_updateDirtyPalettes__writePaletteRegs L
 00:2ee1 s_updateEnemies__next L
 00:3b24 s_updateInteractions__next L
 00:2acd s_updateLinkDirectionFromAngle__end L
+00:0aa8 s_vblankCopyTileFunction__write4Bytes L
 00:c4b7 wRamFunction -
 00:335a s_zeldaAndVillagersCutsceneCaller_hook -
 00:336e s_zeldaKidnappedCutsceneCaller_hook -
@@ -639,6 +644,7 @@
 09:66aa s_sidescrollingStaticGashaSeed_hook -
 09:66b0 s_sidescrollingStaticSeedSatchel_hook -
 09:699c s_spawnHider_hook -
+09:4820 s_spinner_setLinkRelativePosition__func L
 09:47c7 s_spinner_subid02__state0 L
 09:47d9 s_spinner_subid02__state1 L
 09:6608 s_staticGashaSeed_hook -
@@ -656,6 +662,7 @@
 09:6559 s_unblockingD3Dam_hook -
 09:660e s_underwaterGashaSeed_hook -
 01:4808 s_applyPaletteFadeTransitionData -
+01:602a s_checkLinkCloseEnoughToWarpTileCenter__func_618f L
 01:7dec s_checkRoomPack -
 01:7e6e s_checkRoomPackAfterWarp_body_hook -
 01:6081 s_checkTileWarps__checkAdjacentTileIsWarpTile L
@@ -731,9 +738,11 @@
 01:7e2c s_setHoronVillageSeason_hook -
 01:7e1e s_setSeason_b01_hook -
 3f:47ae s_checkItemDropAvailable_body__done L
+3f:539c s_clearTopRowOfTextMap__func L
 3f:5279 s_displayNextTextCharacter__readSubsequentLineBuffers L
 3f:52a4 s_displayNextTextCharacter__playSound L
 3f:52aa s_displayNextTextCharacter__checkCanAdvanceWithAB L
+3f:51bb s_dmaTextboxMap__func L
 3f:553f s_doInventoryTextFirstPass__controlCode L
 3f:5560 s_doInventoryTextFirstPass__dictionary L
 3f:5571 s_doInventoryTextFirstPass__controlCode6 L
@@ -742,6 +751,7 @@
 3f:5580 s_doInventoryTextFirstPass__controlCodeA L
 3f:5593 s_doInventoryTextFirstPass__controlCode8 L
 3f:5595 s_doInventoryTextFirstPass__controlCodeF L
+3f:5443 s_func_53eb__func L
 3f:54a8 s_func_53eb__dmaHeartPieceDisplay L
 3f:4539 s_giveTreasure_body__ret L
 3f:5739 s_handleTextControlCode__controlCode0 L
@@ -775,8 +785,13 @@
 3f:5acd s_interac11_subid01__interac11_01_state3 L
 3f:5ada s_interac11_subid01__interac11_updateSparkle L
 3f:4731 s_loadTreasureDisplayData__getTableIndices_b3f L
+3f:402d s_refreshDirtyPalettes__refresh L
 3f:4067 s_refreshDirtyPalettes__gbaBrightenPalette L
 3f:41b6 s_refreshObjectGfx_body__nextExtraGfxIndex L
+3f:5125 s_saveTilesUnderTextbox__copyTileMap L
+3f:53b3 s_shiftTextboxMapUp__func L
+3f:53eb s_subFirstRowOfTextMapBy20__func L
+3f:590f s_textControlCodeC_1__drawDigit L
 3f:5933 s_textControlCodeC_2__getNextTextboxOptionPosition L
 3f:5653 s_textOptionCode_checkDirectionButtons__updateSelectedTextOption L
 11:5ac6 s_objectDataOp9__allocateObjectType L
@@ -865,6 +880,7 @@
 10:4a33 s_partCode0f__state1 L
 10:4a34 s_partCode0f__state2 L
 10:4a45 s_partCode0f__state3 L
+10:4a4f s_partCode0f__setTileHere L
 10:4a58 s_partCode0f__state4 L
 10:4a7e s_partCode10__state0 L
 10:4aa5 s_partCode10__state1 L
@@ -1510,6 +1526,7 @@
 06:73b5 s_linkCutscene9_hook -
 06:7452 s_linkCutsceneA_hook -
 06:6ec9 s_linkCutscene_oscillateZ_hook -
+06:44ea s_loadLinkAndCompanionAnimationFrame_body__loadAnimationFrame L
 06:6cf4 s_mapleCutscenes_hook -
 06:56ab s_minecartCheckCollisions__trackTL L
 06:56b0 s_minecartCheckCollisions__trackBL L
@@ -1572,24 +1589,7 @@
 06:4d25 s_parentItemCode_slingshot_hook -
 06:6d77 s_ret_hook -
 06:69d8 s_rickyCutscenes_hook -
-06:6a15 s_rickyState1_b06 -
-06:6a1d s_rickyState1__subid0_b06 L
-06:6a25 s_rickyState1__subid0__substate0_b06 L
-06:6a44 s_rickyState1__subid0__substate1_b06 L
-06:6a52 s_rickyState1__clink_b06 L
-06:6a65 s_rickyState1__subid1_b06 L
-06:6a7f s_rickyState1__subid1__substate0_b06 L
-06:6a82 s_rickyState1__subid1__substate1_b06 L
-06:6ab4 s_rickyState1__subid1__substate2_b06 L
-06:6abd s_rickyState1__subid1__substate3_b06 L
-06:6aca s_rickyState1__subid1__substate4_b06 L
-06:6add s_rickyState1__subid1__substate5_b06 L
-06:6aea s_rickyState1__subid1__substate6_b06 L
-06:6b12 s_rickyState1__subid1__substate7_b06 L
-06:6b24 s_rickyState1__subid1__substate8_b06 L
-06:6b2e s_rickyState1__subid1__func_6b2e_b06 L
-06:6b39 s_rickyState1__subid1__substate9_b06 L
-06:6b5a s_rickyState1__subid1__substateA_b06 L
+06:6a15 s_rickyState1_b06_hook -
 06:6d62 s_seasonsFunc_06_6d62_hook -
 06:6d74 s_seasonsFunc_06_6d74_hook -
 06:6d78 s_seasonsFunc_06_6d78_hook -
@@ -1601,6 +1601,7 @@
 06:4333 s_specialObjectCheckPushingAgainstTile__func L
 06:5593 s_specialObjectCode_minecart__state0_b06 L
 06:55bf s_specialObjectCode_minecart__state1_b06 L
+06:4f05 s_tryPickupBombs__pickupObjectIfTouchingLink L
 05:50a5 s_bounceLinkOffTrampolineAfterFalling_hook -
 05:5fdb s_checkLinkJumpingOffCliff__checkCliffTile L
 05:5e74 s_checkLinkPushingAgainstTreeStump_hook -
@@ -1608,6 +1609,7 @@
 05:45e4 s_companionDismountAndSavePosition__dimitri L
 05:4677 s_companionDragToCenterOfHole__adjustX L
 05:4858 s_companionRetIfInactiveWithoutStateCheck__ret L
+05:76e4 s_dimitriCheckCanBeHeldInDirection__checkTile L
 05:7580 s_dimitriState6__substate0 L
 05:758b s_dimitriState6__substate1 L
 05:7593 s_dimitriState6__substate2 L
@@ -1786,6 +1788,7 @@
 05:560f s_updateHeartRingCounter__addOffsetsToCounter L
 05:4251 s_updateLinkInvincibilityCounter__normalFlags L
 05:4061 s_updateSpecialObjects__updateSpecialObject L
+05:4ada s_warpTransition3__enterFromMiddleBottom L
 05:4b83 s_warpTransition6_hook -
 05:4b8b s_warpTransition6_00_hook -
 05:4bb5 s_warpTransition6_01_hook -
@@ -2190,6 +2193,7 @@
 07:4ccf s_itemCode24__state0 L
 07:5ced s_itemCode27__state0 L
 07:5d1d s_itemCode27__state1 L
+07:5aab s_itemCode28__calculatePosition L
 07:5ad4 s_itemCode28__tryToBreakTiles L
 07:56a6 s_itemCode29_hook -
 07:565d s_itemCode2a__state0 L
@@ -2197,6 +2201,7 @@
 07:5019 s_itemCode2b__calcPosition L
 07:4aa0 s_itemUpdateThrowingVertically__unsetCollision L
 07:4b02 s_itemUpdateThrowingVertically__checkHoleOrWater L
+07:4b5f s_itemUpdateThrowingVerticallyAndCheckHazards__createSplash L
 07:5638 s_magicBoomerangTryToBreakTile_hook -
 07:4db4 s_seedItemState1__emberStandard L
 07:4dba s_seedItemState1__scentLanded L
@@ -2278,6 +2283,7 @@
 0d:682c s_enemyCode58__makeParentEnemyVisibleAndRemoveReference L
 0d:6839 s_enemyCode58__copyParentPosition L
 0d:6854 s_enemyCode58__checkDisableDestruction L
+0d:68d0 s_enemyCode5a__addSeed L
 0d:761e s_enemyCode5b_hook -
 0d:7642 s_enemyCode5c_hook -
 0d:693f s_enemyCode5d__state0 L
@@ -2968,6 +2974,6 @@
 0f:4bb3 s_twinrova_state9__substate2 L
 0f:4bc5 s_twinrova_state9__substate3 L
 0f:4bdd s_twinrova_state9__substate4 L
-0b:419d s_scriptCmd_jump -
+0b:419d s_scriptCmd_jump_hook -
 0b:4132 s_scriptCmd_showPasswordScreen__askForSecret L
 0b:413a s_scriptCmd_showPasswordScreen__generateSecret L

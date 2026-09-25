@@ -1550,3 +1550,5 @@ partCode2b
 partCode41
 partCode2e
 partCode3c
+rickyState1_b06
+scriptCmd_jump

@@ -1070,6 +1070,17 @@ L_4a4f:
   I(0x4a55, 4); if (hook_is(gb, 0x3a52, setTile_hook)) { setTile_hook(gb); return; } HANDOFF(0x3a52);  // jp $3a52
 }
 
+// 10:4a4f
+void s_partCode0f__setTileHere(GB *gb) {
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+L_4a4f:
+  PUSH(0x4a4f, AF);  // push af
+  CALL(0x4a50, objectGetShortPosition_hook, 0x2054, 0x4a53);  // call $2054
+  I(0x4a53, 1); C = A;  // ld c,a
+  SET_AF(POP(0x4a54));  // pop af
+  I(0x4a55, 4); if (hook_is(gb, 0x3a52, setTile_hook)) { setTile_hook(gb); return; } HANDOFF(0x3a52);  // jp $3a52
+}
+
 // 10:4a58
 void s_partCode0f__state4(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
