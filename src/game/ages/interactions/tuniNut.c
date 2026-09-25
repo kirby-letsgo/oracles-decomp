@@ -84,7 +84,8 @@ void interactionCodeb2__state1_hook(GB *gb) {
   CYC(b_+15, b_+18); A = mem_rd(gb, wScreenShakeCounterY);
   CYC(b_+18, b_+19); alu_or(gb, A);
   if (!(F & FZ)) { CYCT(b_+19, b_+21); goto update; }
-  CYC(b_+19, b_+21); A = mem_rd(gb, wScreenShakeCounterX);
+  CYC(b_+19, b_+21);
+  CYC(b_+21, b_+24); A = mem_rd(gb, wScreenShakeCounterX);
   CYC(b_+24, b_+25); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+25, b_+28); push_effect(gb, b_+28); volcano_run_script(gb); } else CYC(b_+25, b_+28);
 update:

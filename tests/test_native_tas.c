@@ -75,6 +75,11 @@ static void native_full_tas_matches_reference(void) {
 }
 
 // Seasons: the recorded playthrough, whole (33,337 frames), on the same binary
+// Seasons: the console-verified TAS, the whole game, from a boot with RAM cleared
+static void native_seasons_tas_matches_reference(void) {
+  native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", TAS_DIR "/seasons-consoleverified.inputs", TAS_DIR "/seasons.ref", TAS_DIR "/seasons-consoleverified-boot.state", 321712);
+}
+
 static void native_seasons_play_matches_reference(void) {
   native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", TAS_DIR "/seasons-boot.state", 265064);
 }
@@ -84,4 +89,4 @@ static void native_ages_survives_save_states(void) {
   native_run_reloading(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc", TAS_DIR "/ages-consoleverified.inputs", TAS_DIR "/ages.ref", TAS_DIR "/ages-boot.state", 20000, 1013);
 }
 
-int main(void) { RUN(native_full_tas_matches_reference); RUN(native_seasons_play_matches_reference); RUN(native_ages_survives_save_states); return 0; }
+int main(void) { RUN(native_full_tas_matches_reference); RUN(native_seasons_play_matches_reference); RUN(native_seasons_tas_matches_reference); RUN(native_ages_survives_save_states); return 0; }

@@ -84,9 +84,12 @@ See `tas/README.md` for re-recording the reference hashes afterwards.
 ## Verification
 
 ```bash
-ctest --test-dir build                          # unit suites, first 20k frames, native runs
-TAS_FRAMES=289518 ctest --test-dir build -R tas  # the whole Ages movie
+ctest --test-dir build                          # unit suites, TAS prefixes, whole native runs
+TAS_FRAMES=321712 ctest --test-dir build -R tas  # both whole movies with hooks too
 ```
+
+Two full-game movies are the main gate: the console-verified Ages TAS and the console-verified
+Seasons TAS (`tas/README.md`), plus a recorded Seasons playthrough.
 
 The headless runner replays a movie and checks it:
 

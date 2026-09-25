@@ -72,7 +72,7 @@ static void full_tas_matches_reference(void) {
   fclose(ref); free(gb); free(rom); free(boot); tas_free(&t);
 }
 
-static void seasons_run(const char *inputs, const char *ref_path, uint64_t frames, const char *what) {
+static void seasons_run(const char *inputs, const char *ref_path, const char *init_ram, uint64_t frames, const char *what) {
   const char *rom_path = GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc";
   size_t n, bn;
   uint8_t *rom = oracles_read_file(rom_path, &n);
@@ -88,7 +88,7 @@ static void seasons_run(const char *inputs, const char *ref_path, uint64_t frame
   ASSERT(gb_load_rom(gb, rom, n));
   oracles_apply_agb_boot_patch(boot, bn);
   gb_set_boot_rom(gb, boot, bn);
-  ASSERT(oracles_load_init_ram(gb, TAS_DIR "/gbhawk-wram0.txt"));
+  if (init_ram) ASSERT(oracles_load_init_ram(gb, init_ram));
   gb_reset(gb);
   RefCheck rc = {ref, 0, 0, false, 0};
   rc.have = fscanf(ref, "%llu %llx", &rc.f, &rc.want) == 2;
@@ -101,11 +101,20 @@ static void seasons_run(const char *inputs, const char *ref_path, uint64_t frame
 }
 
 static void seasons_play_matches_reference(void) {
-  seasons_run(TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", 265064, "playthrough");
+  seasons_run(TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", TAS_DIR "/gbhawk-wram0.txt", 265064, "playthrough");
 }
 
 static void seasons_demo_matches_reference(void) {
-  seasons_run(NULL, TAS_DIR "/seasons-noinput.ref", 30000, "demo");
+  seasons_run(NULL, TAS_DIR "/seasons-noinput.ref", TAS_DIR "/gbhawk-wram0.txt", 30000, "demo");
 }
 
-int main(void) { RUN(inputs_file_loads); RUN(frame_grid_is_70224_cycles); RUN(full_tas_matches_reference); RUN(seasons_demo_matches_reference); RUN(seasons_play_matches_reference); return 0; }
+// The console-verified TAS (the whole game) expects WRAM and HRAM cleared at power-on. The hooked
+// build replays the first 60k frames by default; TAS_FRAMES lifts that (321712 is the whole movie).
+static void seasons_tas_matches_reference(void) {
+  const char *limit_env = getenv("TAS_FRAMES");
+  uint64_t frames = limit_env ? strtoull(limit_env, NULL, 10) : 60000;
+  if (frames > 321712) frames = 321712;
+  seasons_run(TAS_DIR "/seasons-consoleverified.inputs", TAS_DIR "/seasons.ref", NULL, frames, "console TAS");
+}
+
+int main(void) { RUN(inputs_file_loads); RUN(frame_grid_is_70224_cycles); RUN(full_tas_matches_reference); RUN(seasons_demo_matches_reference); RUN(seasons_play_matches_reference); RUN(seasons_tas_matches_reference); return 0; }
