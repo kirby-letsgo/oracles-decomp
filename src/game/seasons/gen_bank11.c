@@ -2,18 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 11:5ac6
-void s_objectDataOp9__allocateObjectType(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5ac6:
-  I(0x5ac6, 2); A = mem_rd(gb, DE);  // ld a,(de)
-  RST_PUSH(0x5ac7, 0x5ac8);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
 // 11:58b5
 void s_parseObjectData(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

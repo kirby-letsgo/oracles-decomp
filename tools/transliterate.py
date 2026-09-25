@@ -438,10 +438,10 @@ if names and names[0] == '--out':
     # which are read from the C. Resume points and extra/alias labels are always kept.
     reach = set()
     c_refs = set()
-    PRUNE = SEASONS and _os.environ.get('SEASONS_PRUNE', '1') != '0'
-    # SEASONS_PRUNE=2 (not yet the default): walk only generated code, and trust a shared routine's
-    # C to dispatch its own jump table's entries
-    STRICT = PRUNE and _os.environ.get('SEASONS_PRUNE', '1') == '2'
+    PRUNE = SEASONS and _os.environ.get('SEASONS_PRUNE', '2') != '0'
+    # SEASONS_PRUNE=1 keeps the looser rules (every routine's ROM code walked, every jump-table
+    # entry kept, every SYM mention counted); 0 turns pruning off
+    STRICT = PRUNE and _os.environ.get('SEASONS_PRUNE', '2') == '2'
     if PRUNE:
         for n2 in names:
             for (b2, a2) in instances.get(n2, []):

@@ -47,18 +47,6 @@ void s_applyPaletteFadeTransitionData(GB *gb) {
   I(0x4842, 4); if (hook_is(gb, 0x3217, startFadeBetweenTwoPalettes_hook)) { startFadeBetweenTwoPalettes_hook(gb); return; } HANDOFF(0x3217);  // jp $3217
 }
 
-// 01:602a
-void s_checkLinkCloseEnoughToWarpTileCenter__func_618f(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_602a:
-  I(0x602a, 2); A = mem_rd(gb, HL);  // ld a,(hl)
-  I(0x602b, 1); alu_add(gb, B);  // add b
-  I(0x602c, 2); alu_and(gb, 0x0f);  // and $0f
-  I(0x602e, 2); alu_sub(gb, 0x04);  // sub $04
-  I(0x6030, 2); alu_cp(gb, 0x0a);  // cp $0a
-  RET(0x6032); return;  // ret
-}
-
 // 01:7dec
 void s_checkRoomPack(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -81,33 +69,6 @@ L_7df4:
   I(0x7e06, 1); alu_or(gb, A);  // or a
   if ((F & FZ)) { I(0x7e07, 3); if (hook_is(gb, 0x7e2c, s_setHoronVillageSeason_hook)) { s_setHoronVillageSeason_hook(gb); return; } HANDOFF(0x7e2c); } I(0x7e07, 2);  // jr z,$7e2c
   if (hook_is(gb, 0x7e09, s_determineSeasonForRoomPack_hook)) { s_determineSeasonForRoomPack_hook(gb); return; } HANDOFF(0x7e09);  // fallthrough
-}
-
-// 01:6081
-void s_checkTileWarps__checkAdjacentTileIsWarpTile(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6081:
-  I(0x6081, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x6083, 1); A = alu_inc8(gb, A);  // inc a
-  CALL(0x6084, s_checkTileWarps__checkAdjacentTileIsWarpTile__checkIsWarpTile, 0x608b, 0x6087);  // call $608b
-  if ((F & FC)) { RET_TAKEN(0x6087); return; } I(0x6087, 2);  // ret c
-  I(0x6088, 3); A = mem_rd(gb, 0xff8d);  // ldh a,($ff8d)
-  I(0x608a, 1); A = alu_dec8(gb, A);  // dec a
-L_608b:
-  I(0x608b, 1); C = A;  // ld c,a
-  I(0x608c, 2); B = 0xcf;  // ld b,$cf
-  I(0x608e, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x608f, 3); if (hook_is(gb, 0x60e2, checkTileIsWarpTile_hook)) { checkTileIsWarpTile_hook(gb); return; } HANDOFF(0x60e2);  // jr $60e2
-}
-
-// 01:608b
-void s_checkTileWarps__checkAdjacentTileIsWarpTile__checkIsWarpTile(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_608b:
-  I(0x608b, 1); C = A;  // ld c,a
-  I(0x608c, 2); B = 0xcf;  // ld b,$cf
-  I(0x608e, 2); A = mem_rd(gb, BC);  // ld a,(bc)
-  I(0x608f, 3); if (hook_is(gb, 0x60e2, checkTileIsWarpTile_hook)) { checkTileIsWarpTile_hook(gb); return; } HANDOFF(0x60e2);  // jr $60e2
 }
 
 // 01:5953
@@ -1440,26 +1401,5 @@ void s_makeActiveObjectFollowLink_b01(GB *gb) {
   I(0x48a3, 3); A = mem_rd(gb, 0xffad);  // ldh a,($ffad)
   I(0x48a5, 2); mem_wr(gb, HL, A); SET_HL(HL + 1);  // ld (hl+),a
   if (hook_is(gb, 0x48a6, resetFollowingLinkPath_hook)) { resetFollowingLinkPath_hook(gb); return; } HANDOFF(0x48a6);  // fallthrough
-}
-
-// 01:5ec2
-void s_screenTransitionEyePuzzle__up(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5ec2:
-  I(0x5ec2, 4); A = mem_rd(gb, 0xcc53);  // ld a,($cc53)
-  I(0x5ec5, 2); alu_cp(gb, 0x06);  // cp $06
-  if ((F & FC)) { I(0x5ec7, 3); goto L_5ecc; } I(0x5ec7, 2);  // jr c,$5ecc
-  I(0x5ec9, 4); if (hook_is(gb, 0x5da5, screenTransitionStandard_hook)) { screenTransitionStandard_hook(gb); return; } HANDOFF(0x5da5);  // jp $5da5
-L_5ecc:
-  I(0x5ecc, 1); alu_scf(gb);  // scf
-  RET(0x5ecd); return;  // ret
-}
-
-// 01:5ecc
-void s_screenTransitionEyePuzzle__rightOrLeft(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_5ecc:
-  I(0x5ecc, 1); alu_scf(gb);  // scf
-  RET(0x5ecd); return;  // ret
 }
 

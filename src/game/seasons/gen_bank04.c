@@ -124,32 +124,6 @@ L_5ffd:
   I(0x6003, 3); goto L_5fee;  // jr $5fee
 }
 
-// 04:6a70
-void s_drawRectangleToVramTiles__nextRow(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_6a70:
-  PUSH(0x6a70, BC);  // push bc
-L_6a71:
-  I(0x6a71, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6a72, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6a73, 2); D = (uint8_t)(D | (1 << 2));  // set 2,d
-  I(0x6a75, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x6a76, 2); mem_wr(gb, DE, A);  // ld (de),a
-  I(0x6a77, 2); D = (uint8_t)(D & ~(1 << 2));  // res 2,d
-  I(0x6a79, 2); SET_DE(DE + 1);  // inc de
-  I(0x6a7a, 1); C = alu_dec8(gb, C);  // dec c
-  if (!(F & FZ)) { I(0x6a7b, 3); goto L_6a71; } I(0x6a7b, 2);  // jr nz,$6a71
-  SET_BC(POP(0x6a7d));  // pop bc
-  I(0x6a7e, 2); A = 0x20;  // ld a,$20
-  I(0x6a80, 1); alu_sub(gb, C);  // sub c
-  CALL(0x6a81, addAToDe_hook, 0x0068, 0x6a84);  // call $0068
-  I(0x6a84, 1); B = alu_dec8(gb, B);  // dec b
-  if (!(F & FZ)) { I(0x6a85, 3); goto L_6a70; } I(0x6a85, 2);  // jr nz,$6a70
-  SET_AF(POP(0x6a87));  // pop af
-  I(0x6a88, 3); mem_wr(gb, 0xff70, A);  // ldh ($ff70),a
-  RET(0x6a8a); return;  // ret
-}
-
 // 04:63f2
 void s_tileReplacement_group0Map54(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;

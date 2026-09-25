@@ -156,24 +156,3 @@ L_4097:
   RET(0x409a); return;  // ret
 }
 
-// 03:4846
-void s_secretFunctionCaller_body__jumpTable(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4846:
-  I(0x4846, 1); A = B;  // ld a,b
-  RST_PUSH(0x4847, 0x4848);  // rst $00 (jump table)
-  I(0x0000, 1); alu_add(gb, A); I(0x0001, 3); SET_HL(pop_effect(gb)); I(0x0002, 1); alu_add(gb, L); I(0x0003, 1); L = A;
-  if (!(F & FC)) I(0x0004, 3); else { I(0x0004, 2); I(0x0006, 1); H = alu_inc8(gb, H); }
-  I(0x0007, 2); A = mem_rd(gb, HL); SET_HL(HL + 1); I(0x0008, 2); H = mem_rd(gb, HL); I(0x0009, 1); L = A; I(0x000a, 1);
-  switch (HL) {  default: HANDOFF(HL); }
-}
-
-// 03:4c23
-void s_twinrovaCutscene_deleteAllInteractionsExceptFlames__delete(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4c23:
-  I(0x4c23, 1); L = alu_dec8(gb, L);  // dec l
-  I(0x4c24, 2); B = 0x40;  // ld b,$40
-  I(0x4c26, 4); if (hook_is(gb, 0x044b, clearMemory_hook)) { clearMemory_hook(gb); return; } HANDOFF(0x044b);  // jp $044b
-}
-

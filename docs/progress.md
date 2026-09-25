@@ -4,6 +4,16 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-25, generator, stricter pruning now the default (SEASONS_PRUNE=1 keeps the looser
+  rules, 0 turns it off): only generated code is walked in the ROM; a shared routine's C is
+  trusted with its own jump table (audit_jumptables); hand/shared C counts through the names it
+  hands control to (TAIL*, x_hook, s_x, a SYM(x) that is not loaded into a register, used in
+  GV() or compared with ==) and through constant fallback targets (HANDOFF/hook_continue/
+  asm_call/CALL_C/CALL/CALL_ROM on b_+N or SYM(x)+N), all resolved to the Seasons address. Seasons
+  readable share 79.3% -> 97.0% (table 5,615 entries, 168 generated: banks 00-04 112, the rest
+  58: enemyCode15/58 and 25 locals awaiting local_call_ok, 25 shared-routine locals C reaches,
+  parseObjectData and its two resume points, three alias tails). Native Seasons playthrough
+  passes; every entry the 142k run enters is still generated.
 - 2026-09-25, generator: `tools/transliterate.py --game=seasons` no longer emits an entry into
   a shared routine (one of its @locals, or an alias copy of it in another bank) that nothing can
   reach. Kept when: a call, jump, fall-through or jump-table entry from another routine lands on
