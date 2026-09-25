@@ -2362,13 +2362,13 @@ void checkLinkCollisionsEnabled_hook(GB *gb) {
 
 static void link_vulnerable(GB *gb) {
   BASE(checkLinkVulnerable);
-  SET_HL(w1Link_var2a);
-  CYC(b_+0, b_+3); A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+3, b_+4); alu_or(gb, mem_rd(gb, HL));
-  L = 0x2d;
-  CYC(b_+4, b_+7); alu_or(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+7, b_+10); link_check_no_carry(gb); return; }
-  CYC(b_+7, b_+10);
+  CYC(b_+0, b_+3); SET_HL(w1Link_var2a);
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+4, b_+5); alu_or(gb, mem_rd(gb, HL));
+  CYC(b_+5, b_+7); L = 0x2d;
+  CYC(b_+7, b_+8); alu_or(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { CYCT(b_+8, b_+10); link_check_no_carry(gb); return; }
+  CYC(b_+8, b_+10);
   link_collisions_enabled(gb);
 }
 
@@ -14054,15 +14054,13 @@ void _mainLoop_hook(GB *gb) {
   BASE(_mainLoop);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, pollInput_hook, ROM_pollInput, b_+3);
-  A = mem_rd(gb, hIntroInputsEnabled);
-  CYC(b_+3, b_+5);
+  CYC(b_+3, b_+5); A = mem_rd(gb, hIntroInputsEnabled);
   alu_add(gb, A);
   CYC(b_+5, b_+6);
   if (F & FZ) CYCT(b_+6, b_+8);
   else {
     CYC(b_+6, b_+8);
-    A = mem_rd(gb, wKeysPressed);
-    CYC(b_+8, b_+11);
+    CYC(b_+8, b_+11); A = mem_rd(gb, wKeysPressed);
     alu_sub(gb, (JOY_A | JOY_B | JOY_START | JOY_SELECT));
     CYC(b_+11, b_+13);
     if (F & FZ) { CYCT(b_+13, b_+16); resetGame_hook(gb); return; }
@@ -14078,8 +14076,7 @@ void _mainLoop_hook(GB *gb) {
   CYC(b_+24, b_+26); H8(hActiveThread) = A;
   L = A;
   CYC(b_+26, b_+27);
-  A = mem_rd(gb, HL);
-  CYC(b_+27, b_+28);
+  CYC(b_+27, b_+28); A = mem_rd(gb, HL);
   A = alu_dec8(gb, A);
   CYC(b_+28, b_+29);
   if (F & FZ) { CYCT(b_+29, b_+31); _countdownToRunThread_hook(gb); return; }
@@ -14157,8 +14154,7 @@ void _mainLoop_nextThread_hook(GB *gb) {
     do { I(b_+46, 1); halt_r = hook_halt(gb, b_+47); } while (halt_r == 1);
     if (halt_r < 0) { hook_handoff(gb, b_+47); return; }
     CYC(b_+47, b_+48);
-    alu_bit(gb, 7, mem_rd(gb, HL));
-    CYC(b_+48, b_+50);
+    CYC(b_+48, b_+50); alu_bit(gb, 7, mem_rd(gb, HL));
     if (!(F & FZ)) { CYCT(b_+50, b_+52); continue; }
     CYC(b_+50, b_+52);
     break;
@@ -14178,10 +14174,8 @@ void _countdownToRunThread__afterSp0998_hook(GB *gb) {
 
 void _countdownToRunThread_hook(GB *gb) {
   BASE(_countdownToRunThread);
-  L = alu_inc8(gb, L);
-  CYC(b_+0, b_+1);
-  uint8_t v = alu_dec8(gb, mem_rd(gb, HL));
-  CYC(b_+1, b_+2); mem_wr(gb, HL, v);
+  CYC(b_+0, b_+1); L = alu_inc8(gb, L);
+  CYC(b_+1, b_+2); mem_wr(gb, HL, alu_dec8(gb, mem_rd(gb, HL)));
   if (F & FZ) CYC(b_+2, b_+4);
   else { CYCT(b_+2, b_+4); _mainLoop_nextThread_hook(gb); return; }
   L = alu_dec8(gb, L);
@@ -14191,10 +14185,8 @@ void _countdownToRunThread_hook(GB *gb) {
   CYC(b_+7, b_+8); mem_wr(gb, HL, A); SET_HL(HL + 1);
   L = alu_inc8(gb, L);
   CYC(b_+8, b_+9);
-  A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+9, b_+10);
-  H = mem_rd(gb, HL);
-  CYC(b_+10, b_+11);
+  CYC(b_+9, b_+10); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+10, b_+11); H = mem_rd(gb, HL);
   L = A;
   CYC(b_+11, b_+12);
   gb->sp = HL; gb->sp_loads++;
@@ -14216,18 +14208,14 @@ void _initializeThread_hook(GB *gb) {
   CYC(b_+2, b_+3); mem_wr(gb, HL, A); SET_HL(HL + 1);
   L = alu_inc8(gb, L);
   CYC(b_+3, b_+4);
-  A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+4, b_+5);
+  CYC(b_+4, b_+5); A = mem_rd(gb, HL); SET_HL(HL + 1);
   E = A;
   CYC(b_+5, b_+6);
-  A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+6, b_+7);
+  CYC(b_+6, b_+7); A = mem_rd(gb, HL); SET_HL(HL + 1);
   D = A;
   CYC(b_+7, b_+8);
-  A = mem_rd(gb, HL); SET_HL(HL + 1);
-  CYC(b_+8, b_+9);
-  B = mem_rd(gb, HL);
-  CYC(b_+9, b_+10);
+  CYC(b_+8, b_+9); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+9, b_+10); B = mem_rd(gb, HL);
   C = A;
   CYC(b_+10, b_+11);
   L = E;
@@ -14244,8 +14232,7 @@ static void text_thread_loop(GB *gb);
 void textThreadStart_hook(GB *gb) {
   BASE(textThreadStart);
   uint16_t sp0_ = gb->sp; (void)sp0_;
-  A = mem_rd(gb, wScrollMode);
-  CYC(b_+0, b_+3);
+  CYC(b_+0, b_+3); A = mem_rd(gb, wScrollMode);
   alu_or(gb, A);
   CYC(b_+3, b_+4);
   if (F & FZ) CYCT(b_+4, b_+6);
@@ -14397,8 +14384,7 @@ static void palette_fade_thread_loop(GB *gb) {
     CYC(b_+8, b_+11); mem_wr(gb, MBC_ROM_BANK, A);
     CALL_C(b_+11, paletteFadeHandler_hook, ROM_paletteFadeHandler, b_+14);
     CALL_C(b_+14, checkLockBG7Color3ToBlack_hook, ROM_checkLockBG7Color3ToBlack, b_+17);
-    A = mem_rd(gb, wPaletteThread_updateRate);
-    CYC(b_+17, b_+20);
+    CYC(b_+17, b_+20); A = mem_rd(gb, wPaletteThread_updateRate);
     alu_or(gb, A);
     CYC(b_+20, b_+21);
     if (!(F & FZ)) CYCT(b_+21, b_+23);
@@ -14436,31 +14422,27 @@ static void main_thread_loop(GB *gb) {
     SET_HL(wPlaytimeCounter);
     CYC(b_+6, b_+9);
     CYC(b_+9, b_+10); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-    A = mem_rd(gb, HL); SET_HL(HL + 1);
-    CYC(b_+10, b_+11);
+    CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1);
     CYC(b_+11, b_+14); mem_wr(gb, wFrameCounter, A);
     if (!(F & FZ)) {
       CYCT(b_+14, b_+16);
     } else {
       CYC(b_+14, b_+16);
-      mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-      CYC(b_+16, b_+17);
+      CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
       if (!(F & FZ)) {
         CYCT(b_+17, b_+19);
       } else {
         CYC(b_+17, b_+19);
         L = alu_inc8(gb, L);
         CYC(b_+19, b_+20);
-        mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-        CYC(b_+20, b_+21);
+        CYC(b_+20, b_+21); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
         if (!(F & FZ)) {
           CYCT(b_+21, b_+23);
         } else {
           CYC(b_+21, b_+23);
           L = alu_inc8(gb, L);
           CYC(b_+23, b_+24);
-          mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-          CYC(b_+24, b_+25);
+          CYC(b_+24, b_+25); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
         }
       }
     }
