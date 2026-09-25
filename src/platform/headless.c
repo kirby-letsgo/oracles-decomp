@@ -185,6 +185,8 @@ int main(int argc, char **argv) {
   gb_reset(gb);
   if ((p = arg_value(argc, argv, "--boot-state")) && !oracles_load_boot_state(gb, p)) { fprintf(stderr, "cannot read %s\n", p); return 2; }
   uint64_t reload_at = (p = arg_value(argc, argv, "--reload-at")) ? strtoull(p, NULL, 10) : 0;
+  uint64_t reload_every = (p = arg_value(argc, argv, "--reload-every")) ? strtoull(p, NULL, 10) : 0;     // at the first frame after each multiple whose threads are parked (as the app saves)
+  bool reload_pending = false;
   if ((p = arg_value(argc, argv, "--boot-state-out")) && !oracles_save_boot_state(gb, p)) { fprintf(stderr, "cannot write %s\n", p); return 2; }
   if ((p = arg_value(argc, argv, "--boot-ly"))) {
     int ly = atoi(p);
@@ -303,7 +305,9 @@ int main(int argc, char **argv) {
       continue;
     }
     if (getenv("INTLOG")) dbg_log_ints = (frame >= il_a && frame <= il_b);
-    if (reload_at && frame == reload_at) {
+    if (reload_every && frame && frame % reload_every == 0) reload_pending = true;
+    if ((reload_at && frame == reload_at) || (reload_pending && threads_parked(gb))) {
+      reload_pending = false;
       // a save state round trip: every thread fiber is dropped, as when the app loads a state
       if (!oracles_save_boot_state(gb, "/tmp/oracles-reload.state") || !oracles_load_boot_state(gb, "/tmp/oracles-reload.state")) return 2;
       fibers_reset(gb);

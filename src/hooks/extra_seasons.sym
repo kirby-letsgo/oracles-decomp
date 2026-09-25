@@ -52,3 +52,9 @@
 11:58c7 parseObjectData__afterCall58c7
 11:58ca parseObjectData__afterCall58ca
 3f:4731 loadTreasureDisplayData__getTableIndices_b3f
+00:3274 mainThreadStart__nextFrame
+00:3246 paletteFadeThreadStart__nextFrame
+00:18a4 textThreadStart__nextFrame
+00:19f2 fileSelectThreadStart__nextFrame
+00:1af0 thread_1b10__nextFrame
+00:2c5f introThreadStart__nextFrame

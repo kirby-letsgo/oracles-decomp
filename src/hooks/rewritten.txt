@@ -643,11 +643,17 @@ startGame__afterSp0925
 _countdownToRunThread__afterSp0998
 _initializeThread__afterSp09aa
 textThreadStart
+textThreadStart__nextFrame
 fileSelectThreadStart
+fileSelectThreadStart__nextFrame
 thread_1b10
+thread_1b10__nextFrame
 introThreadStart
+introThreadStart__nextFrame
 paletteFadeThreadStart
+paletteFadeThreadStart__nextFrame
 mainThreadStart
+mainThreadStart__nextFrame
 hramOamDmaFunction
 wMusicReadFunction
 initializeAnimations

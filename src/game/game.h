@@ -409,3 +409,4 @@ void initializeVramMap0(GB *gb);
 void initializeVramMap1(GB *gb);
 void initializeVramMaps(GB *gb);
 void setStatusBarNeedsRefreshBit1(GB *gb);
+bool threads_parked(GB *gb);

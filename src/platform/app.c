@@ -2,7 +2,7 @@
 // takes the user's ROM (argument or file dialog), checks its SHA1 against the two known games,
 // builds the cycle table from the original bytes, zeroes the code bytes and writes the result to
 // the per-platform cache; later launches load the cache and never see the ROM again. Saves are
-// the game's own SRAM image in that cache.
+// the game's own SRAM image in that cache; Cmd+S / Cmd+R save and load one state slot there.
 //
 // usage: oracles-native [ROM] [--game ages|seasons] [--cache DIR] [--frames N]
 //   --frames N exits after N frames (tests run the app under SDL_VIDEO_DRIVER=dummy).
@@ -12,6 +12,7 @@
 #include "core/sha1.h"
 #include "hw/render.h"
 #include "platform/setup.h"
+#include "rt/fibers.h"
 #include "game/game.h"
 #include "assets/assets.h"
 #include <stdio.h>
@@ -138,6 +139,17 @@ static void save_sram(GB *gb, const char *path) {
   if (gb->eram_size) write_file(path, gb->eram, gb->eram_size);
 }
 
+// Cmd+S saves at the first frame whose threads are all parked at the top of their loops
+// (threads_parked), usually the same frame; a load then resumes them in C.
+#define NO_SAVE UINT64_MAX
+
+static uint64_t show_status(SDL_Window *win, const char *title, const char *status, uint64_t frames) {
+  char msg[96];
+  snprintf(msg, sizeof msg, "%s - %s", title, status);
+  SDL_SetWindowTitle(win, msg);
+  return frames + 120;
+}
+
 int main(int argc, char **argv) {
   const char *rom_arg = NULL, *game_arg = NULL, *cache_arg = NULL;
   uint64_t max_frames = 0;
@@ -184,8 +196,9 @@ int main(int argc, char **argv) {
   gb->code_bits = assets_code_bits(rom, rom_size);
 #endif
   gb_reset(gb);
-  char sav[1300];
+  char sav[1300], state[1300];
   snprintf(sav, sizeof sav, "%s/sram.sav", dir);
+  snprintf(state, sizeof state, "%s/savestate", dir);
   load_sram(gb, sav);
 
   SDL_Window *win;
@@ -205,13 +218,21 @@ int main(int argc, char **argv) {
   uint64_t frames = 0;
   bool running = true;
   bool muted = false;
+  uint64_t title_reset = 0, save_from = NO_SAVE;
   while (running && !gb->hung) {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       switch (ev.type) {
       case SDL_EVENT_QUIT: running = false; break;
       case SDL_EVENT_KEY_DOWN:
-        if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
+        if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S && !ev.key.repeat) save_from = frames;
+        else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R && !ev.key.repeat) {
+          bool ok = oracles_load_boot_state(gb, state);
+          if (ok) { fibers_reset(gb); live_joy = 0; save_from = NO_SAVE; }
+          title_reset = show_status(win, title, ok ? "state loaded" : "no state to load", frames);
+          fprintf(stderr, "load state %s %s\n", ok ? "ok:" : "failed:", state);
+        }
+        else if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
           muted = !muted;
           if (audio) SDL_SetAudioStreamGain(audio, muted ? 0.0f : 1.0f);
         }
@@ -226,6 +247,16 @@ int main(int argc, char **argv) {
     if (audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
     gb_run_frame(gb);
     frames++;
+    if (save_from != NO_SAVE && threads_parked(gb)) {
+      bool ok = oracles_save_boot_state(gb, state);
+      title_reset = show_status(win, title, ok ? "state saved" : "could not save state", frames);
+      fprintf(stderr, "save state %s %s\n", ok ? "ok:" : "failed:", state);
+      save_from = NO_SAVE;
+    } else if (save_from != NO_SAVE && frames - save_from > 600) {
+      title_reset = show_status(win, title, "could not save state here", frames);
+      save_from = NO_SAVE;
+    }
+    if (title_reset && frames >= title_reset) { SDL_SetWindowTitle(win, title); title_reset = 0; }
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (audio) SDL_PutAudioStreamData(audio, samples, n * 4);
     framebuffer_to_rgb(gb->sample->framebuffer, rgb);

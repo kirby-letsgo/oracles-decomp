@@ -14286,6 +14286,12 @@ static void text_thread_loop(GB *gb) {
   }
 }
 
+void textThreadStart__nextFrame_hook(GB *gb) {
+  BASE(textThreadStart);
+  CYCT(b_+43, b_+45);
+  text_thread_loop(gb);
+}
+
 static void file_select_thread_loop(GB *gb);
 
 void fileSelectThreadStart_hook(GB *gb) {
@@ -14311,6 +14317,12 @@ static void file_select_thread_loop(GB *gb) {
     CALL_C(b_+18, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+21);
     CYCT(b_+21, b_+23);
   }
+}
+
+void fileSelectThreadStart__nextFrame_hook(GB *gb) {
+  BASE(fileSelectThreadStart);
+  CYCT(b_+21, b_+23);
+  file_select_thread_loop(gb);
 }
 
 static void thread_1b10_loop(GB *gb);
@@ -14343,6 +14355,12 @@ static void thread_1b10_loop(GB *gb) {
   }
 }
 
+void thread_1b10__nextFrame_hook(GB *gb) {
+  BASE(thread_1b10);
+  CYCT(b_+26, b_+28);
+  thread_1b10_loop(gb);
+}
+
 static void intro_thread_loop(GB *gb) {
   BASE(introThreadStart);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
@@ -14358,6 +14376,12 @@ static void intro_thread_loop(GB *gb) {
     CALL_C(b_+14, resumeThreadNextFrame_hook, ROM_resumeThreadNextFrame, b_+17);
     CYCT(b_+17, b_+19);
   }
+}
+
+void introThreadStart__nextFrame_hook(GB *gb) {
+  BASE(introThreadStart);
+  CYCT(b_+17, b_+19);
+  intro_thread_loop(gb);
 }
 
 static void palette_fade_thread_loop(GB *gb) {
@@ -14395,6 +14419,13 @@ void mainThreadStart_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, restartSound_hook, ROM_restartSound, b_+3);
   CALL_C(b_+3, stopTextThread_hook, ROM_stopTextThread, b_+6);
+  main_thread_loop(gb);
+}
+
+// Where the main thread waits for the next frame; a loaded state resumes it here.
+void mainThreadStart__nextFrame_hook(GB *gb) {
+  BASE(mainThreadStart);
+  CYCT(b_+44, b_+46);
   main_thread_loop(gb);
 }
 
@@ -14473,3 +14504,29 @@ void wMusicReadFunction_hook(GB *gb) {
 void introThreadStart_hook(GB *gb) { intro_thread_loop(gb); }
 void paletteFadeThreadStart_hook(GB *gb) { palette_fade_thread_loop(gb); }
 
+void paletteFadeThreadStart__nextFrame_hook(GB *gb) {
+  BASE(paletteFadeThreadStart);
+  CYCT(b_+27, b_+29);
+  palette_fade_thread_loop(gb);
+}
+
+
+// A state saved now can be loaded in the native build: every thread waiting for a later frame
+// resumes at the top of its loop, where C takes over again (deeper waits, such as a graphics load
+// yielding mid-routine, resume at ROM addresses the native build has no code for).
+bool threads_parked(GB *gb) {
+  static void (*const loop_ends[])(GB *) = {
+    mainThreadStart__nextFrame_hook, paletteFadeThreadStart__nextFrame_hook, textThreadStart__nextFrame_hook,
+    fileSelectThreadStart__nextFrame_hook, thread_1b10__nextFrame_hook, introThreadStart__nextFrame_hook,
+  };
+  for (int t = 0; t < 4; t++) {
+    uint16_t slot = wThreadStateBuffer + t * 8;
+    if (mem_rd(gb, slot) != 1) continue;
+    uint16_t sp = mem_rd(gb, slot + 2) | mem_rd(gb, slot + 3) << 8;
+    uint16_t ret = mem_rd(gb, sp + 6) | mem_rd(gb, sp + 7) << 8;
+    bool ok = false;
+    for (size_t i = 0; i < sizeof loop_ends / sizeof loop_ends[0] && !ok; i++) ok = hook_is(gb, ret, loop_ends[i]);
+    if (!ok) return false;
+  }
+  return true;
+}
