@@ -553,6 +553,16 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-25: merged Fable's Seasons generator pruning (2afdc3b, bc3ebed, eb8b50d): generated
+  entries into shared routines that nothing reaches are no longer emitted (kept: targets of
+  generated code, jump-table entries, resume points, extra/alias labels, and every address C
+  names or falls back to). 18 more Seasons routines as hand C from my banks: inventoryMenuState2,
+  loadCommonGraphics_body, loadMinimapDisplayRoom, mapGetRoomIndexWithoutUnusedColumns,
+  minimapPopupType_shop (bank 2), func_1383, checkLinkID0AndControlNormal,
+  roomTileChangesAfterLoad02, the riding-horse / temple intro cinematic states and
+  endgameCutsceneHandler_body (bank 3), applySingleTileChanges and two tileReplacement routines.
+  Seasons hook table: 3,895 shared + 1,590 hand + 76 generated = 98.6% readable.
+
 - 2026-09-25: Seasons playthrough extended to 265,064 frames (first dungeon done and beyond);
   tas/seasons-play.ref re-recorded with --no-hooks, identical to the old one for the first
   142,176 frames. The new footage found three bugs: updateSpecialObjects called

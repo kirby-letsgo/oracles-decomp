@@ -168,7 +168,7 @@ void s_func_5f8c_hook(GB *gb) {
   CALL_C(b_+0, s_func_5fcd_hook, SYM(func_5fcd), b_+3);
   if (F & FZ) { CYCT(b_+3, b_+5); samasaDesertGate_func_5fa3_6(gb); return; }
   CYC(b_+3, b_+5);
-  CALL_C(b_+5, s_checkLinkID0AndControlNormal, SYM(checkLinkID0AndControlNormal), b_+8);
+  CALL_C(b_+5, s_checkLinkID0AndControlNormal_hook, SYM(checkLinkID0AndControlNormal), b_+8);
   if (!(F & FC)) { RET_TAKEN(b_+8); return; }
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+12); A = mem_rd(gb, wGameKeysJustPressed);

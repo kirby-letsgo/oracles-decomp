@@ -106,7 +106,7 @@ state2:
   CYC(b_+89, b_+91); alu_cp(gb, 0xd0);
   if (!(F & FZ)) { CYCT(b_+91, b_+94); TAIL_S(seasonsFunc_0a_5d18); }
   CYC(b_+91, b_+94);
-  CALL_C(b_+94, s_checkLinkID0AndControlNormal, SYM(checkLinkID0AndControlNormal), b_+97);
+  CALL_C(b_+94, s_checkLinkID0AndControlNormal_hook, SYM(checkLinkID0AndControlNormal), b_+97);
   if (!(F & FC)) { CYCT(b_+97, b_+100); TAIL_S(seasonsFunc_0a_5d18); }
   CYC(b_+97, b_+100);
   CALL_C(b_+100, s_objectCheckCollidedWithLink, SYM(objectCheckCollidedWithLink), b_+103);

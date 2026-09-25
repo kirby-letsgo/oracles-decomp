@@ -14968,3 +14968,6 @@ seasonsTable_10_6c5b seasonsTable_10_6c5b -
 table_70f3 table_70f3 -
 objectData7e40 objectData7e40 -
 paletteTransitionSeasonData paletteTransitionSeasonData -
+gfx_key_orechunk gfx_key_orechunk -
+introTempleSprites introTempleSprites -
+linkOnHorseCloseupSprites_2 linkOnHorseCloseupSprites_2 -

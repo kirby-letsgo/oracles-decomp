@@ -1,0 +1,9 @@
+# tools/audit_ofsburns.py entries reviewed as unreachable under Seasons: FUNCTION O(a)
+# (the shared line only runs in Ages; Seasons leaves through its own block first)
+draw_object_terrain_effects O(82)   # Seasons block always jumps to exit/grass/puddle
+draw_object_terrain_effects O(86)
+linkUpdateInAir_sidescroll_hook O(220)   # Seasons block ends with ret
+linkUpdateInAir_sidescroll_hook O(222)
+linkUpdateInAir_sidescroll_hook O(224)
+linkUpdateInAir_sidescroll_hook O(225)
+scriptCmd_jumpRandom_hook O(2)   # Seasons block ends with TAIL

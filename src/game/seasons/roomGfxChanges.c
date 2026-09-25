@@ -319,3 +319,17 @@ L_6a40:
   TAIL(generateW3VramTilesAndAttributes);
 }
 
+void s_roomTileChangesAfterLoad02_hook(GB *gb) {
+  BASE(roomTileChangesAfterLoad02);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); A = mem_rd(gb, hRomBank);
+  CYC(b_+2, b_+3); push_effect(gb, AF);
+  CYC(b_+3, b_+5); A = 0x09;
+  CYC(b_+5, b_+7); mem_wr(gb, hRomBank, A);
+  CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, A);
+  CALL_C(b_+10, s_roomTileChangesAfterLoad02_body_hook, SYM(roomTileChangesAfterLoad02_body), b_+13);
+  CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
+  CYC(b_+14, b_+16); mem_wr(gb, hRomBank, A);
+  CYC(b_+16, b_+19); mem_wr(gb, MBC_ROM_BANK, A);
+  RET(b_+19); return;
+}
