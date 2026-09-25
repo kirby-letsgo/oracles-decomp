@@ -4,6 +4,7 @@
 #include "platform/png.h"
 #include "hw/render.h"
 #include "platform/setup.h"
+#include "platform/window.h"
 #include "hooks/hooks.h"
 #include "rt/fibers.h"
 #include <stdio.h>
@@ -127,7 +128,6 @@ static bool savestate_read(GB *gb, const char *path) {
   return true;
 }
 
-#define SCALE 4
 #define AUDIO_TARGET_BYTES (APU_SAMPLE_RATE / 10 * 4)
 
 static uint8_t *read_all(const char *path, size_t *size) {
@@ -225,9 +225,8 @@ int main(int argc, char **argv) {
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMEPAD)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
   SDL_Window *win;
   SDL_Renderer *ren;
-  if (!SDL_CreateWindowAndRenderer("Oracles", FB_W * SCALE, FB_H * SCALE, 0, &win, &ren)) return 2;
-  SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FB_W, FB_H);
-  SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+  SDL_Texture *tex;
+  if (!oracles_open_window("Oracles", NULL, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
   SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
   SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
   if (audio) SDL_ResumeAudioStreamDevice(audio);
@@ -245,6 +244,7 @@ int main(int argc, char **argv) {
       switch (ev.type) {
       case SDL_EVENT_QUIT: running = false; break;
       case SDL_EVENT_KEY_DOWN:
+        if (oracles_window_key(win, &ev.key)) break;
         if ((ev.key.mod & SDL_KMOD_GUI) && (ev.key.scancode == SDL_SCANCODE_S || ev.key.scancode == SDL_SCANCODE_R)) {
           if (ev.key.repeat) break;
           char path[1024];

@@ -12,6 +12,7 @@
 #include "core/sha1.h"
 #include "hw/render.h"
 #include "platform/setup.h"
+#include "platform/window.h"
 #include "rt/fibers.h"
 #include "game/game.h"
 #include "assets/assets.h"
@@ -19,7 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SCALE 4
 #define AUDIO_TARGET_BYTES (APU_SAMPLE_RATE / 10 * 4)
 #define ASSETS_VERSION 1
 
@@ -205,9 +205,10 @@ int main(int argc, char **argv) {
   SDL_Renderer *ren;
   char title[64];
   snprintf(title, sizeof title, "Oracle of %s", strcmp(game, "ages") == 0 ? "Ages" : "Seasons");
-  if (!SDL_CreateWindowAndRenderer(title, FB_W * SCALE, FB_H * SCALE, 0, &win, &ren)) return 2;
-  SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FB_W, FB_H);
-  SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+  SDL_Texture *tex;
+  char window_size[1100];
+  snprintf(window_size, sizeof window_size, "%swindow.txt", cache);
+  if (!oracles_open_window(title, window_size, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
   SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
   SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
   if (audio) SDL_ResumeAudioStreamDevice(audio);
@@ -225,6 +226,7 @@ int main(int argc, char **argv) {
       switch (ev.type) {
       case SDL_EVENT_QUIT: running = false; break;
       case SDL_EVENT_KEY_DOWN:
+        if (oracles_window_key(win, &ev.key)) break;
         if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S && !ev.key.repeat) save_from = frames;
         else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R && !ev.key.repeat) {
           bool ok = oracles_load_boot_state(gb, state);
@@ -270,6 +272,7 @@ int main(int argc, char **argv) {
   if (gb->hung) fprintf(stderr, "the engine stopped (pc %04x)\n", gb->pc);
   else if (max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
   save_sram(gb, sav);
+  oracles_close_window(win, window_size);
   SDL_Quit();
   return gb->hung ? 1 : 0;
 }
