@@ -2463,6 +2463,7 @@
 0c:51ac spark_getTileOffset_hook -
 0c:51bf spark_checkWallInDirection_hook -
 0c:51f3 enemyCode14_hook -
+0c:5354 enemyCode15_hook -
 0c:53ba enemyCode16_hook -
 0c:545c enemyCode17_hook -
 0c:54d1 ghini_subid00_hook -
@@ -3017,6 +3018,7 @@
 0d:6747 dragonfly_state4_hook -
 0d:6762 dragonfly_state5_hook -
 0d:676c dragonfly_applySpeed_hook -
+0d:6777 enemyCode58_hook -
 0d:6866 enemyCode59_hook -
 0d:689a enemyCode5a_hook -
 0d:691d enemyCode5d_hook -

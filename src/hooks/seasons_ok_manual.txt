@@ -102,3 +102,5 @@ parentItemCode_shield@checkShieldIsUsable   # Seasons tail (no underwater/compan
 interactionCode0c@doSpecializedInitialization   # Ages-only underwater branch; Seasons tail written under game_seasons in breakTileDebris_doSpecializedInitialization
 interactionCodea8@handleSubidHighNibble   # Seasons things 0-5 (its own a8.s) written as the game_seasons branch of interactionCodea8_handleSubidHighNibble
 mapMenu_drawSpriteAtRoomIndex   # both bodies written out (the aligner pairs the wrong ld de)
+enemyCode15@chooseNewDirection   # ld bc,$0718 is the same bytes (01 18 07) in both ROMs; only the symbolizer names differ
+enemyCode58@checkDisableDestruction   # ENEMYCOLLISION_ROCK carried as GV(0x52, 0x4f)

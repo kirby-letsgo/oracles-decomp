@@ -1550,6 +1550,8 @@ partCode2b
 partCode41
 partCode2e
 partCode3c
+rickyState1_b06
+scriptCmd_jump
 cutscene06
 cutscene07
 cutscene08
@@ -1570,8 +1572,6 @@ checkRoomPack
 findActiveRoomInDungeonLayout
 getPaletteFadeTransitionData
 initializeSeedTreeRefillData
-rickyState1_b06
-scriptCmd_jump
 inventoryMenuState2
 loadCommonGraphics_body
 loadMinimapDisplayRoom
