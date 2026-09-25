@@ -105,7 +105,7 @@ dead:
 
 normalStatus:
   CALL_C(b_+25, ecom_checkScentSeedActive_b0e_hook, SYM(ecom_checkScentSeedActive_b0e), b_+28);
-  if (F & FZ) { CYCT(b_+28, b_+35); goto dispatch; } // jr z
+  if (F & FZ) { CYCT(b_+28, b_+30); goto dispatch; } // jr z
   CYC(b_+28, b_+30);
   CYC(b_+30, b_+32); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+32, b_+34); A = 0x19; // SPEED_a0
@@ -315,7 +315,7 @@ dead:
   CYC(b_+23, b_+25); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+25, b_+26); A = mem_rd(gb, DE);
   CYC(b_+26, b_+28); alu_cp(gb, 0x02);
-  if (!(F & FZ)) { CYCT(b_+28, b_+35); goto popDead; } // jr nz
+  if (!(F & FZ)) { CYCT(b_+28, b_+30); goto popDead; } // jr nz
   CYC(b_+28, b_+30);
   CYC(b_+30, b_+33); SET_HL(wKilledGoldenEnemies);
   CYC(b_+33, b_+35); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) | (1 << 2))); // set 2,(hl)

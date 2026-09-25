@@ -42,7 +42,7 @@ void enemyCode1b_checkBushOrRockGone_hook(GB *gb) {
   CYC(b_+239, b_+241); L = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+241, b_+243); mem_wr(gb, HL, 60);
   CYC(b_+243, b_+245); L = ENEMY_BASE + OBJ_COLLISION_TYPE;
-  CYC(b_+245, b_+247); mem_wr(gb, HL, 0x80 | 0x16); // ENEMY_SPINY_BEETLE
+  CYC(b_+245, b_+247); mem_wr(gb, HL, 0x80 | 0x1b); // ENEMY_SPINY_BEETLE
   CYC(b_+247, b_+249); L = ENEMY_BASE + OBJ_COLLISION_RADIUS_Y;
   CYC(b_+249, b_+251); A = 0x06;
   CYC(b_+251, b_+252); mem_wr(gb, HL, A); SET_HL(HL + 1); // ldi

@@ -117,7 +117,7 @@ movingTowardRoller:
   CYC(b_+114, b_+117); A = W8(wLinkAngle);
   CYC(b_+117, b_+119); alu_cp(gb, 0x08);
   CYC(b_+119, b_+122); SET_BC(0x0008);
-  if (F & FZ) { CYCT(b_+122, b_+131); goto afterAngleCheck; } // jr z
+  if (F & FZ) { CYCT(b_+122, b_+124); goto afterAngleCheck; } // jr z
   CYC(b_+122, b_+124);
   CYC(b_+124, b_+126); alu_cp(gb, 0x18);
   CYC(b_+126, b_+129); SET_BC(0x0118);
@@ -188,7 +188,7 @@ state2:
   CALL_C(b_+216, objectApplySpeed_hook, SYM(objectApplySpeed), b_+219);
   CALL_C(b_+219, interactionAnimate_hook, SYM(interactionAnimate), b_+222);
   CALL_C(b_+222, objectCheckCollidedWithLink_ignoreZ_hook, SYM(objectCheckCollidedWithLink_ignoreZ), b_+225);
-  if (!(F & FC)) { CYCT(b_+225, b_+230); goto afterCollisionCheck; } // jr nc
+  if (!(F & FC)) { CYCT(b_+225, b_+227); goto afterCollisionCheck; } // jr nc
   CYC(b_+225, b_+227);
   CYC(b_+227, b_+230); push_effect(gb, b_+230); goto updateLinkPositionWhileRollerMoving;
 
@@ -250,7 +250,7 @@ afterPrevent2:
   CALL_C(b_+293, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+296);
   CYC(b_+296, b_+298); alu_cp(gb, 0x10);
   CYC(b_+298, b_+300); C = 0x08;
-  if (F & FC) { CYCT(b_+300, b_+304); goto afterCTable; } // jr c
+  if (F & FC) { CYCT(b_+300, b_+302); goto afterCTable; } // jr c
   CYC(b_+300, b_+302);
   CYC(b_+302, b_+304); C = 0x18;
 

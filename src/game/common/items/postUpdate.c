@@ -274,7 +274,7 @@ void itemInitializeFromLinkPosition_hook(GB *gb) {
     CYC(b_+10, b_+11); B = A;
   }
   CYC(b_+O(11), b_+OE(14)); A = W8(w1Link_yh);
-  if (!game_seasons) CYC(b_+14, b_+15); alu_add(gb, B);
+  if (!game_seasons) { CYC(b_+14, b_+15); alu_add(gb, B); }
   CYC(b_+O(15), b_+OE(16)); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+O(16), b_+OE(18)); E = 0x0b;
   CYC(b_+O(18), b_+OE(19)); mem_wr(gb, DE, A);

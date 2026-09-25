@@ -154,7 +154,7 @@ void enemyCode5a_addSeed_hook(GB *gb) {
   CYC(b_+O(89), b_+OE(91)); L = PART_BASE + OBJ_XH;
   CYC(b_+O(91), b_+OE(92)); mem_wr(gb, HL, C);
   CYC(b_+O(92), b_+OE(94)); L = PART_BASE + OBJ_RELATED2;
-  CYC(b_+O(94), b_+OE(96)); mem_wr(gb, HL, PART_BASE); // Part.start
+  CYC(b_+O(94), b_+OE(96)); mem_wr(gb, HL, ENEMY_BASE); // this enemy (relatedObj2 = Enemy.start)
   CYC(b_+O(96), b_+OE(97)); L = alu_inc8(gb, L);
   CYC(b_+O(97), b_+OE(98)); mem_wr(gb, HL, D);
   RET(b_+O(98)); return; // ret

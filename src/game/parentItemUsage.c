@@ -289,7 +289,7 @@ void checkItemUsed_hook(GB *gb) {
   if (game_seasons) {       // the boxing match allows punching with nothing equipped
     CYC(b_+S(7), b_+S(10)); A = W8(wInBoxingMatch);
     CYC(b_+S(10), b_+S(11)); alu_or(gb, A);
-    if (!(F & FZ)) { CYCT(b_+S(11), b_+S(13)); goto punch; }
+    if (!(F & FZ)) { CYCT(b_+S(11), b_+S(13)); goto punch_item; }
     CYC(b_+S(11), b_+S(13));
   }
   CYC(b_+O(7), b_+OE(10)); A = W8(wActiveRing);
@@ -312,6 +312,7 @@ punch:
     CYCT(b_+O(21), b_+OE(22)); ret_effect(gb); return;
   }
   CYC(b_+O(21), b_+OE(22));
+punch_item:
   CYC(b_+O(22), b_+OE(24)); A = 0x02;
 
 check_item:

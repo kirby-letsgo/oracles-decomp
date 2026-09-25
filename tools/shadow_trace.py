@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pinpoint where one hook's C diverges from the original code under --verify-shadow.
 
-usage: tools/shadow_trace.py ages|seasons HOOK FRAMES
+usage: [SHADOW_TAS=FILE] [SHADOW_INIT_RAM=] tools/shadow_trace.py ages|seasons HOOK FRAMES
 Runs the movie with SHADOW_ONLY=HOOK to find the first mismatching call, reruns with burn and
 PC traces from that call's start, and prints the first place where the C pass's clock (at each
 burned instruction) and the original code's clock disagree, with the instructions around it."""
@@ -9,8 +9,10 @@ import os, re, subprocess, sys
 game, hook, frames = sys.argv[1], sys.argv[2], sys.argv[3]
 ROM = {'ages': 'roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc',
        'seasons': 'roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc'}[game]
-TAS = {'ages': 'tas/ages-consoleverified.inputs', 'seasons': 'tas/seasons-play.inputs'}[game]
-base = ['./build-quirk/oracles-run', '--rom', ROM, '--boot', 'roms/cgb_boot.bin', '--init-ram', 'tas/gbhawk-wram0.txt',
+# SHADOW_TAS picks another movie; SHADOW_INIT_RAM= (empty) boots with RAM at 0 (the console-verified Seasons resync)
+TAS = os.environ.get('SHADOW_TAS') or {'ages': 'tas/ages-consoleverified.inputs', 'seasons': 'tas/seasons-play.inputs'}[game]
+INIT = os.environ.get('SHADOW_INIT_RAM', 'tas/gbhawk-wram0.txt')
+base = ['./build-quirk/oracles-run', '--rom', ROM, '--boot', 'roms/cgb_boot.bin'] + (['--init-ram', INIT] if INIT else []) + [
         '--tas', TAS, '--frames', frames, '--verify-shadow']
 def run(env):
     return subprocess.run(base, env=dict(os.environ, SHADOW_ONLY=hook, VERIFYLOG='1', **env), capture_output=True, text=True).stderr.split('\n')
