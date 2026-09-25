@@ -28,8 +28,15 @@ IMM8 = {0x06, 0x0e, 0x16, 0x1e, 0x26, 0x2e, 0x36, 0x3e, 0xc6, 0xce, 0xd6, 0xde, 
         0x18, 0x20, 0x28, 0x30, 0x38, 0xe0, 0xf0, 0xe8, 0xf8, 0x10, 0xcb}
 IMM16 = {0x01, 0x11, 0x21, 0x31, 0x08, 0xc2, 0xc3, 0xc4, 0xca, 0xcc, 0xcd, 0xd2, 0xd4, 0xda, 0xdc, 0xea, 0xfa}
 def length(op): return 3 if op in IMM16 else 2 if op in IMM8 else 1
+NOTTAKEN = re.compile(r'\bif \((!\(F & F[ZC]\)|\(F & F[ZC]\)|F & F[ZC])\)\s*\{?\s*CYC\(b_\+(?:(O|OE|S)\()?(\d+)\)?,[^;]*;[^{}]*\}?\s*else\s*\{?\s*CYCT\(b_\+(?:(O|OE|S)\()?(\d+)')
+NEG = {'!(F & FZ)': '(F & FZ)', '(F & FZ)': '!(F & FZ)', '!(F & FC)': '(F & FC)', '(F & FC)': '!(F & FC)'}
 TAKEN = re.compile(r'\bCYCT\(b_\+(?:(O|OE|S)\()?(\d+)\)?,\s*b_\+(?:(O|OE|S)\()?(\d+)\)?\)')
-BRANCH = re.compile(r'\bif \((!?\(F & F[ZC]\))\)\s*\{?\s*(?:CYCT|RET_TAKEN|CALL_C_CC|CALL_L_CC)\(b_\+(?:(O|OE|S)\()?(\d+)')
+BRANCH = re.compile(r'\bif \((!\(F & F[ZC]\)|\(F & F[ZC]\)|F & F[ZC])\)\s*\{?\s*(?:CYCT|RET_TAKEN|CALL_C_CC|CALL_L_CC)\(b_\+(?:(O|OE|S)\()?(\d+)')
+
+# reviewed taken ranges whose inner conditional is not taken on that path: `BASE_IDENT +N` lines
+allowed = set()
+if __import__('os').path.exists('src/hooks/cond_ok.txt'):
+    allowed = set(l.split('#')[0].strip() for l in open('src/hooks/cond_ok.txt') if l.split('#')[0].strip())
 
 bad = checked = 0
 for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
@@ -39,7 +46,7 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     base = None
     for ln, line in enumerate(open(p, errors='replace'), 1):
         mb = re.search(r'\bBASE\((\w+)\)', line)
-        if mb: base = sym.get(mb.group(1))
+        if mb: base, base_id = sym.get(mb.group(1)), mb.group(1)
         if base is None or base == 0xffffffff: continue
         for m in BRANCH.finditer(line.split('//')[0]):
             wrap = m.group(2)
@@ -50,9 +57,24 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
             if not 0 <= fo < len(rom) or rom[fo] not in CC: continue
             kind, cc = CC[rom[fo]]
             checked += 1
-            if m.group(1) != WANT[cc]:
+            cond = m.group(1) if m.group(1).startswith(('!', '(')) else f'({m.group(1)})'
+            if cond != WANT[cc]:
                 bad += 1
                 print(f'{p}:{ln}: if {m.group(1)} but the ROM has {kind} {cc} at +{m.group(3)}')
+        for m in NOTTAKEN.finditer(line.split('//')[0]):     # the if holds the fall-through, the else the jump
+            if m.group(3) != m.group(5): continue
+            wrap = m.group(2)
+            if (wrap == 'S') != seasons_file and wrap is not None: continue
+            if seasons_file and wrap in ('O', 'OE'): continue
+            b, a = base >> 16, (base & 0xffff) + int(m.group(3))
+            fo = a if a < 0x4000 else b * 0x4000 + a - 0x4000
+            if not 0 <= fo < len(rom) or rom[fo] not in CC: continue
+            kind, cc = CC[rom[fo]]
+            checked += 1
+            cond = m.group(1) if m.group(1).startswith(('!', '(')) else f'({m.group(1)})'
+            if cond != NEG[WANT[cc]]:
+                bad += 1
+                print(f'{p}:{ln}: if {m.group(1)} holds the fall-through of {kind} {cc} at +{m.group(3)}, whose condition is {WANT[cc]}')
         # a taken burn charges its last instruction as taken: a conditional branch before it in
         # the same range is charged as not taken (roller's `jr nc` burned with the call after it)
         for m in TAKEN.finditer(line.split('//')[0]):
@@ -67,6 +89,7 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
                 fo = pos if pos < 0x4000 else b * 0x4000 + pos - 0x4000
                 if not 0 <= fo < len(rom): break
                 inner.append((pos, rom[fo])); pos += length(rom[fo])
+            if f'{base_id} +{m.group(2)}' in allowed: continue
             for pos, op in inner[:-1]:
                 if op in CC and CC[op][0] != 'call':
                     bad += 1

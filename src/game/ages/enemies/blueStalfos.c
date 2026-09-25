@@ -670,7 +670,7 @@ void blueStalfos_subid3_hook(GB *gb) {
   if (F & FZ) { CYCT(b_+21, b_+24); blueStalfos_afterImage_resetPositionVars_hook(gb); return; } // jp z
   CYC(b_+21, b_+24);
   CYC(b_+24, b_+26); alu_cp(gb, 0x14);
-  if (F & FC) { CALL_C_CC(b_+26, objectSetVisible82_hook, SYM(objectSetVisible82), b_+29); } else { CYC(b_+26, b_+29); } // call nc
+  if (!(F & FC)) { CALL_C_CC(b_+26, objectSetVisible82_hook, SYM(objectSetVisible82), b_+29); } else { CYC(b_+26, b_+29); } // call nc
   CYC(b_+29, b_+31); L = ENEMY_BASE + OBJ_YH;
   CYC(b_+31, b_+33); E = ENEMY_BASE + 0x30; // Enemy.var30
   CYC(b_+33, b_+34); A = mem_rd(gb, DE);

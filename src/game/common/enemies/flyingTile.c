@@ -222,7 +222,7 @@ void flyingTile_state9_hook(GB *gb) {
   CYC(b_+8, b_+10); alu_sbc(gb, 0x00); // >($0080)
   CYC(b_+10, b_+11); mem_wr(gb, HL, A);
   CYC(b_+11, b_+13); alu_cp(gb, 0xfd);
-  if (F & FC) { CYCT(b_+13, b_+15); flyingTile_animate_hook(gb); return; } // jr nc
+  if (!(F & FC)) { CYCT(b_+13, b_+15); flyingTile_animate_hook(gb); return; } // jr nc
   CYC(b_+13, b_+15);
   CYC(b_+15, b_+16); L = E;
   CYC(b_+16, b_+17); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL))); // [state]

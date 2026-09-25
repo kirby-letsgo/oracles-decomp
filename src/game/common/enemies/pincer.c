@@ -248,7 +248,7 @@ void pincer_head_stateB_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, DE);
   CYC(b_+6, b_+8); alu_add(gb, 0x02);
   CYC(b_+8, b_+10); alu_cp(gb, 0x20);
-  if (F & FC) { CYCT(b_+10, b_+12); goto fullyExtended; } // jr nc
+  if (!(F & FC)) { CYCT(b_+10, b_+12); goto fullyExtended; } // jr nc
   CYC(b_+10, b_+12);
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);
   RET(b_+13); return; // ret

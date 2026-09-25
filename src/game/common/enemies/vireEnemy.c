@@ -732,7 +732,7 @@ substate1:
   CYC(b_+45, b_+46);
   CYC(b_+46, b_+48); B = 0x01;
   CYC(b_+48, b_+50); alu_cp(gb, 0x0a);
-  if (F & FC) { CYCT(b_+50, b_+52); goto L_587b; } // jr nc
+  if (!(F & FC)) { CYCT(b_+50, b_+52); goto L_587b; } // jr nc
   CYC(b_+50, b_+52);
   CYC(b_+52, b_+53); B = alu_inc8(gb, B);
 

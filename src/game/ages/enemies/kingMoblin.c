@@ -436,13 +436,13 @@ void kingMoblin_stateF_hook(GB *gb) {
   CYC(b_+18, b_+20); L = PART_BASE + OBJ_YH;
   CYC(b_+20, b_+21); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+21, b_+23); alu_cp(gb, 0x36);
-  if (F & FC) { CYCT(b_+23, b_+25); kingMoblin_animate2_hook(gb); return; } // jr nc
+  if (!(F & FC)) { CYCT(b_+23, b_+25); kingMoblin_animate2_hook(gb); return; } // jr nc
   CYC(b_+23, b_+25);
   CYC(b_+25, b_+26); L = alu_inc8(gb, L);
   CYC(b_+26, b_+27); A = mem_rd(gb, HL); // [bomb.xh]
   CYC(b_+27, b_+29); alu_sub(gb, 0x30);
   CYC(b_+29, b_+31); alu_cp(gb, 0x41);
-  if (F & FC) { CYCT(b_+31, b_+33); kingMoblin_animate2_hook(gb); return; } // jr nc
+  if (!(F & FC)) { CYCT(b_+31, b_+33); kingMoblin_animate2_hook(gb); return; } // jr nc
   CYC(b_+31, b_+33);
   CYC(b_+33, b_+35); E = ENEMY_BASE + OBJ_XH;
   CYC(b_+35, b_+36); A = mem_rd(gb, DE);
