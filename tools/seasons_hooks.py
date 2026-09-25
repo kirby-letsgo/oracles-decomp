@@ -117,6 +117,8 @@ def main():
 
     def hook_verdict(fn):
         base = fn[:-5]
+        local = re.sub(r'_b[0-9a-f]{2}$', '', base).replace('__', '@')
+        if base not in verdict and '@' in local and local in ages_labels: return local_verdict(local)
         for cand in (base, base.replace('__', '@').split('@')[0], re.sub(r'_b[0-9a-f]{2}$', '', base.replace('__', '@').split('@')[0])):
             if cand in verdict: return verdict[cand]
         return None
