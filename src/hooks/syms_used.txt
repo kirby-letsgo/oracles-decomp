@@ -14971,3 +14971,4 @@ paletteTransitionSeasonData paletteTransitionSeasonData -
 gfx_key_orechunk gfx_key_orechunk -
 introTempleSprites introTempleSprites -
 linkOnHorseCloseupSprites_2 linkOnHorseCloseupSprites_2 -
+_label_331c _label_331c -

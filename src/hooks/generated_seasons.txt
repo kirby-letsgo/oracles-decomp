@@ -222,6 +222,7 @@
 00:17b9 getRandomRingOfGivenTier_hook -
 00:17e5 refillSeedSatchel_hook -
 00:17fa addToGashaMaturity_hook -
+00:180b makeActiveObjectFollowLink_b00_hook -
 00:181f clearFollowingLinkObject_hook -
 00:1826 stopTextThread_hook -
 00:1832 retIfTextIsActive_hook -
@@ -675,6 +676,7 @@
 01:47ab loadBigBufferScrollValues_body_hook -
 01:47cd func_47fc_hook -
 01:47d6 checkAndApplyPaletteFadeTransition_hook -
+01:489d makeActiveObjectFollowLink_b01_hook -
 01:48a6 resetFollowingLinkPath_hook -
 01:48da checkUpdateFollowingLinkObject_hook -
 01:48e6 checkUpdateFollowingLinkObject__update_hook -

@@ -281,7 +281,7 @@ void s_zeldaKidnappedRoom_loadZeldaAndMoblins_hook(GB *gb);
 void s_zeldaKidnapped_spawnInteraction_hook(GB *gb);
 void s_zelda_checkIfLinkFullyHealed_hook(GB *gb);
 void s_zelda_createExclamationMark_hook(GB *gb);
-void s__label_331c(GB *gb);
+void s__label_331c_hook(GB *gb);
 void s_checkGotMakuSeedDidNotSeeZeldaKidnapped_hook(GB *gb);
 void s_checkIfHoronVillageNPCShouldBeSeen_hook(GB *gb);
 void s_checkLinkID0AndControlNormal_hook(GB *gb);
@@ -293,8 +293,7 @@ void s_func_1383_hook(GB *gb);
 void s_func_35ec_hook(GB *gb);
 void s_getLinkedHerosCaveSideEntranceRoom_hook(GB *gb);
 void s_getSunkenCityNPCVisibleSubId_caller_hook(GB *gb);
-void s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains(GB *gb);
-void s_makeActiveObjectFollowLink_b00(GB *gb);
+void s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains_hook(GB *gb);
 void s_multiIntroCutsceneCaller_hook(GB *gb);
 void s_removeOreChunkValue_hook(GB *gb);
 void s_roomTileChangesAfterLoad02_hook(GB *gb);
@@ -306,8 +305,8 @@ void s_seasonsFunc_35cc_hook(GB *gb);
 void s_setMakuTreeStageAndMapText_hook(GB *gb);
 void s_setSeason_b00_hook(GB *gb);
 void s_setUpCharactersAfterMoblinKeepDestroyed_hook(GB *gb);
-void s_specialObjectCode_linkInCutscene_b00(GB *gb);
-void s_specialObjectCode_linkInCutscene__afterCall2cf6_b00(GB *gb);
+void s_specialObjectCode_linkInCutscene_b00_hook(GB *gb);
+void s_specialObjectCode_linkInCutscene__afterCall2cf6_b00_hook(GB *gb);
 void s_updateAnimationsAfterCutscene_hook(GB *gb);
 void wRamFunction(GB *gb);
 void s_zeldaAndVillagersCutsceneCaller_hook(GB *gb);
@@ -508,7 +507,6 @@ void s_determineSeasonForRoomPack_hook(GB *gb);
 void s_findActiveRoomInDungeonLayout_hook(GB *gb);
 void s_getPaletteFadeTransitionData_hook(GB *gb);
 void s_initializeSeedTreeRefillData_hook(GB *gb);
-void s_makeActiveObjectFollowLink_b01(GB *gb);
 void s_screenTransitionLostWoods_hook(GB *gb);
 void s_screenTransitionOnoxDungeon_hook(GB *gb);
 void s_screenTransitionSwordUpgrade_hook(GB *gb);
@@ -1836,6 +1834,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_getRandomRingOfGivenTier getRandomRingOfGivenTier_hook
 #define s_refillSeedSatchel refillSeedSatchel_hook
 #define s_addToGashaMaturity addToGashaMaturity_hook
+#define s_makeActiveObjectFollowLink makeActiveObjectFollowLink_b00_hook
 #define s_clearFollowingLinkObject clearFollowingLinkObject_hook
 #define s_stopTextThread stopTextThread_hook
 #define s_retIfTextIsActive retIfTextIsActive_hook
@@ -2253,6 +2252,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_loadBigBufferScrollValues_body loadBigBufferScrollValues_body_hook
 #define s_func_47fc func_47fc_hook
 #define s_checkAndApplyPaletteFadeTransition checkAndApplyPaletteFadeTransition_hook
+#define s_makeActiveObjectFollowLink makeActiveObjectFollowLink_b01_hook
 #define s_resetFollowingLinkPath resetFollowingLinkPath_hook
 #define s_checkUpdateFollowingLinkObject checkUpdateFollowingLinkObject_hook
 #define s_clearMemoryOnScreenReload clearMemoryOnScreenReload_hook
