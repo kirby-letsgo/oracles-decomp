@@ -511,3 +511,73 @@ void s_checkLinkID0AndControlNormal_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_xor(gb, A);
   RET(b_+7); return;
 }
+
+// _darkenRoomHelper's tail, and brightenRoom's jump target: darken or brighten from the current
+// fade parameter.
+void s__label_331c_hook(GB *gb) {
+  BASE(_label_331c);
+  CYC(b_+0, b_+3); A = W8(wPaletteThread_parameter);
+  TAIL(_setDarkeningVariables);
+}
+
+static void bank0_add_a_to_hl(GB *gb, uint16_t return_address) {
+  push_effect(gb, return_address);
+  burn_rom(gb, 0x00, 0x0010, 0x0011, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0011, 0x0012, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, false);
+    burn_rom(gb, 0x00, 0x0013, 0x0014, false); H = alu_inc8(gb, H);
+    burn_rom(gb, 0x00, 0x0014, 0x0015, false);
+  } else {
+    burn_rom(gb, 0x00, 0x0012, 0x0013, true);
+  }
+  ret_effect(gb);
+}
+
+// Once the Temple Remains is filled with lava, its layouts come from out-of-bounds Subrosia rooms,
+// one set per season (the table after the ret). Leaves bank 4 selected.
+void s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains_hook(GB *gb) {
+  BASE(loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); A = 0x15; // GLOBALFLAG_TEMPLE_REMAINS_FILLED_WITH_LAVA
+  CALL_C(b_+2, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+5);
+  if (F & FZ) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+8); A = 0x04;
+  CYC(b_+8, b_+10); mem_wr(gb, hRomBank, A);
+  CYC(b_+10, b_+13); mem_wr(gb, MBC_ROM_BANK, A);
+  CALL_C(b_+13, s_checkIsTempleRemains_hook, SYM(checkIsTempleRemains), b_+16);
+  if (!(F & FC)) { RET_TAKEN(b_+16); return; }
+  CYC(b_+16, b_+17);
+  CYC(b_+17, b_+20); A = W8(wRoomStateModifier);
+  CYC(b_+20, b_+23); SET_HL(b_+32); // @seasonOffsets
+  CYC(b_+23, b_+24); bank0_add_a_to_hl(gb, b_+24);
+  CYC(b_+24, b_+27); A = W8(wActiveRoom);
+  CYC(b_+27, b_+28); alu_add(gb, mem_rd(gb, HL));
+  CYC(b_+28, b_+31); W8(wLoadingRoom) = A;
+  RET(b_+31); return;
+}
+
+void s_specialObjectCode_linkInCutscene__afterCall2cf6_b00_hook(GB *gb);
+
+// Link's cutscene code (bank 6) with the ROM bank saved and restored. That code can wait a frame,
+// so the return point is an entry of its own.
+void s_specialObjectCode_linkInCutscene_b00_hook(GB *gb) {
+  BASE(specialObjectCode_linkInCutscene_b00);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); A = mem_rd(gb, hRomBank);
+  CYC(b_+2, b_+3); push_effect(gb, AF);
+  CYC(b_+3, b_+5); A = 0x06;
+  CYC(b_+5, b_+7); mem_wr(gb, hRomBank, A);
+  CYC(b_+7, b_+10); mem_wr(gb, MBC_ROM_BANK, A);
+  CALL_C(b_+10, specialObjectCode_linkInCutscene_b06_hook, SYM(specialObjectCode_linkInCutscene_b06), b_+13);
+  s_specialObjectCode_linkInCutscene__afterCall2cf6_b00_hook(gb);
+}
+
+void s_specialObjectCode_linkInCutscene__afterCall2cf6_b00_hook(GB *gb) {
+  BASE(specialObjectCode_linkInCutscene_b00);
+  CYC(b_+13, b_+14); SET_AF(pop_effect(gb));
+  CYC(b_+14, b_+16); mem_wr(gb, hRomBank, A);
+  CYC(b_+16, b_+19); mem_wr(gb, MBC_ROM_BANK, A);
+  RET(b_+19); return;
+}

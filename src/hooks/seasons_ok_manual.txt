@@ -104,3 +104,5 @@ interactionCodea8@handleSubidHighNibble   # Seasons things 0-5 (its own a8.s) wr
 mapMenu_drawSpriteAtRoomIndex   # both bodies written out (the aligner pairs the wrong ld de)
 enemyCode15@chooseNewDirection   # ld bc,$0718 is the same bytes (01 18 07) in both ROMs; only the symbolizer names differ
 enemyCode58@checkDisableDestruction   # ENEMYCOLLISION_ROCK carried as GV(0x52, 0x4f)
+makeActiveObjectFollowLink_b00    # bank-switch trampoline; target via ROM_b01_makeActiveObjectFollowLink (SYM)
+makeActiveObjectFollowLink_b01    # same instructions; RAM operands by name

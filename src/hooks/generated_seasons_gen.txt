@@ -277,7 +277,7 @@
 15:63f5 s_zeldaKidnapped_spawnInteraction_hook -
 15:5aac s_zelda_checkIfLinkFullyHealed_hook -
 15:5ac8 s_zelda_createExclamationMark_hook -
-00:31db s__label_331c -
+00:31db s__label_331c_hook -
 00:3d3d s_checkGotMakuSeedDidNotSeeZeldaKidnapped_hook -
 00:3e07 s_checkIfHoronVillageNPCShouldBeSeen_hook -
 00:1cde s_checkLinkID0AndControlNormal_hook -
@@ -289,8 +289,7 @@
 00:35ec s_func_35ec_hook -
 00:3e8f s_getLinkedHerosCaveSideEntranceRoom_hook -
 00:3e3e s_getSunkenCityNPCVisibleSubId_caller_hook -
-00:3870 s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains L
-00:180b s_makeActiveObjectFollowLink_b00 -
+00:3870 s_loadTilesetAndRoomLayout__adjustLoadingRoomForTempleRemains_hook -
 00:35b8 s_multiIntroCutsceneCaller_hook -
 00:174c s_removeOreChunkValue_hook -
 00:364f s_roomTileChangesAfterLoad02_hook -
@@ -302,8 +301,8 @@
 00:3e20 s_setMakuTreeStageAndMapText_hook -
 00:3a9c s_setSeason_b00_hook -
 00:3e52 s_setUpCharactersAfterMoblinKeepDestroyed_hook -
-00:2ce9 s_specialObjectCode_linkInCutscene_b00 -
-00:2cf6 s_specialObjectCode_linkInCutscene__afterCall2cf6_b00 L
+00:2ce9 s_specialObjectCode_linkInCutscene_b00_hook -
+00:2cf6 s_specialObjectCode_linkInCutscene__afterCall2cf6_b00_hook -
 00:3276 s_updateAnimationsAfterCutscene_hook -
 00:c4b7 wRamFunction -
 00:335a s_zeldaAndVillagersCutsceneCaller_hook -
@@ -504,7 +503,6 @@
 01:551f s_findActiveRoomInDungeonLayout_hook -
 01:47dd s_getPaletteFadeTransitionData_hook -
 01:5f53 s_initializeSeedTreeRefillData_hook -
-01:489d s_makeActiveObjectFollowLink_b01 -
 01:5dd3 s_screenTransitionLostWoods_hook -
 01:5e75 s_screenTransitionOnoxDungeon_hook -
 01:5e6b s_screenTransitionSwordUpgrade_hook -

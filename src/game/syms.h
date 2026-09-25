@@ -14975,6 +14975,7 @@ enum {
   S_gfx_key_orechunk,
   S_introTempleSprites,
   S_linkOnHorseCloseupSprites_2,
+  S__label_331c,
   SYM_COUNT
 };
 enum {
