@@ -14,8 +14,8 @@ it makes the caller ineligible. The guarded forms
 (TAIL(x) is the first form as a macro in game.h: the interpreter runs x until it returns to the
 address on top of the emulated stack) fall back to the interpreter at the callee's address
 instead, which is what the ROM does. Ages is unchanged: every routine is hooked there. Only
-calls whose callee name has a symbol are guarded; jump-table chains with no interpreter
-fallback are left alone.
+calls whose callee name has a symbol and is hooked in one of the tables are guarded; jump-table
+chains with no interpreter fallback are left alone.
 """
 import glob, os, re, sys
 
@@ -26,6 +26,16 @@ FUNC_START = re.compile(r'^(?:static )?(?:void|uint16_t|uint8_t|bool|int|unsigne
 
 def sym_ids():
     return set(re.findall(r'^\s+S_(\w+),', open('src/game/syms.h').read(), re.M))
+
+
+def hooked():
+    """Callees some game's table hooks. A TAIL to a routine hooked in neither game always falls back
+    to its ROM address (the native builds have no code there), so a direct call to its C stays."""
+    out = set()
+    for path in ('src/hooks/generated.txt', 'src/hooks/generated_seasons.txt'):
+        if os.path.exists(path):
+            out.update(p[1][:-5] for p in (l.split() for l in open(path)) if len(p) >= 2 and p[1].endswith('_hook'))
+    return out
 
 
 def guard_file(path, syms, apply):
@@ -78,7 +88,7 @@ def main():
     args = sys.argv[1:]
     apply = '--apply' in args
     if apply: args.remove('--apply')
-    syms = sym_ids()
+    syms = sym_ids() & hooked()
     files = args or [f for f in sorted(glob.glob('src/game/**/*.c', recursive=True))
                      if not os.path.basename(f).startswith('gen_') and os.path.basename(f) not in ('syms.c', 'kernel.c', 'cyc.c', 'ram_code.c')]
     total = sum(guard_file(f, syms, apply) for f in files)
