@@ -27,10 +27,11 @@ void partCode09_hook(GB *gb) {
   CYC(b_+O(10), b_+OE(11)); alu_or(gb, A);
   if (!(F & FZ)) { RET_TAKEN(b_+O(11)); return; } // ret nz
   CYC(b_+O(11), b_+OE(12));
-  CYC(b_+O(12), b_+OE(15)); SET_HL(w1Link); // w1Link
-  CALL_C(b_+O(15), checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+OE(18));
-  if (F & FC) { CYCT(b_+O(18), b_+OE(20)); goto linkTouchedButton; } // jr c
-  CYC(b_+O(18), b_+OE(20));
+  // Same offsets in both games; ofsmap pairs +15/+18 with the magnet-ball check at +23/+26.
+  CYC(b_+S(12), b_+S(15)); SET_HL(w1Link); // w1Link
+  CALL_C(b_+S(15), checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+S(18));
+  if (F & FC) { CYCT(b_+S(18), b_+S(20)); goto linkTouchedButton; } // jr c
+  CYC(b_+S(18), b_+S(20));
   if (game_seasons) {
     CYC(b_+S(20), b_+S(23)); SET_HL(w1MagnetBall);
     CALL_C(b_+S(23), checkObjectsCollided_hook, SYM(checkObjectsCollided), b_+S(26));

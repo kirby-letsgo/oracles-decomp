@@ -4,6 +4,19 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-25, generator: `tools/transliterate.py --game=seasons` no longer emits an entry into
+  a shared routine (one of its @locals, or an alias copy of it in another bank) that nothing can
+  reach. Kept when: a call, jump, fall-through or jump-table entry from another routine lands on
+  it; any jump-table entry lands on it (a shared chain's fallback dispatches it); it is a resume
+  point or an extra/alias label; C names it (SYM, TAIL*, s_x, x_hook); or a kept entry's own
+  generated code calls it (fixed point; a call into its own body counts, a jump becomes a goto).
+  SEASONS_PRUNE=0 turns it off. 1,190 entries dropped (generated_seasons_gen 4,163 -> 2,973);
+  Seasons readable share 67.6% -> 79.3% (table 8,056 -> 6,866, generated 2,611 -> 1,421). The
+  native Seasons playthrough passes, and every entry the 142k run entered is kept. Also:
+  tools/audit_mispair.py (an ofsmap pairing whose Seasons bytes differ while another Seasons
+  instruction in the routine matches the Ages bytes; RAM variables that moved show up as review
+  items), and partCode09's +12..+20 burns are explicit (ofsmap paired them with the magnet-ball
+  copy at +23/+26).
 - 2026-09-25, Seasons 5 batch 3 (bank 10): the 14 top-level routines still generated there are
   Seasons hand C (partCode38/49/48/47/45/41/3d/3c/3b/33/2f/2e/2b, loadRememberedCompanion; the
   latter's Ages C is in bank2.c at ratio 0.72, so the Seasons copy is its own). The bank's other

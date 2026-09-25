@@ -12,66 +12,12 @@ void s_scriptCmd_jump(GB *gb) {
   RET(0x41a1); return;  // ret
 }
 
-// 0b:43b2
-void s_scriptCmd_jumpIfRoomFlagSet__flagunset(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_43b2:
-  SET_HL(POP(0x43b2));  // pop hl
-  I(0x43b3, 2); SET_HL(HL + 1);  // inc hl
-  I(0x43b4, 2); SET_HL(HL + 1);  // inc hl
-  I(0x43b5, 1); alu_scf(gb);  // scf
-  RET(0x43b6); return;  // ret
-}
-
-// 0b:43b7
-void s_scriptCmd_jumpIfRoomFlagSet__flagset(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_43b7:
-  SET_HL(POP(0x43b7));  // pop hl
-  I(0x43b8, 4); if (hook_is(gb, 0x257f, scriptFunc_jump_scf_hook)) { scriptFunc_jump_scf_hook(gb); return; } HANDOFF(0x257f);  // jp $257f
-}
-
-// 0b:457a
-void s_scriptCmd_setOrUnsetGlobalFlag__set(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_457a:
-  PUSH(0x457a, HL);  // push hl
-  CALL(0x457b, setGlobalFlag_hook, 0x30cd, 0x457e);  // call $30cd
-  SET_HL(POP(0x457e));  // pop hl
-  I(0x457f, 1); alu_scf(gb);  // scf
-  RET(0x4580); return;  // ret
-}
-
-// 0b:4581
-void s_scriptCmd_setOrUnsetGlobalFlag__unset(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4581:
-  I(0x4581, 2); alu_and(gb, 0x7f);  // and $7f
-  PUSH(0x4583, HL);  // push hl
-  CALL(0x4584, unsetGlobalFlag_hook, 0x30d3, 0x4587);  // call $30d3
-  SET_HL(POP(0x4587));  // pop hl
-  I(0x4588, 1); alu_scf(gb);  // scf
-  RET(0x4589); return;  // ret
-}
-
 // 0b:4132
 void s_scriptCmd_showPasswordScreen__askForSecret(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4132:
   I(0x4132, 1); A = B;  // ld a,b
   I(0x4133, 2); alu_or(gb, 0x80);  // or $80
-L_4135:
-  CALL(0x4135, openSecretInputMenu_hook, 0x1a0a, 0x4138);  // call $1a0a
-  I(0x4138, 3); goto L_4144;  // jr $4144
-L_4144:
-  SET_HL(POP(0x4144));  // pop hl
-  I(0x4145, 1); alu_xor(gb, A);  // xor a
-  RET(0x4146); return;  // ret
-}
-
-// 0b:4135
-void s_scriptCmd_showPasswordScreen__openSecretMenu(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
 L_4135:
   CALL(0x4135, openSecretInputMenu_hook, 0x1a0a, 0x4138);  // call $1a0a
   I(0x4138, 3); goto L_4144;  // jr $4144
@@ -92,33 +38,5 @@ L_413a:
   SET_HL(POP(0x4144));  // pop hl
   I(0x4145, 1); alu_xor(gb, A);  // xor a
   RET(0x4146); return;  // ret
-}
-
-// 0b:42d5
-void s_scriptCmd_showTextDifferentForLinked__unlinked(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_42d5:
-  I(0x42d5, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x42d6, 2); SET_HL(HL + 1);  // inc hl
-  I(0x42d7, 3); goto L_42db;  // jr $42db
-L_42db:
-  I(0x42db, 1); C = A;  // ld c,a
-  PUSH(0x42dc, HL);  // push hl
-  CALL(0x42dd, showText_hook, 0x184b, 0x42e0);  // call $184b
-  SET_HL(POP(0x42e0));  // pop hl
-  RET(0x42e1); return;  // ret
-}
-
-// 0b:42d9
-void s_scriptCmd_showTextDifferentForLinked__linked(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_42d9:
-  I(0x42d9, 2); SET_HL(HL + 1);  // inc hl
-  I(0x42da, 2); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  I(0x42db, 1); C = A;  // ld c,a
-  PUSH(0x42dc, HL);  // push hl
-  CALL(0x42dd, showText_hook, 0x184b, 0x42e0);  // call $184b
-  SET_HL(POP(0x42e0));  // pop hl
-  RET(0x42e1); return;  // ret
 }
 
