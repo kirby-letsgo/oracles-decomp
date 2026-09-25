@@ -917,7 +917,7 @@ void s_linkCutscene7_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (linkInCutscene_d_jump_table(gb));
     if (jt_ == b_+8) goto state0;
-    if (jt_ == (b_ - 137)) { linkInCutscene_d_ret(gb); return; }
+    if (jt_ == SYM(linkCutscene5__ret)) { linkInCutscene_d_ret(gb); return; }
     HANDOFF(HL);
   } while (0);
 state0:

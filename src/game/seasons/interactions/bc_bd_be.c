@@ -489,10 +489,10 @@ void s_interactionCodebc_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (bc_bd_be_jump_table(gb));
-    if (jt_ == (b_ - 558)) { bc_bd_be_subid0(gb); return; }
+    if (jt_ == SYM(interactionCodebb__subid0)) { bc_bd_be_subid0(gb); return; }
     if (jt_ == b_+14) goto subid1;
     if (jt_ == b_+46) goto subid2;
-    if (jt_ == (b_ - 453)) { bc_bd_be_subid1(gb); return; }
+    if (jt_ == SYM(interactionCodebb__subid1)) { bc_bd_be_subid1(gb); return; }
     if (jt_ == b_+67) goto subid4;
     HANDOFF(HL);
   } while (0);

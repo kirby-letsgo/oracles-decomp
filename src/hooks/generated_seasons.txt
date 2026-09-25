@@ -1815,6 +1815,7 @@
 06:4994 parentItemUpdate_hook -
 06:49e7 clearParentItem_hook -
 06:49f5 clearParentItemH_hook -
+06:49fc parentItemCode_shield_hook -
 06:4a4e parentItemCode_foolsOre_hook -
 06:4a6b parentItemCode_punch_hook -
 06:4aa1 parentItemCode_sword_hook -
@@ -2055,6 +2056,7 @@
 07:61a5 itemUpdateThrowingLaterally_hook -
 07:6220 itemBounce_hook -
 07:62a2 itemCode1a_hook -
+08:4000 interactionCode00_hook -
 08:40a0 interactionCode0f_hook -
 08:4110 interactionCode10_hook -
 08:414f interactionCode12_hook -
@@ -2200,6 +2202,7 @@
 0a:63d5 sidescrollPlatformFunc_5bfc_hook -
 0a:63dd sidescrollPlatform_updateLinkSubpixels_hook -
 0a:676f interactionCodea7_hook -
+0a:67e7 interactionCodea8_hook -
 0a:6af3 interactionCodeae_hook -
 0a:6c4d creditsTextHorizontal_6537_hook -
 0a:6c6a creditsTextHorizontal_6554_hook -
@@ -3581,6 +3584,7 @@
 15:4680 movingPlatform_loadScript_hook -
 15:469d movingPlatform_runScript_hook -
 15:4715 movingPlatform_setScript_hook -
+15:4901 essence_createEnergySwirl_hook -
 15:4909 essence_stopEnergySwirl_hook -
 15:490f vasu_giveRingBox_hook -
 15:4927 vasu_openRingMenu_hook -

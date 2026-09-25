@@ -1,0 +1,61 @@
+#include "game/game.h"
+#include "game/gen.h"
+#include "game/seasons/gen.h"
+
+#undef CYC
+#undef CYCT
+#define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
+#define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
+
+// ref/oracles-disasm/object_code/seasons/interactions/tradeItem.s.
+// INTERAC_TRADE_ITEM
+
+static uint16_t tradeItem_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+// INTERAC_TRADE_ITEM
+void s_interactionCode5d_hook(GB *gb) {
+  BASE(interactionCode5d);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (tradeItem_jump_table(gb));
+    if (jt_ == b_+8) goto state0;
+    if (jt_ == b_+22) goto state1;
+    HANDOFF(HL);
+  } while (0);
+state0:
+  CALL_C(b_+8, s_interactionInitGraphics, SYM(interactionInitGraphics), b_+11);
+  CYC(b_+11, b_+13); A = 0x06;
+  CALL_C(b_+13, s_objectSetCollideRadius, SYM(objectSetCollideRadius), b_+16);
+  CYC(b_+16, b_+18); L = INTERACTION_BASE + OBJ_STATE;
+  CYC(b_+18, b_+19); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+19, b_+22);
+  TAIL(objectSetVisiblec0);
+state1:
+  CYC(b_+22, b_+24); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+24, b_+25); A = mem_rd(gb, DE);
+  CYC(b_+25, b_+28); SET_HL(wTmpcfc0 + 0x1e);
+  CALL_C(b_+28, s_checkFlag, SYM(checkFlag), b_+31);
+  if (!(F & FZ)) { CYCT(b_+31, b_+34); TAIL(interactionDelete); }
+  CYC(b_+31, b_+34);
+  CYC(b_+34, b_+37);
+  TAIL(objectPreventLinkFromPassing);
+}
+

@@ -593,7 +593,7 @@ void s_generalOnox_subid1_hook(GB *gb) {
   do { uint16_t jt_ = (generalOnox_jump_table(gb));
     if (jt_ == b_+16) goto state8;
     if (jt_ == b_+47) goto state9;
-    if (jt_ == (b_ - 254)) { generalOnox_stateA(gb); return; }
+    if (jt_ == SYM(generalOnox_subid0__stateA)) { generalOnox_stateA(gb); return; }
     if (jt_ == b_+159) goto stateB;
     if (jt_ == b_+254) goto stateC;
     if (jt_ == b_+270) goto stateD;
@@ -702,7 +702,7 @@ stateB:
   CYC(b_+161, b_+162); push_effect(gb, b_+162);
   do { uint16_t jt_ = (generalOnox_jump_table(gb));
     if (jt_ == b_+168) goto stateB_substate0;
-    if (jt_ == (b_ - 154)) { generalOnox_stateB_substate1(gb); return; }
+    if (jt_ == SYM(generalOnox_subid0__stateB__substate1)) { generalOnox_stateB_substate1(gb); return; }
     if (jt_ == b_+189) goto stateB_substate2;
     HANDOFF(HL);
   } while (0);
@@ -769,8 +769,8 @@ stateC:
   CYC(b_+255, b_+256); A = mem_rd(gb, DE);
   CYC(b_+256, b_+257); push_effect(gb, b_+257);
   do { uint16_t jt_ = (generalOnox_jump_table(gb));
-    if (jt_ == (b_ - 54)) { generalOnox_stateC_substate0(gb); return; }
-    if (jt_ == (b_ - 33)) { generalOnox_stateC_substate1(gb); return; }
+    if (jt_ == SYM(generalOnox_subid0__stateC__substate0)) { generalOnox_stateC_substate0(gb); return; }
+    if (jt_ == SYM(generalOnox_subid0__stateC__substate1)) { generalOnox_stateC_substate1(gb); return; }
     if (jt_ == b_+263) goto stateC_substate2;
     HANDOFF(HL);
   } while (0);

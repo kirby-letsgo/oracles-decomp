@@ -160,3 +160,36 @@ state3:
   TAIL(interactionRunScript);
 }
 
+
+static uint16_t bombFlower_d_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+// INTERAC_BOMB_FLOWER
+void s_interactionCode6f_hook(GB *gb) {
+  BASE(interactionCode6f);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (bombFlower_d_jump_table(gb));
+    if (jt_ == SYM(bomb_flower_subid0) && hook_is(gb, SYM(bomb_flower_subid0), s_bomb_flower_subid0_hook)) { s_bomb_flower_subid0_hook(gb); return; }
+    if (jt_ == SYM(bomb_flower_subid1) && hook_is(gb, SYM(bomb_flower_subid1), s_bomb_flower_subid1_hook)) { s_bomb_flower_subid1_hook(gb); return; }
+    HANDOFF(HL);
+  } while (0);
+}
+

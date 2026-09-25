@@ -269,15 +269,6 @@ static void volcano_state1(GB *gb) {
 }
 
 // Stages 4 and 5 dispatch into stage 3's states 1..4 by address.
-static int volcano_stage3_state(GB *gb, uint16_t jt_) {
-  uint16_t base_ = SYM(cutsceneHandler_0b_stage3);
-  if (jt_ == base_ + 46) { volcano_state1(gb); return 1; }
-  if (jt_ == base_ + 65) { volcano_state2(gb); return 1; }
-  if (jt_ == base_ + 87) { volcano_state3(gb); return 1; }
-  if (jt_ == base_ + 117) { volcano_state4(gb); return 1; }
-  return 0;
-}
-
 // The Temple Remains screen: loaded (room $15), then the eruption and lava.
 void s_cutsceneHandler_0b_stage3_hook(GB *gb) {
   BASE(cutsceneHandler_0b_stage3);
@@ -286,7 +277,10 @@ void s_cutsceneHandler_0b_stage3_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (volcano_jump_table(gb));
     if (jt_ == b_+14) { goto state0; }
-    else if (volcano_stage3_state(gb, jt_)) { return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state1)) { volcano_state1(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state2)) { volcano_state2(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state3)) { volcano_state3(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state4)) { volcano_state4(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 
@@ -338,7 +332,10 @@ void s_cutsceneHandler_0b_stage4_hook(GB *gb) {
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (volcano_jump_table(gb));
     if (jt_ == b_+14) { volcano_open_screen(gb, b_, 0x0027); return; } // ROOM_SEASONS_027
-    else if (volcano_stage3_state(gb, jt_)) { return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state1)) { volcano_state1(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state2)) { volcano_state2(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state3)) { volcano_state3(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state4)) { volcano_state4(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 }
@@ -352,7 +349,10 @@ void s_cutsceneHandler_0b_stage5_hook(GB *gb) {
   do { uint16_t jt_ = (volcano_jump_table(gb));
     if (jt_ == b_+14) { volcano_open_screen(gb, b_, 0x0017); return; } // ROOM_SEASONS_017
     else if (jt_ == b_+51) { goto state4; }
-    else if (volcano_stage3_state(gb, jt_)) { return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state1)) { volcano_state1(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state2)) { volcano_state2(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state3)) { volcano_state3(gb); return; }
+    else if (jt_ == SYM(cutsceneHandler_0b_stage3__state4)) { volcano_state4(gb); return; }
     else { HANDOFF(HL); }
   } while (0);
 

@@ -10,11 +10,11 @@ void essence_createEnergySwirl_hook(GB *gb);
 void essence_stopEnergySwirl_hook(GB *gb);
 
 void essence_createEnergySwirl_hook(GB *gb) {
-  BASE(movingPlatform_scriptTable);
+  BASE(essence_createEnergySwirl);
   uint16_t sp0_ = gb->sp;
-  CALL_C(b_+138, objectGetPosition_hook, SYM(objectGetPosition), b_+141);
-  CYC(b_+141, b_+143); A = 0xff;
-  CYC(b_+143, b_+146); TAIL(createEnergySwirlGoingIn);
+  CALL_C(b_+0, objectGetPosition_hook, SYM(objectGetPosition), b_+3);
+  CYC(b_+3, b_+5); A = 0xff;
+  CYC(b_+5, b_+8); TAIL(createEnergySwirlGoingIn);
 }
 
 void essence_stopEnergySwirl_hook(GB *gb) {

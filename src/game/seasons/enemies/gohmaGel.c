@@ -394,9 +394,9 @@ void s_gohma_gel_subid2_hook(GB *gb) {
   CYC(b_+1, b_+3); alu_sub(gb, 0x0a);
   CYC(b_+3, b_+4); push_effect(gb, b_+4);
   do { uint16_t jt_ = (gohmaGel_jump_table(gb));
-    if (jt_ == (b_ - 185)) { gohmaGel_stateA(gb); return; }
-    if (jt_ == (b_ - 178)) { gohmaGel_stateB(gb); return; }
-    if (jt_ == (b_ - 133)) { gohmaGel_stateC(gb); return; }
+    if (jt_ == SYM(gohma_gel_subid0__stateA)) { gohmaGel_stateA(gb); return; }
+    if (jt_ == SYM(gohma_gel_subid0__stateB)) { gohmaGel_stateB(gb); return; }
+    if (jt_ == SYM(gohma_gel_subid0__stateC)) { gohmaGel_stateC(gb); return; }
     if (jt_ == b_+14) goto stateD;
     if (jt_ == b_+92) goto seasonsFunc_0d_6f33;
     HANDOFF(HL);

@@ -62,24 +62,35 @@ static void breakTileDebris_doSpecializedInitialization(GB *gb, uint16_t sp0_) {
     return;
   }
   // @interac00
-  CYC(b_+147, b_+150); A = mem_rd(gb, wTilesetFlags);
-  CYC(b_+150, b_+152); alu_and(gb, 0x40);
-  if (F & FZ) {
-    CYCT(b_+152, b_+154); goto notUnderwater;
-  }
-  CYC(b_+152, b_+154);
-  CYC(b_+154, b_+156); A = 0x0e;
-  CYC(b_+156, b_+158); goto stored;
+  if (!game_seasons) {
+    CYC(b_+147, b_+150); A = mem_rd(gb, wTilesetFlags);
+    CYC(b_+150, b_+152); alu_and(gb, 0x40);
+    if (F & FZ) {
+      CYCT(b_+152, b_+154); goto notUnderwater;
+    }
+    CYC(b_+152, b_+154);
+    CYC(b_+154, b_+156); A = 0x0e;
+    CYC(b_+156, b_+158); goto stored;
 notUnderwater:
-  CYC(b_+158, b_+161); A = mem_rd(gb, wGrassAnimationModifier);
-  CYC(b_+161, b_+163); alu_and(gb, 0x03);
-  CYC(b_+163, b_+165); alu_or(gb, 0x08);
+    CYC(b_+158, b_+161); A = mem_rd(gb, wGrassAnimationModifier);
+    CYC(b_+161, b_+163); alu_and(gb, 0x03);
+    CYC(b_+163, b_+165); alu_or(gb, 0x08);
 stored:
-  CYC(b_+165, b_+167); E = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
-  CYC(b_+167, b_+168); mem_wr(gb, DE, A);
-  CYC(b_+168, b_+169); E = alu_inc8(gb, E);
-  CYC(b_+169, b_+170); mem_wr(gb, DE, A);
-  CYC(b_+170, b_+171); ret_effect(gb);
+    CYC(b_+165, b_+167); E = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
+    CYC(b_+167, b_+168); mem_wr(gb, DE, A);
+    CYC(b_+168, b_+169); E = alu_inc8(gb, E);
+    CYC(b_+169, b_+170); mem_wr(gb, DE, A);
+    CYC(b_+170, b_+171); ret_effect(gb);
+    return;
+  }
+  CYC(b_+S(147), b_+S(150)); A = mem_rd(gb, wGrassAnimationModifier);
+  CYC(b_+S(150), b_+S(152)); alu_and(gb, 0x03);
+  CYC(b_+S(152), b_+S(154)); alu_or(gb, 0x08);
+  CYC(b_+S(154), b_+S(156)); E = INTERACTION_BASE + OBJ_OAM_FLAGS_BACKUP;
+  CYC(b_+S(156), b_+S(157)); mem_wr(gb, DE, A);
+  CYC(b_+S(157), b_+S(158)); E = alu_inc8(gb, E);
+  CYC(b_+S(158), b_+S(159)); mem_wr(gb, DE, A);
+  CYC(b_+S(159), b_+S(160)); ret_effect(gb);
 }
 
 void interactionCode00_hook(GB *gb) {

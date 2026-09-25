@@ -42,6 +42,11 @@ static void interactionCodea8_handleSubidHighNibble(GB *gb, uint16_t sp0_) {
   {
     CYC(b_+64, b_+65); push_effect(gb, b_+65);
     uint16_t target = interactionCodea8_jump_table(gb);
+    if (game_seasons) {
+      if (target == b_+S(77)) goto s_thing0;
+      if (target == b_+S(108)) goto s_thing5;
+      goto s_thing1to4;
+    }
     if (target == b_+88) goto thing5;
     if (target == b_+122) goto thing6;
     if (target == b_+127) goto thing1;
@@ -49,58 +54,95 @@ static void interactionCodea8_handleSubidHighNibble(GB *gb, uint16_t sp0_) {
     // target == 0x5e92 falls through to thing2/thing3/thing4 (aliased)
   }
 
-  // interactionCodea8@thing2 / @thing3 / @thing4
-  CYC(b_+79, b_+80); A = B;
+  if (!game_seasons) {
+    // interactionCodea8@thing2 / @thing3 / @thing4
+    CYC(b_+79, b_+80); A = B;
 
 initLinkInCutscene: // interactionCodea8@initLinkInCutscene
-  CYC(b_+80, b_+83); SET_HL(w1Link_id);
-  CYC(b_+83, b_+85); mem_wr(gb, HL, 0x08); // SPECIALOBJECT_LINK_CUTSCENE
-  CYC(b_+85, b_+86); L = alu_inc8(gb, L);
-  CYC(b_+86, b_+87); mem_wr(gb, HL, A); // [w1Link.subid]
-  CYC(b_+87, b_+88); ret_effect(gb); return;
+    CYC(b_+80, b_+83); SET_HL(w1Link_id);
+    CYC(b_+83, b_+85); mem_wr(gb, HL, 0x08); // SPECIALOBJECT_LINK_CUTSCENE
+    CYC(b_+85, b_+86); L = alu_inc8(gb, L);
+    CYC(b_+86, b_+87); mem_wr(gb, HL, A); // [w1Link.subid]
+    CYC(b_+87, b_+88); ret_effect(gb); return;
 
 thing5: // interactionCodea8@thing5
-  CYC(b_+88, b_+89); A = D;
-  CYC(b_+89, b_+92); W8(wLinkObjectIndex) = A;
-  CYC(b_+92, b_+95); SET_HL(wActiveRing);
-  CYC(b_+95, b_+97); mem_wr(gb, HL, 0x3d); // FIST_RING
-  CYC(b_+97, b_+98); alu_xor(gb, A);
-  CYC(b_+98, b_+100); L = 0x88; // <wInventoryB
-  CYC(b_+100, b_+101); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+101, b_+102); mem_wr(gb, HL, A);
-  CYC(b_+102, b_+105); SET_HL(b_+167); // @simulatedInput_5eea data table
-  CYC(b_+105, b_+107); A = 0x0b;
+    CYC(b_+88, b_+89); A = D;
+    CYC(b_+89, b_+92); W8(wLinkObjectIndex) = A;
+    CYC(b_+92, b_+95); SET_HL(wActiveRing);
+    CYC(b_+95, b_+97); mem_wr(gb, HL, 0x3d); // FIST_RING
+    CYC(b_+97, b_+98); alu_xor(gb, A);
+    CYC(b_+98, b_+100); L = 0x88; // <wInventoryB
+    CYC(b_+100, b_+101); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+101, b_+102); mem_wr(gb, HL, A);
+    CYC(b_+102, b_+105); SET_HL(b_+167); // @simulatedInput_5eea data table
+    CYC(b_+105, b_+107); A = 0x0b;
 
 beginSimulatedInput: // interactionCodea8@beginSimulatedInput
-  CYC(b_+107, b_+108); push_effect(gb, DE);
-  CALL_C(b_+108, setSimulatedInputAddress_hook, SYM(setSimulatedInputAddress), b_+111);
-  CYC(b_+111, b_+112); SET_DE(pop_effect(gb));
-  CYC(b_+112, b_+113); alu_xor(gb, A);
-  CYC(b_+113, b_+116); W8(wDisabledObjects) = A;
-  CYC(b_+116, b_+119); SET_HL(w1Link_id);
-  CYC(b_+119, b_+121); mem_wr(gb, HL, 0x00); // SPECIALOBJECT_LINK
-  CYC(b_+121, b_+122); ret_effect(gb); return;
+    CYC(b_+107, b_+108); push_effect(gb, DE);
+    CALL_C(b_+108, setSimulatedInputAddress_hook, SYM(setSimulatedInputAddress), b_+111);
+    CYC(b_+111, b_+112); SET_DE(pop_effect(gb));
+    CYC(b_+112, b_+113); alu_xor(gb, A);
+    CYC(b_+113, b_+116); W8(wDisabledObjects) = A;
+    CYC(b_+116, b_+119); SET_HL(w1Link_id);
+    CYC(b_+119, b_+121); mem_wr(gb, HL, 0x00); // SPECIALOBJECT_LINK
+    CYC(b_+121, b_+122); ret_effect(gb); return;
 
 thing6: // interactionCodea8@thing6
-  CYC(b_+122, b_+124); A = 0x09;
-  CYC(b_+124, b_+127); goto initLinkInCutscene; // jp
+    CYC(b_+122, b_+124); A = 0x09;
+    CYC(b_+124, b_+127); goto initLinkInCutscene; // jp
 
 thing1: // interactionCodea8@thing1
-  CYC(b_+127, b_+129); A = 0x0a;
-  CYC(b_+129, b_+132); goto initLinkInCutscene; // jp
+    CYC(b_+127, b_+129); A = 0x0a;
+    CYC(b_+129, b_+132); goto initLinkInCutscene; // jp
 
 thing0: // interactionCodea8@thing0
-  CYC(b_+132, b_+135); SET_HL(w1Link_direction);
-  CYC(b_+135, b_+137); mem_wr(gb, HL, 0x02); // DIR_DOWN
-  CYC(b_+137, b_+138); A = H;
-  CYC(b_+138, b_+141); W8(wLinkObjectIndex) = A;
-  CYC(b_+141, b_+144); SET_HL(wInventoryB);
-  CYC(b_+144, b_+146); mem_wr(gb, HL, 0x05); // ITEM_SWORD
-  CYC(b_+146, b_+147); L = alu_inc8(gb, L);
-  CYC(b_+147, b_+149); mem_wr(gb, HL, 0x00); // [wInventoryA]
-  CYC(b_+149, b_+152); SET_HL(b_+232); // @linkSwordDemonstrationInput data table
-  CYC(b_+152, b_+154); A = 0x0b;
-  CYC(b_+154, b_+156); goto beginSimulatedInput; // jr
+    CYC(b_+132, b_+135); SET_HL(w1Link_direction);
+    CYC(b_+135, b_+137); mem_wr(gb, HL, 0x02); // DIR_DOWN
+    CYC(b_+137, b_+138); A = H;
+    CYC(b_+138, b_+141); W8(wLinkObjectIndex) = A;
+    CYC(b_+141, b_+144); SET_HL(wInventoryB);
+    CYC(b_+144, b_+146); mem_wr(gb, HL, 0x05); // ITEM_SWORD
+    CYC(b_+146, b_+147); L = alu_inc8(gb, L);
+    CYC(b_+147, b_+149); mem_wr(gb, HL, 0x00); // [wInventoryA]
+    CYC(b_+149, b_+152); SET_HL(b_+232); // @linkSwordDemonstrationInput data table
+    CYC(b_+152, b_+154); A = 0x0b;
+    CYC(b_+154, b_+156); goto beginSimulatedInput; // jr
+  }
+
+  // Seasons: thing0 plays simulatedInput_6869, thing1-4 load Link's cutscene object with
+  // subid (index + 2), thing5 plays simulatedInput_6874 with the fist ring.
+s_thing0:
+  CYC(b_+S(77), b_+S(80)); SET_HL(b_+S(130)); // simulatedInput_6869
+  CYC(b_+S(80), b_+S(82)); A = 0x0a;
+s_beginSimulatedInput:
+  CYC(b_+S(82), b_+S(83)); push_effect(gb, DE);
+  CALL_C(b_+S(83), setSimulatedInputAddress_hook, SYM(setSimulatedInputAddress), b_+S(86));
+  CYC(b_+S(86), b_+S(87)); SET_DE(pop_effect(gb));
+  CYC(b_+S(87), b_+S(88)); alu_xor(gb, A);
+  CYC(b_+S(88), b_+S(91)); W8(wDisabledObjects) = A;
+  CYC(b_+S(91), b_+S(94)); SET_HL(w1Link_id);
+  CYC(b_+S(94), b_+S(96)); mem_wr(gb, HL, 0x00); // SPECIALOBJECT_LINK
+  CYC(b_+S(96), b_+S(97)); ret_effect(gb); return;
+s_thing1to4:
+  CYC(b_+S(97), b_+S(98)); A = B;
+  CYC(b_+S(98), b_+S(100)); alu_add(gb, 0x02);
+  CYC(b_+S(100), b_+S(103)); SET_HL(w1Link_id);
+  CYC(b_+S(103), b_+S(105)); mem_wr(gb, HL, 0x08); // SPECIALOBJECT_LINK_CUTSCENE
+  CYC(b_+S(105), b_+S(106)); L = alu_inc8(gb, L);
+  CYC(b_+S(106), b_+S(107)); mem_wr(gb, HL, A);
+  CYC(b_+S(107), b_+S(108)); ret_effect(gb); return;
+s_thing5:
+  CYC(b_+S(108), b_+S(109)); A = D;
+  CYC(b_+S(109), b_+S(112)); W8(wLinkObjectIndex) = A;
+  CYC(b_+S(112), b_+S(115)); SET_HL(wActiveRing);
+  CYC(b_+S(115), b_+S(117)); mem_wr(gb, HL, 0x3d); // FIST_RING
+  CYC(b_+S(117), b_+S(118)); alu_xor(gb, A);
+  CYC(b_+S(118), b_+S(120)); L = 0x80; // <wInventoryB
+  CYC(b_+S(120), b_+S(121)); mem_wr(gb, HL, A); SET_HL(HL + 1);
+  CYC(b_+S(121), b_+S(122)); mem_wr(gb, HL, A);
+  CYC(b_+S(122), b_+S(125)); SET_HL(b_+S(141)); // simulatedInput_6874
+  CYC(b_+S(125), b_+S(127)); A = 0x0a;
+  CYC(b_+S(127), b_+S(130)); goto s_beginSimulatedInput; // jp
 
   // interactionCodea8@unusedInputData (0b:5edf): Seasons-only pure data, dead in Ages -- not
   // ported as code.

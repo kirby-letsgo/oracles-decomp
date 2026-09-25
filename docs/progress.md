@@ -4,6 +4,30 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-25, Seasons 5 batch 1 (object banks, generated -> hand C): 95 routines that still ran
+  as generated Seasons C are now hand C in src/game/seasons/ (76 in Seasons-only interaction/enemy
+  files: Din's dance and imprisonment, temple sinking, D1 rising stones, maku tree bubble, ball
+  thrown to dog, maku cutscenes, sparkle, jewel helper, quicksand, zelda...; 19 in common files
+  where Seasons' routine is unrelated to Ages': shopkeeper states 3/4, syrup, syrup cucco,
+  twinrova flame, companion spawner, bomb flower, slingshot, magnet ball, fool's ore, biggoron
+  sword, rod of seasons, magnet gloves, slingshot parent, nextToSubrosiaKeydoor). The object-bank
+  "2,776 generated entries" are mostly locals: 1,707 (+ the 24 alias parents such as the ecom_*
+  bank copies, itemCode24, parentItemCode_harp, interactionCode0c) are entry points into routines
+  that already run as shared C, which projects-cb handles in the generator. Left in scope: bank 05
+  (Link states, Ricky/Moosh/Dimitri StateA substates, mapleState5), on hold while projects-cb
+  chases the 05:603d native bug; objectRunMovementScript_body (bank 0d, in the engine file
+  objectMovementScript.c) awaits an ownership call. draft_rewrite.py now spells a jump-table case
+  to a labelled target as SYM(parent__local); mk5.py's label scan does not follow `.ifdef`, so a
+  label defined only for Ages (syrup.s interactionCode5f) must be removed by hand.
+- 2026-09-24, audit_jumptables in my Seasons files: 16 -> 3. The `(b_ - N)` cases
+  (dragonOnox, generalOnox, gohmaGel, bc_bd_be, linkInCutscene) and din's `+ 0x77` are now
+  `SYM(parent__local)`; volcanoErupting's helper dispatch is spelled out per target. The last
+  three (digdogger, gleeok, manhandla) are the audit reading past an 8-entry table into the
+  `dec b; ld a,b` after it (an anonymous `+` label the symbol file lacks). Blocked hooks:
+  parentItemCode_shield, interactionCode00 and interactionCodea8 now run under Seasons (per-game
+  tails; a8's Ages path under `if (!game_seasons)`); eligible 3,887 -> 3,890. enemyCode15 and
+  enemyCode58 stay blocked by `seasons_hooks.py`'s CALL_L body comparison, although their C
+  already carries the difference (GV(0x52, 0x4f); the same `ld bc,$0718` literal).
 - 2026-09-24, Seasons 4 batch 3: `tools/ofsmap.py` no longer aligns a data `@local` as code.
   `data_locals()` reads the disassembly sources (resolved through the `ref/oracles-disasm`
   symlinks) and treats a local whose first line is not an instruction or code macro (the

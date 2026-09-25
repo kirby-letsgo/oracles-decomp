@@ -23,20 +23,36 @@ static uint16_t shield_parent_jump_table(GB *gb) {
 }
 
 // parentItemCode_shield@checkShieldIsUsable: carry set when Link may hold the shield out and
-// the button is still held. The Ages instruction stream; the routine is not hooked under Seasons.
+// the button is still held. Seasons has no underwater or companion check.
 static void shield_check_usable(GB *gb) {
   BASE(parentItemCode_shield__checkShieldIsUsable);
   uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
   CYC(b_+0, b_+3); A = mem_rd(gb, wLinkSwimmingState);
   alu_or(gb, A);
   CYC(b_+3, b_+4);
-  if (!(F & FZ)) { CYCT(b_+4, b_+6); goto disallow; }
+  if (!(F & FZ)) { CYCT(b_+4, b_+6); if (game_seasons) goto disallow_s; goto disallow; }
   CYC(b_+4, b_+6);
   CYC(b_+6, b_+9); A = mem_rd(gb, wcc95);
   alu_rlca(gb);
   CYC(b_+9, b_+10);
-  if (F & FC) { CYCT(b_+10, b_+12); goto disallow; }
+  if (F & FC) { CYCT(b_+10, b_+12); if (game_seasons) goto disallow_s; goto disallow; }
   CYC(b_+10, b_+12);
+  if (game_seasons) {
+    CYC(b_+S(12), b_+S(15)); A = mem_rd(gb, wLinkObjectIndex);
+    CYC(b_+S(15), b_+S(16)); alu_rrca(gb);
+    if (F & FC) { CYCT(b_+S(16), b_+S(18)); goto disallow_s; }
+    CYC(b_+S(16), b_+S(18));
+    CALL_C(b_+S(18), parentItemCheckButtonPressed_hook, SYM(parentItemCheckButtonPressed), b_+S(21));
+    if (F & FZ) { CYCT(b_+S(21), b_+S(23)); goto disallow_s; }
+    CYC(b_+S(21), b_+S(23));
+    CYC(b_+S(23), b_+S(24)); alu_scf(gb);
+    CYC(b_+S(24), b_+S(25)); ret_effect(gb);
+    return;
+disallow_s:
+    CYC(b_+S(25), b_+S(26)); alu_xor(gb, A);
+    CYC(b_+S(26), b_+S(27)); ret_effect(gb);
+    return;
+  }
   CALL_C(b_+12, isLinkUnderwater_hook, SYM(isLinkUnderwater), b_+15);
   if (!(F & FZ)) { CYCT(b_+15, b_+17); goto disallow; }
   CYC(b_+15, b_+17);

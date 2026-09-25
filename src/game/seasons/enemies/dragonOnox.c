@@ -1594,8 +1594,8 @@ void s_dragonOnox_rightClaw_hook(GB *gb) {
   do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+10) goto state0;
     if (jt_ == b_+48) goto state1;
-    if (jt_ == (b_ - 354)) { dragonOnox_state2(gb); return; }
-    if (jt_ == (b_ - 79)) { dragonOnox_state3(gb); return; }
+    if (jt_ == SYM(dragonOnox_leftClaw__state2)) { dragonOnox_state2(gb); return; }
+    if (jt_ == SYM(dragonOnox_leftClaw__state3)) { dragonOnox_state3(gb); return; }
     HANDOFF(HL);
   } while (0);
 state0:
@@ -1723,7 +1723,7 @@ void s_dragonOnox_rightClawSphere_hook(GB *gb) {
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto linkPartsAndAnimate;
-    if (jt_ == (b_ - 24)) { dragonOnox_connectParts(gb); return; }
+    if (jt_ == SYM(dragonOnox_leftClawSphere__connectParts)) { dragonOnox_connectParts(gb); return; }
     HANDOFF(HL);
   } while (0);
 linkPartsAndAnimate:
@@ -1824,7 +1824,7 @@ void s_dragonOnox_rightShoulderSphere_hook(GB *gb) {
   CYC(b_+1, b_+2); push_effect(gb, b_+2);
   do { uint16_t jt_ = (dragonOnox_jump_table(gb));
     if (jt_ == b_+6) goto linkPartsAndAnimate;
-    if (jt_ == (b_ - 28)) { dragonOnox_dragonOnox_leftShoulderSphere_connectParts(gb); return; }
+    if (jt_ == SYM(dragonOnox_leftShoulderSphere__connectParts)) { dragonOnox_dragonOnox_leftShoulderSphere_connectParts(gb); return; }
     HANDOFF(HL);
   } while (0);
 linkPartsAndAnimate:

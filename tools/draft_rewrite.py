@@ -426,7 +426,14 @@ def draft(name, start=None, helper=None, pending=None, owner=None, hookname=None
                 else:
                     f = need_helper(pending, tb, t)
                     d = t - base
-                    lines.append(f'    if (jt_ == {"(b_ + " + str(d) + ")" if d >= 0 else "(b_ - " + str(-d) + ")"}) {{ {f}(gb); return; }}')
+                    ae = "(b_ + " + str(d) + ")" if d >= 0 else "(b_ - " + str(-d) + ")"
+                    n = name_at.get((tb, t))
+                    if n and not noncanonical(tb, t): ae = f'SYM({symref(n)})'
+                    elif not n and (tb, t) in locs:
+                        ln = locs[(tb, t)]
+                        ae = f'SYM({ages_spelling.get(ln, ln.replace("@", "__"))})'
+                        if ln not in ages_spelling: needed.add(ln.replace('@', '__'))
+                    lines.append(f'    if (jt_ == {ae}) {{ {f}(gb); return; }}')
             lines.append('    HANDOFF(HL);')
             lines.append('  } while (0);')
             s = '\n'.join(lines)
