@@ -5,6 +5,7 @@
 #include "hooks/hooks.h"
 #include "game/game.h"
 #include "assets/assets.h"
+#include "rt/fibers.h"
 #include <stdlib.h>
 
 static uint8_t tas_cb(void *ctx, uint64_t frame) { return tas_input_at((const Tas *)ctx, frame); }
@@ -23,7 +24,14 @@ static void ref_cb(GB *gb, const GBSample *sm, void *ctx) {
 // The native build has no interpreter, so it cannot run the CGB boot ROM: it starts from the
 // post-boot state that oracles-run --boot-state-out recorded (tas/ages-boot.state) and must then
 // produce the same state hashes as the emulator-hosted build.
+static void native_run_reloading(const char *rom_path, const char *inputs, const char *ref_path, const char *state_path, uint64_t frames, uint64_t reload_every);
 static void native_run(const char *rom_path, const char *inputs, const char *ref_path, const char *state_path, uint64_t frames) {
+  native_run_reloading(rom_path, inputs, ref_path, state_path, frames, 0);
+}
+
+// reload_every: a save state round trip (every thread fiber dropped, as when the app loads a
+// state) at the first frame after each multiple whose threads are parked, as the app saves.
+static void native_run_reloading(const char *rom_path, const char *inputs, const char *ref_path, const char *state_path, uint64_t frames, uint64_t reload_every) {
   size_t n;
   uint8_t *rom = oracles_read_file(rom_path, &n);
   if (!rom) SKIP("ROM not present");
@@ -46,7 +54,17 @@ static void native_run(const char *rom_path, const char *inputs, const char *ref
   rc.have = fscanf(ref, "%llu %llx", &rc.f, &rc.want) == 2;
   gb->input_at = tas_cb; gb->input_ctx = &t;
   gb->frame_cb = ref_cb; gb->frame_ctx = &rc;
-  for (uint64_t i = 0; i < limit && !rc.mismatch && !gb->hung; i++) gb_run_frame(gb);
+  bool pending = false;
+  for (uint64_t i = 0; i < limit && !rc.mismatch && !gb->hung; i++) {
+    if (reload_every && i && i % reload_every == 0) pending = true;
+    if (pending && threads_parked(gb)) {
+      ASSERT(oracles_save_boot_state(gb, "/tmp/oracles-native-reload.state"));
+      ASSERT(oracles_load_boot_state(gb, "/tmp/oracles-native-reload.state"));
+      fibers_reset(gb);
+      pending = false;
+    }
+    gb_run_frame(gb);
+  }
   if (gb->hung) { fprintf(stderr, "native build stopped at frame %llu\n", (unsigned long long)GRID_FRAME(gb->cycles)); ASSERT(0); }
   if (rc.mismatch) { fprintf(stderr, "state mismatch at frame %llu\n", rc.mismatch); ASSERT(0); }
   fclose(ref); free(gb); free(rom); tas_free(&t);
@@ -61,4 +79,9 @@ static void native_seasons_play_matches_reference(void) {
   native_run(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", TAS_DIR "/seasons-boot.state", 265064);
 }
 
-int main(void) { RUN(native_full_tas_matches_reference); RUN(native_seasons_play_matches_reference); return 0; }
+// Ages with a save state loaded about every 1000 frames: the native build resumes every thread
+static void native_ages_survives_save_states(void) {
+  native_run_reloading(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc", TAS_DIR "/ages-consoleverified.inputs", TAS_DIR "/ages.ref", TAS_DIR "/ages-boot.state", 20000, 1013);
+}
+
+int main(void) { RUN(native_full_tas_matches_reference); RUN(native_seasons_play_matches_reference); RUN(native_ages_survives_save_states); return 0; }

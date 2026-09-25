@@ -1161,3 +1161,9 @@
 39:4174 updateSound__stopSound
 39:417f updateSound__updateChannels
 03:76cb func_03_7619__state1__cbb3_02
+00:33cd mainThreadStart__nextFrame
+00:339f paletteFadeThreadStart__nextFrame
+00:18cb textThreadStart__nextFrame
+00:1a2c fileSelectThreadStart__nextFrame
+00:1b2a thread_1b10__nextFrame
+00:2d18 introThreadStart__nextFrame

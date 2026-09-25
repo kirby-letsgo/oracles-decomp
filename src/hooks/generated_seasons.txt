@@ -232,6 +232,7 @@
 00:184d _label_00_203_hook -
 00:184f _label_00_204_hook -
 00:1879 textThreadStart_hook -
+00:18a4 textThreadStart__nextFrame_hook -
 00:18a6 retrieveTextCharacter_hook -
 00:1922 readByteFromW7ActiveBank_hook -
 00:1936 readByteFromW7TextTableBank_hook -
@@ -244,6 +245,7 @@
 00:1986 clearAllItemsAndPutLinkOnGround_hook -
 00:19a5 copyTextCharacterGfx_hook -
 00:19dd fileSelectThreadStart_hook -
+00:19f2 fileSelectThreadStart__nextFrame_hook -
 00:19f4 secretFunctionCaller_hook -
 00:1a0a openSecretInputMenu_hook -
 00:1a17 updateMenus_hook -
@@ -261,6 +263,7 @@
 00:1a9d getRoomDungeonProperties_hook -
 00:1abd copy8BytesFromRingMapToCec0_hook -
 00:1ad6 thread_1b10_hook -
+00:1af0 thread_1b10__nextFrame_hook -
 00:1af2 objectAddToAButtonSensitiveObjectList_hook -
 00:1b07 objectRemoveFromAButtonSensitiveObjectList_hook -
 00:1b23 linkInteractWithAButtonSensitiveObjects_hook -
@@ -483,6 +486,7 @@
 00:2c37 itemUpdateAngle_hook -
 00:2c40 getFreeItemSlot_hook -
 00:2c4e introThreadStart_hook H
+00:2c5f introThreadStart__nextFrame_hook -
 00:2c61 intro_cinematic_hook -
 00:2c8f func_2d48_hook -
 00:2ca6 clearFadingPalettes_hook -
@@ -554,7 +558,9 @@
 00:3217 startFadeBetweenTwoPalettes_hook -
 00:3222 setPaletteThreadDelay_hook -
 00:322b paletteFadeThreadStart_hook -
+00:3246 paletteFadeThreadStart__nextFrame_hook -
 00:3248 mainThreadStart_hook -
+00:3274 mainThreadStart__nextFrame_hook -
 00:328a loadScreenMusic_hook -
 00:32be applyWarpDest_hook -
 00:32dc loadScreenMusicAndSetRoomPack_hook -

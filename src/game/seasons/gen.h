@@ -1837,6 +1837,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s__label_00_203 _label_00_203_hook
 #define s__label_00_204 _label_00_204_hook
 #define s_textThreadStart textThreadStart_hook
+#define s_textThreadStart__nextFrame textThreadStart__nextFrame_hook
 #define s_retrieveTextCharacter retrieveTextCharacter_hook
 #define s_readByteFromW7ActiveBank readByteFromW7ActiveBank_hook
 #define s_readByteFromW7TextTableBank readByteFromW7TextTableBank_hook
@@ -1849,6 +1850,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_clearAllItemsAndPutLinkOnGround clearAllItemsAndPutLinkOnGround_hook
 #define s_copyTextCharacterGfx copyTextCharacterGfx_hook
 #define s_fileSelectThreadStart fileSelectThreadStart_hook
+#define s_fileSelectThreadStart__nextFrame fileSelectThreadStart__nextFrame_hook
 #define s_secretFunctionCaller secretFunctionCaller_hook
 #define s_openSecretInputMenu openSecretInputMenu_hook
 #define s_updateMenus updateMenus_hook
@@ -1866,6 +1868,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_getRoomDungeonProperties getRoomDungeonProperties_hook
 #define s_copy8BytesFromRingMapToCec0 copy8BytesFromRingMapToCec0_hook
 #define s_thread_1b10 thread_1b10_hook
+#define s_thread_1b10__nextFrame thread_1b10__nextFrame_hook
 #define s_objectAddToAButtonSensitiveObjectList objectAddToAButtonSensitiveObjectList_hook
 #define s_objectRemoveFromAButtonSensitiveObjectList objectRemoveFromAButtonSensitiveObjectList_hook
 #define s_linkInteractWithAButtonSensitiveObjects linkInteractWithAButtonSensitiveObjects_hook
@@ -2087,6 +2090,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_itemUpdateAngle itemUpdateAngle_hook
 #define s_getFreeItemSlot getFreeItemSlot_hook
 #define s_introThreadStart introThreadStart_hook
+#define s_introThreadStart__nextFrame introThreadStart__nextFrame_hook
 #define s_intro_cinematic intro_cinematic_hook
 #define s_func_2d48 func_2d48_hook
 #define s_clearFadingPalettes clearFadingPalettes_hook
@@ -2158,7 +2162,9 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_startFadeBetweenTwoPalettes startFadeBetweenTwoPalettes_hook
 #define s_setPaletteThreadDelay setPaletteThreadDelay_hook
 #define s_paletteFadeThreadStart paletteFadeThreadStart_hook
+#define s_paletteFadeThreadStart__nextFrame paletteFadeThreadStart__nextFrame_hook
 #define s_mainThreadStart mainThreadStart_hook
+#define s_mainThreadStart__nextFrame mainThreadStart__nextFrame_hook
 #define s_loadScreenMusic loadScreenMusic_hook
 #define s_applyWarpDest applyWarpDest_hook
 #define s_loadScreenMusicAndSetRoomPack loadScreenMusicAndSetRoomPack_hook
