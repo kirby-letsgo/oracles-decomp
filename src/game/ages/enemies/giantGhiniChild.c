@@ -242,7 +242,7 @@ void giantGhiniChild_stateB_hook(GB *gb) {
   CYC(b_+24, b_+26);
   CYC(b_+26, b_+27); A = mem_rd(gb, HL);
   CYC(b_+27, b_+29); alu_sub(gb, 0x03); // BTN_A|BTN_B
-  if (F & FC) { CYCT(b_+29, b_+31); goto storeCounter1; } // jr nc
+  if (!(F & FC)) { CYCT(b_+29, b_+31); goto storeCounter1; } // jr nc
   CYC(b_+29, b_+31);
   CYC(b_+31, b_+33); A = 0x01;
 

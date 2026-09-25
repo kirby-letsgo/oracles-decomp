@@ -43,7 +43,7 @@ void zora_waitForLinkToMoveDown_hook(GB *gb) {
   CYC(b_+0, b_+3); A = mem_rd(gb, w1Link_yh);
   CYC(b_+3, b_+5); alu_cp(gb, 0x18);
   CYC(b_+5, b_+7); A = 0x01;
-  if (F & FC) { CYCT(b_+7, b_+9); goto store; }
+  if (!(F & FC)) { CYCT(b_+7, b_+9); goto store; }
   CYC(b_+7, b_+9);
   CYC(b_+9, b_+10); A = alu_dec8(gb, A);
 store:

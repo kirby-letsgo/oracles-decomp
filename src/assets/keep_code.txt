@@ -11,3 +11,4 @@ seasons 00d336-00d337       # the same one-byte overrun in Seasons (frame 4986 o
 seasons 012518-012519       # loadAnimationData@helper with an out-of-table index reads tileReplacement_group0Map6f+2 (frame 111847)
 seasons 01603d-01603e     # mapleState6 (Maple's item minigame) reads linkState12+0x33 as data (frame 194644)
 seasons 002e83-002e84     # loadAnimationData@helper with an out-of-table index reads _updateEnemiesIfStateIsZero@next+4 (frame 256212)
+seasons 000081-000082       # seasonsFunc_0c_699d (rolling spike trap) reads (bc) with c=$81 and b from var31, which is 0 there (frame 153461 of the console-verified resync)

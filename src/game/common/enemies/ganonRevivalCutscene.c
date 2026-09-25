@@ -56,7 +56,7 @@ void label_266_hook(GB *gb) {
   CYC(b_+13, b_+14); alu_sub(gb, C);
   CYC(b_+14, b_+16); alu_add(gb, 0x08);
   CYC(b_+16, b_+18); alu_cp(gb, 0x11);
-  if (F & FC) { CYCT(b_+18, b_+20); goto checkOtherAxis; } // jr nc
+  if (!(F & FC)) { CYCT(b_+18, b_+20); goto checkOtherAxis; } // jr nc
   CYC(b_+18, b_+20);
   CYC(b_+20, b_+22); A = hram_rd(gb, (uint8_t)hFF8F);
   CYC(b_+22, b_+23); alu_sub(gb, B);
@@ -124,7 +124,7 @@ void label_270_hook(GB *gb) {
   CYC(b_+5, b_+6); A = mem_rd(gb, HL); // [counter1]
   CYC(b_+6, b_+8); alu_cp(gb, 0x10);
   CYC(b_+8, b_+9); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
-  if (F & FC) { CYCT(b_+9, b_+11); goto delete; } // jr nc
+  if (!(F & FC)) { CYCT(b_+9, b_+11); goto delete; } // jr nc
   CYC(b_+9, b_+11);
   CALL_C(b_+11, ganonRevivalCutscene_spawnShadow_hook, SYM(ganonRevivalCutscene_spawnShadow), b_+14);
   CYC(b_+14, b_+16); E = ENEMY_BASE + 0x30; // Enemy.var30

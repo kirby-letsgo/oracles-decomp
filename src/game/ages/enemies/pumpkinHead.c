@@ -272,7 +272,7 @@ justGrabbed:
   CYC(b_+38, b_+39); A = mem_rd(gb, HL);
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x13);
   CYC(b_+41, b_+43); alu_cp(gb, 0x13);
-  if (F & FC) { CYCT(b_+43, b_+45); goto L_6242; } // jr nc
+  if (!(F & FC)) { CYCT(b_+43, b_+45); goto L_6242; } // jr nc
   CYC(b_+43, b_+45);
   CYC(b_+45, b_+47); L = ENEMY_BASE + OBJ_ZH;
   CYC(b_+47, b_+49); mem_wr(gb, HL, 0xf8);
@@ -932,13 +932,13 @@ void pumpkinHead_ghost_state17_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_sub(gb, C);
   CYC(b_+7, b_+9); alu_add(gb, 0x08);
   CYC(b_+9, b_+11); alu_cp(gb, 0x11);
-  if (F & FC) { CYCT(b_+11, b_+13); goto moveTowardHead; } // jr nc
+  if (!(F & FC)) { CYCT(b_+11, b_+13); goto moveTowardHead; } // jr nc
   CYC(b_+11, b_+13);
   CYC(b_+13, b_+15); A = H8(hFF8F);
   CYC(b_+15, b_+16); alu_sub(gb, B);
   CYC(b_+16, b_+18); alu_add(gb, 0x08);
   CYC(b_+18, b_+20); alu_cp(gb, 0x11);
-  if (F & FC) { CYCT(b_+20, b_+22); goto moveTowardHead; } // jr nc
+  if (!(F & FC)) { CYCT(b_+20, b_+22); goto moveTowardHead; } // jr nc
   CYC(b_+20, b_+22);
   CYC(b_+22, b_+24); A = OBJ_RELATED2 + 1; // Object.relatedObj2+1
   CALL_C(b_+24, objectGetRelatedObject1Var_hook, SYM(objectGetRelatedObject1Var), b_+27);

@@ -1,0 +1,2 @@
+# tools/audit_cond.py: taken ranges whose inner conditional is never taken on that path
+findByteAtHl +1   # or a / ret z / cp e / jr nz: A is nonzero there, the ret z falls through

@@ -1291,13 +1291,13 @@ void octogon_moveTowardTargetPosition_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_sub(gb, C);
   CYC(b_+7, b_+8); A = alu_inc8(gb, A);
   CYC(b_+8, b_+10); alu_cp(gb, 0x03);
-  if (F & FC) { CYCT(b_+10, b_+13); ecom_moveTowardPosition_b0f_hook(gb); return; } // jp nc
+  if (!(F & FC)) { CYCT(b_+10, b_+13); ecom_moveTowardPosition_b0f_hook(gb); return; } // jp nc
   CYC(b_+10, b_+13);
   CYC(b_+13, b_+15); A = mem_rd(gb, hFF8F); // hFF8F
   CYC(b_+15, b_+16); alu_sub(gb, B);
   CYC(b_+16, b_+17); A = alu_inc8(gb, A);
   CYC(b_+17, b_+19); alu_cp(gb, 0x03);
-  if (F & FC) { CYCT(b_+19, b_+22); ecom_moveTowardPosition_b0f_hook(gb); return; } // jp nc
+  if (!(F & FC)) { CYCT(b_+19, b_+22); ecom_moveTowardPosition_b0f_hook(gb); return; } // jp nc
   CYC(b_+19, b_+22);
   CYC(b_+22, b_+24); L = ENEMY_BASE + OBJ_YH;
   CYC(b_+24, b_+25); mem_wr(gb, HL, B);
