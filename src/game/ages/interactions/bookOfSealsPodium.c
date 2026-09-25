@@ -203,7 +203,7 @@ void interactionCodeb4__state2_hook(GB *gb) {
   CYC(b_+147, b_+149); A = 0x55; // TREASURE_BOOK_OF_SEALS
   CALL_C(b_+149, loseTreasure_hook, SYM(loseTreasure), b_+152);
   CYC(b_+152, b_+154);
-  interactionCodeb4__activatedBook_hook(gb);
+  TAIL(interactionCodeb4__activatedBook);
 }
 
 void interactionCodeb4__state3_hook(GB *gb) {
@@ -219,7 +219,7 @@ void interactionCodeb4__state3_hook(GB *gb) {
   CYC(b_+167, b_+169); A = 0xf4;
   CYC(b_+169, b_+170); mem_wr(gb, DE, A);
   CYC(b_+170, b_+173);
-  interactionCodeb4__func_69ce_hook(gb);
+  TAIL(interactionCodeb4__func_69ce);
 }
 
 void interactionCodeb4__state4_hook(GB *gb) {
