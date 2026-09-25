@@ -1,95 +1,113 @@
 Native reimplementation of The Legend of Zelda: Oracle of Ages and Oracle of Seasons in C.
 
+Every routine the games run is readable C: all of Ages, and 99% of Seasons (shared with Ages
+where the two games agree, hand-written where Seasons differs; the rest is generated C from the
+disassembly). The native build runs both games with no CPU emulator and no ROM code. Behaviour is
+checked against the original ROM by replaying full playthroughs and comparing every C routine
+with the original code it replaces.
 
-# Oracles-Decomp Development Setup
+You need your own US ROMs; none are included.
 
 ## Prerequisites
-- macOS (Linux/Windows supported via CMake)
-- Xcode Command Line Tools
-- Homebrew (for dependencies)
-- CMake 3.15+
-- SDL3 (via Homebrew)
-- Clang
 
-## Installation
+- macOS (Linux and Windows build through CMake)
+- Xcode Command Line Tools (Clang)
+- CMake 3.15+ and Ninja
+- SDL3 (Homebrew, or fetched automatically on first configure)
+- Python 3, and wla-dx plus pyyaml to build the disassembly's symbol files
 
-1. **Install dependencies**:
-   ```bash
-   brew install cmake sdl3
-   ````
+```bash
+brew install cmake ninja sdl3 wla-dx
+pip3 install pyyaml
+```
 
-2. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-username/oracles-decomp.git
-   cd oracles-decomp
-   ````
+## Setup
 
-3. **Initialize submodules** (if needed):
-   ```bash
-   git submodule update --init --recursive
-   ````
+```bash
+git clone git@github.com:kirby-letsgo/oracles-decomp.git
+cd oracles-decomp
+git submodule update --init --recursive
+make -C ref/oracles-disasm ages CPUS=4
+make -C ref/oracles-disasm seasons CPUS=4
+```
 
-## Build Instructions
+Put the ROMs and the CGB boot ROM in `roms/` (git-ignored):
 
-1. **Configure with CMake**:
-   ```bash
-   mkdir -p build && cd build
-   cmake -S .. -G Ninja
-   ````
+| File | SHA1 |
+|---|---|
+| `roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc` | `880374fb978b18af4aa529e2e32f7ffb4d7dd2f4` |
+| `roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc` | `ba1268290fb2b1b70505d2d7b5825fc8a4816a4b` |
+| `roms/cgb_boot.bin` | the Game Boy Color boot ROM |
 
-2. **Build the project**:
-   ```bash
-   ninja
-   ````
+## Build
 
-3. **Run tests**:
-   ```bash
-   ctest
-   ````
+```bash
+cmake -S . -B build -G Ninja
+cmake --build build
+ctest --test-dir build
+```
 
-## Running the Game
+`-DORACLES_SDL=OFF` builds only the headless tools.
 
-1. **Prepare a ROM**:
-   - Place a US ROM in `roms/` (e.g., `roms/oracle_of_ages.gbc`)
-   - Ensure it matches the SHA1 hash in `porting-notes.md`
+## Playing
 
-2. **Interactive play (SDL window)**:
+Two apps, same game, same controls:
 
-   The default `build/` tree only builds `oracles-run`, a headless CLI used for
-   verification. To get a playable window, configure a separate tree with
-   `-DORACLES_SDL=ON`:
-   ```bash
-   cmake -B build-sdl -DORACLES_SDL=ON
-   cmake --build build-sdl -j4 --target oracles
-   ./build-sdl/oracles roms/oracle_of_ages.gbc roms/cgb_boot.bin
-   ````
-   Note: `oracles` takes positional args (`ROM [BOOTROM]`), not `--rom`/`--boot`
-   flags — those flags are only for the headless `oracles-run` tool below.
-   The first configure fetches SDL3 automatically if it isn't found via
-   Homebrew, so it can take a few minutes.
+- `oracles-native`, the real port: no CPU emulator. On first launch it reads your ROM once,
+  keeps the graphics, sound and data, zeroes the code bytes, and caches the result; later
+  launches never touch the ROM again.
+  ```bash
+  ./build/oracles-native "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
+  ```
+- `oracles`, the development app: runs the ROM on our emulator core with the C routines hooked
+  in, so it can boot the real boot ROM, record playthroughs and fall back to the original code.
+  ```bash
+  ./build/oracles "roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc" roms/cgb_boot.bin
+  ```
 
-   Controls: arrow keys to move, `X`/`Z` for A/B, Return for Start, Right
-   Shift for Select.
+Controls: arrow keys to move, `X` / `Z` for A / B, Return or Esc for Start, Backspace or Right
+Shift for Select, `M` to mute, `F12` for a screenshot. In `oracles`, Cmd+S saves a state and
+Cmd+R loads it. The game's own save (battery RAM) is kept next to the ROM as `.sav`.
 
-3. **Headless run (no window)**:
-   ```bash
-   ./build/oracles-run --rom roms/oracle_of_ages.gbc --boot roms/cgb_boot.bin
-   ````
+## Recording a playthrough
 
-## TAS Replay
+The recordings in `tas/` are the test suite. To extend the Seasons one:
 
-1. **Run the full movie**:
-   ```bash
-   TAS_FRAMES=289518 ctest -R tas
-   ````
+```bash
+./build/oracles "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc" roms/cgb_boot.bin --record tas/seasons-play.inputs
+```
 
-2. **Debug frame hashes**:
-   ```bash
-   ./build/oracles-run --tas tas/ages-consoleverified.inputs --probe
-   ````
+It resumes where the file ends (from a snapshot, without replaying) and writes the file every
+minute and on quit. Loading a save state while recording rewinds the recording to that point.
+See `tas/README.md` for re-recording the reference hashes afterwards.
 
-## Notes
-- ROMs are git-ignored (add to `.gitignore`)
-- Use `--no-hooks` for fast verification
-- Debug with `--report` for hook statistics
-- See `docs/progress.md` for milestone status
+## Verification
+
+```bash
+ctest --test-dir build                          # unit suites, first 20k frames, native runs
+TAS_FRAMES=289518 ctest --test-dir build -R tas  # the whole Ages movie
+```
+
+The headless runner replays a movie and checks it:
+
+```bash
+./build/oracles-run --rom ROM --boot roms/cgb_boot.bin --init-ram tas/gbhawk-wram0.txt \
+  --tas tas/seasons-play.inputs --frames 265064 --verify-shadow --ref-check tas/seasons-play.ref
+```
+
+`--verify-shadow` runs every hooked C routine, replays the original code from the same state and
+compares registers, memory and cycles. `--ref-check` compares the machine state every 60 frames
+with the hashes the pure interpreter (`--no-hooks`) recorded. `oracles-native-run` replays
+movies on the native build.
+
+## Layout
+
+- `src/core/`, `src/hw/`: SM83 CPU, memory bus, PPU, APU, timers.
+- `src/game/`: the game in C, one file per disassembly file; `src/game/seasons/` holds the
+  Seasons-only code.
+- `src/hooks/`: the address-to-function tables and the lists the generators read.
+- `src/rt/`: the native runtime (no interpreter).
+- `src/platform/`: the SDL apps and the headless runner.
+- `tools/`: generators and the audits run on every change.
+- `tas/`: input movies and reference hashes.
+- `ref/oracles-disasm/`: the community disassembly (submodule), used for symbols and routines.

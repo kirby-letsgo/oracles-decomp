@@ -40,3 +40,10 @@
 0a:4b32 interactionCodeb7__afterCall48b5
 03:4071 setCpuToDoubleSpeed extern
 02:50ce reloadGraphicsOnExitMenu_body__afterCall
+01:4c3f cutscene15__state1__substate2__afterCall4ca4
+00:33d4 updateAllObjects__jump34ad
+02:416a fileSelectMode1__subModes
+02:508b menuStateFadeOutOfMenu__afterCall
+02:6848 dungeonMap_checkCompassTile__treasure68e3
+02:684f dungeonMap_checkCompassTile__nothing68ea
+02:6851 dungeonMap_checkCompassTile__ret68ec

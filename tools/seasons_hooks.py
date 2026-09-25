@@ -160,7 +160,7 @@ def main():
         if '@' in name and name.split('@')[0] in ofs_parents and name in seasons_names: return 'IDENTICAL'   # the mapped C covers its locals
         if name in hand_ok and name in seasons_names: return 'IDENTICAL'
         if unpairable.match(name): return local_verdict(name) if name in ages_labels else 'AGES_ONLY'
-        if name not in seasons_names: return 'AGES_ONLY'
+        if name not in seasons_names and name.replace('@', '__') not in seasons_names: return 'AGES_ONLY'
         if name in verdict: return verdict[name]
         if name.replace('@', '__') in verdict: return verdict[name.replace('@', '__')]
         if '@' in name and name in ages_labels: return local_verdict(name)

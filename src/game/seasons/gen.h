@@ -503,10 +503,6 @@ void s_cutscene11_hook(GB *gb);
 void s_cutscene12_hook(GB *gb);
 void s_cutscene13_hook(GB *gb);
 void s_cutscene14_hook(GB *gb);
-void s_cutscene15__state1__substate2(GB *gb);
-void s_cutscene15__state1__substate2__afterCall4ca4(GB *gb);
-void s_cutscene15__state1__substate2__afterCall4ca4__afterCall4c5b(GB *gb);
-void s_cutscene15__state1__substate2__afterCall4ca4__afterCall4c63(GB *gb);
 void s_determineCompanionRegionSeason_hook(GB *gb);
 void s_determineSeasonForRoomPack_hook(GB *gb);
 void s_findActiveRoomInDungeonLayout_hook(GB *gb);
@@ -1388,11 +1384,6 @@ void s_seasonsFunc_0c_69d2_hook(GB *gb);
 void s_seasonsFunc_0c_69fd_hook(GB *gb);
 void s_checkPirateShipMoved_hook(GB *gb);
 void s_checkWhetherToDisplaySeasonInSubscreen_hook(GB *gb);
-void s_dungeonMap_checkCompassTile____treasure(GB *gb);
-void s_dungeonMap_checkCompassTile____nothing(GB *gb);
-void s_dungeonMap_checkCompassTile____ret(GB *gb);
-void s_fileSelectMode1__mode1SubModes(GB *gb);
-void s_fileSelectMode1__state3(GB *gb);
 void s_inventoryMenuState2_hook(GB *gb);
 void s_loadCommonGraphics_body_hook(GB *gb);
 void s_loadMinimapDisplayRoom_hook(GB *gb);
@@ -2181,6 +2172,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_loadScreenMusicAndSetRoomPack loadScreenMusicAndSetRoomPack_hook
 #define s_dismountCompanionAndSetRememberedPositionToScreenCenter dismountCompanionAndSetRememberedPositionToScreenCenter_hook
 #define s_updateAllObjects updateAllObjects_hook
+#define s_updateAllObjects__jump34ad updateAllObjects__jump34ad_hook
 #define s_updateSpecialObjectsAndInteractions updateSpecialObjectsAndInteractions_hook
 #define s_updateInteractionsAndDrawAllSprites updateInteractionsAndDrawAllSprites_hook
 #define s_func_3539 func_3539_hook
@@ -2283,6 +2275,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_cutscene17 cutscene17_hook
 #define s_initWaveScrollValuesForEverySecondLine initWaveScrollValuesForEverySecondLine_hook
 #define s_cutscene15 cutscene15_hook
+#define s_cutscene15__state1__substate2__afterCall4ca4 cutscene15__state1__substate2__afterCall4ca4_hook
 #define s_cutscene18 cutscene18_hook
 #define s_cutscene19 cutscene19_hook
 #define s_cutscene18__afterCall4d27 cutscene18__afterCall4d27_hook
@@ -2395,6 +2388,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_getFileDisplayVariableAddress_paramE getFileDisplayVariableAddress_paramE_hook
 #define s_fileSelectMode0 fileSelectMode0_hook
 #define s_fileSelectMode1 fileSelectMode1_hook
+#define s_fileSelectMode1__subModes fileSelectMode1__subModes_hook
 #define s_fileSelectMode5 fileSelectMode5_hook
 #define s_fileSelectMode3 fileSelectMode3_hook
 #define s_fileSelectMode4 fileSelectMode4_hook
@@ -2445,6 +2439,7 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_menuStateFadeIntoMenu menuStateFadeIntoMenu_hook
 #define s_saveGraphicsOnEnterMenu_body saveGraphicsOnEnterMenu_body_hook
 #define s_menuStateFadeOutOfMenu menuStateFadeOutOfMenu_hook
+#define s_menuStateFadeOutOfMenu__afterCall menuStateFadeOutOfMenu__afterCall_hook
 #define s_reloadGraphicsOnExitMenu_body reloadGraphicsOnExitMenu_body_hook
 #define s_reloadGraphicsOnExitMenu_body__afterCall reloadGraphicsOnExitMenu_body__afterCall_hook
 #define s_menuStateFadeIntoGame menuStateFadeIntoGame_hook
@@ -2553,6 +2548,9 @@ void s_scriptCmd_jump_hook(GB *gb);
 #define s_dungeonMap_getTileForRoom dungeonMap_getTileForRoom_hook
 #define s_dungeonMap_checkCanViewFloor dungeonMap_checkCanViewFloor_hook
 #define s_dungeonMap_checkCompassTile dungeonMap_checkCompassTile_hook
+#define s_dungeonMap_checkCompassTile__treasure68e3 dungeonMap_checkCompassTile__treasure68e3_hook
+#define s_dungeonMap_checkCompassTile__nothing68ea dungeonMap_checkCompassTile__nothing68ea_hook
+#define s_dungeonMap_checkCompassTile__ret68ec dungeonMap_checkCompassTile__ret68ec_hook
 #define s_dungeonMap_getFloorAddress dungeonMap_getFloorAddress_hook
 #define s_runRingMenu runRingMenu_hook
 #define s_ringMenu_state0 ringMenu_state0_hook

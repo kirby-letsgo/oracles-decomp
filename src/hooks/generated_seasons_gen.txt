@@ -499,10 +499,6 @@
 01:5c3d s_cutscene12_hook -
 01:5b4e s_cutscene13_hook -
 01:613a s_cutscene14_hook -
-01:4c0f s_cutscene15__state1__substate2 L
-01:4c3f s_cutscene15__state1__substate2__afterCall4ca4 -
-01:4c5b s_cutscene15__state1__substate2__afterCall4ca4__afterCall4c5b L
-01:4c63 s_cutscene15__state1__substate2__afterCall4ca4__afterCall4c63 L
 01:7e3c s_determineCompanionRegionSeason_hook -
 01:7e09 s_determineSeasonForRoomPack_hook -
 01:551f s_findActiveRoomInDungeonLayout_hook -
@@ -1384,11 +1380,6 @@
 0c:69fd s_seasonsFunc_0c_69fd_hook -
 02:66ab s_checkPirateShipMoved_hook -
 02:58f0 s_checkWhetherToDisplaySeasonInSubscreen_hook -
-02:6848 s_dungeonMap_checkCompassTile____treasure L
-02:684f s_dungeonMap_checkCompassTile____nothing L
-02:6851 s_dungeonMap_checkCompassTile____ret L
-02:416a s_fileSelectMode1__mode1SubModes L
-02:422d s_fileSelectMode1__state3 L
 02:5704 s_inventoryMenuState2_hook -
 02:5127 s_loadCommonGraphics_body_hook -
 02:5f8d s_loadMinimapDisplayRoom_hook -
