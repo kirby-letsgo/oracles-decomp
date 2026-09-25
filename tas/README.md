@@ -1,6 +1,6 @@
 # TAS input movies
 
-Used as deterministic playthrough scripts for the verification suite. See `docs/design.md`.
+Used as deterministic playthrough scripts for the verification suite.
 
 | File | Game | Author | Source | Core | Frames |
 |---|---|---|---|---|---|
@@ -17,10 +17,12 @@ to record a playthrough on our own core: `oracles ROM roms/cgb_boot.bin --record
 boots exactly like the headless runner (AGB patch, `gbhawk-wram0.txt`, fresh SRAM), writes the
 file every 60 seconds and on quit, and fast-forwards through an existing file before appending.
 
-`seasons-play.inputs` is a playthrough recorded with `oracles --record` on 2026-09-20 (33,337
-frames: file creation, the intro, the first area); `seasons-play.ref` is the interpreter's state
-every 60 frames on it, and `tests/test_tas.c` replays it with hooks on. Extend it by running the
-same `--record` command again (it resumes), then re-record the `.ref` with `--no-hooks`.
+`seasons-play.inputs` is a playthrough recorded with `oracles --record` (265,064 frames: file
+creation, the intro, Horon Village, the first dungeon and beyond); `seasons-play.ref` is the
+interpreter's state every 60 frames on it, and `tests/test_tas.c` and `tests/test_native_tas.c`
+replay it (with hooks, and on the native build). Extend it by running the same `--record`
+command again (it resumes), then re-record the `.ref` with `--no-hooks --ref-out` over the new
+length and update the frame count in both tests.
 
 `seasons-noinput.ref` is the interpreter's (`--no-hooks`) state every 60 frames for a 30,000-frame
 run of the Seasons ROM with no input (logos, title, attract demo); `tests/test_tas.c` replays it
