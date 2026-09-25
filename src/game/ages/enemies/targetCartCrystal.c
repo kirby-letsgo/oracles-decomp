@@ -96,6 +96,7 @@ void targetCartCrystal_state0_hook(GB *gb) {
   CALL_C(b_+3, targetCartCrystal_loadPosition_hook, SYM(targetCartCrystal_loadPosition), b_+6);
   CALL_C(b_+6, targetCartCrystal_loadBehaviour_hook, SYM(targetCartCrystal_loadBehaviour), b_+9);
   if (F & FZ) { CYCT(b_+9, b_+11); goto skipInitSpeed; } // jr z
+  CYC(b_+9, b_+11);
   CALL_C(b_+11, targetCartCrystal_initSpeed_hook, SYM(targetCartCrystal_initSpeed), b_+14);
 
 skipInitSpeed:
@@ -111,6 +112,7 @@ void targetCartCrystal_state1_hook(GB *gb) {
   CYC(b_+2, b_+3); A = mem_rd(gb, DE);
   CYC(b_+3, b_+4); alu_or(gb, A);
   if (F & FZ) { CYCT(b_+4, b_+6); goto checkDeleteInFirstRoom; } // jr z
+  CYC(b_+4, b_+6);
   CALL_C(b_+6, targetCartCrystal_updateMovement_hook, SYM(targetCartCrystal_updateMovement), b_+9);
 
 checkDeleteInFirstRoom:

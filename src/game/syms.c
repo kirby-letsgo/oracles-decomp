@@ -14969,6 +14969,8 @@ static const uint32_t syms_ages[SYM_COUNT] = {
   0xffffffff,
   0xffffffff,
   0xffffffff,
+  0xffffffff,
+  0xffffffff,
 };
 static const uint32_t syms_seasons[SYM_COUNT] = {
   0x0015420d,
@@ -29939,6 +29941,8 @@ static const uint32_t syms_seasons[SYM_COUNT] = {
   0x0005708d,
   0x00106c5b,
   0x001070f3,
+  0x00117e40,
+  0x00014845,
 };
 static const uint32_t ram_ages[RAMSYM_COUNT] = {
   0x00000000,

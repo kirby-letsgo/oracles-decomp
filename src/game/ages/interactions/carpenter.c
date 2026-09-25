@@ -308,6 +308,7 @@ runSubid:
   CALL_C(b_+370, objectUpdateSpeedZ_paramC_hook, SYM(objectUpdateSpeedZ_paramC), b_+373);
   CALL_C(b_+373, interactionRunScript_hook, SYM(interactionRunScript), b_+376);
   if (!(F & FC)) { CYCT(b_+376, b_+377); ret_effect(gb); return; } // ret nc
+  CYC(b_+376, b_+377);
 
 delete2:
   CYC(b_+377, b_+380); TAIL(interactionDelete); // jp

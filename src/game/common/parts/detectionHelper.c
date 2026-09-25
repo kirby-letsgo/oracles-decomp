@@ -104,7 +104,7 @@ L_48f2:
   CYC(b_+76, b_+78); E = 0x02;
   CYC(b_+78, b_+81); detectionHelper_spawnCollisionHelper_hook(gb);
   CYC(b_+81, b_+83); E = 0x03;
-  detectionHelper_spawnCollisionHelper_hook(gb); return; // falls through
+  detectionHelper_spawnCollisionHelper_hook(gb); ret_effect(gb); return; // falls through: the helper's ret is this routine's
 
 subid0_state0:
   CYC(b_+108, b_+109); H = D;

@@ -14970,6 +14970,8 @@ enum {
   S_rickyStateASubstate7,
   S_seasonsTable_10_6c5b,
   S_table_70f3,
+  S_objectData7e40,
+  S_paletteTransitionSeasonData,
   SYM_COUNT
 };
 enum {

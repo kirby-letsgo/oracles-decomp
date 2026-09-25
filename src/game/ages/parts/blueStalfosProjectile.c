@@ -141,7 +141,7 @@ state0:
 L_6fe1:
   CYC(b_+64, b_+66); A = 0xbf; // SND_BLUE_STALFOS_CHARGE
   CALL_C(b_+66, playSound_b00_hook, SYM(playSound_b00), b_+69);
-  CYC(b_+69, b_+73); TAIL(objectSetVisible81); // jp
+  CYC(b_+69, b_+72); TAIL(objectSetVisible81); // jp
 
 state1:
   CALL_C(b_+73, partCommon_decCounter1IfNonzero_hook, SYM(partCommon_decCounter1IfNonzero), b_+76);

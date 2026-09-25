@@ -176,6 +176,9 @@ def main():
                 if g.rd(bank, addr + off) not in (0xcd, 0xc4, 0xcc, 0xd4, 0xdc): return False
             ta = A.rd(a[0], a[1] + off + 1) | (A.rd(a[0], a[1] + off + 2) << 8)
             ts = S.rd(s_[0], s_[1] + off + 1) | (S.rd(s_[0], s_[1] + off + 2) << 8)
+            # a callee already checked by hand or resolved by gameconst (its C tells the games apart)
+            callee = A.by_addr.get((a[0] if ta >= 0x4000 else 0, ta))
+            if callee and (callee in hand_ok or callee.replace('@', '__') in const_resolved or callee in const_resolved): continue
             try:
                 an, ash = A.normalized(a[0], ta); sn, ssh = S.normalized(s_[0], ts)
                 if an != sn and ash == ssh: an, sn = reconcile(an, sn, A, S)

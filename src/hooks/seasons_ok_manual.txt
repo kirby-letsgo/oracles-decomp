@@ -101,3 +101,4 @@ parentItemCode_harp@getSelectedSongAddr   # Ages-only ret z / ld l,<wSelectedHar
 parentItemCode_shield@checkShieldIsUsable   # Seasons tail (no underwater/companion check) written under if (game_seasons) in shield_check_usable
 interactionCode0c@doSpecializedInitialization   # Ages-only underwater branch; Seasons tail written under game_seasons in breakTileDebris_doSpecializedInitialization
 interactionCodea8@handleSubidHighNibble   # Seasons things 0-5 (its own a8.s) written as the game_seasons branch of interactionCodea8_handleSubidHighNibble
+mapMenu_drawSpriteAtRoomIndex   # both bodies written out (the aligner pairs the wrong ld de)

@@ -167,7 +167,7 @@ seek:
   CYC(b_+134, b_+135); mem_wr(gb, DE, A);
   CALL_C(b_+135, rope_updateAnimationFromAngle_hook, SYM(rope_updateAnimationFromAngle), b_+138);
   CALL_C(b_+138, ecom_applyVelocityForSideviewEnemy_b0d_hook, SYM(ecom_applyVelocityForSideviewEnemy_b0d), b_+141);
-  CYC(b_+141, b_+148); TAIL(rope_animate); // jp
+  CYC(b_+141, b_+144); TAIL(rope_animate); // jp
 
 state_stub:
   RET(b_+148); return; // ret

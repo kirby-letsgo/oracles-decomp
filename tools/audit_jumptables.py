@@ -39,7 +39,14 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         try: ins = [x for x in G.body(bank, base & 0xffff) if x[0] == addr]
         except Exception: continue
         if not ins or ins[0][2] != 'jumptable': continue
-        targets = sorted(set(v for _, v in ins[0][4]))
+        entries = [v for _, v in ins[0][4]]
+        # the table ends at a branch target inside the routine (an anonymous `+` label the .sym lacks)
+        try: body = G.body(bank, base & 0xffff)
+        except Exception: body = []
+        branch = set(v for x in body if x[2] in ('jp', 'jpcc', 'jr', 'jrcc', 'call', 'callcc') for k2, v in x[4] if k2 == 'rom')
+        for k in range(1, len(entries)):
+            if addr + 1 + 2 * k in branch: entries = entries[:k]; break
+        targets = sorted(set(entries))
         text = ' '.join(x.split('//')[0] for x in L[i:i + 400])
         d0 = text.find('do {')
         if d0 != -1 and d0 < text.find('jump_table'):
@@ -64,7 +71,6 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         miss = [t for t in targets if t not in have]
         # a chain that branches on the index it dispatched (`substate == k`) instead of the target
         idx_have = set(int(n) for n in re.findall(r'\b(?:substate|state|subid) == (\d+)', ' '.join(L[i:i + 60])))
-        entries = [v for _, v in ins[0][4]]
         miss = [t for t in miss if not all(k in idx_have for k, v in enumerate(entries) if v == t)]
         # the chain's default: a fallback (HANDOFF/hook_continue) dispatches whatever is hooked at the
         # target, so a hooked entry is covered; any other default (goto, TAIL, falling through) is

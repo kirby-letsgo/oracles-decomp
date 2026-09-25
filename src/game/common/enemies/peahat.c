@@ -135,7 +135,7 @@ void peahat_state9_hook(GB *gb) {
   CALL_C(b_+9, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+12);
   CYC(b_+12, b_+14); alu_and(gb, 0x07);
   CYC(b_+14, b_+17); SET_HL(SYM(peahat_counter1Vals)); // @counter1Vals
-  peahat_addAToHl_from_rst(gb, b_+18);
+  CYC(b_+17, b_+18); peahat_addAToHl_from_rst(gb, b_+18);
   CYC(b_+18, b_+20); E = ENEMY_BASE + OBJ_COUNTER1;
   CYC(b_+20, b_+21); A = mem_rd(gb, HL);
   CYC(b_+21, b_+22); mem_wr(gb, DE, A);
@@ -248,7 +248,7 @@ setZh:
   // Determine speed
   CYC(b_+22, b_+23); A = B;
   CYC(b_+23, b_+26); SET_HL(b_+74); // @speedVals
-  peahat_addAToHl_from_rst(gb, b_+27);
+  CYC(b_+26, b_+27); peahat_addAToHl_from_rst(gb, b_+27);
   CYC(b_+27, b_+29); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+29, b_+30); A = mem_rd(gb, HL);
   CYC(b_+30, b_+31); mem_wr(gb, DE, A);
@@ -261,7 +261,7 @@ animate:
   CYC(b_+40, b_+42); alu_and(gb, 0xf0);
   CYC(b_+42, b_+44); A = alu_swap(gb, A);
   CYC(b_+44, b_+47); SET_HL(b_+66); // @animFrequencies
-  peahat_addAToHl_from_rst(gb, b_+48);
+  CYC(b_+47, b_+48); peahat_addAToHl_from_rst(gb, b_+48);
   CYC(b_+48, b_+49); B = mem_rd(gb, HL);
   CYC(b_+49, b_+50); A = B;
   CYC(b_+50, b_+51); A = alu_inc8(gb, A);
@@ -274,5 +274,6 @@ checkFrequency:
   CYC(b_+58, b_+61); A = mem_rd(gb, wFrameCounter);
   CYC(b_+61, b_+62); alu_and(gb, B);
   if (F & FZ) { CYCT(b_+62, b_+65); enemyAnimate_hook(gb); return; } // jp z
+  CYC(b_+62, b_+65);
   RET(b_+65); return; // ret
 }

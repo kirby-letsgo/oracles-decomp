@@ -555,7 +555,7 @@ L_53d8:
   CYC(b_+104, b_+106); L = ENEMY_BASE + 0x30; // Enemy.var30
   CALL_C(b_+106, ecom_readPositionVars_b0f_hook, SYM(ecom_readPositionVars_b0f), b_+109);
   CALL_C(b_+109, smasher_updateAngleTowardPosition_hook, SYM(smasher_updateAngleTowardPosition), b_+112);
-  CYC(b_+112, b_+119); TAIL(enemySetAnimation); // jp
+  CYC(b_+112, b_+115); TAIL(enemySetAnimation); // jp
 }
 
 // Moving toward ball on the ground

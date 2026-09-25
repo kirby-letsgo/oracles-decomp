@@ -628,7 +628,7 @@ void swordEnemy_checkIgnoreCollision_hook(GB *gb) {
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);
   CYC(b_+12, b_+13); alu_add(gb, A);
   CYC(b_+13, b_+16); SET_HL(b_+21); // @angleBits
-  swordEnemy_addDoubleIndexToHl_from_rst(gb, b_+17);
+  CYC(b_+16, b_+17); swordEnemy_addDoubleIndexToHl_from_rst(gb, b_+17);
   CYC(b_+17, b_+18); A = B;
   CYC(b_+18, b_+21); TAIL(checkFlag); // jp
 }

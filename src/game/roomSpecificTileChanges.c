@@ -640,7 +640,7 @@ void tileReplacement_group0Mapba_hook(GB *gb) {
   CALL_C(b_+14, replaceVineTiles_hook, SYM(replaceVineTiles), b_+17);
   CYC(b_+17, b_+19); A = 0x8b;
   CYC(b_+19, b_+22); mem_wr(gb, wRoomLayout + 0x18, A);
-  CYC(b_+22, b_+26); ret_effect(gb);
+  CYC(b_+22, b_+23); ret_effect(gb);
 }
 
 void tileReplacement_group0Mapaa_hook(GB *gb) {

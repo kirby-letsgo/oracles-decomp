@@ -189,14 +189,12 @@ no_input_block:;
   CYC(b_+O(59), b_+OE(61)); mem_wr(gb, HL, (uint8_t)(mem_rd(gb, HL) & 0x7f));
   CALL_C(b_+O(61), updateGameKeysPressed_hook, SYM(updateGameKeysPressed), b_+OE(64));
   CYC(b_+O(64), b_+OE(67)); SET_HL(w1Companion);
-  CYC(b_+O(67), b_+OE(70)); push_effect(gb, b_+OE(70));
-  update_special_object(gb);
+  CYC(b_+O(67), b_+OE(70)); CALL_L_(update_special_object, b_+OE(70));
   CYC(b_+O(70), b_+OE(71)); alu_xor(gb, A);
   CYC(b_+O(71), b_+OE(74)); mem_wr(gb, wLinkClimbingVine, A);
   if (!game_seasons) { CYC(b_+74, b_+77); mem_wr(gb, wDisallowMountingCompanion, A); }
   CYC(b_+O(77), b_+OE(80)); SET_HL(w1Link);
-  CYC(b_+O(80), b_+OE(83)); push_effect(gb, b_+OE(83));
-  update_special_object(gb);
+  CYC(b_+O(80), b_+OE(83)); CALL_L_(update_special_object, b_+OE(83));
   CALL_C(b_+O(83), updateLinkInvincibilityCounter_hook, SYM(updateLinkInvincibilityCounter), b_+OE(86));
   CYC(b_+O(86), b_+OE(89)); A = mem_rd(gb, wLinkPlayingInstrument);
   CYC(b_+O(89), b_+OE(92)); mem_wr(gb, wLinkRidingObject, A);
