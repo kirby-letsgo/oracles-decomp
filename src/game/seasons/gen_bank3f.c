@@ -2,21 +2,6 @@
 #include "game/asm.h"
 #include "game/seasons/gen.h"
 
-// 3f:47ae
-void s_checkItemDropAvailable_body__done(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_47ae:
-  I(0x47ae, 2); C = 0xff;  // ld c,$ff
-  RET(0x47b0); return;  // ret
-}
-
-// 3f:4539
-void s_giveTreasure_body__ret(GB *gb) {
-  uint16_t sp0_ = gb->sp; (void)sp0_;
-L_4539:
-  RET(0x4539); return;  // ret
-}
-
 // 3f:4731
 void s_loadTreasureDisplayData__getTableIndices_b3f(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
