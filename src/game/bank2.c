@@ -5381,40 +5381,88 @@ void drawTreasureExtraTiles__val00_hook(GB *gb) {
   CYC(b_+O(78), b_+OE(79)); ret_effect(gb);
 }
 
+// Seasons: the magnet gloves' tile shows their polarity
 void drawTreasureExtraTiles__val03_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  AGES_ONLY();
-  CYC(b_+79, b_+80); ret_effect(gb);
+  if (game_seasons) {
+    CYC(b_+S(79), b_+S(80)); H = D;
+    CYC(b_+S(80), b_+S(81)); L = E;
+    CYC(b_+S(81), b_+S(84)); A = W8(wMagnetGlovePolarity);
+    CYC(b_+S(84), b_+S(86)); alu_and(gb, 0x01);
+    if (F & FZ) { CYCT(b_+S(86), b_+S(87)); ret_effect(gb); return; }
+    CYC(b_+S(86), b_+S(87));
+    CYC(b_+S(87), b_+S(89)); mem_wr(gb, HL, 0x0a);
+    CYC(b_+S(89), b_+S(91)); D |= 0x04;
+    CYC(b_+S(91), b_+S(92)); alu_rrca(gb);
+    CYC(b_+S(92), b_+S(93)); alu_or(gb, C);
+    CYC(b_+S(93), b_+S(94)); mem_wr(gb, DE, A);
+    CYC(b_+S(94), b_+S(95)); ret_effect(gb);
+  } else {
+    CYC(b_+79, b_+80); ret_effect(gb);
+  }
+}
+
+// Seasons: one tile per season obtained (wObtainedSeasons bits 0-3)
+static void drawTreasureExtraTiles__val02_seasons(GB *gb) {
+  BASE(drawTreasureExtraTiles);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+S(95), b_+S(96)); H = D;
+  CYC(b_+S(96), b_+S(97)); L = E;
+  CYC(b_+S(97), b_+S(99)); B = 0x1c;
+  CYC(b_+S(99), b_+S(102)); A = W8(wObtainedSeasons);
+  CYC(b_+S(102), b_+S(103)); alu_rrca(gb);
+  CYC(b_+S(103), b_+S(104)); E = A;
+  if (F & FC) { CALL_C_CC(b_+S(104), drawTreasureExtraTiles__drawTile_hook, b_+S(133), b_+S(107)); } else CYC(b_+S(104), b_+S(107));
+  CYC(b_+S(107), b_+S(109)); A = 0xe0;
+  CYC(b_+S(109), b_+S(110)); alu_add(gb, L);
+  CYC(b_+S(110), b_+S(111)); L = A;
+  CYC(b_+S(111), b_+S(112)); B = alu_inc8(gb, B);
+  CYC(b_+S(112), b_+S(114)); E = alu_srl(gb, E);
+  if (F & FC) { CALL_C_CC(b_+S(114), drawTreasureExtraTiles__drawTile_hook, b_+S(133), b_+S(117)); } else CYC(b_+S(114), b_+S(117));
+  CYC(b_+S(117), b_+S(118)); L = alu_inc8(gb, L);
+  CYC(b_+S(118), b_+S(119)); B = alu_inc8(gb, B);
+  CYC(b_+S(119), b_+S(121)); E = alu_srl(gb, E);
+  if (F & FC) { CALL_C_CC(b_+S(121), drawTreasureExtraTiles__drawTile_hook, b_+S(133), b_+S(124)); } else CYC(b_+S(121), b_+S(124));
+  CYC(b_+S(124), b_+S(126)); A = 0x20;
+  CYC(b_+S(126), b_+S(127)); push_effect(gb, b_+S(127)); add_a_to_hl(gb);
+  CYC(b_+S(127), b_+S(128)); B = alu_inc8(gb, B);
+  CYC(b_+S(128), b_+S(130)); E = alu_srl(gb, E);
+  if (F & FC) { CYCT(b_+S(130), b_+S(132)); drawTreasureExtraTiles__drawTile_hook(gb); return; }
+  CYC(b_+S(130), b_+S(132));
+  CYC(b_+S(132), b_+S(133)); ret_effect(gb);
 }
 
 void drawTreasureExtraTiles__val02_hook(GB *gb) {
   BASE(drawTreasureExtraTiles);
-  AGES_ONLY();
-  CYC(b_+80, b_+81); H = D;
-  CYC(b_+81, b_+82); L = E;
-  CYC(b_+82, b_+83); A = C;
-  CYC(b_+83, b_+85); alu_cp(gb, 0x07);
-  if (F & FZ) { CYCT(b_+85, b_+87); drawTreasureExtraTiles__val02__drawOnInventory_hook(gb); return; }
-  CYC(b_+85, b_+87);
-  CYC(b_+87, b_+89); A = 0x1f;
-  CYC(b_+89, b_+90); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+90, b_+92); mem_wr(gb, HL, 0x1d);
-  CYC(b_+92, b_+94); H |= 0x04;
-  CYC(b_+94, b_+96); A = 0x80;
-  CYC(b_+96, b_+97); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+97, b_+98); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+98, b_+100); mem_wr(gb, HL, 0x00);
-  CYC(b_+100, b_+103); SET_BC((hSoundChannelBanks + 6));
-  CYC(b_+103, b_+104); alu_add_hl(gb, BC);
-  CYC(b_+104, b_+106); mem_wr(gb, HL, 0x00);
-  CYC(b_+106, b_+107); L = alu_dec8(gb, L);
-  CYC(b_+107, b_+108); mem_wr(gb, HL, A); SET_HL(HL - 1);
-  CYC(b_+108, b_+109); mem_wr(gb, HL, A);
-  CYC(b_+109, b_+111); H &= ~0x04;
-  CYC(b_+111, b_+113); A = 0x1c;
-  CYC(b_+113, b_+114); mem_wr(gb, HL, A); SET_HL(HL + 1);
-  CYC(b_+114, b_+116); mem_wr(gb, HL, 0x1e);
-  CYC(b_+116, b_+117); ret_effect(gb);
+  if (game_seasons) {
+    drawTreasureExtraTiles__val02_seasons(gb);
+  } else {
+    CYC(b_+80, b_+81); H = D;
+    CYC(b_+81, b_+82); L = E;
+    CYC(b_+82, b_+83); A = C;
+    CYC(b_+83, b_+85); alu_cp(gb, 0x07);
+    if (F & FZ) { CYCT(b_+85, b_+87); drawTreasureExtraTiles__val02__drawOnInventory_hook(gb); return; }
+    CYC(b_+85, b_+87);
+    CYC(b_+87, b_+89); A = 0x1f;
+    CYC(b_+89, b_+90); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(b_+90, b_+92); mem_wr(gb, HL, 0x1d);
+    CYC(b_+92, b_+94); H |= 0x04;
+    CYC(b_+94, b_+96); A = 0x80;
+    CYC(b_+96, b_+97); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+97, b_+98); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+98, b_+100); mem_wr(gb, HL, 0x00);
+    CYC(b_+100, b_+103); SET_BC((hSoundChannelBanks + 6));
+    CYC(b_+103, b_+104); alu_add_hl(gb, BC);
+    CYC(b_+104, b_+106); mem_wr(gb, HL, 0x00);
+    CYC(b_+106, b_+107); L = alu_dec8(gb, L);
+    CYC(b_+107, b_+108); mem_wr(gb, HL, A); SET_HL(HL - 1);
+    CYC(b_+108, b_+109); mem_wr(gb, HL, A);
+    CYC(b_+109, b_+111); H &= ~0x04;
+    CYC(b_+111, b_+113); A = 0x1c;
+    CYC(b_+113, b_+114); mem_wr(gb, HL, A); SET_HL(HL + 1);
+    CYC(b_+114, b_+116); mem_wr(gb, HL, 0x1e);
+    CYC(b_+116, b_+117); ret_effect(gb);
+  }
 }
 
 void drawTreasureExtraTiles__val02__drawOnInventory_hook(GB *gb) {

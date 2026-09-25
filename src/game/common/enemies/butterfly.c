@@ -35,7 +35,7 @@ void enemyCode37_hook(GB *gb) {
   {
     CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
     uint16_t target = butterfly_jump_table(gb);
-    if (target == b_+O(8)) goto state0;
+    if (target == b_+(game_seasons ? S(8) : 8)) goto state0;     // Seasons: state0 starts with the inserted wRoomStateModifier check
     if (target == b_+O(21)) goto state1;
     HANDOFF(target);
   }

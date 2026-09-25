@@ -447,7 +447,7 @@ void twinrova_stateD_hook(GB *gb) {
   CYC(b_+11, b_+13); L = 0x89;  // ld l,Enemy.angle
   CYC(b_+13, b_+15); alu_bit(gb, 4, mem_rd(gb, HL));  // bit 4,(hl)
   CYC(b_+15, b_+17); A = 0x0a;  // ld a,$0a
-  if ((F & FZ)) { CYCT(b_+17, b_+20); goto setAnim; } CYC(b_+17, b_+19);  // jr z,+
+  if ((F & FZ)) { CYCT(b_+17, b_+19); goto setAnim; } CYC(b_+17, b_+19);  // jr z,+
   CYC(b_+19, b_+20); A = alu_inc8(gb, A);  // inc a
 setAnim:
   CYC(b_+20, b_+23); if (hook_is(gb, SYM(enemySetAnimation), enemySetAnimation_hook)) { enemySetAnimation_hook(gb); return; } HANDOFF(SYM(enemySetAnimation));  // jp enemySetAnimation

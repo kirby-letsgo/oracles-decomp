@@ -71,14 +71,15 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
             if v is not None and v != ROM[fo + 1]:
                 bad += 1; print(f'{p}:{n}: {r} = {expr} is 0x{v:02x}, ROM has ld {r.lower()},${ROM[fo+1]:02x}')
                 fixes.setdefault(p, []).append((n, m.group(0), m.group(0).replace(f'{r} = {expr};', f'{r} = {spelled(expr, ROM[fo + 1])};')))
-        for m in re.finditer(r'\bCYCT?\(b_\+(?:OE?\()?(\d+)\)?, b_\+(?:OE?\()?(\d+)\)?\);\s*mem_wr\(gb, HL, (0x[0-9a-fA-F]+)\);', code):
+        for m in re.finditer(r'\bCYCT?\(b_\+(?:OE?\()?(\d+)\)?, b_\+(?:OE?\()?(\d+)\)?\);\s*mem_wr\(gb, HL, ([^;]+)\);', code):
             off, end = int(m.group(1)), int(m.group(2))
             if end - off != 2: continue
             bank, addr = base >> 16, (base & 0xffff) + off
             fo = addr if addr < 0x4000 else bank * 0x4000 + addr - 0x4000
             if ROM[fo] != 0x36: continue
-            if int(m.group(3), 16) != ROM[fo + 1]:
-                bad += 1; print(f'{p}:{n}: (hl) = {m.group(3)}, ROM has ld (hl),${ROM[fo+1]:02x}')
+            v = ev(m.group(3).strip())
+            if v is not None and v != ROM[fo + 1]:
+                bad += 1; print(f'{p}:{n}: (hl) = {m.group(3).strip()} is 0x{v:02x}, ROM has ld (hl),${ROM[fo+1]:02x}')
         for m in re.finditer(r'\bCYCT?\(b_\+(?:OE?\()?(\d+)\)?, b_\+(?:OE?\()?(\d+)\)?\);\s*SET_(BC|DE|HL)\((GV\([^;]*\)|0x[0-9a-fA-F]+)\);', code):
             off, end, rr = int(m.group(1)), int(m.group(2)), m.group(3)
             if end - off != 3: continue

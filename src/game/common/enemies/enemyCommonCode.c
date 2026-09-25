@@ -306,10 +306,10 @@ void ecom_fallingInHole_b10_hook(GB *gb) {
     CYCT(b_+35, b_+37);
   } else {
     CYC(b_+35, b_+37);
-    alu_xor(gb, A);
+    CYC(b_+37, b_+38); alu_xor(gb, A);
   }
-  CYC(b_+37, b_+38); A = alu_inc8(gb, A);
-  CYC(b_+38, b_+40); mem_wr(gb, HL, A);
+  CYC(b_+38, b_+39); A = alu_inc8(gb, A);
+  CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+43);
   TAIL(enemyAnimate);
 }
@@ -1522,10 +1522,10 @@ void ecom_fallingInHole_b0d_hook(GB *gb) {
     CYCT(b_+35, b_+37);
   } else {
     CYC(b_+35, b_+37);
-    alu_xor(gb, A);
+    CYC(b_+37, b_+38); alu_xor(gb, A);
   }
-  CYC(b_+37, b_+38); A = alu_inc8(gb, A);
-  CYC(b_+38, b_+40); mem_wr(gb, HL, A);
+  CYC(b_+38, b_+39); A = alu_inc8(gb, A);
+  CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+43);
   TAIL(enemyAnimate);
 }
@@ -2739,10 +2739,10 @@ void ecom_fallingInHole_b0e_hook(GB *gb) {
     CYCT(b_+35, b_+37);
   } else {
     CYC(b_+35, b_+37);
-    alu_xor(gb, A);
+    CYC(b_+37, b_+38); alu_xor(gb, A);
   }
-  CYC(b_+37, b_+38); A = alu_inc8(gb, A);
-  CYC(b_+38, b_+40); mem_wr(gb, HL, A);
+  CYC(b_+38, b_+39); A = alu_inc8(gb, A);
+  CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+43);
   TAIL(enemyAnimate);
 }
@@ -3956,10 +3956,10 @@ void ecom_fallingInHole_b0f_hook(GB *gb) {
     CYCT(b_+35, b_+37);
   } else {
     CYC(b_+35, b_+37);
-    alu_xor(gb, A);
+    CYC(b_+37, b_+38); alu_xor(gb, A);
   }
-  CYC(b_+37, b_+38); A = alu_inc8(gb, A);
-  CYC(b_+38, b_+40); mem_wr(gb, HL, A);
+  CYC(b_+38, b_+39); A = alu_inc8(gb, A);
+  CYC(b_+39, b_+40); mem_wr(gb, HL, A);
   CYC(b_+40, b_+43);
   TAIL(enemyAnimate);
 }

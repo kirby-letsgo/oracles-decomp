@@ -117,7 +117,7 @@ void pincer_state1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CYC(b_+0, b_+2); B = 0x04;
   CALL_C(b_+2, checkBEnemySlotsAvailable_hook, SYM(checkBEnemySlotsAvailable), b_+5);
-  if (F & FZ) { RET_TAKEN(b_+5); return; } // ret nz -- not-z path continues
+  if (!(F & FZ)) { RET_TAKEN(b_+5); return; } // ret nz
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); B = 0x45; // ENEMY_PINCER
   CALL_C(b_+8, ecom_spawnUncountedEnemyWithSubid01_b0e_hook, SYM(ecom_spawnUncountedEnemyWithSubid01_b0e), b_+11);

@@ -103,7 +103,7 @@ void interactionCodeb5__state1_hook(GB *gb) {
   BASE(interactionCodeb5);
   uint16_t sp0_ = gb->sp;
   CYC(b_+O(39), b_+OE(41)); E = 0x45;
-  CYC(b_+O(41), b_+OE(43)); A = mem_rd(gb, DE);
+  CYC(b_+O(41), b_+OE(42)); A = mem_rd(gb, DE);
   CYC(b_+O(42), b_+OE(43)); push_effect(gb, b_+OE(43));
   do { uint16_t jt_ = (final_dungeon_energy_jump_table(gb));
     if (jt_ == b_+O(49)) { interactionCodeb5__substate0_hook(gb); return; }
@@ -117,7 +117,7 @@ void interactionCodeb5_hook(GB *gb) {
   BASE(interactionCodeb5);
   uint16_t sp0_ = gb->sp;
   CYC(b_+O(0), b_+OE(2)); E = 0x44;
-  CYC(b_+O(2), b_+OE(4)); A = mem_rd(gb, DE);
+  CYC(b_+O(2), b_+OE(3)); A = mem_rd(gb, DE);
   CYC(b_+O(3), b_+OE(4)); push_effect(gb, b_+OE(4));
   do { uint16_t jt_ = (final_dungeon_energy_jump_table(gb));
     if (jt_ == b_+O(8)) { interactionCodeb5__state0_hook(gb); return; }
