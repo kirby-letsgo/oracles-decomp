@@ -1369,27 +1369,43 @@ void mapMenu_drawCursor_hook(GB *gb) {
 
 void mapMenu_drawSpriteAtRoomIndex_hook(GB *gb) {
   BASE(mapMenu_drawSpriteAtRoomIndex);
-  CYC(b_+O(0), b_+OE(1)); C = A;
-  CYC(b_+O(1), b_+OE(4)); SET_DE(GV(GV(0x1018, 0x0811), 0x2820));
   if (game_seasons) {
+    CYC(b_+S(0), b_+S(1)); C = A;
+    CYC(b_+S(1), b_+S(4)); SET_DE(0x0810);
     CYC(b_+S(4), b_+S(7)); A = W8(wMapMenu_mode);
     CYC(b_+S(7), b_+S(8)); alu_rrca(gb);
     if (!(F & FC)) CYCT(b_+S(8), b_+S(10));
-    else { CYC(b_+S(8), b_+S(10)); CYC(b_+S(10), b_+S(13)); SET_DE(0x2011); }
+    else { CYC(b_+S(8), b_+S(10)); CYC(b_+S(10), b_+S(13)); SET_DE(0x2820); }
+    CYC(b_+S(13), b_+S(14)); A = C;
+    CYC(b_+S(14), b_+S(16)); alu_and(gb, 0xf0);
+    CYC(b_+S(16), b_+S(18)); A = alu_srl(gb, A);
+    CYC(b_+S(18), b_+S(19)); alu_add(gb, D);
+    CYC(b_+S(19), b_+S(20)); B = A;
+    CYC(b_+S(20), b_+S(21)); A = C;
+    CYC(b_+S(21), b_+S(23)); alu_and(gb, 0x0f);
+    CYC(b_+S(23), b_+S(24)); alu_add(gb, A);
+    CYC(b_+S(24), b_+S(25)); alu_add(gb, A);
+    CYC(b_+S(25), b_+S(26)); alu_add(gb, A);
+    CYC(b_+S(26), b_+S(27)); alu_add(gb, E);
+    CYC(b_+S(27), b_+S(28)); C = A;
+    CYC(b_+S(28), b_+S(31)); TAIL(addSpritesToOam_withOffset);
+  } else {
+    CYC(b_+0, b_+1); C = A;
+    CYC(b_+1, b_+4); SET_DE(0x1018);
+    CYC(b_+4, b_+5); A = C;
+    CYC(b_+5, b_+7); alu_and(gb, 0xf0);
+    CYC(b_+7, b_+9); A = alu_srl(gb, A);
+    CYC(b_+9, b_+10); alu_add(gb, D);
+    CYC(b_+10, b_+11); B = A;
+    CYC(b_+11, b_+12); A = C;
+    CYC(b_+12, b_+14); alu_and(gb, 0x0f);
+    CYC(b_+14, b_+15); alu_add(gb, A);
+    CYC(b_+15, b_+16); alu_add(gb, A);
+    CYC(b_+16, b_+17); alu_add(gb, A);
+    CYC(b_+17, b_+18); alu_add(gb, E);
+    CYC(b_+18, b_+19); C = A;
+    CYC(b_+19, b_+22); TAIL(addSpritesToOam_withOffset);
   }
-  CYC(b_+O(4), b_+OE(5)); A = C;
-  CYC(b_+O(5), b_+OE(7)); alu_and(gb, 0xf0);
-  CYC(b_+O(7), b_+OE(9)); A = alu_srl(gb, A);
-  CYC(b_+O(9), b_+OE(10)); alu_add(gb, D);
-  CYC(b_+O(10), b_+OE(11)); B = A;
-  CYC(b_+O(11), b_+OE(12)); A = C;
-  CYC(b_+O(12), b_+OE(14)); alu_and(gb, 0x0f);
-  CYC(b_+O(14), b_+OE(15)); alu_add(gb, A);
-  CYC(b_+O(15), b_+OE(16)); alu_add(gb, A);
-  CYC(b_+O(16), b_+OE(17)); alu_add(gb, A);
-  CYC(b_+O(17), b_+OE(18)); alu_add(gb, E);
-  CYC(b_+O(18), b_+OE(19)); C = A;
-  CYC(b_+O(19), b_+OE(22)); TAIL(addSpritesToOam_withOffset);
 }
 
 void mapMenu_drawWarpSites_hook(GB *gb) {
@@ -1530,8 +1546,8 @@ void mapMenu_clearUnvisitedTiles_hook(GB *gb) {
   CYC(b_+O(0), b_+OE(2)); A = 4;
   CYC(b_+O(2), b_+OE(4)); hram_wr(gb, 0x70, A);
   CYC(b_+O(4), b_+OE(7)); SET_DE(GV(0x0e0e, 0x1010));
-  CYC(b_+O(7), b_+OE(10)); SET_HL(w4TileMap + GV(0x43, 0x22));
   if (game_seasons) {
+    CYC(b_+S(7), b_+S(10)); SET_HL(w4TileMap + 0x22);
     CYC(b_+S(10), b_+S(13)); A = W8(wMapMenu_mode);
     CYC(b_+S(13), b_+S(14)); alu_rrca(gb);
     if (!(F & FC)) CYCT(b_+S(14), b_+S(16));
@@ -1540,6 +1556,8 @@ void mapMenu_clearUnvisitedTiles_hook(GB *gb) {
       CYC(b_+S(16), b_+S(19)); SET_DE(0x080b);
       CYC(b_+S(19), b_+S(22)); SET_HL(w4TileMap + 0xa4);
     }
+  } else {
+    CYC(b_+7, b_+10); SET_HL(w4TileMap + 0x43);
   }
   CYC(b_+O(10), b_+OE(12)); B = 0;
   TAIL(mapMenu_clearUnvisitedTiles__rowLoop);
@@ -3257,12 +3275,14 @@ void mapGetRoomTextOrReturn_hook(GB *gb) {
     CYC(b_+O(6), b_+OE(7)); ret_effect(gb);
     return;
   }
-  CYC(b_+O(7), b_+OE(9)); C = GV(0x80, 0x40);
   if (game_seasons) {
+    CYC(b_+S(7), b_+S(9)); C = 0x80;
     CYC(b_+S(9), b_+S(12)); A = W8(wMapMenu_mode);
     CYC(b_+S(12), b_+S(13)); alu_rrca(gb);
     if (!(F & FC)) CYCT(b_+S(13), b_+S(15));
     else { CYC(b_+S(13), b_+S(15)); CYC(b_+S(15), b_+S(17)); C = 0x40; }
+  } else {
+    CYC(b_+7, b_+9); C = 0x80;
   }
   CYC(b_+O(9), b_+OE(12)); A = W8(wMapMenu_cursorIndex);
   CYC(b_+O(12), b_+OE(13)); alu_cp(gb, C);
@@ -3396,8 +3416,11 @@ void mapGetRoomText__specialCode4_hook(GB *gb) {
   CYC(b_+O(101), b_+OE(103)); C = GV(0x26, 0x21);
   if (F & FZ) { CYCT(b_+O(103), b_+OE(104)); ret_effect(gb); return; }
   CYC(b_+O(103), b_+OE(104));
-  if (game_seasons) { CYC(b_+S(90), b_+S(92)); C = 0x2c; }
-  else { CYC(b_+O(104), b_+OE(105)); C = alu_dec8(gb, C); }
+  if (game_seasons) {
+    CYC(b_+S(90), b_+S(92)); C = 0x2c;
+  } else {
+    CYC(b_+104, b_+105); C = alu_dec8(gb, C);
+  }
   CYC(b_+O(105), b_+OE(106)); ret_effect(gb);
 }
 

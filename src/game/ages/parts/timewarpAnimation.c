@@ -38,6 +38,7 @@ state1:
   CYC(b_+37, b_+39);
   CYC(b_+39, b_+41); alu_bit(gb, 1, A);
   if (!(F & FZ)) { CYCT(b_+41, b_+44); partDelete_hook(gb); return; } // jp nz
+  CYC(b_+41, b_+44);
 
 relatedObj1_stateLessThan3:
   CYC(b_+44, b_+46); L = 0x61;

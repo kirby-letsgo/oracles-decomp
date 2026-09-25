@@ -90,6 +90,7 @@ void interactionCodeb2__state1_hook(GB *gb) {
 update:
   CALL_C(b_+28, interactionDecCounter1_hook, SYM(interactionDecCounter1), b_+31);
   if (!(F & FZ)) { CYCT(b_+31, b_+32); ret_effect(gb); return; }
+  CYC(b_+31, b_+32);
   CYC(b_+32, b_+35); push_effect(gb, b_+35); volcano_set_random_counter1(gb);
   CYC(b_+35, b_+37); C = 0x0f;
   CALL_C(b_+37, getRandomNumber_hook, SYM(getRandomNumber), b_+40);

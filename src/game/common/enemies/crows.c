@@ -364,7 +364,7 @@ checkX:
 lookup:
   CYC(b_+22, b_+23); A = B;
   CYC(b_+23, b_+26); SET_HL(SYM(crow_offScreenSpawnData)); // @crow_offScreenSpawnData
-  crow_addAToHl_from_rst(gb, b_+27);
+  CYC(b_+26, b_+27); crow_addAToHl_from_rst(gb, b_+27);
 
   // Read in spawn position
   CYC(b_+27, b_+29); E = ENEMY_BASE + OBJ_YH;
@@ -596,7 +596,7 @@ setSpeed:
   CYC(b_+9, b_+11); alu_and(gb, 0xf0);
   CYC(b_+11, b_+13); A = alu_swap(gb, A);
   CYC(b_+13, b_+16); SET_HL(SYM(crow_speeds)); // @crow_speeds
-  crow_addAToHl_from_rst(gb, b_+17);
+  CYC(b_+16, b_+17); crow_addAToHl_from_rst(gb, b_+17);
   CYC(b_+17, b_+19); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+19, b_+20); A = mem_rd(gb, HL);
   CYC(b_+20, b_+21); mem_wr(gb, DE, A);

@@ -167,7 +167,7 @@ state0:
   CALL_C(b_+74, partSetAnimation_hook, SYM(partSetAnimation), b_+77);
 
 L_61a7:
-  CYC(b_+77, b_+82); TAIL(objectSetVisible82); // jp
+  CYC(b_+77, b_+80); TAIL(objectSetVisible82); // jp
 
 state1:
   CYC(b_+82, b_+84); A = 0x20;

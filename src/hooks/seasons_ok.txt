@@ -183,6 +183,7 @@ insertIndexIntoLoadedObjectGfx__object
 interac11_subid00
 interac11_subid01@interac11_updateSparkle
 interactionAnimate
+interactionCode0c@doSpecializedInitialization
 interactionCode10
 interactionCode1c
 interactionCode46@runState
@@ -214,6 +215,7 @@ interactionCodea1@state0To7
 interactionCodea1@updateSubid
 interactionCodea2@state0To7
 interactionCodea2@updateState
+interactionCodea8@handleSubidHighNibble
 interactionCodeac
 interactionCodeac@checkUpdateState
 interactionCodeae
@@ -269,6 +271,7 @@ loadRoomLayout@loadLayoutData
 loadStaticObjects
 mapGetRoomText__specialCode2
 mapGetRoomText__specialCode3
+mapMenu_drawSpriteAtRoomIndex
 mapMenu_drawSprites
 mapleSpawnItemDrops
 mapleState0
@@ -298,6 +301,7 @@ objectRunMovementScript
 octorok_state_uninitialized
 paletteFadeHandler06
 parentItemCode_harp@getSelectedSongAddr
+parentItemCode_shield@checkShieldIsUsable
 parseGivenObjectData_b00
 partAnimate
 partCheckCollisions

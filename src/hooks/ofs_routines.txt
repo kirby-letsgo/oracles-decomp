@@ -119,7 +119,6 @@ mapGetRoomText
 mapGetRoomTextOrReturn
 mapMenu_checkRoomVisited
 mapMenu_clearUnvisitedTiles
-mapMenu_drawSpriteAtRoomIndex
 mapMenu_loadPopupData
 mapMenu_state0
 mapMenu_state1

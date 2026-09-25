@@ -279,6 +279,7 @@ checkDistance:
 updatePosition:
   CALL_C(b_+42, ecom_decCounter1_b0f_hook, SYM(ecom_decCounter1_b0f), b_+45);
   if (!(F & FZ)) { CYCT(b_+45, b_+47); goto applyVelocity; } // jr nz
+  CYC(b_+45, b_+47);
   CALL_C(b_+47, objectGetAngleTowardLink_hook, SYM(objectGetAngleTowardLink), b_+50);
   CYC(b_+50, b_+52); E = ENEMY_BASE + OBJ_ANGLE;
   CYC(b_+52, b_+53); mem_wr(gb, DE, A);

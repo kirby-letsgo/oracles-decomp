@@ -187,3 +187,37 @@ def seasons_code(lines):
             out.append(code[:m2.start()] + (code[j:] if not ages_depth else '')); continue
         out.append(code)
     return out
+
+
+def ages_code(lines):
+    """For each C source line, the part that runs under Ages: `if (game_seasons) { ... }` blocks,
+    the else branch of `if (!game_seasons) { ... } else {` and one-line `if (game_seasons) ...;`
+    are blanked."""
+    out, depth, pending_else = [], 0, False
+    for line in lines:
+        code = line.split('//')[0]
+        if depth:
+            j = 0
+            while j < len(code) and depth:
+                if code[j] == '{': depth += 1
+                elif code[j] == '}': depth -= 1
+                j += 1
+            if depth: out.append(''); continue
+            out.append(''); continue
+        if re.search(r'if \(game_seasons\)\s*[^{\s]', code) or re.search(r'\bgame_seasons\s*&&', code):
+            out.append(''); continue
+        m = re.search(r'if \(game_seasons\)\s*\{', code)
+        if m:
+            depth = 1; j = m.end()
+            while j < len(code) and depth:
+                if code[j] == '{': depth += 1
+                elif code[j] == '}': depth -= 1
+                j += 1
+            out.append(code[:m.start()]); continue
+        m = re.search(r'\}\s*else\s*\{', code)
+        if m and pending_else:
+            depth = 1; pending_else = False; out.append(code[:m.start()]); continue
+        if re.search(r'if \(!game_seasons\)\s*\{', code): pending_else = True
+        elif code.strip().startswith('}') and pending_else and not re.search(r'else', code): pending_else = False
+        out.append(code)
+    return out

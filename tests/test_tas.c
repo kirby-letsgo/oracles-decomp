@@ -101,7 +101,7 @@ static void seasons_run(const char *inputs, const char *ref_path, uint64_t frame
 }
 
 static void seasons_play_matches_reference(void) {
-  seasons_run(TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", 142176, "playthrough");
+  seasons_run(TAS_DIR "/seasons-play.inputs", TAS_DIR "/seasons-play.ref", 265064, "playthrough");
 }
 
 static void seasons_demo_matches_reference(void) {

@@ -406,6 +406,7 @@ void objectDataOp0_hook(GB *gb) {
       CYC(b_+46, b_+47); alu_add_hl(gb, BC);
       CYC(b_+47, b_+49); alu_bit(gb, 7, mem_rd(gb, HL));
       if (!(F & FZ)) { CYCT(b_+49, b_+51); break; }
+      CYC(b_+49, b_+51);
       CYCT(b_+51, b_+53);
     }
   }

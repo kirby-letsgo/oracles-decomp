@@ -553,6 +553,35 @@ writes the same per-frame key bytes and 60-frame WRAM hashes as the GBHawk Lua d
 
 ## Done
 
+- 2026-09-25: Seasons playthrough extended to 265,064 frames (first dungeon done and beyond);
+  tas/seasons-play.ref re-recorded with --no-hooks, identical to the old one for the first
+  142,176 frames. The new footage found three bugs: updateSpecialObjects called
+  update_special_object without a return check, so Maple leaving (mapleDeleteSelf's `pop af; jp
+  itemDelete`) carried on in the C and hung (frame 195196; latent in Ages too, now CALL_L_);
+  mapMenu_drawSpriteAtRoomIndex had both Seasons ld de constants wrong (a nested GV from an
+  old gameconst pass, and the Subrosia value; frame 204873); Maple's minigame reads 05:603d as
+  data (keep_code). audit_imm now reads O()/OE() offsets and GV expressions in SET_BC/DE/HL and
+  skips Seasons-only code (symfiles.ages_code), which catches the map bug's kind. The root of
+  the map bug was an ofsmap mispairing (the Ages `ld de` paired with Seasons' second `ld de`);
+  tools/audit_ofsburns.py lists shared O() burns that land on a Seasons S() block, which found
+  the same mistake in mapMenu_clearUnvisitedTiles (its shared ld hl burned the whole Seasons
+  block) and mapGetRoomTextOrReturn (Seasons got C=$40 always); both written out per game.
+  More from the new frames: spawnBipinBlossomFamilyObjects burned a jr plus a table byte
+  (audit_bounds now rejects a range that continues past jr/jp/ret/reti/jp hl: 13 more such
+  ranges fixed); peahat called its rst helper without burning the rst (tools/audit_rst.py:
+  10 more fixed); partCode0e fell through into the stackless spawnCollisionHelper without
+  popping, leaving pc at 10:4978 (native stopped there, replace mode re-ran the helper).
+  Merged Fable's Seasons 5 batches 1-3 (128 generated routines as hand C) and moved 20 bank 1
+  Seasons routines (cutscene handlers, palette fade data, checkRoomPack, seed tree init) to
+  src/game/seasons/bank1.c via tools/draft_rewrite.py. peahat_updatePosition's `jp z` had no
+  not-taken burn: tools/audit_notaken.py lists conditional jr/jp/ret whose fall-through never
+  burns the branch, which found 15 more in shared and Ages code (ambiGuard, swoop,
+  targetCartCrystal, carpenter, tuniNut, timewarpAnimation, fireKeese, ...), all on paths the
+  movies take only one way. Maple and loadAnimationData@helper read two more code bytes as data
+  (keep_code).
+  audit_jumptables ends a table at a branch target inside the routine; seasons_hooks lets a
+  CALL_L callee listed in seasons_ok or seasons_ok_manual through.
+
 - 2026-09-25: save states in the SDL app (Cmd+S / Cmd+R, one slot: ROM.savestate, or
   FILE.inputs.savestate while recording, where loading cuts the recorded inputs back to the
   state's frame). A loaded state has no thread fibers: kernel_run_thread now starts a fresh

@@ -1484,7 +1484,7 @@ haveC:
   CYC(b_+22, b_+23); H = mem_rd(gb, HL);  // ld h,(hl)
   CYC(b_+23, b_+24); L = A;  // ld l,a
   CYC(b_+24, b_+25); A = mem_rd(gb, HL); SET_HL(HL + 1);  // ld a,(hl+)
-  CYC(b_+25, b_+28); TAIL(label_10_135);  // jr label_10_135
+  CYC(b_+25, b_+27); TAIL(label_10_135);  // jr label_10_135
 }
 
 void ganon_decideTeleportLocationAndCounter_hook(GB *gb) {

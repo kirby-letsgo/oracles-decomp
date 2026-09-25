@@ -273,7 +273,7 @@ void spawnBipinBlossomFamilyObjects_hook(GB *gb) {
     CYC(b_+53, b_+54); A = mem_rd(gb, BC);
     CYC(b_+54, b_+55); mem_wr(gb, HL, A);
     CYC(b_+55, b_+56); SET_BC(BC + 1);
-    CYC(b_+56, b_+59);
+    CYC(b_+56, b_+58);
   }
 }
 

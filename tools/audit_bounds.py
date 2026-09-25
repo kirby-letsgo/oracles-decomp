@@ -26,12 +26,16 @@ def rd(base, off):
     bank, addr = base >> 16, (base & 0xffff) + off
     return ROM[addr if addr < 0x4000 else bank * 0x4000 + addr - 0x4000]
 
+STOP = (0x18, 0xc3, 0xc9, 0xd9, 0xe9)       # jr, jp, ret, reti, jp hl: nothing after them in one range
+
 def reaches(base, x, y):
     a = x
     for _ in range(64):
         if a == y: return True
         if a > y: return False
-        a += length(rd(base, a), rd(base, a + 1))
+        op = rd(base, a)
+        a += length(op, rd(base, a + 1))
+        if op in STOP and a < y: return False
     return False
 
 BURN = re.compile(r'\b(CYCT?)\(b_\+(\d+), b_\+(\d+)\)|\bCALL_[CL](?:_CC)?\(b_\+(\d+)|\bRET(?:_TAKEN)?\(b_\+(\d+)\)')

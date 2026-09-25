@@ -184,7 +184,8 @@ release:
   CYC(b_+O(142), b_+OE(144)); A = 0x05;
   CALL_C(b_+O(144), objectGetRelatedObject2Var_hook, SYM(objectGetRelatedObject2Var), b_+OE(147));
   CYC(b_+O(147), b_+OE(149)); mem_wr(gb, HL, 0x03);
-  CYC(b_+O(149), b_+OE(152));
+  // ofsmap pairs this jp with the one after the puff (Seasons +175); release's own is at +162.
+  CYC(b_+(game_seasons ? S(162) : 149), b_+(game_seasons ? S(165) : 152));
   TAIL(itemDelete);
 
 pre_destroy:

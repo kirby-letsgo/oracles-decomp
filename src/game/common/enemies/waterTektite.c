@@ -217,7 +217,7 @@ void waterTektite_getAdjacentWallsBitsetGivenAngle_hook(GB *gb) {
   CYC(b_+8, b_+10); L = ENEMY_BASE + OBJ_XH;
   CYC(b_+10, b_+11); C = mem_rd(gb, HL);
   CYC(b_+11, b_+14); SET_HL(SYM(ecom_sideviewAdjacentWallOffsetTable_b0e)); // ecom_sideviewAdjacentWallOffsetTable (bank 0e)
-  waterTektite_addAToHl_from_rst(gb, b_+15);
+  CYC(b_+14, b_+15); waterTektite_addAToHl_from_rst(gb, b_+15);
 
   CYC(b_+15, b_+17); A = 0x10;
   CYC(b_+17, b_+19); mem_wr(gb, hFF8B, A); // hFF8B
@@ -261,7 +261,7 @@ void waterTektike_setSpeedFromCounter1_hook(GB *gb) {
   CYC(b_+1, b_+3); A = alu_srl(gb, A);
   CYC(b_+3, b_+5); A = alu_srl(gb, A);
   CYC(b_+5, b_+8); SET_HL(b_+14); // @speedVals
-  waterTektite_addAToHl_from_rst(gb, b_+9);
+  CYC(b_+8, b_+9); waterTektite_addAToHl_from_rst(gb, b_+9);
   CYC(b_+9, b_+11); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+11, b_+12); A = mem_rd(gb, HL);
   CYC(b_+12, b_+13); mem_wr(gb, DE, A);

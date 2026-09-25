@@ -403,7 +403,7 @@ stillDiving:
   CYC(b_+11, b_+13); alu_and(gb, 0xf0);
   CYC(b_+13, b_+15); A = alu_swap(gb, A);
   CYC(b_+15, b_+18); SET_HL(SYM(fireKeese_subid0_zOffsets)); // @zOffsets
-  fireKeese_addAToHl_from_rst(gb, b_+19);
+  CYC(b_+18, b_+19); fireKeese_addAToHl_from_rst(gb, b_+19);
 
   CYC(b_+19, b_+21); E = ENEMY_BASE + OBJ_Z;
   CYC(b_+21, b_+22); A = mem_rd(gb, DE);
@@ -612,7 +612,7 @@ void fireKeese_subid1_setSpeedAndAnimateBasedOnCounter1_hook(GB *gb) {
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
   CYC(b_+8, b_+10); A = alu_swap(gb, A);
   CYC(b_+10, b_+13); SET_HL(SYM(fireKeese_subid1_speeds)); // @speeds
-  fireKeese_addAToHl_from_rst(gb, b_+14);
+  CYC(b_+13, b_+14); fireKeese_addAToHl_from_rst(gb, b_+14);
   CYC(b_+14, b_+16); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+16, b_+17); A = mem_rd(gb, HL);
   CYC(b_+17, b_+18); mem_wr(gb, DE, A);
@@ -624,10 +624,11 @@ animate:
   CYC(b_+21, b_+23); alu_and(gb, 0xf0);
   CYC(b_+23, b_+25); A = alu_swap(gb, A);
   CYC(b_+25, b_+28); SET_HL(SYM(fireKeese_subid1_animFrequencies)); // @animFrequencies
-  fireKeese_addAToHl_from_rst(gb, b_+29);
+  CYC(b_+28, b_+29); fireKeese_addAToHl_from_rst(gb, b_+29);
   CYC(b_+29, b_+32); A = mem_rd(gb, wFrameCounter);
   CYC(b_+32, b_+33); alu_and(gb, mem_rd(gb, HL));
   if (F & FZ) { CYCT(b_+33, b_+36); enemyAnimate_hook(gb); return; } // jp z
+  CYC(b_+33, b_+36);
   RET(b_+36); return; // ret
 }
 

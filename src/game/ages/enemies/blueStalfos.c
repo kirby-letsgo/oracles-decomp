@@ -455,7 +455,7 @@ void blueStalfos_main_state12_hook(GB *gb) {
   CYC(b_+21, b_+23); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+23, b_+24); A = mem_rd(gb, HL);
   CYC(b_+24, b_+25); mem_wr(gb, DE, A);
-  CYC(b_+25, b_+32); TAIL(objectSetVisible82); // jp
+  CYC(b_+25, b_+28); TAIL(objectSetVisible82); // jp
 }
 
 // Moving down toward baby Link before attacking with sickle

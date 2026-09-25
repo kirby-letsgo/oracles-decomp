@@ -203,7 +203,7 @@ substate3:
   CYC(b_+20, b_+22); E = ENEMY_BASE + OBJ_SUBID;
   CYC(b_+22, b_+23); A = mem_rd(gb, DE);
   CYC(b_+23, b_+26); SET_HL(b_+36); // @stateAndCounter1
-  wizzrobe_addDoubleIndexToHl_from_rst(gb, b_+27);
+  CYC(b_+26, b_+27); wizzrobe_addDoubleIndexToHl_from_rst(gb, b_+27);
 
   CYC(b_+27, b_+29); E = ENEMY_BASE + OBJ_STATE;
   CYC(b_+29, b_+30); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)

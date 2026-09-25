@@ -103,14 +103,14 @@ setBehaviour:
   CYC(b_+80, b_+81); H = D;
   CYC(b_+81, b_+83); L = INTERACTION_BASE + 0x38; // Interaction.var38
   CYC(b_+83, b_+84); mem_wr(gb, HL, C);
-  CYC(b_+84, b_+127); goto loadScript; // jr
+  CYC(b_+84, b_+86); goto loadScript; // jr
 
 initSubid01:
   CYC(b_+86, b_+88); A = 0x26; // GLOBALFLAG_RAFTON_CHANGED_ROOMS
   CALL_C(b_+88, checkGlobalFlag_hook, SYM(checkGlobalFlag), b_+91);
   if (F & FZ) { CYCT(b_+91, b_+94); interactionDelete_hook(gb); return; } // jp z
   CYC(b_+91, b_+94);
-  CYC(b_+94, b_+127); goto loadScript; // jr
+  CYC(b_+94, b_+96); goto loadScript; // jr
 
 state1:
   CYC(b_+96, b_+98); E = INTERACTION_BASE + OBJ_SUBID;

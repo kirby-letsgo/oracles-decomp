@@ -149,7 +149,7 @@ void vire_setRandomCounter1_hook(GB *gb) {
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x03); CYC(b_+5, b_+8); SET_HL(b_+14);
-  vire_add_a_to_hl(gb, b_+9);
+  CYC(b_+8, b_+9); vire_add_a_to_hl(gb, b_+9);
   CYC(b_+9, b_+11); E = 0x46; CYC(b_+11, b_+12); A = mem_rd(gb, HL); CYC(b_+12, b_+13); mem_wr(gb, DE, A); RET(b_+13); return;
 }
 

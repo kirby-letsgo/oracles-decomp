@@ -54,7 +54,7 @@ void makuTree_showText_hook(GB *gb) {
   BASE(makuTree_showText);
   uint16_t sp0_ = gb->sp;
   CALL_C(b_+0, makuTree_modifyTextIndexForLinked_hook, SYM(makuTree_modifyTextIndexForLinked), b_+3);
-  CYC(b_+3, b_+6); TAIL(label_15_203);
+  CYC(b_+3, b_+5); TAIL(label_15_203);
 }
 
 void label_15_203_hook(GB *gb) {

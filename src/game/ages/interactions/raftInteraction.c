@@ -37,7 +37,7 @@ void interactionCodee6__checkLinkWithinRange_hook(GB *gb) {
   CYC(b_+157, b_+158); B = A;  // ld b,a
   CYC(b_+158, b_+159); L = alu_inc8(gb, L);  // inc l
   CYC(b_+159, b_+160); C = mem_rd(gb, HL);  // ld c,(hl)
-  CYC(b_+160, b_+164); TAIL(interactionCheckContainsPoint);  // jp interactionCheckContainsPoint
+  CYC(b_+160, b_+163); TAIL(interactionCheckContainsPoint);  // jp interactionCheckContainsPoint
 }
 
 void interactionCodee6_hook(GB *gb) {

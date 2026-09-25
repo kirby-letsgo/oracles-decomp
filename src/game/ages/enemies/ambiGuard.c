@@ -176,6 +176,7 @@ void ambiGuard_state8_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_YH;
   CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestination8; } // jr nc
+  CYC(b_+7, b_+9);
   CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
   CYC(b_+12, b_+14); TAIL(ambiGuard_animate); // jr
 
@@ -196,6 +197,7 @@ void ambiGuard_state9_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_VAR33;
   CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestination9; } // jr nc
+  CYC(b_+7, b_+9);
   CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
   CYC(b_+12, b_+14); TAIL(ambiGuard_animate); // jr
 
@@ -216,6 +218,7 @@ void ambiGuard_stateA_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_VAR32;
   CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestinationA; } // jr nc
+  CYC(b_+7, b_+9);
   CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
   CYC(b_+12, b_+14); TAIL(ambiGuard_animate); // jr
 
@@ -236,6 +239,7 @@ void ambiGuard_stateB_hook(GB *gb) {
   CYC(b_+4, b_+6); L = ENEMY_BASE + OBJ_XH;
   CYC(b_+6, b_+7); alu_cp(gb, mem_rd(gb, HL));
   if (!(F & FC)) { CYCT(b_+7, b_+9); goto reachedDestinationB; } // jr nc
+  CYC(b_+7, b_+9);
   CALL_C(b_+9, objectApplySpeed_hook, SYM(objectApplySpeed), b_+12);
   CYC(b_+12, b_+14); TAIL(ambiGuard_animate); // jr
 
@@ -464,6 +468,7 @@ void ambiGuard_commonInitialization_hook(GB *gb) {
   CYC(b_+0, b_+3); SET_HL(wGroup4RoomFlags + 0xfc);
   CYC(b_+3, b_+5); alu_bit(gb, 7, mem_rd(gb, HL));
   if (F & FZ) { CYCT(b_+5, b_+7); goto notDefeated; } // jr z
+  CYC(b_+5, b_+7);
   CALL_C(b_+7, enemyDelete_hook, SYM(enemyDelete), b_+10);
   CYC(b_+10, b_+11); alu_or(gb, D);
   RET(b_+11); return; // ret

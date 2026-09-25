@@ -418,7 +418,7 @@ loop:
   CYC(b_+140, b_+141); push_effect(gb, HL);
   CALL_C(b_+141, setTile_hook, SYM(setTile), b_+144);
   CYC(b_+144, b_+145); SET_HL(pop_effect(gb));
-  CYC(b_+145, b_+148);
+  CYC(b_+145, b_+147);
   goto loop;
 }
 
