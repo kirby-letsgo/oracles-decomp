@@ -198,3 +198,131 @@ L_7b86:
   TAIL(itemDelete);
 }
 
+
+static uint16_t moosh_d_jump_table(GB *gb) {
+  burn_rom(gb, 0x00, 0x0000, 0x0001, false); alu_add(gb, A);
+  burn_rom(gb, 0x00, 0x0001, 0x0002, false); SET_HL(pop_effect(gb));
+  burn_rom(gb, 0x00, 0x0002, 0x0003, false); alu_add(gb, L);
+  burn_rom(gb, 0x00, 0x0003, 0x0004, false); L = A;
+  if (F & FC) {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, false);
+    burn_rom(gb, 0x00, 0x0006, 0x0007, false); H = alu_inc8(gb, H);
+  } else {
+    burn_rom(gb, 0x00, 0x0004, 0x0006, true);
+  }
+  burn_rom(gb, 0x00, 0x0007, 0x0008, false); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  burn_rom(gb, 0x00, 0x0008, 0x0009, false); H = mem_rd(gb, HL);
+  burn_rom(gb, 0x00, 0x0009, 0x000a, false); L = A;
+  burn_rom(gb, 0x00, 0x000a, 0x000b, false);
+  return HL;
+}
+
+// State A: cutscene stuff
+void s_mooshStateA_hook(GB *gb) {
+  BASE(mooshStateA);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+2); E = 0x03;
+  CYC(b_+2, b_+3); A = mem_rd(gb, DE);
+  CYC(b_+3, b_+4); push_effect(gb, b_+4);
+  do { uint16_t jt_ = (moosh_d_jump_table(gb));
+    if (jt_ == SYM(mooshStateASubstate0) && hook_is(gb, SYM(mooshStateASubstate0), s_mooshStateASubstate0_hook)) { s_mooshStateASubstate0_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate1) && hook_is(gb, SYM(mooshStateASubstate1), s_mooshStateASubstate1_hook)) { s_mooshStateASubstate1_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate2) && hook_is(gb, SYM(mooshStateASubstate2), s_mooshStateASubstate2_hook)) { s_mooshStateASubstate2_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate3) && hook_is(gb, SYM(mooshStateASubstate3), s_mooshStateASubstate3_hook)) { s_mooshStateASubstate3_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate4) && hook_is(gb, SYM(mooshStateASubstate4), s_mooshStateASubstate4_hook)) { s_mooshStateASubstate4_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate5) && hook_is(gb, SYM(mooshStateASubstate5), s_mooshStateASubstate5_hook)) { s_mooshStateASubstate5_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate8) && hook_is(gb, SYM(mooshStateASubstate8), s_mooshStateASubstate8_hook)) { s_mooshStateASubstate8_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstate9) && hook_is(gb, SYM(mooshStateASubstate9), s_mooshStateASubstate9_hook)) { s_mooshStateASubstate9_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstateA) && hook_is(gb, SYM(mooshStateASubstateA), s_mooshStateASubstateA_hook)) { s_mooshStateASubstateA_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstateB) && hook_is(gb, SYM(mooshStateASubstateB), s_mooshStateASubstateB_hook)) { s_mooshStateASubstateB_hook(gb); return; }
+    if (jt_ == SYM(mooshStateASubstateC) && hook_is(gb, SYM(mooshStateASubstateC), s_mooshStateASubstateC_hook)) { s_mooshStateASubstateC_hook(gb); return; }
+    HANDOFF(HL);
+  } while (0);
+}
+
+// mooshStateASubstate5+17
+static void moosh_d_mooshStateASubstate5_17(GB *gb) {
+  BASE(mooshStateASubstate5);
+  uint16_t sp0_ = cpu_sp(gb); (void)sp0_;
+  CYC(b_+17, b_+19); E = 0x3d;
+  CYC(b_+19, b_+20); alu_xor(gb, A);
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  CALL_C(b_+21, s_objectRemoveFromAButtonSensitiveObjectList, SYM(objectRemoveFromAButtonSensitiveObjectList), b_+24);
+  CYC(b_+24, b_+26); C = 0x01;
+  CALL_C(b_+26, s_companionSetAnimation, SYM(companionSetAnimation), b_+29);
+  CYC(b_+29, b_+32);
+  TAIL(companionForceMount);
+}
+
+void s_mooshStateASubstate1_hook(GB *gb) {
+  BASE(mooshStateASubstate1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_companionSetAnimationToVar3f, SYM(companionSetAnimationToVar3f), b_+3);
+  CALL_C(b_+3, s_mooshUpdateAsNpc, SYM(mooshUpdateAsNpc), b_+6);
+  CYC(b_+6, b_+9); A = mem_rd(gb, wMooshState);
+  CYC(b_+9, b_+11); alu_and(gb, 0x80);
+  if (F & FZ) { CYCT(b_+11, b_+13); goto L_7a9c; }
+  CYC(b_+11, b_+13);
+  CYC(b_+13, b_+15);
+  moosh_d_mooshStateASubstate5_17(gb); return;
+L_7a9c:
+  CYC(b_+15, b_+17); E = 0x3d;
+  CYC(b_+17, b_+18); A = mem_rd(gb, DE);
+  CYC(b_+18, b_+19); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+19); return; }
+  CYC(b_+19, b_+20);
+  CYC(b_+20, b_+22); A = 0x81;
+  CYC(b_+22, b_+25); mem_wr(gb, wDisabledObjects, A);
+  RET(b_+25); return;
+}
+
+void s_mooshStateASubstate3_hook(GB *gb) {
+  BASE(mooshStateASubstate3);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_companionSetAnimationToVar3f, SYM(companionSetAnimationToVar3f), b_+3);
+  CALL_C(b_+3, s_specialObjectAnimate, SYM(specialObjectAnimate), b_+6);
+  CALL_C(b_+6, s_companionDecCounter1IfNonzero, SYM(companionDecCounter1IfNonzero), b_+9);
+  if (!(F & FZ)) { RET_TAKEN(b_+9); return; }
+  CYC(b_+9, b_+10);
+  CYC(b_+10, b_+12); C = 0x10;
+  CYC(b_+12, b_+15);
+  TAIL(objectUpdateSpeedZ_paramC);
+}
+
+void s_mooshStateASubstate4_hook(GB *gb) {
+  BASE(mooshStateASubstate4);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_companionSetAnimationToVar3f, SYM(companionSetAnimationToVar3f), b_+3);
+  CYC(b_+3, b_+5); C = 0x10;
+  CALL_C(b_+5, s_objectUpdateSpeedZ_paramC, SYM(objectUpdateSpeedZ_paramC), b_+8);
+  if (!(F & FZ)) { RET_TAKEN(b_+8); return; }
+  CYC(b_+8, b_+9);
+  CYC(b_+9, b_+11); E = 0x3e;
+  CYC(b_+11, b_+12); A = mem_rd(gb, DE);
+  CYC(b_+12, b_+14); alu_or(gb, 0x40);
+  CYC(b_+14, b_+15); mem_wr(gb, DE, A);
+  CYC(b_+15, b_+18);
+  TAIL(specialObjectAnimate);
+}
+
+void s_mooshStateASubstate5_hook(GB *gb) {
+  BASE(mooshStateASubstate5);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, s_companionSetAnimationToVar3f, SYM(companionSetAnimationToVar3f), b_+3);
+  CALL_C(b_+3, s_mooshUpdateAsNpc, SYM(mooshUpdateAsNpc), b_+6);
+  CYC(b_+6, b_+9); A = mem_rd(gb, wMooshState);
+  CYC(b_+9, b_+11); alu_and(gb, 0x20);
+  if (F & FZ) { RET_TAKEN(b_+11); return; }
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+14); A = 0xff;
+  CYC(b_+14, b_+17); mem_wr(gb, wStatusBarNeedsRefresh, A);
+  CYC(b_+17, b_+19); E = 0x3d;
+  CYC(b_+19, b_+20); alu_xor(gb, A);
+  CYC(b_+20, b_+21); mem_wr(gb, DE, A);
+  CALL_C(b_+21, s_objectRemoveFromAButtonSensitiveObjectList, SYM(objectRemoveFromAButtonSensitiveObjectList), b_+24);
+  CYC(b_+24, b_+26); C = 0x01;
+  CALL_C(b_+26, s_companionSetAnimation, SYM(companionSetAnimation), b_+29);
+  CYC(b_+29, b_+32);
+  TAIL(companionForceMount);
+}
+

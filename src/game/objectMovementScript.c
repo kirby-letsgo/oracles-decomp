@@ -77,139 +77,148 @@ void objectLoadMovementScript_body_hook(GB *gb) {
 void objectRunMovementScript_body_hook(GB *gb) {
   BASE(objectRunMovementScript_body);
   uint16_t sp0_ = gb->sp;
-  CYC(b_+0, b_+2); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+2, b_+4); alu_add(gb, 0x30); // Object.var30
-  CYC(b_+4, b_+5); E = A;
-  CYC(b_+5, b_+6); A = mem_rd(gb, DE);
-  CYC(b_+6, b_+7); L = A;
-  CYC(b_+7, b_+8); E = alu_inc8(gb, E);
-  CYC(b_+8, b_+9); A = mem_rd(gb, DE);
-  CYC(b_+9, b_+10); H = A;
+  CYC(b_+O(0), b_+OE(2)); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+  CYC(b_+O(2), b_+OE(4)); alu_add(gb, 0x30); // Object.var30
+  CYC(b_+O(4), b_+OE(5)); E = A;
+  CYC(b_+O(5), b_+OE(6)); A = mem_rd(gb, DE);
+  CYC(b_+O(6), b_+OE(7)); L = A;
+  CYC(b_+O(7), b_+OE(8)); E = alu_inc8(gb, E);
+  CYC(b_+O(8), b_+OE(9)); A = mem_rd(gb, DE);
+  CYC(b_+O(9), b_+OE(10)); H = A;
 
 nextOp:
-  CYC(b_+10, b_+11); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  PUSH(b_+11, HL);
+  CYC(b_+O(10), b_+OE(11)); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  PUSH(b_+O(11), HL);
   {
-    CYC(b_+12, b_+13); push_effect(gb, b_+13);
+    CYC(b_+O(12), b_+OE(13)); push_effect(gb, b_+OE(13));
     uint16_t target = objectMovementScript_jump_table(gb);
-    if (target == b_+27) goto cmd00_jump;
-    if (target == b_+33) goto moveUp;
-    if (target == b_+55) goto moveRight;
-    if (target == b_+77) goto moveDown;
-    if (target == b_+99) goto moveLeft;
-    if (target == b_+121) goto wait;
-    if (target == b_+142) goto setstate;
+    if (target == b_+O(27)) goto cmd00_jump;
+    if (target == b_+O(33)) goto moveUp;
+    if (target == b_+O(55)) goto moveRight;
+    if (target == b_+O(77)) goto moveDown;
+    if (target == b_+O(99)) goto moveLeft;
+    if (target == b_+O(121)) goto wait;
+    if (!game_seasons && target == b_+142) goto setstate;
     HANDOFF(target);
   }
 
 cmd00_jump:
-  SET_HL(POP(b_+27));
-  CYC(b_+28, b_+29); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
-  CYC(b_+29, b_+30); H = mem_rd(gb, HL);
-  CYC(b_+30, b_+31); L = A;
-  CYC(b_+31, b_+33); goto nextOp; // jr
+  SET_HL(POP(b_+O(27)));
+  CYC(b_+O(28), b_+OE(29)); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
+  CYC(b_+O(29), b_+OE(30)); H = mem_rd(gb, HL);
+  CYC(b_+O(30), b_+OE(31)); L = A;
+  CYC(b_+O(31), b_+OE(33)); goto nextOp; // jr
 
 moveUp:
-  SET_BC(POP(b_+33));
-  CYC(b_+34, b_+35); H = D;
-  CYC(b_+35, b_+37); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+37, b_+39); alu_add(gb, OBJ_VAR32);
-  CYC(b_+39, b_+40); L = A;
-  CYC(b_+40, b_+41); A = mem_rd(gb, BC);
-  CYC(b_+41, b_+42); mem_wr(gb, HL, A);
-  CYC(b_+42, b_+43); A = L;
-  CYC(b_+43, b_+45); alu_add(gb, 0xd7); // Object.angle-Object.var32
-  CYC(b_+45, b_+46); L = A;
-  CYC(b_+46, b_+48); mem_wr(gb, HL, 0x00); // ANGLE_UP
-  CYC(b_+48, b_+50); alu_add(gb, 0xfb); // Object.state-Object.angle
-  CYC(b_+50, b_+51); L = A;
-  CYC(b_+51, b_+53); mem_wr(gb, HL, 0x08);
-  CYC(b_+53, b_+55); goto storePointer; // jr
+  SET_BC(POP(b_+O(33)));
+  CYC(b_+O(34), b_+OE(35)); H = D;
+  CYC(b_+O(35), b_+OE(37)); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+  CYC(b_+O(37), b_+OE(39)); alu_add(gb, OBJ_VAR32);
+  CYC(b_+O(39), b_+OE(40)); L = A;
+  CYC(b_+O(40), b_+OE(41)); A = mem_rd(gb, BC);
+  CYC(b_+O(41), b_+OE(42)); mem_wr(gb, HL, A);
+  CYC(b_+O(42), b_+OE(43)); A = L;
+  CYC(b_+O(43), b_+OE(45)); alu_add(gb, 0xd7); // Object.angle-Object.var32
+  CYC(b_+O(45), b_+OE(46)); L = A;
+  CYC(b_+O(46), b_+OE(48)); mem_wr(gb, HL, 0x00); // ANGLE_UP
+  CYC(b_+O(48), b_+OE(50)); alu_add(gb, 0xfb); // Object.state-Object.angle
+  CYC(b_+O(50), b_+OE(51)); L = A;
+  CYC(b_+O(51), b_+OE(53)); mem_wr(gb, HL, 0x08);
+  CYC(b_+O(53), b_+OE(55)); goto storePointer; // jr
 
 moveRight:
-  SET_BC(POP(b_+55));
-  CYC(b_+56, b_+57); H = D;
-  CYC(b_+57, b_+59); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+59, b_+61); alu_add(gb, OBJ_VAR33);
-  CYC(b_+61, b_+62); L = A;
-  CYC(b_+62, b_+63); A = mem_rd(gb, BC);
-  CYC(b_+63, b_+64); mem_wr(gb, HL, A);
-  CYC(b_+64, b_+65); A = L;
-  CYC(b_+65, b_+67); alu_add(gb, 0xd6); // Object.angle-Object.var33
-  CYC(b_+67, b_+68); L = A;
-  CYC(b_+68, b_+70); mem_wr(gb, HL, 0x08); // ANGLE_RIGHT
-  CYC(b_+70, b_+72); alu_add(gb, 0xfb); // Object.state-Object.angle
-  CYC(b_+72, b_+73); L = A;
-  CYC(b_+73, b_+75); mem_wr(gb, HL, 0x09);
-  CYC(b_+75, b_+77); goto storePointer; // jr
+  SET_BC(POP(b_+O(55)));
+  CYC(b_+O(56), b_+OE(57)); H = D;
+  CYC(b_+O(57), b_+OE(59)); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+  CYC(b_+O(59), b_+OE(61)); alu_add(gb, OBJ_VAR33);
+  CYC(b_+O(61), b_+OE(62)); L = A;
+  CYC(b_+O(62), b_+OE(63)); A = mem_rd(gb, BC);
+  CYC(b_+O(63), b_+OE(64)); mem_wr(gb, HL, A);
+  CYC(b_+O(64), b_+OE(65)); A = L;
+  CYC(b_+O(65), b_+OE(67)); alu_add(gb, 0xd6); // Object.angle-Object.var33
+  CYC(b_+O(67), b_+OE(68)); L = A;
+  CYC(b_+O(68), b_+OE(70)); mem_wr(gb, HL, 0x08); // ANGLE_RIGHT
+  CYC(b_+O(70), b_+OE(72)); alu_add(gb, 0xfb); // Object.state-Object.angle
+  CYC(b_+O(72), b_+OE(73)); L = A;
+  CYC(b_+O(73), b_+OE(75)); mem_wr(gb, HL, 0x09);
+  CYC(b_+O(75), b_+OE(77)); goto storePointer; // jr
 
 moveDown:
-  SET_BC(POP(b_+77));
-  CYC(b_+78, b_+79); H = D;
-  CYC(b_+79, b_+81); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+81, b_+83); alu_add(gb, OBJ_VAR32);
-  CYC(b_+83, b_+84); L = A;
-  CYC(b_+84, b_+85); A = mem_rd(gb, BC);
-  CYC(b_+85, b_+86); mem_wr(gb, HL, A);
-  CYC(b_+86, b_+87); A = L;
-  CYC(b_+87, b_+89); alu_add(gb, 0xd7); // Object.angle-Object.var32
-  CYC(b_+89, b_+90); L = A;
-  CYC(b_+90, b_+92); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
-  CYC(b_+92, b_+94); alu_add(gb, 0xfb); // Object.state-Object.angle
-  CYC(b_+94, b_+95); L = A;
-  CYC(b_+95, b_+97); mem_wr(gb, HL, 0x0a);
-  CYC(b_+97, b_+99); goto storePointer; // jr
+  SET_BC(POP(b_+O(77)));
+  CYC(b_+O(78), b_+OE(79)); H = D;
+  CYC(b_+O(79), b_+OE(81)); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+  CYC(b_+O(81), b_+OE(83)); alu_add(gb, OBJ_VAR32);
+  CYC(b_+O(83), b_+OE(84)); L = A;
+  CYC(b_+O(84), b_+OE(85)); A = mem_rd(gb, BC);
+  CYC(b_+O(85), b_+OE(86)); mem_wr(gb, HL, A);
+  CYC(b_+O(86), b_+OE(87)); A = L;
+  CYC(b_+O(87), b_+OE(89)); alu_add(gb, 0xd7); // Object.angle-Object.var32
+  CYC(b_+O(89), b_+OE(90)); L = A;
+  CYC(b_+O(90), b_+OE(92)); mem_wr(gb, HL, 0x10); // ANGLE_DOWN
+  CYC(b_+O(92), b_+OE(94)); alu_add(gb, 0xfb); // Object.state-Object.angle
+  CYC(b_+O(94), b_+OE(95)); L = A;
+  CYC(b_+O(95), b_+OE(97)); mem_wr(gb, HL, 0x0a);
+  CYC(b_+O(97), b_+OE(99)); goto storePointer; // jr
 
 moveLeft:
-  SET_BC(POP(b_+99));
-  CYC(b_+100, b_+101); H = D;
-  CYC(b_+101, b_+103); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+103, b_+105); alu_add(gb, OBJ_VAR33);
-  CYC(b_+105, b_+106); L = A;
-  CYC(b_+106, b_+107); A = mem_rd(gb, BC);
-  CYC(b_+107, b_+108); mem_wr(gb, HL, A);
-  CYC(b_+108, b_+109); A = L;
-  CYC(b_+109, b_+111); alu_add(gb, 0xd6); // Object.angle-Object.var33
-  CYC(b_+111, b_+112); L = A;
-  CYC(b_+112, b_+114); mem_wr(gb, HL, 0x18); // ANGLE_LEFT
-  CYC(b_+114, b_+116); alu_add(gb, 0xfb); // Object.state-Object.angle
-  CYC(b_+116, b_+117); L = A;
-  CYC(b_+117, b_+119); mem_wr(gb, HL, 0x0b);
-  CYC(b_+119, b_+121); goto storePointer; // jr
+  SET_BC(POP(b_+O(99)));
+  CYC(b_+O(100), b_+OE(101)); H = D;
+  CYC(b_+O(101), b_+OE(103)); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+  CYC(b_+O(103), b_+OE(105)); alu_add(gb, OBJ_VAR33);
+  CYC(b_+O(105), b_+OE(106)); L = A;
+  CYC(b_+O(106), b_+OE(107)); A = mem_rd(gb, BC);
+  CYC(b_+O(107), b_+OE(108)); mem_wr(gb, HL, A);
+  CYC(b_+O(108), b_+OE(109)); A = L;
+  CYC(b_+O(109), b_+OE(111)); alu_add(gb, 0xd6); // Object.angle-Object.var33
+  CYC(b_+O(111), b_+OE(112)); L = A;
+  CYC(b_+O(112), b_+OE(114)); mem_wr(gb, HL, 0x18); // ANGLE_LEFT
+  CYC(b_+O(114), b_+OE(116)); alu_add(gb, 0xfb); // Object.state-Object.angle
+  CYC(b_+O(116), b_+OE(117)); L = A;
+  CYC(b_+O(117), b_+OE(119)); mem_wr(gb, HL, 0x0b);
+  CYC(b_+O(119), b_+OE(121)); goto storePointer; // jr
 
 wait:
-  SET_BC(POP(b_+121));
-  CYC(b_+122, b_+123); H = D;
-  CYC(b_+123, b_+125); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+125, b_+127); alu_add(gb, OBJ_COUNTER1);
-  CYC(b_+127, b_+128); L = A;
-  CYC(b_+128, b_+129); A = mem_rd(gb, BC);
-  CYC(b_+129, b_+130); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
-  CYC(b_+130, b_+131); L = alu_dec8(gb, L);
-  CYC(b_+131, b_+133); mem_wr(gb, HL, 0x0c);
+  SET_BC(POP(b_+O(121)));
+  CYC(b_+O(122), b_+OE(123)); H = D;
+  CYC(b_+O(123), b_+OE(125)); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+  CYC(b_+O(125), b_+OE(127)); alu_add(gb, OBJ_COUNTER1);
+  CYC(b_+O(127), b_+OE(128)); L = A;
+  CYC(b_+O(128), b_+OE(129)); A = mem_rd(gb, BC);
+  if (!game_seasons) {
+    CYC(b_+129, b_+130); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
+    CYC(b_+130, b_+131); L = alu_dec8(gb, L);
+  } else {
+    CYC(b_+S(127), b_+S(128)); mem_wr(gb, HL, A);
+    CYC(b_+S(128), b_+S(129)); A = L;
+    CYC(b_+S(129), b_+S(131)); alu_add(gb, 0xfe);
+    CYC(b_+S(131), b_+S(132)); L = A;
+  }
+  CYC(b_+O(131), b_+OE(133)); mem_wr(gb, HL, 0x0c);
   goto storePointer; // fallthrough
 
 storePointer:
-  CYC(b_+133, b_+134); SET_BC(BC + 1); // inc bc
-  CYC(b_+134, b_+135); A = L;
-  CYC(b_+135, b_+137); alu_add(gb, 0x2c); // Object.var30-Object.state
-  CYC(b_+137, b_+138); L = A;
-  CYC(b_+138, b_+139); mem_wr(gb, HL, C);
-  CYC(b_+139, b_+140); L = alu_inc8(gb, L);
-  CYC(b_+140, b_+141); mem_wr(gb, HL, B);
-  RET(b_+141); return; // ret
+  CYC(b_+O(133), b_+OE(134)); SET_BC(BC + 1); // inc bc
+  if (!game_seasons) { CYC(b_+134, b_+135); A = L; }
+  CYC(b_+O(135), b_+OE(137)); alu_add(gb, 0x2c); // Object.var30-Object.state
+  CYC(b_+O(137), b_+OE(138)); L = A;
+  CYC(b_+O(138), b_+OE(139)); mem_wr(gb, HL, C);
+  CYC(b_+O(139), b_+OE(140)); L = alu_inc8(gb, L);
+  CYC(b_+O(140), b_+OE(141)); mem_wr(gb, HL, B);
+  RET(b_+O(141)); return; // ret
 
 setstate:
-  SET_BC(POP(b_+142));
-  CYC(b_+143, b_+144); H = D;
-  CYC(b_+144, b_+146); A = hram_rd(gb, (uint8_t)hActiveObjectType);
-  CYC(b_+146, b_+148); alu_add(gb, OBJ_COUNTER1);
-  CYC(b_+148, b_+149); L = A;
-  CYC(b_+149, b_+150); A = mem_rd(gb, BC);
-  CYC(b_+150, b_+151); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
-  CYC(b_+151, b_+152); L = alu_dec8(gb, L);
-  CYC(b_+152, b_+153); SET_BC(BC + 1); // inc bc
-  CYC(b_+153, b_+154); A = mem_rd(gb, BC);
-  CYC(b_+154, b_+155); mem_wr(gb, HL, A); // [state]
-  CYC(b_+155, b_+157); goto storePointer; // jr
+  if (!game_seasons) {
+    SET_BC(POP(b_+142));
+    CYC(b_+143, b_+144); H = D;
+    CYC(b_+144, b_+146); A = hram_rd(gb, (uint8_t)hActiveObjectType);
+    CYC(b_+146, b_+148); alu_add(gb, OBJ_COUNTER1);
+    CYC(b_+148, b_+149); L = A;
+    CYC(b_+149, b_+150); A = mem_rd(gb, BC);
+    CYC(b_+150, b_+151); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
+    CYC(b_+151, b_+152); L = alu_dec8(gb, L);
+    CYC(b_+152, b_+153); SET_BC(BC + 1); // inc bc
+    CYC(b_+153, b_+154); A = mem_rd(gb, BC);
+    CYC(b_+154, b_+155); mem_wr(gb, HL, A); // [state]
+    CYC(b_+155, b_+157); goto storePointer; // jr
+  }
 }

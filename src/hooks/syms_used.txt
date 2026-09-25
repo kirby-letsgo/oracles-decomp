@@ -14962,3 +14962,5 @@ syrupScript_purchaseItem syrupScript_purchaseItem -
 syrupScript_showClosedText syrupScript_showClosedText -
 syrupScript_showWelcomeText syrupScript_showWelcomeText -
 syrupScript_spawnShopItems syrupScript_spawnShopItems -
+linkState10 linkState10 -
+rickyStateASubstate7 rickyStateASubstate7 -

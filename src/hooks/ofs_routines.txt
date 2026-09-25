@@ -123,11 +123,13 @@ mapMenu_drawSpriteAtRoomIndex
 mapMenu_loadPopupData
 mapMenu_state0
 mapMenu_state1
+mapleState5
 mapleStateB
 mooshState0
 nextToPushableBlock
 objectCheckIsOverHazard
 objectOscillateZ_body
+objectRunMovementScript_body
 overworldSwimmingState1
 paletteFadeHandler
 paletteFadeHandler05

@@ -4,6 +4,13 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-25, Seasons 5 batch 2 (bank 05 and the movement script): 19 more routines as Seasons
+  hand C (linkState09/0f/10, linkUpdateDiving/Velocity, overworldSwimmingState3,
+  warpTransition6, mooshStateA and substates 1/3/4/5, rickyStateA substates 2-7, dimitriStateA);
+  mapleState5 (Ages-only past-encounter flags, GV book text) and objectRunMovementScript_body
+  (per-game @wait tail, Ages-only @setstate) now run as shared C under Seasons. Eligible
+  3,891 -> 3,893. mk5.py lists a label twice when a file defines it under both `.ifdef ROM_AGES`
+  and `.else`; the lists are de-duplicated (the drafter reads the Seasons ROM either way).
 - 2026-09-25, Seasons 5 batch 1 (object banks, generated -> hand C): 95 routines that still ran
   as generated Seasons C are now hand C in src/game/seasons/ (76 in Seasons-only interaction/enemy
   files: Din's dance and imprisonment, temple sinking, D1 rising stones, maku tree bubble, ball

@@ -1652,6 +1652,7 @@
 05:6425 mapleDecideNextAngle_hook -
 05:6442 mapleCollideWithLink_hook -
 05:64a2 mapleState3_hook -
+05:650f mapleState5_hook -
 05:659f mapleUpdateOscillation_hook -
 05:65be mapleUpdateAngle_hook -
 05:65d2 mapleDecideAnimation_hook -
@@ -3020,6 +3021,7 @@
 0d:6acd label_270_hook -
 0d:6af4 ganonRevivalCutscene_spawnShadow_hook -
 0d:798f objectLoadMovementScript_body_hook -
+0d:79ae objectRunMovementScript_body_hook -
 0e:4000 ecom_incState_b0f_hook -
 0e:4005 ecom_incSubstate_b0f_hook -
 0e:400a ecom_updateKnockback_b0f_hook -

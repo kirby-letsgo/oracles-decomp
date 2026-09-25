@@ -14966,6 +14966,8 @@ enum {
   S_syrupScript_showClosedText,
   S_syrupScript_showWelcomeText,
   S_syrupScript_spawnShopItems,
+  S_linkState10,
+  S_rickyStateASubstate7,
   SYM_COUNT
 };
 enum {
