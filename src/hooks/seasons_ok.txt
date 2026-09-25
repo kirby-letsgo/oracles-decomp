@@ -108,6 +108,7 @@ enemyCode04
 enemyCode12
 enemyCode13
 enemyCode14
+enemyCode15@chooseNewDirection
 enemyCode19
 enemyCode1a
 enemyCode21
@@ -115,6 +116,7 @@ enemyCode25
 enemyCode3e
 enemyCode48
 enemyCode4b
+enemyCode58@checkDisableDestruction
 enemyDie
 enemyDie_uncounted
 enemyDie_uncounted_withoutItemDrop
