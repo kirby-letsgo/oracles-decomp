@@ -1536,3 +1536,17 @@ rickyStateASubstate3
 rickyStateASubstate5
 rickyStateASubstate4
 rickyStateASubstate7
+loadRememberedCompanion
+partCode2f
+partCode33
+partCode38
+partCode3b
+partCode3d
+partCode45
+partCode47
+partCode48
+partCode49
+partCode2b
+partCode41
+partCode2e
+partCode3c

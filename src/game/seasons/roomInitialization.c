@@ -62,3 +62,41 @@ spawn_if_not_here:
   CYC(b_+51, b_+53); mem_wr(gb, HL, 0x01);
   RET(b_+53); return;
 }
+
+// Check the wRememberedCompanion variables to see if a companion is in this room.
+void s_loadRememberedCompanion_hook(GB *gb) {
+  BASE(loadRememberedCompanion);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+0, b_+3); SET_HL(wRememberedCompanionId);
+  CYC(b_+3, b_+4); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+4, b_+5); alu_or(gb, A);
+  if (F & FZ) { RET_TAKEN(b_+5); return; }
+  CYC(b_+5, b_+6);
+  CYC(b_+6, b_+7); C = A;
+  CYC(b_+7, b_+10); A = mem_rd(gb, wActiveGroup);
+  CYC(b_+10, b_+11); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+11); return; }
+  CYC(b_+11, b_+12);
+  CYC(b_+12, b_+13); L = alu_inc8(gb, L);
+  CYC(b_+13, b_+16); A = mem_rd(gb, wActiveRoom);
+  CYC(b_+16, b_+17); alu_cp(gb, mem_rd(gb, HL));
+  if (!(F & FZ)) { RET_TAKEN(b_+17); return; }
+  CYC(b_+17, b_+18);
+  CYC(b_+18, b_+21); A = mem_rd(gb, w1Companion);
+  CYC(b_+21, b_+22); alu_or(gb, A);
+  if (!(F & FZ)) { RET_TAKEN(b_+22); return; }
+  CYC(b_+22, b_+23);
+  CYC(b_+23, b_+24); A = C;
+  CYC(b_+24, b_+27); mem_wr(gb, w1Companion_id, A);
+  CYC(b_+27, b_+29); A = 0x01;
+  CYC(b_+29, b_+32); mem_wr(gb, w1Companion, A);
+  CYC(b_+32, b_+33); L = alu_inc8(gb, L);
+  CYC(b_+33, b_+34); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+34, b_+37); mem_wr(gb, w1Companion_yh, A);
+  CYC(b_+37, b_+40); mem_wr(gb, wLastAnimalMountPointY, A);
+  CYC(b_+40, b_+41); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+41, b_+44); mem_wr(gb, w1Companion_xh, A);
+  CYC(b_+44, b_+47); mem_wr(gb, wLastAnimalMountPointX, A);
+  RET(b_+47); return;
+}
+

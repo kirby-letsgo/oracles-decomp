@@ -4,6 +4,11 @@ Updated 2026-09-15. Newest entries at the top of each section.
 
 ## Where things stand
 
+- 2026-09-25, Seasons 5 batch 3 (bank 10): the 14 top-level routines still generated there are
+  Seasons hand C (partCode38/49/48/47/45/41/3d/3c/3b/33/2f/2e/2b, loadRememberedCompanion; the
+  latter's Ages C is in bank2.c at ratio 0.72, so the Seasons copy is its own). The bank's other
+  ~430 generated entries are milestone-3 hand routines' neighbours or entry points into shared
+  routines (the generator-locals work).
 - 2026-09-25, Seasons 5 batch 2 (bank 05 and the movement script): 19 more routines as Seasons
   hand C (linkState09/0f/10, linkUpdateDiving/Velocity, overworldSwimmingState3,
   warpTransition6, mooshStateA and substates 1/3/4/5, rickyStateA substates 2-7, dimitriStateA);

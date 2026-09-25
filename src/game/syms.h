@@ -14968,6 +14968,8 @@ enum {
   S_syrupScript_spawnShopItems,
   S_linkState10,
   S_rickyStateASubstate7,
+  S_seasonsTable_10_6c5b,
+  S_table_70f3,
   SYM_COUNT
 };
 enum {

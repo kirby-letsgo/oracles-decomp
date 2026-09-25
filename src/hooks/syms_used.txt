@@ -14964,3 +14964,5 @@ syrupScript_showWelcomeText syrupScript_showWelcomeText -
 syrupScript_spawnShopItems syrupScript_spawnShopItems -
 linkState10 linkState10 -
 rickyStateASubstate7 rickyStateASubstate7 -
+seasonsTable_10_6c5b seasonsTable_10_6c5b -
+table_70f3 table_70f3 -
