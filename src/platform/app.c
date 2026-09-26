@@ -4,7 +4,9 @@
 // the per-platform cache; later launches load the cache and never see the ROM again. Saves are
 // the game's own SRAM image in that cache; Cmd+S / Cmd+R save and load one state slot there.
 //
-// usage: oracles-native [ROM] [--game ages|seasons] [--cache DIR] [--frames N]
+// usage: oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]
+//   --file N boots straight into save file N, as choosing it in the launcher does.
+//   With neither a ROM nor --game it opens the launcher (the ROM file dialog on first launch).
 //   --frames N exits after N frames (tests run the app under SDL_VIDEO_DRIVER=dummy).
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -16,6 +18,7 @@
 #include "rt/fibers.h"
 #include "game/game.h"
 #include "assets/assets.h"
+#include "ui/launcher.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -139,6 +142,152 @@ static void save_sram(GB *gb, const char *path) {
   if (gb->eram_size) write_file(path, gb->eram, gb->eram_size);
 }
 
+static const char *const game_ids[UI_GAMES] = {"ages", "seasons"};
+
+static bool pick_rom(char *game_out, const char *cache) {
+  static const SDL_DialogFileFilter filters[] = {{"Game Boy Color ROM", "gbc;gb"}};
+  pick_state = 0;
+  SDL_ShowOpenFileDialog(on_pick, NULL, NULL, filters, 1, NULL, false);
+  while (!pick_state) { SDL_Event ev; while (SDL_PollEvent(&ev)) if (ev.type == SDL_EVENT_QUIT) return false; SDL_Delay(10); }
+  return pick_state > 0 && extract(picked, cache, game_out);
+}
+
+// Installed games, their save files and save state, each game's colours, and the font from whichever
+// ROM image is cached.
+static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
+  memset(l->games, 0, sizeof l->games);
+  font->loaded = false;
+  for (int g = 0; g < UI_GAMES; g++) {
+    LauncherGame *lg = &l->games[g];
+    ui_theme_default(&lg->theme, g == UI_GAME_AGES);
+    if (!cached(cache, game_ids[g])) continue;
+    lg->installed = true;
+    char path[1300];
+    size_t n;
+    snprintf(path, sizeof path, "%s%s/sram.sav", cache, game_ids[g]);
+    uint8_t *sram = oracles_read_file(path, &n);
+    ui_read_files(sram, sram ? n : 0, g == UI_GAME_AGES, lg->files);
+    free(sram);
+    snprintf(path, sizeof path, "%s%s/savestate", cache, game_ids[g]);
+    FILE *f = fopen(path, "rb");
+    if (f) { lg->has_state = true; fclose(f); }
+    snprintf(path, sizeof path, "%s%s/rom.bin", cache, game_ids[g]);
+    uint8_t *rom = oracles_read_file(path, &n);
+    ui_theme_load(&lg->theme, rom, rom ? n : 0, g == UI_GAME_AGES);
+    if (!font->loaded) ui_font_load(font, rom, rom ? n : 0);
+    free(rom);
+  }
+}
+
+static bool menu_button(const SDL_Event *ev, UiButton *b) {
+  if (ev->type == SDL_EVENT_KEY_DOWN) {
+    switch (ev->key.scancode) {
+    case SDL_SCANCODE_UP: *b = UI_UP; return true;
+    case SDL_SCANCODE_DOWN: *b = UI_DOWN; return true;
+    case SDL_SCANCODE_LEFT: *b = UI_LEFT; return true;
+    case SDL_SCANCODE_RIGHT: *b = UI_RIGHT; return true;
+    case SDL_SCANCODE_X: case SDL_SCANCODE_RETURN: case SDL_SCANCODE_SPACE: *b = UI_ACCEPT; return true;
+    case SDL_SCANCODE_Z: case SDL_SCANCODE_ESCAPE: case SDL_SCANCODE_BACKSPACE: *b = UI_BACK; return true;
+    default: return false;
+    }
+  }
+  if (ev->type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) {
+    switch (ev->gbutton.button) {
+    case SDL_GAMEPAD_BUTTON_DPAD_UP: *b = UI_UP; return true;
+    case SDL_GAMEPAD_BUTTON_DPAD_DOWN: *b = UI_DOWN; return true;
+    case SDL_GAMEPAD_BUTTON_DPAD_LEFT: *b = UI_LEFT; return true;
+    case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: *b = UI_RIGHT; return true;
+    case SDL_GAMEPAD_BUTTON_SOUTH: case SDL_GAMEPAD_BUTTON_START: *b = UI_ACCEPT; return true;
+    case SDL_GAMEPAD_BUTTON_EAST: case SDL_GAMEPAD_BUTTON_WEST: *b = UI_BACK; return true;
+    default: return false;
+    }
+  }
+  return false;
+}
+
+// Runs the launcher until a game is chosen (true) or the player quits (false).
+static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const char *cache, char *game_out, int *file_out, bool *file_used) {
+  static Launcher l;
+  static UiFont font;
+  static UiCanvas canvas;
+  static uint8_t rgb[UI_W * UI_H * 3];
+  launcher_load(&l, &font, cache);
+  if (!font.loaded) {
+    char game[16];
+    if (!pick_rom(game, cache)) return false;
+    launcher_load(&l, &font, cache);
+  }
+  launcher_init(&l, UI_GAME_SEASONS);
+  for (;;) {
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) return false;
+      if (ev.type == SDL_EVENT_KEY_DOWN && oracles_window_key(win, &ev.key)) continue;
+      if (ev.type == SDL_EVENT_GAMEPAD_ADDED) SDL_OpenGamepad(ev.gdevice.which);
+      UiButton b;
+      if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+      LaunchResult r = launcher_press(&l, b);
+      if (r.action == LAUNCH_QUIT) return false;
+      if (r.action == LAUNCH_ADD_ROM) {
+        char game[16];
+        if (pick_rom(game, cache)) { UiGame g = l.game; launcher_load(&l, &font, cache); launcher_init(&l, g); }
+      }
+      if (r.action == LAUNCH_PLAY) {
+        strcpy(game_out, game_ids[r.game]);
+        *file_out = r.file;
+        *file_used = r.file >= 0 && l.games[r.game].files[r.file].valid;
+        return true;
+      }
+    }
+    launcher_draw(&l, &font, &canvas);
+    ui_to_rgb(&canvas, rgb);
+    SDL_UpdateTexture(tex, NULL, rgb, UI_W * 3);
+    SDL_RenderClear(ren);
+    SDL_RenderTexture(ren, tex, NULL, NULL);
+    SDL_RenderPresent(ren);
+    SDL_Delay(16);
+  }
+}
+
+// Boots straight into a save file: presses Start until the file select screen is up, moves the
+// cursor to the file, then A (the file) and A (the text-speed prompt). Driven by the game's own
+// file-select state, so the same inputs a player would give; any key cancels it.
+typedef enum { BOOT_OFF, BOOT_TO_FILE_SELECT, BOOT_MOVE, BOOT_SELECT, BOOT_TEXT_SPEED } BootPhase;
+typedef struct { BootPhase phase; int file; bool open_file; uint64_t since; } BootDriver;
+
+// wThreadStateBuffer+6/+7 ($c2e6/$c2e7) in both games: the intro stage and the title screen's state
+#define INTRO_STAGE 0x2e6
+#define INTRO_VAR 0x2e7
+#define FS_MODE(gb) ((gb)->wram[0][wFileSelect_mode & 0xfff])
+#define FS_MODE2(gb) ((gb)->wram[0][wFileSelect_mode2 & 0xfff])
+#define FS_CURSOR(gb) ((gb)->wram[0][wFileSelect_cursorPos & 0xfff])
+
+static uint8_t boot_input(GB *gb, BootDriver *d, uint64_t frame) {
+  bool pulse = (frame / 6) % 2 == 0;
+  bool choosing = FS_MODE(gb) == 1 && FS_MODE2(gb) == 1;
+  if (frame - d->since > 3600) { d->phase = BOOT_OFF; return 0; }
+  switch (d->phase) {
+  case BOOT_OFF: return 0;
+  case BOOT_TO_FILE_SELECT:
+    // Start until the title screen fades out (intro stage 3, title state 3); none after that, so no
+    // press lands on the file select screen's first input frame
+    if (gb->wram[0][INTRO_STAGE] == 3 && gb->wram[0][INTRO_VAR] == 3) { d->phase = BOOT_MOVE; return 0; }
+    return pulse ? JOY_START : 0;
+  case BOOT_MOVE:
+    if (!choosing) return 0;
+    if (FS_CURSOR(gb) == d->file) { d->phase = d->open_file ? BOOT_SELECT : BOOT_OFF; return 0; }
+    return pulse ? JOY_DOWN : 0;
+  case BOOT_SELECT:
+    if (FS_MODE2(gb) == 2) { d->phase = BOOT_TEXT_SPEED; return 0; }
+    if (FS_MODE(gb) != 1) { d->phase = BOOT_OFF; return 0; }
+    return pulse ? JOY_A : 0;
+  case BOOT_TEXT_SPEED:
+    if (FS_MODE2(gb) != 2) { d->phase = BOOT_OFF; return 0; }
+    return pulse ? JOY_A : 0;
+  }
+  return 0;
+}
+
 // Cmd+S saves at the first frame whose threads are all parked at the top of their loops
 // (threads_parked), usually the same frame; a load then resumes them in C.
 #define NO_SAVE UINT64_MAX
@@ -152,13 +301,15 @@ static uint64_t show_status(SDL_Window *win, const char *title, const char *stat
 
 int main(int argc, char **argv) {
   const char *rom_arg = NULL, *game_arg = NULL, *cache_arg = NULL;
+  int file_arg = -1;
   uint64_t max_frames = 0;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--game") && i + 1 < argc) game_arg = argv[++i];
     else if (!strcmp(argv[i], "--frames") && i + 1 < argc) max_frames = strtoull(argv[++i], NULL, 10);
     else if (!strcmp(argv[i], "--cache") && i + 1 < argc) cache_arg = argv[++i];
+    else if (!strcmp(argv[i], "--file") && i + 1 < argc) file_arg = atoi(argv[++i]) - 1;
     else if (argv[i][0] != '-') rom_arg = argv[i];
-    else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons] [--cache DIR] [--frames N]\n"); return 2; }
+    else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]\n"); return 2; }
   }
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMEPAD)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
   char cache[1024];
@@ -166,19 +317,29 @@ int main(int argc, char **argv) {
   else { char *p = SDL_GetPrefPath("oracles-decomp", "oracles"); if (!p) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; } snprintf(cache, sizeof cache, "%s", p); SDL_free(p); }
   SDL_CreateDirectory(cache);
 
+  SDL_Window *win;
+  SDL_Renderer *ren;
+  SDL_Texture *tex;
+  char window_size[1100];
+  snprintf(window_size, sizeof window_size, "%swindow.txt", cache);
+  if (!oracles_open_window("Oracles", window_size, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
+
   char game[16] = "";
+  int start_file = -1;
+  bool start_file_used = false;
   if (rom_arg) { if (!extract(rom_arg, cache, game)) return 2; }
-  else if (game_arg && cached(cache, game_arg)) snprintf(game, sizeof game, "%s", game_arg);
-  else if (!game_arg && cached(cache, "ages") && !cached(cache, "seasons")) strcpy(game, "ages");
-  else if (!game_arg && cached(cache, "seasons") && !cached(cache, "ages")) strcpy(game, "seasons");
-  else if (!game_arg && cached(cache, "ages") && cached(cache, "seasons")) strcpy(game, "ages");
-  else {
-    static const SDL_DialogFileFilter filters[] = {{"Game Boy Color ROM", "gbc;gb"}};
-    SDL_ShowOpenFileDialog(on_pick, NULL, NULL, filters, 1, NULL, false);
-    while (!pick_state) { SDL_Event ev; while (SDL_PollEvent(&ev)) if (ev.type == SDL_EVENT_QUIT) return 0; SDL_Delay(10); }
-    if (pick_state < 0) return 0;
-    if (!extract(picked, cache, game)) return 2;
+  else if (game_arg) {
+    if (!cached(cache, game_arg)) { fprintf(stderr, "%s is not installed; run once with its ROM path\n", game_arg); return 2; }
+    snprintf(game, sizeof game, "%s", game_arg);
+    if (file_arg >= 0 && file_arg < UI_FILES) {
+      Launcher probe;
+      UiFont font;
+      launcher_load(&probe, &font, cache);
+      start_file = file_arg;
+      start_file_used = probe.games[strcmp(game, "ages") == 0 ? UI_GAME_AGES : UI_GAME_SEASONS].files[file_arg].valid;
+    }
   }
+  else if (!run_launcher(win, ren, tex, cache, game, &start_file, &start_file_used)) { oracles_close_window(win, window_size); SDL_Quit(); return 0; }
 
   char dir[1100], path[1300];
   snprintf(dir, sizeof dir, "%s%s", cache, game);
@@ -201,14 +362,9 @@ int main(int argc, char **argv) {
   snprintf(state, sizeof state, "%s/savestate", dir);
   load_sram(gb, sav);
 
-  SDL_Window *win;
-  SDL_Renderer *ren;
   char title[64];
   snprintf(title, sizeof title, "Oracle of %s", strcmp(game, "ages") == 0 ? "Ages" : "Seasons");
-  SDL_Texture *tex;
-  char window_size[1100];
-  snprintf(window_size, sizeof window_size, "%swindow.txt", cache);
-  if (!oracles_open_window(title, window_size, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
+  SDL_SetWindowTitle(win, title);
   SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
   SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
   if (audio) SDL_ResumeAudioStreamDevice(audio);
@@ -220,6 +376,11 @@ int main(int argc, char **argv) {
   bool running = true;
   bool muted = false;
   uint64_t title_reset = 0, save_from = NO_SAVE;
+  BootDriver boot = {start_file >= 0 ? BOOT_TO_FILE_SELECT : BOOT_OFF, start_file, start_file_used, 0};
+  if (start_file == LAUNCH_STATE) {
+    if (oracles_load_boot_state(gb, state)) fibers_reset(gb);
+    else fprintf(stderr, "load state failed: %s\n", state);
+  }
   while (running && !gb->hung) {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
@@ -227,6 +388,7 @@ int main(int argc, char **argv) {
       case SDL_EVENT_QUIT: running = false; break;
       case SDL_EVENT_KEY_DOWN:
         if (oracles_window_key(win, &ev.key)) break;
+        if (boot.phase != BOOT_OFF) { boot.phase = BOOT_OFF; live_joy = 0; }
         if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S && !ev.key.repeat) save_from = frames;
         else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R && !ev.key.repeat) {
           bool ok = oracles_load_boot_state(gb, state);
@@ -246,9 +408,16 @@ int main(int argc, char **argv) {
       case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
       }
     }
-    if (audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
-    gb_run_frame(gb);
-    frames++;
+    if (boot.phase != BOOT_OFF) {
+      // fast-forward the logos and menus, silently
+      for (int i = 0; i < 8 && boot.phase != BOOT_OFF; i++) { live_joy = boot_input(gb, &boot, frames); gb_run_frame(gb); frames++; }
+      if (boot.phase == BOOT_OFF) { live_joy = 0; fprintf(stderr, "boot into file %d done at frame %llu\n", boot.file + 1, (unsigned long long)frames); }
+      apu_read_samples(&gb->apu, samples, APU_RING);
+    } else {
+      if (audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
+      gb_run_frame(gb);
+      frames++;
+    }
     if (save_from != NO_SAVE && threads_parked(gb)) {
       bool ok = oracles_save_boot_state(gb, state);
       title_reset = show_status(win, title, ok ? "state saved" : "could not save state", frames);
