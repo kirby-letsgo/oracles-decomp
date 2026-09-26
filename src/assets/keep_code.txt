@@ -12,3 +12,13 @@ seasons 012518-012519       # loadAnimationData@helper with an out-of-table inde
 seasons 01603d-01603e     # mapleState6 (Maple's item minigame) reads linkState12+0x33 as data (frame 194644)
 seasons 002e83-002e84     # loadAnimationData@helper with an out-of-table index reads _updateEnemiesIfStateIsZero@next+4 (frame 256212)
 seasons 000081-000082       # seasonsFunc_0c_699d (rolling spike trap) reads (bc) with c=$81 and b from var31, which is 0 there (frame 153461 of the console-verified resync)
+seasons 000681-00068a       # loadAnimationData with an out-of-table animation group reads its header (state byte and four counter pointers) from func_069c+9 (frame 217053 of the console-verified movie, reached once the timer matches GBHawk)
+seasons 000b20-000b21       # ...and the first byte behind each of the four pointers: $0b20, $1006, $1207 and bank 4 $64cd
+seasons 001006-001007
+seasons 001207-001208
+seasons 0124cd-0124ce
+seasons 03bb1c-03bb1f       # manhandla func_7a1f reads two bytes of table_7afe at (subid-2)*6 + 7-hFF8F, which runs past the table into func_7b1c (frame 235590 of the console-verified movie)
+seasons 025618-025654       # interactionCode66@subid0@state0 (Explorer's Crypt armos puzzle) counts its 8-byte table copy down in e, which holds <Interaction.state ($44): it copies 68 bytes, 60 of them from @state1 (frame 262516 of the console-verified movie)
+seasons 042e37-042e3b       # partCode3b indexes seasonsTable_10_6c5b with its parent's $88 byte; out of range it reads 4 bytes of func_6e37 (frame 270301 of the console-verified movie)
+seasons 03a0fb-03a0fe       # checkFlag called with hl inside enemyCode77@state0 (Frypolar) reads 60fb and 60fd (frames 270301, 270360 of the console-verified movie)
+seasons 000c81-000c82       # loadAnimationData@helper with an out-of-table animation group follows a counter pointer to $0c81 (frame 280607 of the console-verified movie)

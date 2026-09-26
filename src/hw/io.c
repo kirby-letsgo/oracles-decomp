@@ -19,8 +19,8 @@ uint8_t io_read(GB *gb, uint8_t r) {
   case R_P1: gb->joy_read = true; return joypad_read(gb);
   case R_SB: return gb->io[R_SB];
   case R_SC: return gb->io[R_SC] | 0x7c;
-  case R_DIV: return gb->div_counter >> 8;
-  case R_TIMA: case R_TMA: return gb->io[r];
+  case R_DIV: case R_TIMA: return timer_io_read(gb, r);
+  case R_TMA: return gb->io[r];
   case R_TAC: return gb->io[R_TAC] | 0xf8;
   case R_IF: return gb->io[R_IF] | 0xe0;
   case R_LY: return ppu_ly_read(gb);
@@ -57,11 +57,11 @@ void io_write(GB *gb, uint8_t r, uint8_t v) {
       gb->io[R_IF] |= INT_SERIAL;
     }
     return;
-  case R_DIV: if (dbg_log_timer_writes) printf("  OURS write DIV at cycle %llu div=%04x\n", (unsigned long long)gb->cycles, gb->div_counter); timer_write_div(gb); return;
+  case R_DIV: if (dbg_log_timer_writes) printf("  OURS write DIV at cycle %llu div=%04x\n", (unsigned long long)gb->cycles, gb->div_counter); timer_io_write(gb, r, v); return;
   case R_TIMA: if (dbg_log_timer_writes) printf("  OURS write TIMA=%02x at cycle %llu div=%04x reload=%d\n", v, (unsigned long long)gb->cycles, gb->div_counter, gb->tima_reload);
-    if (gb->tima_reload != 2) { gb->io[R_TIMA] = v; gb->tima_reload = 0; } return;
-  case R_TMA: gb->io[R_TMA] = v; if (gb->tima_reload == 2) gb->io[R_TIMA] = v; return;
-  case R_TAC: if (dbg_log_timer_writes) printf("  OURS write TAC=%02x at cycle %llu div=%04x TIMA=%02x\n", v, (unsigned long long)gb->cycles, gb->div_counter, gb->io[R_TIMA]); timer_write_tac(gb, v); return;
+    timer_io_write(gb, r, v); return;
+  case R_TMA: timer_io_write(gb, r, v); return;
+  case R_TAC: if (dbg_log_timer_writes) printf("  OURS write TAC=%02x at cycle %llu div=%04x TIMA=%02x\n", v, (unsigned long long)gb->cycles, gb->div_counter, gb->io[R_TIMA]); timer_io_write(gb, r, v); return;
   case R_IF: gb->io[R_IF] = v & 0x1f; return;
   case R_LCDC: ppu_write_lcdc(gb, v); return;
   case R_STAT: gb->io[R_STAT] = (gb->io[R_STAT] & 0x07) | (v & 0x78); ppu_update_stat(gb); return;

@@ -393,3 +393,68 @@ for double in (False, True):
         name = 'iv_%s%s' % ('push_' if push else '', 'd' if double else 's')
         open('tests/timing/%s.gbc' % name, 'wb').write(iv_rom(double, push))
 print('wrote IV')
+
+# Test TW/TR: a TIMA write or read swept across a 4096 Hz tick (TAC=4, the Seasons sound timer).
+# Each iteration resets DIV, waits 181 + k M-cycles, then tw_* writes TIMA=$f0 and reads it back
+# 101 M-cycles later, tr_* zeroes TIMA after the DIV reset and reads it; the value goes to C000+k. Seasons' timer handler rewrites
+# TIMA in the M-cycle of a tick at frame 23507 of the console-verified movie.
+def delay(n):  # ld a,n; dec a; jr nz: 4n+1 M-cycles
+    return bytes([0x3e, n]) + b'\x3d\x20\xfd'
+def tw_rom(double, write):
+    code = bytearray((PRELUDE if double else PRELUDE_SS) + b'\x3e\x04\xe0\x07')
+    for k in range(160):
+        code += b'\xe0\x04' + (b'' if write else b'\xaf\xe0\x05') + delay(45) + b'\x00' * k
+        if write: code += b'\x3e\xf0\xe0\x05' + delay(25)
+        code += b'\xf0\x05' + bytes([0xea, k, 0xc0])
+    code += b'\x18\xfe'
+    assert 0x150 + len(code) < 0x8000, hex(len(code))
+    return rom_with(bytes(code))
+for double in (False, True):
+    sp = 'd' if double else 's'
+    open('tests/timing/tw_%s.gbc' % sp, 'wb').write(tw_rom(double, True))
+    open('tests/timing/tr_%s.gbc' % sp, 'wb').write(tw_rom(double, False))
+
+# Test DV: DIV straight after the double-speed STOP (dv_s: after switching back to single speed; *off: LCD off first, as the games do), sampled every 5 M-cycles (ldh a,(DIV);
+# ld (hl+),a) into C000..C09F: the sample index of each DIV step gives the divider's phase.
+DV_PRELUDE = (b'\xf3' b'\x31\xfe\xff' b'\x3e\x01\xe0\x4d' b'\xaf\xe0\xff' b'\x3e\x30\xe0\x00' b'\x10\x00')
+open('tests/timing/dv_d.gbc', 'wb').write(rom_with(DV_PRELUDE + b'\x21\x00\xc0' + b'\xf0\x04\x22' * 160 + b'\x18\xfe'))
+open('tests/timing/dv_s.gbc', 'wb').write(rom_with(DV_PRELUDE + b'\x3e\x01\xe0\x4d\x10\x00' + b'\x21\x00\xc0' + b'\xf0\x04\x22' * 160 + b'\x18\xfe'))
+DV_LCD_OFF = b'\xf3' + wait_ly(0x90) + b'\xaf\xe0\x40'
+open('tests/timing/dv_doff.gbc', 'wb').write(rom_with(DV_LCD_OFF + DV_PRELUDE + b'\x21\x00\xc0' + b'\xf0\x04\x22' * 160 + b'\x18\xfe'))
+open('tests/timing/dv_soff.gbc', 'wb').write(rom_with(DV_LCD_OFF + DV_PRELUDE + b'\x3e\x01\xe0\x4d\x10\x00' + b'\x21\x00\xc0' + b'\xf0\x04\x22' * 160 + b'\x18\xfe'))
+print('wrote TW, TR, DV')
+
+# Test TH: a TIMA write swept across a tick with no DIV reset, anchored to the previous overflow as
+# the Seasons sound handler is (TAC=4). Each iteration: TIMA=$ff, IF=0, halt (IME=0, IE=timer) until
+# the overflow, wait 149 + k M-cycles, TIMA=$f0, read TIMA 101 M-cycles later into C000+k.
+# thr_*: the same without the write: TMA=0, TIMA read at 149 + k (0 until the next tick, then 1).
+def th_rom(double, write=True):
+    code = bytearray((PRELUDE if double else PRELUDE_SS) + b'\x3e\x04\xe0\xff' + b'\x3e\x04\xe0\x07')
+    for k in range(160):
+        code += b'\x3e\xff\xe0\x05\xaf\xe0\x0f\x76' + delay(37) + b'\x00' * k
+        if write: code += b'\x3e\xf0\xe0\x05' + delay(25)
+        code += b'\xf0\x05' + bytes([0xea, k, 0xc0])
+    code += b'\x18\xfe'
+    assert 0x150 + len(code) < 0x8000, hex(len(code))
+    return rom_with(bytes(code))
+open('tests/timing/th_d.gbc', 'wb').write(th_rom(True))
+open('tests/timing/th_s.gbc', 'wb').write(th_rom(False))
+open('tests/timing/thr_d.gbc', 'wb').write(th_rom(True, False))
+open('tests/timing/thr_s.gbc', 'wb').write(th_rom(False, False))
+print('wrote TH')
+
+# Test TL: TIMA and TMA writes swept across an overflow and its reload (TAC=5, a tick every 4
+# M-cycles, TMA=$a0). Each iteration: IF=0, TMA=$a0, DIV reset, TIMA=$fe, k nops, then TIMA=$f0
+# (TIMA -> C000+k, IF -> C020+k) or, in the second sweep, TMA=$b0 (C040+k, C060+k).
+def tl_rom(double):
+    code = bytearray((PRELUDE if double else PRELUDE_SS) + b'\x3e\x05\xe0\x07')
+    for sweep, (reg, val) in enumerate(((0x05, 0xf0), (0x06, 0xb0))):
+        for k in range(32):
+            code += b'\xaf\xe0\x0f\x3e\xa0\xe0\x06\xe0\x04\x3e\xfe\xe0\x05' + b'\x00' * k
+            code += bytes([0x3e, val, 0xe0, reg])
+            code += b'\xf0\x05' + bytes([0xea, sweep * 0x40 + k, 0xc0]) + b'\xf0\x0f' + bytes([0xea, sweep * 0x40 + 0x20 + k, 0xc0])
+    code += b'\x18\xfe'
+    return rom_with(bytes(code))
+open('tests/timing/tl_d.gbc', 'wb').write(tl_rom(True))
+open('tests/timing/tl_s.gbc', 'wb').write(tl_rom(False))
+print('wrote TL')

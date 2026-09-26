@@ -75,6 +75,7 @@ void gb_reset(GB *gb) {
   gb->boot = boot; gb->boot_size = boot_size;
   gb->serial_out = serial_out; gb->serial_ctx = serial_ctx;
   gb->rom_bank = 1;
+  gb->div_counter = 4;
   gb->sample = &gb->samples[0];
   for (int i = 0; i < FB_W * FB_H; i++) gb->framebuffer[i] = 0x7fff;
   apu_reset(&gb->apu);
