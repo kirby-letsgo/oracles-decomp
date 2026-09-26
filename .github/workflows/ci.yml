@@ -12,9 +12,11 @@ jobs:
           submodules: true
       - name: Install ninja
         run: |
-          if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update && sudo apt-get install -y ninja-build; else brew install ninja; fi
+          if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update && sudo apt-get install -y ninja-build; else brew install ninja sdl3; fi
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DORACLES_SDL=OFF
+        # macOS also builds the apps (Homebrew's SDL3), so an app that no longer compiles fails here
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then cmake -S . -B build -G Ninja; else cmake -S . -B build -G Ninja -DORACLES_SDL=OFF; fi
       - name: Build
         run: cmake --build build
       - name: Test

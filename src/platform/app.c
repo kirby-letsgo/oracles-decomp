@@ -456,6 +456,8 @@ static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
   SDL_RenderPresent(ren);
 }
 
+static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb);
+
 // A game frame: in widescreen the room around the camera fills the sides (the message stays centred).
 static void present_game(SDL_Renderer *ren, SDL_Texture *tex, const GBSample *sample, const uint8_t *rgb, bool seasons) {
   if (!settings.widescreen) { present(ren, tex, rgb); return; }
