@@ -357,3 +357,39 @@ for double in (False, True):
     open('tests/timing/vr_%s.gbc' % sp, 'wb').write(v_rom(double, False))
     open('tests/timing/vw_%s.gbc' % sp, 'wb').write(v_rom(double, True))
 print('wrote VR, VW')
+
+# Test IV: which vector a dispatch takes when a higher-priority interrupt arrives during it. Each
+# frame: halt (IME=0) on the line-16 LYC interrupt, LYC=17, IE=STAT|timer, IF=timer, k nops, ei, nop:
+# the timer dispatch starts k M-cycles later each iteration while the line-17 STAT interrupt stays
+# put. The vector taken goes to C000+k ($48, $50, or $00 when nothing is left pending). iv_push_*
+# point SP at 0000, so the PC high push lands in IE (mooneye ie_push). Double speed waits 95 extra
+# M-cycles first (the line is 228 M-cycles long).
+def iv_rom(double, push):
+    code = bytearray((PRELUDE if double else PRELUDE_SS) + b'\xaf\xe0\x0f')
+    patches = []
+    for k in range(160):
+        code += b'\x31\xf0\xdf'                               # ld sp,dff0
+        code += b'\xaf\xe0\x0f\x3e\x02\xe0\xff\x3e\x10\xe0\x45'  # IF=0, IE=STAT, LYC=16
+        code += b'\x3e\x40\xe0\x41'                           # STAT: LYC interrupt
+        code += b'\x76'                                       # halt
+        code += b'\x3e\x11\xe0\x45\x3e\x06\xe0\xff\x3e\x04\xe0\x0f'   # LYC=17, IE=STAT|timer, IF=timer
+        code += bytes([0x01, k, 0xc0])                        # ld bc,c000+k
+        patches.append(len(code) + 1)
+        code += b'\x21\x00\x00'                               # ld hl,next iteration
+        if double: code += b'\x3e\x18\x3d\x20\xfd'            # ld a,24; dec a; jr nz
+        if push: code += b'\x31\x00\x00'                      # ld sp,0000
+        code += b'\x00' * k + b'\xfb\x00'                     # nops; ei; nop
+        next_addr = 0x150 + len(code)
+        code[patches[-1]:patches[-1] + 2] = bytes([next_addr & 0xff, next_addr >> 8])
+    code += b'\xf3\x18\xfe'
+    assert 0x150 + len(code) < 0x8000, hex(len(code))
+    rom = bytearray(rom_with(bytes(code)))
+    rom[0:3] = b'\xaf\x02\xe9'                                # ld (bc),0; jp hl
+    rom[0x48:0x4c] = b'\x3e\x48\x02\xe9'                      # ld a,$48; ld (bc),a; jp hl
+    rom[0x50:0x54] = b'\x3e\x50\x02\xe9'
+    return bytes(rom)
+for double in (False, True):
+    for push in (False, True):
+        name = 'iv_%s%s' % ('push_' if push else '', 'd' if double else 's')
+        open('tests/timing/%s.gbc' % name, 'wb').write(iv_rom(double, push))
+print('wrote IV')
