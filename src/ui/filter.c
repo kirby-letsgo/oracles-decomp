@@ -12,21 +12,21 @@ void ui_gbc_colour(const uint8_t in[3], uint8_t out[3]) {
   out[2] = (uint8_t)(B * 7 / 8 + 20);
 }
 
-static void source_pixel(const uint8_t *src, bool gbc, int x, int y, uint8_t out[3]) {
-  const uint8_t *p = src + (y * UI_W + x) * 3;
+static void source_pixel(const uint8_t *src, int src_w, bool gbc, int x, int y, uint8_t out[3]) {
+  const uint8_t *p = src + (y * src_w + x) * 3;
   if (gbc) ui_gbc_colour(p, out);
   else memcpy(out, p, 3);
 }
 
 static uint8_t shade(uint8_t v, int num, int den) { return (uint8_t)(v * num / den); }
 
-void ui_filter(const uint8_t *src, bool gbc, ScreenFilter filter, int scale, uint8_t *dst) {
-  int w = UI_W * scale, h = UI_H * scale;
+void ui_filter(const uint8_t *src, int src_w, bool gbc, ScreenFilter filter, int scale, uint8_t *dst) {
+  int w = src_w * scale, h = UI_H * scale;
   if (filter != FILTER_CRT) {
     for (int y = 0; y < UI_H; y++)
-      for (int x = 0; x < UI_W; x++) {
+      for (int x = 0; x < src_w; x++) {
         uint8_t px[3];
-        source_pixel(src, gbc, x, y, px);
+        source_pixel(src, src_w, gbc, x, y, px);
         for (int sy = 0; sy < scale; sy++)
           for (int sx = 0; sx < scale; sx++) {
             uint8_t *d = dst + ((y * scale + sy) * w + x * scale + sx) * 3;
@@ -48,13 +48,13 @@ void ui_filter(const uint8_t *src, bool gbc, ScreenFilter filter, int scale, uin
       float ux = nx * k, uy = ny * k;
       uint8_t *d = dst + (y * w + x) * 3;
       if (ux < -1 || ux > 1 || uy < -1 || uy > 1) { d[0] = d[1] = d[2] = 0; continue; }
-      float fx = (ux + 1) / 2 * UI_W, fy = (uy + 1) / 2 * UI_H;
+      float fx = (ux + 1) / 2 * src_w, fy = (uy + 1) / 2 * UI_H;
       int sx = (int)fx, sy = (int)fy;
-      if (sx >= UI_W) sx = UI_W - 1;
+      if (sx >= src_w) sx = src_w - 1;
       if (sy >= UI_H) sy = UI_H - 1;
       uint8_t px[3], nb[3];
-      source_pixel(src, gbc, sx, sy, px);
-      source_pixel(src, gbc, sx + 1 < UI_W ? sx + 1 : sx, sy, nb);
+      source_pixel(src, src_w, gbc, sx, sy, px);
+      source_pixel(src, src_w, gbc, sx + 1 < src_w ? sx + 1 : sx, sy, nb);
       float within = fy - sy;                             // 0..1 down the source row
       float line = 0.55f + 0.45f * sinf(within * 3.14159265f);
       float vignette = 1 - 0.35f * r2 * r2;

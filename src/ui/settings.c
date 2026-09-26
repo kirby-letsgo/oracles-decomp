@@ -11,6 +11,8 @@ void settings_default(Settings *s) {
   s->fullscreen = false;
   s->filter = FILTER_SHARP;
   s->fill = false;
+  s->widescreen = false;
+  s->dim_sides = true;
   s->gbc_colours = false;
   s->fast_text = false;
   s->quick_swap = false;
@@ -30,6 +32,8 @@ void settings_parse(Settings *s, const char *text) {
       if (!strcmp(key, "volume")) { int v = atoi(value); if (v >= 0 && v <= 10) s->volume = v; }
       else if (!strcmp(key, "fullscreen")) s->fullscreen = !strcmp(value, "on");
       else if (!strcmp(key, "scale")) s->fill = !strcmp(value, "fill");
+      else if (!strcmp(key, "widescreen")) s->widescreen = !strcmp(value, "on");
+      else if (!strcmp(key, "dim_sides")) s->dim_sides = !strcmp(value, "on");
       else if (!strcmp(key, "gbc_colours")) s->gbc_colours = !strcmp(value, "on");
       else if (!strcmp(key, "fast_text")) s->fast_text = !strcmp(value, "on");
       else if (!strcmp(key, "quick_swap")) s->quick_swap = !strcmp(value, "on");
@@ -45,8 +49,8 @@ void settings_parse(Settings *s, const char *text) {
 }
 
 int settings_format(const Settings *s, char *out, size_t size) {
-  int n = snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\nscale=%s\ngbc_colours=%s\nfast_text=%s\nfast_menus=%s\nquick_swap=%s\nfour_slots=%s\n",
-                   s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->gbc_colours ? "on" : "off",
+  int n = snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\nscale=%s\nwidescreen=%s\ndim_sides=%s\ngbc_colours=%s\nfast_text=%s\nfast_menus=%s\nquick_swap=%s\nfour_slots=%s\n",
+                   s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->widescreen ? "on" : "off", s->dim_sides ? "on" : "off", s->gbc_colours ? "on" : "off",
                    s->fast_text ? "on" : "off", s->fast_menus ? "on" : "off", s->quick_swap ? "on" : "off", s->four_slots ? "on" : "off");
   if (n < (int)size) n += bindings_format(&s->bindings, out + n, size - n);
   return n;
@@ -70,6 +74,8 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case SET_VOLUME: s->volume = s->volume + dir < 0 ? 0 : s->volume + dir > 10 ? 10 : s->volume + dir; break;
   case SET_SCREEN: s->filter = (ScreenFilter)((s->filter + dir + FILTERS) % FILTERS); break;
   case SET_SCALE: if (dir) s->fill = !s->fill; break;
+  case SET_WIDESCREEN: if (dir) s->widescreen = !s->widescreen; break;
+  case SET_DIM_SIDES: if (dir) s->dim_sides = !s->dim_sides; break;
   case SET_COLOURS: if (dir) s->gbc_colours = !s->gbc_colours; break;
   case SET_FULLSCREEN: if (dir) s->fullscreen = !s->fullscreen; break;
   case SET_FAST_TEXT: if (dir) s->fast_text = !s->fast_text; break;
@@ -82,7 +88,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
 }
 
 void settings_draw_list(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, int y0, int visible, bool focused, UiCanvas *c) {
-  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "SCALE", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS", "SYNC"};
+  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "SCALE", "WIDESCREEN", "DIM SIDES", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS", "SYNC"};
   int first = (int)m->sel - visible / 2;
   if (first > SET_ROWS - visible) first = SET_ROWS - visible;
   if (first < 0) first = 0;
@@ -97,6 +103,8 @@ void settings_draw_list(const SettingsMenu *m, const Settings *s, const UiFont *
     case SET_VOLUME: snprintf(v, sizeof v, "%d", s->volume); break;
     case SET_SCREEN: snprintf(v, sizeof v, "%s", filter_names[s->filter]); break;
     case SET_SCALE: snprintf(v, sizeof v, "%s", s->fill ? "FILL" : "PIXEL"); break;
+    case SET_WIDESCREEN: snprintf(v, sizeof v, "%s", s->widescreen ? "ON" : "OFF"); break;
+    case SET_DIM_SIDES: snprintf(v, sizeof v, "%s", s->dim_sides ? "ON" : "OFF"); break;
     case SET_COLOURS: snprintf(v, sizeof v, "%s", s->gbc_colours ? "GBC" : "VIVID"); break;
     case SET_FULLSCREEN: snprintf(v, sizeof v, "%s", s->fullscreen ? "ON" : "OFF"); break;
     case SET_FAST_TEXT: snprintf(v, sizeof v, "%s", s->fast_text ? "ON" : "OFF"); break;

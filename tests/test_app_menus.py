@@ -13,8 +13,8 @@ with tempfile.TemporaryDirectory() as cache:
     r = subprocess.run([app, rom, '--cache', cache, '--frames', '1'], env=env, capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
     keys = ('200:Escape,210:Down,220:X,230:X,240:Z,300:Escape,310:Down,320:Down,330:X,340:X,'
-            '360:Escape,370:Up,380:Up,390:X,400:Left,401:Down,402:Down,403:Down,404:Down,405:Down,406:Down,407:Down,408:Down,409:Down,410:X,'
-            '412:Down,414:Down,416:Down,418:Down,420:X,422:S,424:Z,426:Z,428:Z,'
+            '360:Escape,370:Up,380:Up,390:X,400:Left,' + ','.join(f'{t}:Down' for t in range(401, 412)) + ',412:X,'
+            '414:Down,416:Down,418:Down,420:Down,422:X,424:S,426:Z,428:Z,430:Z,'
             '460:Escape,470:Up,480:X,520:Z')
     r = subprocess.run([app, '--game', 'seasons', '--cache', cache], env=dict(env, ORACLES_TEST_KEYS=keys), capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr

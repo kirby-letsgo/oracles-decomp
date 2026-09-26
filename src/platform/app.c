@@ -15,6 +15,7 @@
 #include "hw/render.h"
 #include "platform/setup.h"
 #include "platform/window.h"
+#include "platform/png.h"
 #include "rt/fibers.h"
 #include "game/game.h"
 #include "game/features.h"
@@ -241,6 +242,19 @@ static void apply_window_settings(SDL_Window *win) {
   if (!!(SDL_GetWindowFlags(win) & SDL_WINDOW_FULLSCREEN) != settings.fullscreen) SDL_SetWindowFullscreen(win, settings.fullscreen);
 }
 
+// Turning widescreen on or off reshapes a desktop window to the new picture at its current scale.
+static void fit_window_to_picture(SDL_Window *win) {
+#ifndef __ANDROID__
+  if (SDL_GetWindowFlags(win) & SDL_WINDOW_FULLSCREEN) return;
+  int w, h;
+  if (!SDL_GetWindowSize(win, &w, &h)) return;
+  int s = SDL_max(1, h / FB_H);
+  SDL_SetWindowSize(win, (settings.widescreen ? 256 : FB_W) * s, FB_H * s);
+#else
+  (void)win;
+#endif
+}
+
 static float volume_gain(bool muted) { return muted ? 0.0f : settings.volume / 10.0f; }
 
 // A message shown over the screen for two seconds (state saved, item set, ...).
@@ -343,48 +357,84 @@ static bool poll_event(SDL_Event *ev) {
 // next whole scale and shrinks that smoothly, so pixels stay sharp without uneven widths. The
 // overlay is drawn in game pixels too.
 #define MAX_FILTER_SCALE 12
-static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
-  static SDL_Texture *big, *over;
-  static int big_scale, over_w, over_h;
+#define WIDE_W 256
+
+static uint64_t test_tick;
+
+// Test hook: ORACLES_SHOT="tick:path.png[,tick:path.png]" saves the window's pixels at the first frame
+// drawn at or after each loop tick.
+static void shot_if_due(SDL_Renderer *ren) {
+  static const char *spec;
+  static bool init;
+  static uint32_t taken;
+  if (!init) { init = true; spec = getenv("ORACLES_SHOT"); }
+  int i = 0;
+  for (const char *p = spec; p && *p; i++) {
+    unsigned long long at;
+    char path[512];
+    int len = 0;
+    if (sscanf(p, "%llu:%511[^,]%n", &at, path, &len) != 2) break;
+    if (test_tick >= at && i < 32 && !(taken >> i & 1)) {
+      taken |= 1u << i;
+      SDL_Surface *raw = SDL_RenderReadPixels(ren, NULL);
+      SDL_Surface *rgb = raw ? SDL_ConvertSurface(raw, SDL_PIXELFORMAT_RGB24) : NULL;
+      if (rgb) {
+        uint8_t *packed = malloc((size_t)rgb->w * rgb->h * 3);
+        for (int y = 0; y < rgb->h; y++) memcpy(packed + (size_t)y * rgb->w * 3, (uint8_t *)rgb->pixels + (size_t)y * rgb->pitch, (size_t)rgb->w * 3);
+        png_write_rgb(path, packed, rgb->w, rgb->h);
+        free(packed);
+      }
+      SDL_DestroySurface(rgb);
+      SDL_DestroySurface(raw);
+    }
+    p += len;
+    if (*p == ',') p++;
+  }
+}
+
+// Draws a picture pic_w (160 or WIDE_W) x 144 at the layout's place and scale, then the overlay.
+static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
+  static SDL_Texture *direct, *big, *over;
+  static int direct_w, big_scale, big_w, over_w, over_h;
   static uint8_t *buf, *over_px;
-  int w = FB_W, h = FB_H;
+  int w = pic_w, h = FB_H;
   SDL_GetCurrentRenderOutputSize(ren, &w, &h);
   SDL_Rect safe = {0, 0, w, h};
   SDL_GetRenderSafeArea(ren, &safe);
-  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots, settings.fill);
-  if (toast[0] && SDL_GetTicks() < toast_until && overlay_font && overlay_font->loaded) {
-    static UiCanvas with_toast;
-    memcpy(with_toast.px, rgb, sizeof with_toast.px);
-    ui_toast(&with_toast, overlay_font, &overlay_theme, toast);
-    rgb = &with_toast.px[0][0][0];
-  }
+  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots, settings.fill, pic_w);
   static int logged_w, logged_h, logged_scale;
   if (w != logged_w || h != logged_h || layout.scale != logged_scale) {
     fprintf(stderr, "screen %dx%d, safe area %d,%d %dx%d, scale %d\n", w, h, safe.x, safe.y, safe.w, safe.h, layout.scale);
     logged_w = w; logged_h = h; logged_scale = layout.scale;
   }
-  bool fractional = layout.game_px.w % FB_W != 0;
-  int scale = SDL_min(fractional ? (layout.game_px.w + FB_W - 1) / FB_W : layout.scale, MAX_FILTER_SCALE);
+  bool fractional = layout.game_px.w % pic_w != 0;
+  int scale = SDL_min(fractional ? (layout.game_px.w + pic_w - 1) / pic_w : layout.scale, MAX_FILTER_SCALE);
   SDL_FRect dst = {(float)layout.game_px.x, (float)layout.game_px.y, (float)layout.game_px.w, (float)layout.game_px.h};
   if (touch_on) SDL_SetRenderDrawColor(ren, overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b, 255);
   SDL_RenderClear(ren);
   SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
   if (touch_on) SDL_RenderFillRect(ren, &dst);
   if (!fractional && (settings.filter == FILTER_SHARP || scale < 2) && !settings.gbc_colours) {
-    SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
-    SDL_RenderTexture(ren, tex, NULL, &dst);
+    if (!direct || direct_w != pic_w) {
+      if (direct) SDL_DestroyTexture(direct);
+      direct = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, pic_w, FB_H);
+      SDL_SetTextureScaleMode(direct, SDL_SCALEMODE_NEAREST);
+      direct_w = pic_w;
+    }
+    SDL_UpdateTexture(direct, NULL, rgb, pic_w * 3);
+    SDL_RenderTexture(ren, direct, NULL, &dst);
   } else {
-    if (!big || big_scale != scale) {
+    if (!big || big_scale != scale || big_w != pic_w) {
       if (big) SDL_DestroyTexture(big);
-      big = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FB_W * scale, FB_H * scale);
-      SDL_SetTextureScaleMode(big, SDL_SCALEMODE_NEAREST);
+      big = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, pic_w * scale, FB_H * scale);
       free(buf);
-      buf = malloc((size_t)FB_W * scale * FB_H * scale * 3);
+      buf = malloc((size_t)pic_w * scale * FB_H * scale * 3);
       big_scale = scale;
+      big_w = pic_w;
     }
     SDL_SetTextureScaleMode(big, fractional ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
-    ui_filter(rgb, settings.gbc_colours, scale < 2 ? FILTER_SHARP : settings.filter, scale, buf);
-    SDL_UpdateTexture(big, NULL, buf, FB_W * scale * 3);
+    ui_filter(rgb, pic_w, settings.gbc_colours, scale < 2 ? FILTER_SHARP : settings.filter, scale, buf);
+    SDL_UpdateTexture(big, NULL, buf, pic_w * scale * 3);
     SDL_RenderTexture(ren, big, NULL, &dst);
   }
   if (touch_on) {
@@ -402,7 +452,30 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
     SDL_UpdateTexture(over, NULL, over_px, layout.w * 4);
     SDL_RenderTexture(ren, over, NULL, &(SDL_FRect){0, 0, (float)(layout.w * layout.scale), (float)(layout.h * layout.scale)});
   }
+  shot_if_due(ren);
   SDL_RenderPresent(ren);
+}
+
+// A 160-wide picture (a menu, or the game where the sides are not drawn): with the current message,
+// and in widescreen centred on the theme's border colour.
+static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
+  (void)tex;
+  if (toast[0] && SDL_GetTicks() < toast_until && overlay_font && overlay_font->loaded) {
+    static UiCanvas with_toast;
+    memcpy(with_toast.px, rgb, sizeof with_toast.px);
+    ui_toast(&with_toast, overlay_font, &overlay_theme, toast);
+    rgb = &with_toast.px[0][0][0];
+  }
+  if (!settings.widescreen) { present_frame(ren, rgb, FB_W); return; }
+  static uint8_t wide[WIDE_W * FB_H * 3];
+  const int side = (WIDE_W - FB_W) / 2;
+  for (int y = 0; y < FB_H; y++) {
+    uint8_t *row = wide + (size_t)y * WIDE_W * 3;
+    for (int x = 0; x < WIDE_W; x++)
+      if (x < side || x >= side + FB_W) { row[x * 3] = overlay_theme.bg.r; row[x * 3 + 1] = overlay_theme.bg.g; row[x * 3 + 2] = overlay_theme.bg.b; }
+    memcpy(row + side * 3, rgb + (size_t)y * FB_W * 3, FB_W * 3);
+  }
+  present_frame(ren, wide, WIDE_W);
 }
 
 // A modal settings screen; returns false when the window is closed. Changes apply as they are made.
@@ -440,7 +513,6 @@ static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
 
 // Test hook: ORACLES_TEST_KEYS="120:Escape,130:Down,140:X" presses each key at that loop tick (every
 // pass of the launcher, menu or game loop is a tick), so ctest can drive the menus headless.
-static uint64_t test_tick;
 
 // "#A", "#UP", ... in ORACLES_TEST_KEYS touch that control of the overlay (one finger).
 static void test_touch(const char *name, bool down) {
@@ -588,12 +660,13 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       UiButton b;
       if (!menu_button(&ev, &b)) continue;
       SettingsRow row;
-      bool was_full = settings.fullscreen;
+      bool was_full = settings.fullscreen, was_wide = settings.widescreen;
       MenuAction a = settings_press(&m, &settings, b, &row);
       if (a == MENU_BACK) { settings_store(); return true; }
       if (a == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, font, theme, game_rgb)) return false;
       if (a == MENU_PICK && row == SET_SYNC && !run_sync_page(win, ren, tex, font, theme, game_rgb)) return false;
       if (settings.fullscreen != was_full) apply_window_settings(win);
+      if (settings.widescreen != was_wide) fit_window_to_picture(win);
       if (audio) SDL_SetAudioStreamGain(audio, volume_gain(false));
       apply_game_settings();
       settings_store();
@@ -824,7 +897,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       if (r.action == LAUNCH_QUIT) return false;
       if (r.action == LAUNCH_SETTINGS) {
         SettingsRow row;
-        bool was_full = settings.fullscreen;
+        bool was_full = settings.fullscreen, was_wide = settings.widescreen;
         MenuAction sa = settings_press(&settings_menu, &settings, r.button, &row);
         if (sa == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, &font, &l.games[l.game].theme, NULL)) return false;
         if (sa == MENU_PICK && row == SET_SYNC) {
@@ -832,6 +905,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
           launcher_load(&l, &font, cache);
         }
         if (settings.fullscreen != was_full) apply_window_settings(win);
+        if (settings.widescreen != was_wide) fit_window_to_picture(win);
         apply_game_settings();
         settings_store();
       }
@@ -1247,6 +1321,7 @@ int main(int argc, char **argv) {
   snprintf(app_cache, sizeof app_cache, "%s", cache);
   sync_config_load(&sync_cfg, cache);
   settings_reload(win);
+  if (settings.widescreen && !file_exists(window_size)) fit_window_to_picture(win);
 
   // a ROM or --game on the command line starts that game directly; quitting it opens the launcher
   char game[16] = "";

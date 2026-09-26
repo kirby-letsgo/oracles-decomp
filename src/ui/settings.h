@@ -12,6 +12,8 @@ typedef struct {
   bool fullscreen;
   ScreenFilter filter;
   bool fill;                    // the game fills the width (or height) at a fractional scale
+  bool widescreen;              // 256 wide: the neighbouring rooms beside the 160 of the game
+  bool dim_sides;               // widescreen's side strips drawn darker than the live room
   bool gbc_colours;             // the Game Boy Color screen's paler, warmer colours
   bool fast_text;               // each line of a text box appears at once
   bool quick_swap;              // the Swap button exchanges the A and B items
@@ -21,7 +23,7 @@ typedef struct {
   char sync_label[12];          // the SYNC row's value, kept by the app (sync.ini, not settings.ini)
 } Settings;
 
-typedef enum { SET_VOLUME, SET_SCREEN, SET_SCALE, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_QUICK_SWAP, SET_FOUR_SLOTS, SET_CONTROLS, SET_SYNC, SET_ROWS } SettingsRow;
+typedef enum { SET_VOLUME, SET_SCREEN, SET_SCALE, SET_WIDESCREEN, SET_DIM_SIDES, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_QUICK_SWAP, SET_FOUR_SLOTS, SET_CONTROLS, SET_SYNC, SET_ROWS } SettingsRow;
 
 typedef struct {
   SettingsRow sel;

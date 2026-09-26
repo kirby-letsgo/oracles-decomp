@@ -37,10 +37,11 @@ static int cluster_y(int above, int below, bool item_buttons) {
   return (above + below + reach - DPAD / 2) / 2;
 }
 
-void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, bool item_buttons, bool fill) {
+void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, bool item_buttons, bool fill, int pic_w) {
   memset(l, 0, sizeof *l);
   l->screen_w = screen_w;
   l->screen_h = screen_h;
+  l->pic_w = pic_w;
   l->overlay = overlay;
   l->portrait = overlay && screen_h > screen_w;
   if (safe.w <= 0 || safe.h <= 0) safe = (UiRect){0, 0, screen_w, screen_h};
@@ -48,7 +49,7 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
   // full width and keeps clear of the top and bottom insets, in landscape the other way round.
   bool tall = screen_h > screen_w;
   int fit_w = tall ? screen_w : safe.w, fit_h = tall ? safe.h : screen_h;
-  int s = imax(imin(fit_w / UI_W, fit_h / UI_H), 1);
+  int s = imax(imin(fit_w / pic_w, fit_h / UI_H), 1);
   // the largest scale that leaves room for the controls: below the game in portrait, beside it
   // (between the top and bottom rows of pills) in landscape
   int cluster = item_buttons ? CLUSTER_ITEMS_H : CLUSTER_H;
@@ -63,11 +64,11 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
   // fill: the largest fractional scale that fits, in portrait still leaving the controls their room
   float zoom = s;
   if (fill) {
-    zoom = fminf((float)fit_w / UI_W, (float)fit_h / UI_H);
-    if (l->portrait) zoom = fminf((float)screen_w / UI_W, (float)(bottom - top - (need - UI_H)) * s / UI_H);
+    zoom = fminf((float)fit_w / pic_w, (float)fit_h / UI_H);
+    if (l->portrait) zoom = fminf((float)screen_w / pic_w, (float)(bottom - top - (need - UI_H)) * s / UI_H);
     zoom = fmaxf(zoom, (float)s);
   }
-  int pw = (int)(UI_W * zoom), ph = (int)(UI_H * zoom);
+  int pw = (int)(pic_w * zoom), ph = (int)(UI_H * zoom);
   int gx = tall ? imax(screen_w - pw, 0) / 2 : safe.x + imax(safe.w - pw, 0) / 2;
   int gy = l->portrait ? top * s : tall ? safe.y + imax(safe.h - ph, 0) / 2 : imax(screen_h - ph, 0) / 2;
   if (!fill) { gx -= gx % s; gy -= gy % s; }

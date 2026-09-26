@@ -180,13 +180,14 @@ static void settings_round_trip(void) {
   settings_default(&s);
   ASSERT_EQ(s.volume, 10);
   s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true; s.fill = true;
+  s.widescreen = true; s.dim_sides = false;
   char buf[1024];
   settings_format(&s, buf, sizeof buf);
   settings_default(&back);
   settings_parse(&back, buf);
   ASSERT_EQ(back.volume, 3);
   ASSERT_EQ(back.filter, FILTER_CRT);
-  ASSERT(back.gbc_colours && back.fullscreen && back.fill);
+  ASSERT(back.gbc_colours && back.fullscreen && back.fill && back.widescreen && !back.dim_sides);
   settings_parse(&back, "volume=99\nfilter=weird\nunknown=1\n  volume = 7\n");
   ASSERT_EQ(back.volume, 7);                            // 99 rejected, spaced line accepted
   ASSERT_EQ(back.filter, FILTER_CRT);
@@ -240,16 +241,22 @@ static void settings_menu_changes_values(void) {
 static void filters_keep_pixel_alignment(void) {
   static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 4 * UI_H * 4 * 3];
   memset(src, 200, sizeof src);
-  ui_filter(src, false, FILTER_SHARP, 4, dst);
+  ui_filter(src, UI_W, false, FILTER_SHARP, 4, dst);
   ASSERT_EQ(dst[0], 200);
   ASSERT_EQ(dst[(3 * UI_W * 4 + 3) * 3], 200);
-  ui_filter(src, false, FILTER_SCANLINES, 4, dst);
+  ui_filter(src, UI_W, false, FILTER_SCANLINES, 4, dst);
   ASSERT_EQ(dst[0], 200);
   ASSERT_EQ(dst[(3 * UI_W * 4) * 3], 100);              // the last row of each pixel is darker
-  ui_filter(src, false, FILTER_LCD, 4, dst);
+  ui_filter(src, UI_W, false, FILTER_LCD, 4, dst);
   ASSERT_EQ(dst[3 * 3], 150);                           // the last column too
-  ui_filter(src, false, FILTER_CRT, 4, dst);
+  ui_filter(src, UI_W, false, FILTER_CRT, 4, dst);
   ASSERT_EQ(dst[0], 0);                                 // the curved screen leaves the corner black
+  static uint8_t wide[256 * UI_H * 3], wdst[256 * 3 * UI_H * 3 * 3];
+  memset(wide, 10, sizeof wide);
+  wide[(5 * 256 + 255) * 3] = 250;                      // the last column of the 256-wide picture
+  ui_filter(wide, 256, false, FILTER_SHARP, 3, wdst);
+  ASSERT_EQ(wdst[((5 * 3 + 2) * 256 * 3 + 255 * 3 + 2) * 3], 250);
+  ASSERT_EQ(wdst[((5 * 3) * 256 * 3 + 254 * 3) * 3], 10);
   uint8_t in[3] = {255, 255, 255}, out[3];
   ui_gbc_colour(in, out);
   ASSERT(out[0] < 255 && out[2] < out[0]);              // paler and warm
@@ -301,7 +308,7 @@ static void touch_layout_fits_screens(void) {
     for (int variant = 0; variant < 4; variant++) {
       int w = sizes[i][0], h = sizes[i][1], items = variant & 1;
       TouchLayout l;
-      touch_layout(&l, w, h, (UiRect){0, 90, w, h - 90 - 60}, true, items, variant >> 1);
+      touch_layout(&l, w, h, (UiRect){0, 90, w, h - 90 - 60}, true, items, variant >> 1, UI_W);
       ASSERT(l.scale >= 3);
       ASSERT(inside(l.game, l.w, l.h));
       ASSERT(l.game_px.x >= 0 && l.game_px.x + l.game_px.w <= w && l.game_px.y + l.game_px.h <= h);
@@ -319,17 +326,17 @@ static void touch_layout_fits_screens(void) {
       }
     }
   TouchLayout l;
-  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false);   // Pixel 8: corners in the safe area
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false, UI_W);   // Pixel 8: corners in the safe area
   ASSERT_EQ(l.scale, 6);
   ASSERT(l.game.y * 6 >= 164);
-  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, false);
+  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, false, UI_W);
   ASSERT_EQ(l.scale, 7);
   ASSERT(l.game.x * 7 >= 132);
-  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false, UI_W);
   ASSERT(l.portrait);
   ASSERT_EQ(l.scale, 6);
   ASSERT_EQ(l.game.x, 10);
-  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, false, false, false);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, false, false, false, UI_W);
   ASSERT(!l.portrait);
   ASSERT_EQ(l.game.y, (400 - 144) / 2);                // no overlay: centred, nothing to press
   ASSERT_EQ(touch_hit(&l, 100, 300), 0);
@@ -362,27 +369,43 @@ static void toast_boxes_a_message_near_the_bottom(void) {
 
 static void touch_fill_scales_past_whole_pixels(void) {
   TouchLayout l;
-  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, true);   // Pixel 8 portrait
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, true, UI_W);   // Pixel 8 portrait
   ASSERT_EQ(l.scale, 6);
   ASSERT_EQ(l.game_px.w, 1080);                        // 6.75x: the full width
   ASSERT_EQ(l.game_px.h, 972);
   ASSERT(l.game_px.y >= 164);
   for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) ASSERT(!overlaps(l.button[a], l.game));
   ASSERT(!overlaps(l.dpad, l.game));
-  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, true);
+  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, true, UI_W);
   ASSERT_EQ(l.game_px.h, 1080);                        // landscape: the full height
   ASSERT_EQ(l.game_px.w, 1200);
-  touch_layout(&l, 1000, 700, (UiRect){0, 0, 1000, 700}, false, false, true);        // desktop window
+  touch_layout(&l, 1000, 700, (UiRect){0, 0, 1000, 700}, false, false, true, UI_W);        // desktop window
   ASSERT_EQ(l.game_px.w, 777);
   ASSERT_EQ(l.game_px.h, 700);
-  touch_layout(&l, 1000, 700, (UiRect){0, 0, 1000, 700}, false, false, false);
+  touch_layout(&l, 1000, 700, (UiRect){0, 0, 1000, 700}, false, false, false, UI_W);
   ASSERT_EQ(l.game_px.w, 640);
   ASSERT_EQ(l.game_px.x % 4, 0);
 }
 
+static void touch_layout_takes_the_wide_picture(void) {
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false, 256);
+  ASSERT_EQ(l.scale, 4);                                // 256 x 4 = 1024 of 1080
+  ASSERT_EQ(l.game_px.w, 1024);
+  ASSERT_EQ(l.game.w, 256);
+  for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) ASSERT(!overlaps(l.button[a], l.game));
+  touch_layout(&l, 1920, 1080, (UiRect){0, 0, 1920, 1080}, false, false, false, 256);
+  ASSERT_EQ(l.scale, 7);
+  ASSERT_EQ(l.game_px.w, 1792);
+  ASSERT(abs(l.game_px.x - (1920 - 1792) / 2) < l.scale);  // centred on the pixel grid
+  touch_layout(&l, 1920, 1080, (UiRect){0, 0, 1920, 1080}, false, false, true, 256);
+  ASSERT_EQ(l.game_px.w, 1920);                         // fill: 16:9 exactly fills 16:9
+  ASSERT_EQ(l.game_px.h, 1080);
+}
+
 static void touch_hits_each_control(void) {
   TouchLayout l;
-  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, true, false);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, true, false, UI_W);
   float x, y;
   for (int a = 0; a < ACTIONS; a++) {
     bool shown = touch_point(&l, (Action)a, &x, &y);
@@ -394,13 +417,13 @@ static void touch_hits_each_control(void) {
   ASSERT_EQ(touch_hit(&l, cx - r * 0.7f, cy + r * 0.2f), 1u << ACT_LEFT);
   ASSERT_EQ(touch_hit(&l, cx, cy), 0);                 // the centre is a dead zone
   ASSERT_EQ(touch_hit(&l, l.game.x + 80, l.game.y + 72), 0);
-  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false, UI_W);
   ASSERT(!touch_point(&l, ACT_ITEM_X, &x, &y));
 }
 
 static void touch_draw_lights_held_buttons(void) {
   TouchLayout l;
-  touch_layout(&l, 2400, 1080, (UiRect){0, 0, 2400, 1080}, true, false, false);
+  touch_layout(&l, 2400, 1080, (UiRect){0, 0, 2400, 1080}, true, false, false, UI_W);
   UiTheme t;
   ui_theme_default(&t, true);
   uint8_t *img = malloc((size_t)l.w * l.h * 4);
@@ -424,7 +447,7 @@ static void touch_labels_centre_on_their_ink(void) {
     for (int r = 7; r <= 14; r++) font.glyph[(uint8_t)*p][r] = 0x81;   // ink rows 7-14, low in the cell
   font.loaded = true;
   TouchLayout l;
-  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false, UI_W);
   UiTheme t;
   ui_theme_default(&t, false);
   uint8_t *img = malloc((size_t)l.w * l.h * 4);
@@ -528,6 +551,7 @@ int main(void) {
   RUN(code_entry_edits_each_digit);
   RUN(conflict_picks_a_side);
   RUN(touch_fill_scales_past_whole_pixels);
+  RUN(touch_layout_takes_the_wide_picture);
   RUN(touch_hits_each_control);
   RUN(touch_draw_lights_held_buttons);
   RUN(touch_labels_centre_on_their_ink);

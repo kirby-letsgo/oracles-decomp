@@ -4,6 +4,6 @@
 // curve, glow and vignette). GBC colour correction mimics the handheld's paler, warmer screen.
 #include "ui/settings.h"
 
-// src: UI_W x UI_H RGB24. dst: (UI_W*scale) x (UI_H*scale) RGB24. scale >= 1.
-void ui_filter(const uint8_t *src, bool gbc_colours, ScreenFilter filter, int scale, uint8_t *dst);
+// src: src_w x UI_H RGB24 (160, or 256 in widescreen). dst: (src_w*scale) x (UI_H*scale) RGB24. scale >= 1.
+void ui_filter(const uint8_t *src, int src_w, bool gbc_colours, ScreenFilter filter, int scale, uint8_t *dst);
 void ui_gbc_colour(const uint8_t in[3], uint8_t out[3]);
