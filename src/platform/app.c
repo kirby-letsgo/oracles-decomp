@@ -612,6 +612,8 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
     launcher_load(&l, &font, cache);
   }
   launcher_init(&l, UI_GAME_SEASONS);
+  static SettingsMenu settings_menu;
+  settings_menu_open(&settings_menu);
   for (;;) {
     test_keys();
     SDL_Event ev;
@@ -623,7 +625,15 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
       LaunchResult r = launcher_press(&l, b);
       if (r.action == LAUNCH_QUIT) return false;
-      if (r.action == LAUNCH_SETTINGS && !run_settings(win, ren, tex, &font, &l.games[l.game].theme, NULL, NULL)) return false;
+      if (r.action == LAUNCH_SETTINGS) {
+        SettingsRow row;
+        bool was_full = settings.fullscreen;
+        if (settings_press(&settings_menu, &settings, r.button, &row) == MENU_PICK && row == SET_CONTROLS &&
+            !run_controls(win, ren, tex, &font, &l.games[l.game].theme, NULL)) return false;
+        if (settings.fullscreen != was_full) apply_window_settings(win);
+        apply_game_settings();
+        settings_store();
+      }
       if (r.action == LAUNCH_ADD_ROM) {
         char game[16];
         if (pick_rom(game, cache)) { UiGame g = l.game; launcher_load(&l, &font, cache); launcher_init(&l, g); }
@@ -648,6 +658,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
     }
     overlay_style(&font, &l.games[l.game].theme);
     launcher_draw(&l, &font, &canvas);
+    if (l.settings_tab) settings_draw_list(&settings_menu, &settings, &font, &l.games[l.game].theme, LAUNCHER_BODY_Y + 2, 5, l.settings_list, &canvas);
     ui_to_rgb(&canvas, rgb);
     present(ren, tex, rgb);
     SDL_Delay(16);

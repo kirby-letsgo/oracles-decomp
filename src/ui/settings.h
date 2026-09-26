@@ -36,3 +36,6 @@ void settings_menu_open(SettingsMenu *m);
 // Left/right change the highlighted value in s; accept on CONTROLS returns MENU_PICK with that row.
 MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow *picked);
 void settings_draw(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, const uint8_t *game_rgb, UiCanvas *c);
+// The rows alone, `visible` of them from y, scrolled to the selection; the cursor only when focused
+// (the launcher's settings tab draws them in its body).
+void settings_draw_list(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, int y, int visible, bool focused, UiCanvas *c);

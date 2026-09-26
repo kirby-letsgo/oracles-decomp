@@ -77,11 +77,20 @@ static void launcher_navigates_and_starts(void) {
   launcher_press(&l, UI_DOWN); launcher_press(&l, UI_DOWN);
   ASSERT_EQ(launcher_press(&l, UI_ACCEPT).file, -1);    // the title-screen row
   launcher_press(&l, UI_DOWN);
-  ASSERT_EQ(l.row, ROW_SETTINGS);
-  ASSERT_EQ(launcher_press(&l, UI_ACCEPT).action, LAUNCH_SETTINGS);
-  launcher_press(&l, UI_DOWN);
   ASSERT_EQ(l.row, 0);                                  // wraps
-  launcher_press(&l, UI_LEFT);
+  launcher_press(&l, UI_RIGHT);                         // Seasons -> the settings tab
+  ASSERT(l.settings_tab && !l.settings_list);
+  ASSERT_EQ(l.game, UI_GAME_SEASONS);                   // keeps Seasons' colours
+  ASSERT_EQ(launcher_press(&l, UI_DOWN).action, LAUNCH_NONE);   // into the list
+  ASSERT(l.settings_list);
+  LaunchResult sr = launcher_press(&l, UI_LEFT);        // left/right now belong to the list
+  ASSERT_EQ(sr.action, LAUNCH_SETTINGS);
+  ASSERT_EQ(sr.button, UI_LEFT);
+  ASSERT(l.settings_tab);
+  launcher_press(&l, UI_BACK);                          // back to the tab row
+  ASSERT(!l.settings_list);
+  launcher_press(&l, UI_RIGHT);                         // wraps to Ages
+  ASSERT(!l.settings_tab);
   ASSERT_EQ(l.game, UI_GAME_AGES);
   ASSERT_EQ(launcher_press(&l, UI_ACCEPT).action, LAUNCH_ADD_ROM);
   ASSERT_EQ(launcher_press(&l, UI_BACK).action, LAUNCH_QUIT);
@@ -89,6 +98,9 @@ static void launcher_navigates_and_starts(void) {
   UiFont font;
   ui_font_load(&font, rom, sizeof rom);
   launcher_draw(&l, &font, &c);                         // draws without the game art too
+  launcher_press(&l, UI_LEFT);
+  ASSERT(l.settings_tab);
+  launcher_draw(&l, &font, &c);
 }
 
 static void launcher_offers_resume_and_slots(void) {
