@@ -27,9 +27,6 @@ bool oracles_open_window(const char *title, const char *size_path, SDL_Window **
   if (!saved_size(size_path, &w, &h)) { int s = default_scale(); w = FB_W * s; h = FB_H * s; }
   if (!SDL_CreateWindowAndRenderer(title, w, h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY, win, ren)) return false;
   SDL_SetWindowMinimumSize(*win, FB_W, FB_H);
-  // the renderer's output is the window's pixel size (high pixel density), so the integer scale
-  // is in real pixels: one game pixel is exactly N screen pixels on Retina too
-  SDL_SetRenderLogicalPresentation(*ren, FB_W, FB_H, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
   SDL_SetRenderDrawColor(*ren, 0, 0, 0, 255);
   *tex = SDL_CreateTexture(*ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FB_W, FB_H);
   if (!*tex) return false;

@@ -2,7 +2,8 @@
 // (agent-docs specs/2026-09-21-m5-fibers-design.md). The context switch saves the callee-saved
 // registers on the outgoing stack, swaps stack pointers and restores from the incoming one; a
 // fresh fiber's stack holds an initial frame that "returns" into fiber_tramp, which calls
-// fiber_main with the GB. Stacks are mmap regions with a guard page at the low end.
+// fiber_main with the GB. Stacks are mmap regions with a guard page at the low end. The switch is
+// file-scope assembly rather than naked functions, which GCC ignores on arm64.
 #include "rt/fibers.h"
 #include "hooks/hooks.h"
 #include <stdio.h>
@@ -29,59 +30,67 @@ struct Fibers {
   HookCtx kernel_ctx;
 };
 
+static void fiber_main(void *arg);
+
+
+#ifdef __APPLE__
+#define ASM_FUNC(name) ".globl _" #name "\n.p2align 4\n_" #name ":\n"
+#else
+#define ASM_FUNC(name) ".globl " #name "\n.type " #name ", %function\n.p2align 4\n" #name ":\n"
+#endif
+
+void oracles_fiber_swap(void **save_sp, void *load_sp);
+void oracles_fiber_tramp(void);
+
 #if defined(__aarch64__)
-__attribute__((naked)) static void fiber_swap(void **save_sp, void *load_sp) {
-  __asm__ volatile(
-      "sub sp, sp, #160\n"
-      "stp x19, x20, [sp, #0]\n"
-      "stp x21, x22, [sp, #16]\n"
-      "stp x23, x24, [sp, #32]\n"
-      "stp x25, x26, [sp, #48]\n"
-      "stp x27, x28, [sp, #64]\n"
-      "stp x29, x30, [sp, #80]\n"
-      "stp d8, d9, [sp, #96]\n"
-      "stp d10, d11, [sp, #112]\n"
-      "stp d12, d13, [sp, #128]\n"
-      "stp d14, d15, [sp, #144]\n"
-      "mov x9, sp\n"
-      "str x9, [x0]\n"
-      "mov sp, x1\n"
-      "ldp x19, x20, [sp, #0]\n"
-      "ldp x21, x22, [sp, #16]\n"
-      "ldp x23, x24, [sp, #32]\n"
-      "ldp x25, x26, [sp, #48]\n"
-      "ldp x27, x28, [sp, #64]\n"
-      "ldp x29, x30, [sp, #80]\n"
-      "ldp d8, d9, [sp, #96]\n"
-      "ldp d10, d11, [sp, #112]\n"
-      "ldp d12, d13, [sp, #128]\n"
-      "ldp d14, d15, [sp, #144]\n"
-      "add sp, sp, #160\n"
-      "ret\n");
-}
-__attribute__((naked)) static void fiber_tramp(void) {
-  __asm__ volatile("mov x0, x20\n blr x19\n brk #1\n");
-}
+__asm__(".text\n" ASM_FUNC(oracles_fiber_swap)
+        "sub sp, sp, #160\n"
+        "stp x19, x20, [sp, #0]\n"
+        "stp x21, x22, [sp, #16]\n"
+        "stp x23, x24, [sp, #32]\n"
+        "stp x25, x26, [sp, #48]\n"
+        "stp x27, x28, [sp, #64]\n"
+        "stp x29, x30, [sp, #80]\n"
+        "stp d8, d9, [sp, #96]\n"
+        "stp d10, d11, [sp, #112]\n"
+        "stp d12, d13, [sp, #128]\n"
+        "stp d14, d15, [sp, #144]\n"
+        "mov x9, sp\n"
+        "str x9, [x0]\n"
+        "mov sp, x1\n"
+        "ldp x19, x20, [sp, #0]\n"
+        "ldp x21, x22, [sp, #16]\n"
+        "ldp x23, x24, [sp, #32]\n"
+        "ldp x25, x26, [sp, #48]\n"
+        "ldp x27, x28, [sp, #64]\n"
+        "ldp x29, x30, [sp, #80]\n"
+        "ldp d8, d9, [sp, #96]\n"
+        "ldp d10, d11, [sp, #112]\n"
+        "ldp d12, d13, [sp, #128]\n"
+        "ldp d14, d15, [sp, #144]\n"
+        "add sp, sp, #160\n"
+        "ret\n"
+        ASM_FUNC(oracles_fiber_tramp)
+        "mov x0, x20\n"
+        "blr x19\n"
+        "brk #1\n");
 static void *fiber_init_frame(uint8_t *top, void (*fn)(void *), void *arg) {
   uint64_t *frame = (uint64_t *)(top - 160);
   memset(frame, 0, 160);
   frame[0] = (uint64_t)fn;
   frame[1] = (uint64_t)arg;
-  frame[11] = (uint64_t)fiber_tramp;
+  frame[11] = (uint64_t)oracles_fiber_tramp;
   return frame;
 }
 #elif defined(__x86_64__)
-__attribute__((naked)) static void fiber_swap(void **save_sp, void *load_sp) {
-  __asm__ volatile(
-      "pushq %rbp\n pushq %rbx\n pushq %r12\n pushq %r13\n pushq %r14\n pushq %r15\n"
-      "movq %rsp, (%rdi)\n"
-      "movq %rsi, %rsp\n"
-      "popq %r15\n popq %r14\n popq %r13\n popq %r12\n popq %rbx\n popq %rbp\n"
-      "ret\n");
-}
-__attribute__((naked)) static void fiber_tramp(void) {
-  __asm__ volatile("movq %r12, %rdi\n andq $-16, %rsp\n callq *%r13\n ud2\n");
-}
+__asm__(".text\n" ASM_FUNC(oracles_fiber_swap)
+        "pushq %rbp\n pushq %rbx\n pushq %r12\n pushq %r13\n pushq %r14\n pushq %r15\n"
+        "movq %rsp, (%rdi)\n"
+        "movq %rsi, %rsp\n"
+        "popq %r15\n popq %r14\n popq %r13\n popq %r12\n popq %rbx\n popq %rbp\n"
+        "ret\n"
+        ASM_FUNC(oracles_fiber_tramp)
+        "movq %r12, %rdi\n andq $-16, %rsp\n callq *%r13\n ud2\n");
 static void *fiber_init_frame(uint8_t *top, void (*fn)(void *), void *arg) {
   uint64_t *frame = (uint64_t *)(top - 56);
   memset(frame, 0, 56);
@@ -89,12 +98,25 @@ static void *fiber_init_frame(uint8_t *top, void (*fn)(void *), void *arg) {
   frame[1] = 0;                       // r14
   frame[2] = (uint64_t)fn;            // r13
   frame[3] = (uint64_t)arg;           // r12
-  frame[6] = (uint64_t)fiber_tramp;   // return address
+  frame[6] = (uint64_t)oracles_fiber_tramp;   // return address
   return frame;
 }
 #else
 #error "fibers: unsupported architecture"
 #endif
+
+static void fiber_prepare(struct Fibers *F, Fiber *f, GB *gb) {
+  (void)F;
+  if (!f->stack) {
+    size_t page = (size_t)sysconf(_SC_PAGESIZE);
+    f->stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (f->stack == MAP_FAILED) { perror("fiber: mmap"); abort(); }
+    mprotect(f->stack, page, PROT_NONE);
+  }
+  f->sp = fiber_init_frame(f->stack + STACK_SIZE, fiber_main, gb);
+}
+static void fiber_enter(struct Fibers *F, Fiber *f) { oracles_fiber_swap(&F->kernel_sp, f->sp); }
+static void fiber_leave(struct Fibers *F, Fiber *f) { oracles_fiber_swap(&f->sp, F->kernel_sp); }
 
 static struct Fibers *fibers(GB *gb) {
   if (!gb->fib) { gb->fib = calloc(1, sizeof *gb->fib); gb->fib->current = -1; }
@@ -124,14 +146,8 @@ int fiber_run(GB *gb, int n, void (*start)(GB *), uint16_t fallback_pc) {
   if (n < 0 || n >= NFIBERS) { fprintf(stderr, "fiber: bad thread %d\n", n); gb->hung = true; return FIBER_EXIT; }
   Fiber *f = &F->f[n];
   if (start) {
-    if (!f->stack) {
-      size_t page = (size_t)sysconf(_SC_PAGESIZE);
-      f->stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-      if (f->stack == MAP_FAILED) { perror("fiber: mmap"); abort(); }
-      mprotect(f->stack, page, PROT_NONE);
-      hook_ctx_init(&f->ctx);
-    }
-    f->sp = fiber_init_frame(f->stack + STACK_SIZE, fiber_main, gb);
+    if (!f->start) hook_ctx_init(&f->ctx);
+    fiber_prepare(F, f, gb);
     f->start = start;
     f->ctx.depth = f->ctx.jmp_depth = 0;
     f->live = true;
@@ -143,7 +159,7 @@ int fiber_run(GB *gb, int n, void (*start)(GB *), uint16_t fallback_pc) {
   F->current = n;
   F->request = FIBER_YIELD;
   hook_ctx_switch(&F->kernel_ctx, &f->ctx);
-  fiber_swap(&F->kernel_sp, f->sp);
+  fiber_enter(F, f);
   F->current = -1;
   return F->request;
 }
@@ -156,6 +172,6 @@ void fiber_back(GB *gb, int request) {
   F->request = request;
   if (request != FIBER_YIELD) f->live = false;
   hook_ctx_switch(&f->ctx, &F->kernel_ctx);
-  fiber_swap(&f->sp, F->kernel_sp);
+  fiber_leave(F, f);
   if (request != FIBER_YIELD) { fprintf(stderr, "fiber: dead thread resumed\n"); abort(); }
 }

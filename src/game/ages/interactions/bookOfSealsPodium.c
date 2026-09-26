@@ -23,7 +23,8 @@ static uint16_t book_of_seals_jump_table(GB *gb) {
 static void book_add_a_to_hl(GB *gb, uint16_t ra) {
   push_effect(gb, ra); burn_rom(gb,0,0x10,0x11,false); alu_add(gb,L); burn_rom(gb,0,0x11,0x12,false); L=A;
   if (F&FC) { burn_rom(gb,0,0x12,0x13,false); burn_rom(gb,0,0x13,0x14,false); H=alu_inc8(gb,H); burn_rom(gb,0,0x14,0x15,false); }
-  else burn_rom(gb,0,0x12,0x13,true); ret_effect(gb);
+  else burn_rom(gb,0,0x12,0x13,true);
+  ret_effect(gb);
 }
 
 // @param[out] c subid; the interaction's script pointer is set to that podium's path list.

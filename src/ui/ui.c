@@ -78,6 +78,19 @@ void ui_glyph(UiCanvas *c, const UiFont *font, int x, int y, uint8_t ch, UiColor
       if (!(font->glyph[ch][r] & (0x80 >> b))) put(c, x + b, y + r, color);
 }
 
+bool ui_text_ink(const UiFont *font, const char *s, int *top, int *bottom) {
+  *top = UI_GLYPH_H;
+  *bottom = -1;
+  if (!font->loaded) return false;
+  for (; *s; s++)
+    for (int r = 0; r < UI_GLYPH_H; r++)
+      if ((uint8_t)*s < 128 && font->glyph[(uint8_t)*s][r] != 0xff) {
+        if (r < *top) *top = r;
+        if (r > *bottom) *bottom = r;
+      }
+  return *bottom >= 0;
+}
+
 int ui_text(UiCanvas *c, const UiFont *font, int x, int y, const char *s, UiColor color) {
   int x0 = x;
   for (; *s; s++, x += UI_GLYPH_W) ui_glyph(c, font, x, y, (uint8_t)*s, color);

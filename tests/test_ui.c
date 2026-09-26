@@ -5,6 +5,7 @@
 #include "ui/menu.h"
 #include "ui/settings.h"
 #include "ui/filter.h"
+#include "ui/touch.h"
 
 static uint8_t rom[0x80000];
 
@@ -165,14 +166,14 @@ static void settings_round_trip(void) {
   Settings s, back;
   settings_default(&s);
   ASSERT_EQ(s.volume, 10);
-  s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true;
-  char buf[256];
+  s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true; s.fill = true;
+  char buf[1024];
   settings_format(&s, buf, sizeof buf);
   settings_default(&back);
   settings_parse(&back, buf);
   ASSERT_EQ(back.volume, 3);
   ASSERT_EQ(back.filter, FILTER_CRT);
-  ASSERT(back.gbc_colours && back.fullscreen);
+  ASSERT(back.gbc_colours && back.fullscreen && back.fill);
   settings_parse(&back, "volume=99\nfilter=weird\nunknown=1\n  volume = 7\n");
   ASSERT_EQ(back.volume, 7);                            // 99 rejected, spaced line accepted
   ASSERT_EQ(back.filter, FILTER_CRT);
@@ -191,6 +192,10 @@ static void settings_menu_changes_values(void) {
   settings_press(&m, &s, UI_DOWN, &row);
   settings_press(&m, &s, UI_LEFT, &row);
   ASSERT_EQ(s.filter, FILTER_CRT);                      // wraps backwards
+  settings_press(&m, &s, UI_DOWN, &row);
+  settings_press(&m, &s, UI_RIGHT, &row);
+  ASSERT(s.fill);
+  settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
   ASSERT_EQ(m.sel, SET_CONTROLS);
@@ -270,6 +275,155 @@ static void bindings_remap_and_persist(void) {
   ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_A);
 }
 
+static bool overlaps(UiRect a, UiRect b) { return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h; }
+static bool inside(UiRect a, int w, int h) { return a.x >= 0 && a.y >= 0 && a.x + a.w <= w && a.y + a.h <= h; }
+
+static void touch_layout_fits_screens(void) {
+  static const int sizes[][2] = {{1080, 2400}, {720, 1280}, {1440, 3200}, {1600, 2560}, {1080, 1920}, {2400, 1080}, {1280, 720}, {2560, 1600}, {1920, 1080}};
+  for (size_t i = 0; i < sizeof sizes / sizeof sizes[0]; i++)
+    for (int variant = 0; variant < 4; variant++) {
+      int w = sizes[i][0], h = sizes[i][1], items = variant & 1;
+      TouchLayout l;
+      touch_layout(&l, w, h, (UiRect){0, 90, w, h - 90 - 60}, true, items, variant >> 1);
+      ASSERT(l.scale >= 3);
+      ASSERT(inside(l.game, l.w, l.h));
+      ASSERT(l.game_px.x >= 0 && l.game_px.x + l.game_px.w <= w && l.game_px.y + l.game_px.h <= h);
+      if (l.portrait) ASSERT(l.game.y * l.scale >= 90);
+      UiRect controls[ACTIONS + 1];
+      int n = 0;
+      controls[n++] = l.dpad;
+      for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) controls[n++] = l.button[a];
+      ASSERT_EQ(n, items ? 9 : 7);                     // D-pad, A, B, Start, Select, Pause, Fast (+ X, Y)
+      int side = l.game.x;
+      for (int j = 0; j < n; j++) {
+        ASSERT(inside(controls[j], l.w, l.h - 60 / l.scale));
+        if (l.portrait || side >= 70) ASSERT(!overlaps(controls[j], l.game));
+        for (int k = 0; k < j; k++) ASSERT(!overlaps(controls[j], controls[k]));
+      }
+    }
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false);   // Pixel 8: corners in the safe area
+  ASSERT_EQ(l.scale, 6);
+  ASSERT(l.game.y * 6 >= 164);
+  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, false);
+  ASSERT_EQ(l.scale, 7);
+  ASSERT(l.game.x * 7 >= 132);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false);
+  ASSERT(l.portrait);
+  ASSERT_EQ(l.scale, 6);
+  ASSERT_EQ(l.game.x, 10);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, false, false, false);
+  ASSERT(!l.portrait);
+  ASSERT_EQ(l.game.y, (400 - 144) / 2);                // no overlay: centred, nothing to press
+  ASSERT_EQ(touch_hit(&l, 100, 300), 0);
+}
+
+static void toast_boxes_a_message_near_the_bottom(void) {
+  UiFont font;
+  ASSERT(ui_font_load(&font, rom, sizeof rom));
+  UiTheme t;
+  ui_theme_default(&t, true);
+  static UiCanvas c;
+  ui_clear(&c, UI_BLACK);
+  ui_toast(&c, &font, &t, "STATE SAVED");
+  int top, bottom;
+  ASSERT(ui_text_ink(&font, "STATE SAVED", &top, &bottom));
+  int w = 11 * UI_GLYPH_W + 10, h = bottom - top + 5, x = (UI_W - w) / 2, y = UI_H - h;
+  ASSERT_EQ(c.px[y][x][0], t.border.r);
+  ASSERT_EQ(c.px[y + 1][x + 1][0], t.panel.r);
+  ASSERT_EQ(c.px[y - 1][x][0], 0);
+  PauseMenu pm;
+  pause_open(&pm, true, true);
+  static UiCanvas pc;
+  static uint8_t grey[UI_W * UI_H * 3];
+  pause_draw(&pm, &font, &t, grey, &pc);
+  int box_bottom = 0;                                  // the pause box stays visible above it
+  for (int yy = 0; yy < UI_H; yy++) if (!memcmp(pc.px[yy][UI_W / 2], &t.border, 3)) box_bottom = yy;
+  ASSERT(y > box_bottom);
+  ui_toast(&c, &font, &t, "A VERY LONG MESSAGE THAT DOES NOT FIT");   // clipped to the screen
+}
+
+static void touch_fill_scales_past_whole_pixels(void) {
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, true);   // Pixel 8 portrait
+  ASSERT_EQ(l.scale, 6);
+  ASSERT_EQ(l.game_px.w, 1080);                        // 6.75x: the full width
+  ASSERT_EQ(l.game_px.h, 972);
+  ASSERT(l.game_px.y >= 164);
+  for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) ASSERT(!overlaps(l.button[a], l.game));
+  ASSERT(!overlaps(l.dpad, l.game));
+  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, true);
+  ASSERT_EQ(l.game_px.h, 1080);                        // landscape: the full height
+  ASSERT_EQ(l.game_px.w, 1200);
+  touch_layout(&l, 1000, 700, (UiRect){0, 0, 1000, 700}, false, false, true);        // desktop window
+  ASSERT_EQ(l.game_px.w, 777);
+  ASSERT_EQ(l.game_px.h, 700);
+  touch_layout(&l, 1000, 700, (UiRect){0, 0, 1000, 700}, false, false, false);
+  ASSERT_EQ(l.game_px.w, 640);
+  ASSERT_EQ(l.game_px.x % 4, 0);
+}
+
+static void touch_hits_each_control(void) {
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, true, false);
+  float x, y;
+  for (int a = 0; a < ACTIONS; a++) {
+    bool shown = touch_point(&l, (Action)a, &x, &y);
+    ASSERT_EQ(shown, a != ACT_SWAP);
+    if (shown) ASSERT_EQ(touch_hit(&l, x, y), 1u << a);
+  }
+  float r = l.dpad.w / 2.0f, cx = l.dpad.x + r, cy = l.dpad.y + r;
+  ASSERT_EQ(touch_hit(&l, cx + r * 0.6f, cy - r * 0.6f), (1u << ACT_UP) | (1u << ACT_RIGHT));
+  ASSERT_EQ(touch_hit(&l, cx - r * 0.7f, cy + r * 0.2f), 1u << ACT_LEFT);
+  ASSERT_EQ(touch_hit(&l, cx, cy), 0);                 // the centre is a dead zone
+  ASSERT_EQ(touch_hit(&l, l.game.x + 80, l.game.y + 72), 0);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false);
+  ASSERT(!touch_point(&l, ACT_ITEM_X, &x, &y));
+}
+
+static void touch_draw_lights_held_buttons(void) {
+  TouchLayout l;
+  touch_layout(&l, 2400, 1080, (UiRect){0, 0, 2400, 1080}, true, false, false);
+  UiTheme t;
+  ui_theme_default(&t, true);
+  uint8_t *img = malloc((size_t)l.w * l.h * 4);
+  const UiRect *a = &l.button[ACT_A];
+  int px = a->x + 3, py = a->y + a->h / 2;             // inside the ring, clear of the label
+  touch_draw(&l, NULL, &t, 0, img);
+  uint8_t *p = img + ((size_t)py * l.w + px) * 4;
+  ASSERT_EQ(p[0], t.panel.r);
+  ASSERT(p[3] > 0 && p[3] < 255);                      // landscape: translucent over the sides
+  ASSERT_EQ(img[((size_t)(l.game.y + 72) * l.w + l.game.x + 80) * 4 + 3], 0);
+  touch_draw(&l, NULL, &t, 1u << ACT_A, img);
+  ASSERT_EQ(p[0], t.highlight.r);
+  ASSERT_EQ(p[1], t.highlight.g);
+  free(img);
+}
+
+static void touch_labels_centre_on_their_ink(void) {
+  static UiFont font;
+  memset(font.glyph, 0xff, sizeof font.glyph);
+  for (const char *p = "START"; *p; p++)
+    for (int r = 7; r <= 14; r++) font.glyph[(uint8_t)*p][r] = 0x81;   // ink rows 7-14, low in the cell
+  font.loaded = true;
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false, false);
+  UiTheme t;
+  ui_theme_default(&t, false);
+  uint8_t *img = malloc((size_t)l.w * l.h * 4);
+  touch_draw(&l, &font, &t, 0, img);
+  const UiRect *b = &l.button[ACT_START];
+  int first = -1, last = -1, x = b->x + b->w / 2 - 20 + 1;           // a pixel column of the first letter
+  for (int y = b->y + 1; y < b->y + b->h - 1; y++) {
+    uint8_t *p = img + ((size_t)y * l.w + x) * 4;
+    if (p[0] == t.text.r && p[1] == t.text.g && p[2] == t.text.b) { if (first < 0) first = y; last = y; }
+  }
+  ASSERT_EQ(last - first, 7);
+  int above = first - b->y, below = b->y + b->h - 1 - last;
+  ASSERT(above - below <= 1 && below - above <= 1);
+  free(img);
+}
+
 int main(void) {
   RUN(font_loads_from_the_rom_offset);
   RUN(text_draws_glyph_pixels);
@@ -283,5 +437,11 @@ int main(void) {
   RUN(settings_menu_changes_values);
   RUN(filters_keep_pixel_alignment);
   RUN(bindings_remap_and_persist);
+  RUN(touch_layout_fits_screens);
+  RUN(toast_boxes_a_message_near_the_bottom);
+  RUN(touch_fill_scales_past_whole_pixels);
+  RUN(touch_hits_each_control);
+  RUN(touch_draw_lights_held_buttons);
+  RUN(touch_labels_centre_on_their_ink);
   return 0;
 }
