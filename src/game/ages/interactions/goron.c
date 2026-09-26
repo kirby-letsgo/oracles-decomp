@@ -898,7 +898,7 @@ update_animation:
   CYC(b_+56, b_+57); mem_wr(gb, DE, A);
   CYC(b_+57, b_+60); A = W8(wTmpcfc0_goronDance_danceAnimation);
   CALL_C(b_+60, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+63);
-  CYC(b_+63, b_+66); TAIL(interactionPushLinkAwayAndUpdateDrawPriority);
+  CYC(b_+63, b_+66); CYC(SYM(goronSubid00__pushLinkAway), (SYM(goronSubid00__pushLinkAway) + 3)); TAIL(interactionPushLinkAwayAndUpdateDrawPriority); // jp to goronSubid00@pushLinkAway, a jp
 goto_state1:
   CYC(b_+66, b_+67); H = D;
   CYC(b_+67, b_+69); L = INTERACTION_BASE + OBJ_STATE;

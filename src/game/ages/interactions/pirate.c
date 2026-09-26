@@ -176,11 +176,11 @@ state3: // interactionCodec4@state3
   CYC(b_+173, b_+175);
   CYC(b_+175, b_+178); SET_BC(0x360d); // TX_360d
   CALL_C(b_+178, showText_hook, SYM(showText), b_+181);
-  CYC(b_+181, b_+183); interactionCodec4_resetPushCounter(gb); return; // jr
+  CYC(b_+181, b_+183); interactionCodec4_resetPushCounter(gb); ret_effect(gb); return; // jr; its ret ends the hook
 
 haveEyeball: // interactionCodec4@haveEyeball
   CALL_C(b_+183, checkLinkCollisionsEnabled_hook, SYM(checkLinkCollisionsEnabled), b_+186);
-  if (!(F & FC)) { CYCT(b_+186, b_+188); interactionCodec4_resetPushCounter(gb); return; } // jr nc
+  if (!(F & FC)) { CYCT(b_+186, b_+188); interactionCodec4_resetPushCounter(gb); ret_effect(gb); return; } // jr nc
   CYC(b_+186, b_+188);
   CYC(b_+188, b_+190); A = 0x81; // DISABLE_ALL_BUT_INTERACTIONS | DISABLE_LINK
   CYC(b_+190, b_+193); W8(wDisabledObjects) = A;
