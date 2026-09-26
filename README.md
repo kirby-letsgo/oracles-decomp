@@ -85,6 +85,32 @@ inventory and press one to assign it, then hold it in play to use the item).
 - `oracles`: Esc is Start as well; Cmd+S / Cmd+R save and load one state next to the ROM, F12 takes a
   screenshot, and the game's save (battery RAM) is kept next to the ROM as `.sav`.
 
+`ORACLES_TOUCH=1 ./build/oracles-native` shows the phone's touch controls on the desktop, with the
+mouse as a finger.
+
+## Android
+
+`oracles-native` also builds as an Android app (arm64, Android 8+). Needs the Android SDK with
+platform 35, build-tools 35, NDK 27.2.12479018 and CMake 3.31.6 (`sdkmanager` installs them), and a
+JDK; `android/local.properties` names the SDK (`sdk.dir=...`).
+
+```bash
+cd android
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+The build runs this repo's CMake with SDL 3.4.16 from source (its Java glue is vendored in
+`android/app/src/main/java/org/libsdl/app`, same release) and optimises the engine in debug APKs too.
+On first launch the app opens the system file picker: choose the ROM (copy it to the phone's
+Downloads first, e.g. `adb push ROM /sdcard/Download/`); Add ROM in the launcher adds the other game.
+
+Touch controls sit under the game in portrait and at its sides in landscape: D-pad (diagonals by
+touching between arms), A, B, Start, Select, Pause and fast-forward (`>>`, hold), plus X and Y when 4
+slots is on. They hide when a controller or keyboard is used and come back on the next touch. The
+back button pauses (and goes back in menus). Leaving the app saves the game and a Resume state, and
+coming back opens the pause menu. `adb logcat -s oracles` shows the engine's messages.
+
 ## Recording a playthrough
 
 The recordings in `tas/` are the test suite. To extend the Seasons one:

@@ -227,6 +227,7 @@ int main(int argc, char **argv) {
   SDL_Renderer *ren;
   SDL_Texture *tex;
   if (!oracles_open_window("Oracles", NULL, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
+  SDL_SetRenderLogicalPresentation(ren, FB_W, FB_H, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
   SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
   SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
   if (audio) SDL_ResumeAudioStreamDevice(audio);

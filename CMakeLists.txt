@@ -8,7 +8,11 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 
-option(ORACLES_SDL "Build the SDL3 frontend" ON)
+if(ANDROID)
+  option(ORACLES_SDL "Build the SDL3 frontend" OFF)
+else()
+  option(ORACLES_SDL "Build the SDL3 frontend" ON)
+endif()
 
 file(GLOB_RECURSE ORACLES_GAME_SRC CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/game/*.c")
 set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
@@ -60,22 +64,43 @@ if(ORACLES_SDL)
   target_link_libraries(oracles-native oraclesnative oraclesui SDL3::SDL3)
   target_compile_definitions(oracles-native PRIVATE ORACLES_NATIVE=1)
   if(APPLE)
-    add_executable(oracles-native-app MACOSX_BUNDLE src/platform/app.c src/platform/window.c)
+    set(ORACLES_ICNS ${CMAKE_SOURCE_DIR}/icon/Oracles.icns)
+    set_source_files_properties(${ORACLES_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    add_executable(oracles-native-app MACOSX_BUNDLE src/platform/app.c src/platform/window.c ${ORACLES_ICNS})
     target_link_libraries(oracles-native-app oraclesnative oraclesui SDL3::SDL3)
     target_compile_definitions(oracles-native-app PRIVATE ORACLES_NATIVE=1)
     set_target_properties(oracles-native-app PROPERTIES
       OUTPUT_NAME "Oracles"
       MACOSX_BUNDLE_BUNDLE_NAME "Oracles"
+      MACOSX_BUNDLE_ICON_FILE "Oracles.icns"
       MACOSX_BUNDLE_GUI_IDENTIFIER "dev.oracles-decomp.oracles"
       MACOSX_BUNDLE_BUNDLE_VERSION "0.5"
       MACOSX_BUNDLE_SHORT_VERSION_STRING "0.5")
   endif()
 endif()
 
-add_library(oraclesui STATIC src/ui/ui.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c)
+add_library(oraclesui STATIC src/ui/ui.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c src/ui/touch.c)
 target_include_directories(oraclesui PUBLIC src)
 if(NOT WIN32)
   target_link_libraries(oraclesui PUBLIC m)
+endif()
+
+# The Android app: SDL3 from source, linked statically into libmain.so with the engine and the UI.
+if(ANDROID)
+  enable_language(CXX)   # SDL's Android HIDAPI is C++, so libmain links the C++ runtime
+  include(FetchContent)
+  set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+  set(SDL_STATIC ON CACHE BOOL "" FORCE)
+  set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(SDL3
+    URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz
+    URL_HASH SHA256=7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68)
+  FetchContent_MakeAvailable(SDL3)
+  add_library(main SHARED src/platform/app.c src/platform/window.c)
+  target_link_libraries(main oraclesnative oraclesui SDL3::SDL3-static log)
+  target_compile_definitions(main PRIVATE ORACLES_NATIVE=1)
+  set_target_properties(main PROPERTIES LINKER_LANGUAGE CXX)
+  return()
 endif()
 
 enable_testing()

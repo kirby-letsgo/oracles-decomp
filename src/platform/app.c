@@ -23,6 +23,7 @@
 #include "ui/menu.h"
 #include "ui/settings.h"
 #include "ui/filter.h"
+#include "ui/touch.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,10 +57,10 @@ static const char *game_of(const uint8_t *rom, size_t n) {
 // from the original bytes, and a manifest naming both.
 static bool extract(const char *rom_path, const char *cache, char *game_out) {
   size_t n;
-  uint8_t *rom = oracles_read_file(rom_path, &n);
-  if (!rom) { fprintf(stderr, "cannot read %s\n", rom_path); return false; }
+  uint8_t *rom = SDL_LoadFile(rom_path, &n);
+  if (!rom) { fprintf(stderr, "cannot read %s: %s\n", rom_path, SDL_GetError()); return false; }
   const char *game = game_of(rom, n);
-  if (!game) { free(rom); return false; }
+  if (!game) { SDL_free(rom); return false; }
   char hex[41];
   sha1_hex(rom, n, hex);
   uint8_t *tab = cyctab_alloc(rom, n);
@@ -78,7 +79,7 @@ static bool extract(const char *rom_path, const char *cache, char *game_out) {
   if (ok) fprintf(stderr, "extracted %s: %zu code bytes zeroed, cache %s\n", game, zeroed, dir);
   else fprintf(stderr, "cannot write the cache in %s\n", dir);
   strcpy(game_out, game);
-  free(rom); free(tab);
+  SDL_free(rom); free(tab);
   return ok;
 }
 
@@ -99,8 +100,7 @@ static uint8_t joy_of(Action a) {
   static const uint8_t bits[ACTIONS] = {JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT, JOY_A, JOY_B, JOY_START, JOY_SELECT, 0, 0, 0, 0, 0};
   return a < ACTIONS ? bits[a] : 0;
 }
-static uint8_t key_bit(SDL_Scancode sc) { return joy_of(bindings_key_action(&settings.bindings, (int)sc)); }
-static uint8_t pad_bit(int button) { return joy_of(bindings_pad_action(&settings.bindings, button)); }
+static uint32_t action_bit(Action a) { return a < ACTIONS ? 1u << a : 0; }
 
 static const char *key_name(int sc) {
   static char buf[32];
@@ -142,11 +142,18 @@ static void save_sram(GB *gb, const char *path) {
 
 static const char *const game_ids[UI_GAMES] = {"ages", "seasons"};
 
+static bool poll_event(SDL_Event *ev);
+
 static bool pick_rom(char *game_out, const char *cache) {
   static const SDL_DialogFileFilter filters[] = {{"Game Boy Color ROM", "gbc;gb"}};
   pick_state = 0;
+#ifdef __ANDROID__
+  (void)filters;
+  SDL_ShowOpenFileDialog(on_pick, NULL, NULL, NULL, 0, NULL, false);
+#else
   SDL_ShowOpenFileDialog(on_pick, NULL, NULL, filters, 1, NULL, false);
-  while (!pick_state) { SDL_Event ev; while (SDL_PollEvent(&ev)) if (ev.type == SDL_EVENT_QUIT) return false; SDL_Delay(10); }
+#endif
+  while (!pick_state) { SDL_Event ev; while (poll_event(&ev)) if (ev.type == SDL_EVENT_QUIT) return false; SDL_Delay(10); }
   return pick_state > 0 && extract(picked, cache, game_out);
 }
 
@@ -226,6 +233,9 @@ static void settings_store(void) {
 }
 
 static void apply_window_settings(SDL_Window *win) {
+#ifdef __ANDROID__
+  settings.fullscreen = true;
+#endif
   if (!!(SDL_GetWindowFlags(win) & SDL_WINDOW_FULLSCREEN) != settings.fullscreen) SDL_SetWindowFullscreen(win, settings.fullscreen);
 }
 
@@ -268,20 +278,79 @@ static void item_button(GB *gb, const char *dir, int slot, bool down, SDL_Window
   slot_joy[slot] = features_slot_press(gb, slot);
 }
 
-// Sharp and uncorrected frames go straight to the 160x144 texture; filters render at the window's
-// integer scale into a texture of that size, which the logical presentation then shows 1:1.
+// The touch overlay: shown from the first touch until a controller or keyboard is used. The layout
+// comes from the last present, and every finger holds the actions under it.
+#define TEST_TOUCH_ID 0x7e57
+#define FINGERS 10
+static TouchLayout layout;
+static bool touch_on, touch_mouse;
+static uint32_t touch_held, touch_pressed, touch_released;
+static struct { SDL_FingerID id; uint32_t held; bool down; } fingers[FINGERS];
+static const UiFont *overlay_font;
+static UiTheme overlay_theme;
+
+static void overlay_style(const UiFont *font, const UiTheme *theme) { overlay_font = font; overlay_theme = *theme; }
+
+static bool direct_touch(SDL_TouchID id) {
+  return id == TEST_TOUCH_ID || (touch_mouse && id == SDL_MOUSE_TOUCHID) || SDL_GetTouchDeviceType(id) == SDL_TOUCH_DEVICE_DIRECT;
+}
+
+static void touch_event(const SDL_Event *ev) {
+  touch_pressed = touch_released = 0;
+  if (ev->type == SDL_EVENT_GAMEPAD_BUTTON_DOWN || (ev->type == SDL_EVENT_KEY_DOWN && ev->key.scancode != SDL_SCANCODE_AC_BACK)) {
+    touch_on = false;
+    memset(fingers, 0, sizeof fingers);
+    touch_released = touch_held;
+    touch_held = 0;
+    return;
+  }
+  bool down = ev->type == SDL_EVENT_FINGER_DOWN, move = ev->type == SDL_EVENT_FINGER_MOTION;
+  bool up = ev->type == SDL_EVENT_FINGER_UP || ev->type == SDL_EVENT_FINGER_CANCELED;
+  if ((!down && !move && !up) || !direct_touch(ev->tfinger.touchID)) return;
+  if (!touch_on) { touch_on = down; return; }
+  int f = -1;
+  for (int i = 0; i < FINGERS && f < 0; i++) if (fingers[i].down && fingers[i].id == ev->tfinger.fingerID) f = i;
+  for (int i = 0; i < FINGERS && f < 0 && down; i++) if (!fingers[i].down) f = i;
+  if (f < 0) return;
+  fingers[f].id = ev->tfinger.fingerID;
+  fingers[f].down = !up;
+  float x = ev->tfinger.x * layout.screen_w / layout.scale, y = ev->tfinger.y * layout.screen_h / layout.scale;
+  fingers[f].held = up ? 0 : touch_hit(&layout, x, y);
+  uint32_t held = 0;
+  for (int i = 0; i < FINGERS; i++) held |= fingers[i].held;
+  touch_pressed = held & ~touch_held;
+  touch_released = touch_held & ~held;
+  touch_held = held;
+}
+
+// Every loop polls through here, so the touch state sees each event once.
+static bool poll_event(SDL_Event *ev) {
+  if (!SDL_PollEvent(ev)) return false;
+  touch_event(ev);
+  return true;
+}
+
+// Sharp and uncorrected frames go straight to the 160x144 texture; filters render at the layout's
+// integer scale into a texture of that size, shown 1:1. The overlay is drawn in game pixels too.
 #define MAX_FILTER_SCALE 12
 static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
-  static SDL_Texture *big;
-  static int big_scale;
-  static uint8_t *buf;
-  int w = 0, h = 0, scale = 1;
-  if (SDL_GetCurrentRenderOutputSize(ren, &w, &h)) scale = SDL_min(w / FB_W, h / FB_H);
-  scale = SDL_clamp(scale, 1, MAX_FILTER_SCALE);
+  static SDL_Texture *big, *over;
+  static int big_scale, over_w, over_h;
+  static uint8_t *buf, *over_px;
+  int w = FB_W, h = FB_H;
+  SDL_GetCurrentRenderOutputSize(ren, &w, &h);
+  SDL_Rect safe = {0, 0, w, h};
+  SDL_GetRenderSafeArea(ren, &safe);
+  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots);
+  int scale = SDL_min(layout.scale, MAX_FILTER_SCALE);
+  SDL_FRect dst = {(float)(layout.game.x * layout.scale), (float)(layout.game.y * layout.scale), (float)(FB_W * layout.scale), (float)(FB_H * layout.scale)};
+  if (touch_on) SDL_SetRenderDrawColor(ren, overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b, 255);
   SDL_RenderClear(ren);
+  SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+  if (touch_on) SDL_RenderFillRect(ren, &dst);
   if ((settings.filter == FILTER_SHARP || scale < 2) && !settings.gbc_colours) {
     SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
-    SDL_RenderTexture(ren, tex, NULL, NULL);
+    SDL_RenderTexture(ren, tex, NULL, &dst);
   } else {
     if (!big || big_scale != scale) {
       if (big) SDL_DestroyTexture(big);
@@ -293,7 +362,22 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
     }
     ui_filter(rgb, settings.gbc_colours, scale < 2 ? FILTER_SHARP : settings.filter, scale, buf);
     SDL_UpdateTexture(big, NULL, buf, FB_W * scale * 3);
-    SDL_RenderTexture(ren, big, NULL, NULL);
+    SDL_RenderTexture(ren, big, NULL, &dst);
+  }
+  if (touch_on) {
+    if (!over || over_w != layout.w || over_h != layout.h) {
+      if (over) SDL_DestroyTexture(over);
+      over = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, layout.w, layout.h);
+      SDL_SetTextureScaleMode(over, SDL_SCALEMODE_NEAREST);
+      SDL_SetTextureBlendMode(over, SDL_BLENDMODE_BLEND);
+      free(over_px);
+      over_px = malloc((size_t)layout.w * layout.h * 4);
+      over_w = layout.w;
+      over_h = layout.h;
+    }
+    touch_draw(&layout, overlay_font, &overlay_theme, touch_held, over_px);
+    SDL_UpdateTexture(over, NULL, over_px, layout.w * 4);
+    SDL_RenderTexture(ren, over, NULL, &(SDL_FRect){0, 0, (float)(layout.w * layout.scale), (float)(layout.h * layout.scale)});
   }
   SDL_RenderPresent(ren);
 }
@@ -334,6 +418,23 @@ static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
 // Test hook: ORACLES_TEST_KEYS="120:Escape,130:Down,140:X" presses each key at that loop tick (every
 // pass of the launcher, menu or game loop is a tick), so ctest can drive the menus headless.
 static uint64_t test_tick;
+
+// "#A", "#UP", ... in ORACLES_TEST_KEYS touch that control of the overlay (one finger).
+static void test_touch(const char *name, bool down) {
+  static const char *const names[ACTIONS] = {"UP", "DOWN", "LEFT", "RIGHT", "A", "B", "START", "SELECT", "PAUSE", "FAST", "SWAP", "X", "Y"};
+  float x, y;
+  for (int a = 0; a < ACTIONS; a++) {
+    if (strcmp(name, names[a]) || !touch_point(&layout, (Action)a, &x, &y)) continue;
+    SDL_Event ev = {0};
+    ev.type = down ? SDL_EVENT_FINGER_DOWN : SDL_EVENT_FINGER_UP;
+    ev.tfinger.touchID = TEST_TOUCH_ID;
+    ev.tfinger.fingerID = 1;
+    ev.tfinger.x = x * layout.scale / layout.screen_w;
+    ev.tfinger.y = y * layout.scale / layout.screen_h;
+    SDL_PushEvent(&ev);
+  }
+}
+
 static void test_keys(void) {
   static const char *spec;
   static bool init;
@@ -344,7 +445,8 @@ static void test_keys(void) {
     unsigned long long at;
     int len = 0;
     if (sscanf(p, "%llu:%31[^,]%n", &at, name, &len) != 2) break;
-    if (at == test_tick || at + 1 == test_tick) {
+    if ((at == test_tick || at + 1 == test_tick) && name[0] == '#') test_touch(name + 1, at == test_tick);
+    else if (at == test_tick || at + 1 == test_tick) {
       SDL_Event ev = {0};
       ev.type = at == test_tick ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
       ev.key.scancode = SDL_GetScancodeFromName(name);
@@ -364,8 +466,15 @@ static bool window_key(SDL_Window *win, const SDL_KeyboardEvent *key) {
 }
 
 static bool menu_button(const SDL_Event *ev, UiButton *b) {
+  static const UiButton touch_buttons[ACTIONS] = {
+    [ACT_UP] = UI_UP, [ACT_DOWN] = UI_DOWN, [ACT_LEFT] = UI_LEFT, [ACT_RIGHT] = UI_RIGHT,
+    [ACT_A] = UI_ACCEPT, [ACT_START] = UI_ACCEPT, [ACT_B] = UI_BACK, [ACT_PAUSE] = UI_BACK,
+  };
+  for (int a = 0; a < ACTIONS; a++)
+    if ((touch_pressed >> a & 1) && (a <= ACT_START || a == ACT_PAUSE)) { *b = touch_buttons[a]; return true; }
   if (ev->type == SDL_EVENT_KEY_DOWN) {
     switch (ev->key.scancode) {
+    case SDL_SCANCODE_AC_BACK: *b = UI_BACK; return true;
     case SDL_SCANCODE_UP: *b = UI_UP; return true;
     case SDL_SCANCODE_DOWN: *b = UI_DOWN; return true;
     case SDL_SCANCODE_LEFT: *b = UI_LEFT; return true;
@@ -395,7 +504,7 @@ static int pick_slot(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, Slots
   for (;;) {
     test_keys();
     SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
+    while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return -2;
       if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
       UiButton b;
@@ -418,7 +527,7 @@ static bool run_controls(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   for (;;) {
     test_keys();
     SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
+    while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
       if (ev.type == SDL_EVENT_GAMEPAD_ADDED) SDL_OpenGamepad(ev.gdevice.which);
       if (m.waiting) {
@@ -448,7 +557,7 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   for (;;) {
     test_keys();
     SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
+    while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
       if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
       UiButton b;
@@ -485,7 +594,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   for (;;) {
     test_keys();
     SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
+    while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
       if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
       if (ev.type == SDL_EVENT_GAMEPAD_ADDED) SDL_OpenGamepad(ev.gdevice.which);
@@ -516,6 +625,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
         return true;
       }
     }
+    overlay_style(&font, &l.games[l.game].theme);
     launcher_draw(&l, &font, &canvas);
     ui_to_rgb(&canvas, rgb);
     present(ren, tex, rgb);
@@ -585,6 +695,39 @@ typedef struct {
   uint64_t max_frames;
 } GameStart;
 
+// The running game, for the background event watch.
+typedef struct {
+  GB *gb;
+  const char *dir, *sav;
+  uint8_t *paused_rgb;
+  GameMode *mode;
+  bool *parked, backgrounded;
+  uint64_t *frames;
+} Session;
+static Session session;
+
+// Android stops the app inside the event pump that queues the background event, so it is handled in
+// an event watch, on the main thread before the app stops: the game runs silently to a frame it can
+// be saved at and writes the resume state and SRAM (Android may close it in the background); the
+// game loop then opens the pause menu.
+static bool SDLCALL on_app_event(void *data, SDL_Event *ev) {
+  (void)data;
+  if ((ev->type != SDL_EVENT_WILL_ENTER_BACKGROUND && ev->type != SDL_EVENT_TERMINATING) || !session.gb) return true;
+  GB *gb = session.gb;
+  if (*session.mode == MODE_PLAY || *session.mode == MODE_PAUSING) {
+    static int16_t samples[APU_RING * 2];
+    live_joy = 0;
+    for (int i = 0; i < PARK_TIMEOUT && !threads_parked(gb); i++) { features_frame(gb); gb_run_frame(gb); (*session.frames)++; }
+    apu_read_samples(&gb->apu, samples, APU_RING);
+    *session.parked = threads_parked(gb);
+    framebuffer_to_rgb(gb->sample->framebuffer, session.paused_rgb);
+    session.backgrounded = true;
+  }
+  if (*session.parked && (session.backgrounded || *session.mode == MODE_PAUSED)) slot_save(gb, session.dir, SLOT_AUTO, session.paused_rgb);
+  save_sram(gb, session.sav);
+  return true;
+}
+
 static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const GameStart *gs) {
   char dir[1100], path[1300];
   snprintf(dir, sizeof dir, "%s%s", gs->cache, gs->game);
@@ -600,6 +743,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   UiTheme theme;
   ui_font_load(&font, rom, rom_size);
   ui_theme_load(&theme, rom, rom_size, ages);
+  overlay_style(&font, &theme);
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
   if (!gb_load_rom(gb, rom, rom_size)) { fprintf(stderr, "cache in %s is not a ROM image\n", dir); return GAME_FAILED; }
@@ -637,11 +781,12 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     if (!slot_load(gb, dir, slot)) fprintf(stderr, "could not load the state in slot %d\n", slot + 1);
   }
   framebuffer_to_rgb(gb->sample ? gb->sample->framebuffer : gb->framebuffer, rgb);
+  session = (Session){gb, dir, sav, paused_rgb, &mode, &parked, false, &frames};
 
   for (bool running = true; running && !gb->hung;) {
     test_keys();
     SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
+    while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) {
         if (mode == MODE_PAUSED) { end = GAME_QUIT; running = false; if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); }
         else { mode = MODE_QUITTING; end = GAME_QUIT; park_from = frames; live_joy = 0; }
@@ -682,51 +827,59 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         continue;
       }
       if (mode != MODE_PLAY) continue;
-      bool pause_key = (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat && bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_PAUSE) ||
-                       (ev.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_PAUSE);
-      if (pause_key) { mode = MODE_PAUSING; park_from = frames; live_joy = 0; boot.phase = BOOT_OFF; continue; }
+      uint32_t press = touch_pressed, release = touch_released;
       switch (ev.type) {
       case SDL_EVENT_KEY_DOWN:
-        if (boot.phase != BOOT_OFF) { boot.phase = BOOT_OFF; live_joy = 0; }
-        if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S && !ev.key.repeat) save_from = frames;
-        else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R && !ev.key.repeat) {
+        if (ev.key.repeat) break;
+        if (ev.key.scancode == SDL_SCANCODE_AC_BACK) press |= 1u << ACT_PAUSE;
+        else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S) save_from = frames;
+        else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R) {
           bool ok = slot_load(gb, dir, 0);
           if (ok) { live_joy = 0; save_from = NO_SAVE; }
           title_reset = show_status(win, title, ok ? "state 1 loaded" : "no state in slot 1", frames);
         }
-        else if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
+        else if (ev.key.scancode == SDL_SCANCODE_M) {
           muted = !muted;
           if (audio) SDL_SetAudioStreamGain(audio, volume_gain(muted));
         }
-        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_FAST) fast = true;
-        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_SWAP) { if (!ev.key.repeat) features_quick_swap(gb); }
-        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_X) { if (!ev.key.repeat) item_button(gb, dir, 0, true, win, title, &title_reset, frames); }
-        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_Y) { if (!ev.key.repeat) item_button(gb, dir, 1, true, win, title, &title_reset, frames); }
-        else live_joy |= key_bit(ev.key.scancode);
+        else press |= action_bit(bindings_key_action(&settings.bindings, (int)ev.key.scancode));
         break;
       case SDL_EVENT_KEY_UP:
-        if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_FAST) fast = false;
-        if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_X) item_button(gb, dir, 0, false, win, title, &title_reset, frames);
-        if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_Y) item_button(gb, dir, 1, false, win, title, &title_reset, frames);
-        live_joy &= ~key_bit(ev.key.scancode);
+        release |= action_bit(bindings_key_action(&settings.bindings, (int)ev.key.scancode));
         break;
       case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         if (ev.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER && settings.bindings.pad[ACT_FAST] == PAD_RIGHT_TRIGGER) fast = ev.gaxis.value > 16000;
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_FAST) fast = true;
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_SWAP) features_quick_swap(gb);
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_X) item_button(gb, dir, 0, true, win, title, &title_reset, frames);
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_Y) item_button(gb, dir, 1, true, win, title, &title_reset, frames);
-        live_joy |= pad_bit(ev.gbutton.button);
+        press |= action_bit(bindings_pad_action(&settings.bindings, ev.gbutton.button));
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_UP:
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_FAST) fast = false;
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_X) item_button(gb, dir, 0, false, win, title, &title_reset, frames);
-        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_Y) item_button(gb, dir, 1, false, win, title, &title_reset, frames);
-        live_joy &= ~pad_bit(ev.gbutton.button);
+        release |= action_bit(bindings_pad_action(&settings.bindings, ev.gbutton.button));
         break;
       }
+      if (press >> ACT_PAUSE & 1) { mode = MODE_PAUSING; park_from = frames; live_joy = 0; boot.phase = BOOT_OFF; continue; }
+      if (press && boot.phase != BOOT_OFF) { boot.phase = BOOT_OFF; live_joy = 0; }
+      for (int a = 0; a < ACTIONS; a++) {
+        bool item = a == ACT_ITEM_X || a == ACT_ITEM_Y;
+        if (press >> a & 1) {
+          if (a == ACT_FAST) fast = true;
+          else if (a == ACT_SWAP) features_quick_swap(gb);
+          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, true, win, title, &title_reset, frames);
+          else live_joy |= joy_of((Action)a);
+        }
+        if (release >> a & 1) {
+          if (a == ACT_FAST) fast = false;
+          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, false, win, title, &title_reset, frames);
+          else live_joy &= (uint8_t)~joy_of((Action)a);
+        }
+      }
+    }
+    if (session.backgrounded) {
+      session.backgrounded = false;
+      mode = MODE_PAUSED;
+      boot.phase = BOOT_OFF;
+      pause_open(&pause, parked, any_slot(dir));
+      if (audio) { SDL_PauseAudioStreamDevice(audio); SDL_ClearAudioStream(audio); }
     }
     if (!running) break;
 
@@ -786,11 +939,38 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   if (gb->hung) { fprintf(stderr, "the engine stopped (pc %04x)\n", gb->pc); end = GAME_FAILED; }
   else if (gs->max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
   save_sram(gb, sav);
+  session.gb = NULL;
   if (audio) SDL_DestroyAudioStream(audio);
   SDL_SetWindowTitle(win, "Oracles");
   free(gb); free(rom); free(tab);
   return end;
 }
+
+#ifdef __ANDROID__
+#include <android/log.h>
+#include <unistd.h>
+
+static int log_pipe[2];
+
+static int SDLCALL log_thread(void *data) {
+  (void)data;
+  char buf[1024];
+  ssize_t n;
+  while ((n = read(log_pipe[0], buf, sizeof buf - 1)) > 0) {
+    buf[n] = 0;
+    __android_log_write(ANDROID_LOG_INFO, "oracles", buf);
+  }
+  return 0;
+}
+
+// The engine reports on stderr, which Android discards: send it to logcat.
+static void stderr_to_logcat(void) {
+  if (pipe(log_pipe) != 0) return;
+  setvbuf(stderr, NULL, _IOLBF, 0);
+  dup2(log_pipe[1], 2);
+  SDL_DetachThread(SDL_CreateThread(log_thread, "log", NULL));
+}
+#endif
 
 int main(int argc, char **argv) {
   const char *rom_arg = NULL, *game_arg = NULL, *cache_arg = NULL;
@@ -804,7 +984,16 @@ int main(int argc, char **argv) {
     else if (argv[i][0] != '-') rom_arg = argv[i];
     else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]\n"); return 2; }
   }
+#ifdef __ANDROID__
+  stderr_to_logcat();
+  SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
+  SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight Portrait");
+  touch_on = true;
+#endif
+  // ORACLES_TOUCH=1 shows the overlay on desktop, with the mouse as a finger
+  if (getenv("ORACLES_TOUCH")) { touch_on = touch_mouse = true; SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1"); }
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMEPAD)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
+  SDL_AddEventWatch(on_app_event, NULL);
   char cache[1024];
   if (cache_arg) snprintf(cache, sizeof cache, "%s%s", cache_arg, cache_arg[strlen(cache_arg) - 1] == '/' ? "" : "/");
   else { char *p = SDL_GetPrefPath("oracles-decomp", "oracles"); if (!p) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; } snprintf(cache, sizeof cache, "%s", p); SDL_free(p); }

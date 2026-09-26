@@ -5,6 +5,7 @@
 #include "ui/menu.h"
 #include "ui/settings.h"
 #include "ui/filter.h"
+#include "ui/touch.h"
 
 static uint8_t rom[0x80000];
 
@@ -270,6 +271,103 @@ static void bindings_remap_and_persist(void) {
   ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_A);
 }
 
+static bool overlaps(UiRect a, UiRect b) { return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h; }
+static bool inside(UiRect a, int w, int h) { return a.x >= 0 && a.y >= 0 && a.x + a.w <= w && a.y + a.h <= h; }
+
+static void touch_layout_fits_screens(void) {
+  static const int sizes[][2] = {{1080, 2400}, {720, 1280}, {1440, 3200}, {1600, 2560}, {1080, 1920}, {2400, 1080}, {1280, 720}, {2560, 1600}, {1920, 1080}};
+  for (size_t i = 0; i < sizeof sizes / sizeof sizes[0]; i++)
+    for (int items = 0; items < 2; items++) {
+      int w = sizes[i][0], h = sizes[i][1];
+      TouchLayout l;
+      touch_layout(&l, w, h, (UiRect){0, 90, w, h - 90 - 60}, true, items);
+      ASSERT(l.scale >= 3);
+      ASSERT(inside(l.game, w / l.scale, h / l.scale));
+      ASSERT(l.game.y * l.scale >= 90);
+      UiRect controls[ACTIONS + 1];
+      int n = 0;
+      controls[n++] = l.dpad;
+      for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) controls[n++] = l.button[a];
+      ASSERT_EQ(n, items ? 9 : 7);                     // D-pad, A, B, Start, Select, Pause, Fast (+ X, Y)
+      int side = l.game.x;
+      for (int j = 0; j < n; j++) {
+        ASSERT(inside(controls[j], l.w, l.h - 60 / l.scale));
+        if (l.portrait || side >= 70) ASSERT(!overlaps(controls[j], l.game));
+        for (int k = 0; k < j; k++) ASSERT(!overlaps(controls[j], controls[k]));
+      }
+    }
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false);
+  ASSERT(l.portrait);
+  ASSERT_EQ(l.scale, 6);
+  ASSERT_EQ(l.game.x, 10);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, false, false);
+  ASSERT(!l.portrait);
+  ASSERT_EQ(l.game.y, (400 - 144) / 2);                // no overlay: centred, nothing to press
+  ASSERT_EQ(touch_hit(&l, 100, 300), 0);
+}
+
+static void touch_hits_each_control(void) {
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, true);
+  float x, y;
+  for (int a = 0; a < ACTIONS; a++) {
+    bool shown = touch_point(&l, (Action)a, &x, &y);
+    ASSERT_EQ(shown, a != ACT_SWAP);
+    if (shown) ASSERT_EQ(touch_hit(&l, x, y), 1u << a);
+  }
+  float r = l.dpad.w / 2.0f, cx = l.dpad.x + r, cy = l.dpad.y + r;
+  ASSERT_EQ(touch_hit(&l, cx + r * 0.6f, cy - r * 0.6f), (1u << ACT_UP) | (1u << ACT_RIGHT));
+  ASSERT_EQ(touch_hit(&l, cx - r * 0.7f, cy + r * 0.2f), 1u << ACT_LEFT);
+  ASSERT_EQ(touch_hit(&l, cx, cy), 0);                 // the centre is a dead zone
+  ASSERT_EQ(touch_hit(&l, l.game.x + 80, l.game.y + 72), 0);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false);
+  ASSERT(!touch_point(&l, ACT_ITEM_X, &x, &y));
+}
+
+static void touch_draw_lights_held_buttons(void) {
+  TouchLayout l;
+  touch_layout(&l, 2400, 1080, (UiRect){0, 0, 2400, 1080}, true, false);
+  UiTheme t;
+  ui_theme_default(&t, true);
+  uint8_t *img = malloc((size_t)l.w * l.h * 4);
+  const UiRect *a = &l.button[ACT_A];
+  int px = a->x + 3, py = a->y + a->h / 2;             // inside the ring, clear of the label
+  touch_draw(&l, NULL, &t, 0, img);
+  uint8_t *p = img + ((size_t)py * l.w + px) * 4;
+  ASSERT_EQ(p[0], t.panel.r);
+  ASSERT(p[3] > 0 && p[3] < 255);                      // landscape: translucent over the sides
+  ASSERT_EQ(img[((size_t)(l.game.y + 72) * l.w + l.game.x + 80) * 4 + 3], 0);
+  touch_draw(&l, NULL, &t, 1u << ACT_A, img);
+  ASSERT_EQ(p[0], t.highlight.r);
+  ASSERT_EQ(p[1], t.highlight.g);
+  free(img);
+}
+
+static void touch_labels_centre_on_their_ink(void) {
+  static UiFont font;
+  memset(font.glyph, 0xff, sizeof font.glyph);
+  for (const char *p = "START"; *p; p++)
+    for (int r = 7; r <= 14; r++) font.glyph[(uint8_t)*p][r] = 0x81;   // ink rows 7-14, low in the cell
+  font.loaded = true;
+  TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false);
+  UiTheme t;
+  ui_theme_default(&t, false);
+  uint8_t *img = malloc((size_t)l.w * l.h * 4);
+  touch_draw(&l, &font, &t, 0, img);
+  const UiRect *b = &l.button[ACT_START];
+  int first = -1, last = -1, x = b->x + b->w / 2 - 20 + 1;           // a pixel column of the first letter
+  for (int y = b->y + 1; y < b->y + b->h - 1; y++) {
+    uint8_t *p = img + ((size_t)y * l.w + x) * 4;
+    if (p[0] == t.text.r && p[1] == t.text.g && p[2] == t.text.b) { if (first < 0) first = y; last = y; }
+  }
+  ASSERT_EQ(last - first, 7);
+  int above = first - b->y, below = b->y + b->h - 1 - last;
+  ASSERT(above - below <= 1 && below - above <= 1);
+  free(img);
+}
+
 int main(void) {
   RUN(font_loads_from_the_rom_offset);
   RUN(text_draws_glyph_pixels);
@@ -283,5 +381,9 @@ int main(void) {
   RUN(settings_menu_changes_values);
   RUN(filters_keep_pixel_alignment);
   RUN(bindings_remap_and_persist);
+  RUN(touch_layout_fits_screens);
+  RUN(touch_hits_each_control);
+  RUN(touch_draw_lights_held_buttons);
+  RUN(touch_labels_centre_on_their_ink);
   return 0;
 }
