@@ -55,6 +55,15 @@ Linux (Debian/Ubuntu; other distros need the same libraries): `tools/linux_deps.
 compiler, CMake, Ninja and SDL's build dependencies, then build as above with
 `-DORACLES_SDL_VENDORED=ON` (distributions rarely ship SDL3 yet).
 
+Windows (64-bit) is cross-compiled with MinGW-w64 (`brew install mingw-w64` or `apt install
+mingw-w64`); the result is a single `Oracles.exe` that needs only system DLLs. Wine runs the tests.
+
+```bash
+cmake -S . -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DORACLES_SDL_VENDORED=ON
+cmake --build build-win
+wine build-win/test_native_tas.exe
+```
+
 ## Playing
 
 Two apps, same game:
