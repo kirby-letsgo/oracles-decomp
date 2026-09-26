@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: oracles
+      POSTGRES_PASSWORD: oracles
+      POSTGRES_DB: oracles_sync
+    ports:
+      - '5433:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:

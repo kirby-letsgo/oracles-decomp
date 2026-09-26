@@ -4,6 +4,7 @@ name: release
 on:
   push:
     branches: [main]
+    paths-ignore: ['sync-server/**']
   workflow_dispatch:
 
 concurrency:
