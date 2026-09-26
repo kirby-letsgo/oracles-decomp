@@ -37,7 +37,7 @@ static int cluster_y(int above, int below, bool item_buttons) {
   return (above + below + reach - DPAD / 2) / 2;
 }
 
-void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, bool item_buttons) {
+void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, bool item_buttons, bool fill) {
   memset(l, 0, sizeof *l);
   l->screen_w = screen_w;
   l->screen_h = screen_h;
@@ -59,14 +59,23 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
   l->h = ceil_div(screen_h, s);
   int st = ceil_div(safe.y, s), sb = ceil_div(screen_h - safe.y - safe.h, s);
   int sl = ceil_div(safe.x, s), sr = ceil_div(screen_w - safe.x - safe.w, s);
-  int gx = tall ? imax(screen_w - UI_W * s, 0) / 2 : safe.x + imax(safe.w - UI_W * s, 0) / 2;
-  int gy = tall ? safe.y + imax(safe.h - UI_H * s, 0) / 2 : imax(screen_h - UI_H * s, 0) / 2;
-  l->game = (UiRect){gx / s, gy / s, UI_W, UI_H};
-  if (!overlay) return;
   int left = sl + MARGIN, right = l->w - sr - MARGIN, top = st + MARGIN, bottom = l->h - sb - MARGIN;
+  // fill: the largest fractional scale that fits, in portrait still leaving the controls their room
+  float zoom = s;
+  if (fill) {
+    zoom = fminf((float)fit_w / UI_W, (float)fit_h / UI_H);
+    if (l->portrait) zoom = fminf((float)screen_w / UI_W, (float)(bottom - top - (need - UI_H)) * s / UI_H);
+    zoom = fmaxf(zoom, (float)s);
+  }
+  int pw = (int)(UI_W * zoom), ph = (int)(UI_H * zoom);
+  int gx = tall ? imax(screen_w - pw, 0) / 2 : safe.x + imax(safe.w - pw, 0) / 2;
+  int gy = l->portrait ? top * s : tall ? safe.y + imax(safe.h - ph, 0) / 2 : imax(screen_h - ph, 0) / 2;
+  if (!fill) { gx -= gx % s; gy -= gy % s; }
+  l->game_px = (UiRect){gx, gy, pw, ph};
+  l->game = (UiRect){gx / s, gy / s, ceil_div(gx + pw, s) - gx / s, ceil_div(gy + ph, s) - gy / s};
+  if (!overlay) return;
   if (l->portrait) {
-    l->game.y = top;
-    int row = l->game.y + UI_H + 6, pills = bottom - PILL_H;
+    int row = l->game.y + l->game.h + 6, pills = bottom - PILL_H;
     l->button[ACT_FAST] = (UiRect){left, row, pill_w(ACT_FAST), PILL_H};
     l->button[ACT_PAUSE] = (UiRect){right - pill_w(ACT_PAUSE), row, pill_w(ACT_PAUSE), PILL_H};
     l->button[ACT_SELECT] = (UiRect){l->w / 2 - 4 - pill_w(ACT_SELECT), pills, pill_w(ACT_SELECT), PILL_H};
@@ -130,16 +139,10 @@ static void put(const Ink *k, int x, int y, UiColor c) {
   p[0] = c.r; p[1] = c.g; p[2] = c.b; p[3] = k->alpha;
 }
 
-static bool glyph_row_inked(const UiFont *font, uint8_t ch, int r) { return ch < 128 && font->glyph[ch][r] != 0xff; }
-
 // Centred on its ink, not its cell: the font's letters sit low in their 16-pixel cells.
 static void text(const Ink *k, const UiFont *font, int cx, int cy, const char *s, UiColor c) {
-  if (!font || !font->loaded) return;
-  int top = UI_GLYPH_H, bottom = -1;
-  for (const char *p = s; *p; p++)
-    for (int r = 0; r < UI_GLYPH_H; r++)
-      if (glyph_row_inked(font, (uint8_t)*p, r)) { top = imin(top, r); bottom = imax(bottom, r); }
-  if (bottom < 0) return;
+  int top, bottom;
+  if (!font || !ui_text_ink(font, s, &top, &bottom)) return;
   int x = cx - (int)strlen(s) * UI_GLYPH_W / 2, y = cy - (top + bottom + 1) / 2;
   for (; *s; s++, x += UI_GLYPH_W)
     for (int r = 0; r < UI_GLYPH_H; r++)

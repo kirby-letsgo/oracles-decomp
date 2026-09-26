@@ -37,3 +37,5 @@ void slots_draw(const SlotsMenu *m, const UiFont *font, const UiTheme *t, const 
 
 // The game's 160x144 RGB24 frame, darkened, as a menu background.
 void ui_dim_rgb(UiCanvas *c, const uint8_t *rgb);
+// A one-line message in a box near the bottom of the screen, drawn over what the canvas holds.
+void ui_toast(UiCanvas *c, const UiFont *font, const UiTheme *t, const char *msg);

@@ -227,7 +227,7 @@ static bool any_slot(const char *dir) {
 static char settings_path[1100];
 
 static void settings_store(void) {
-  char text[256];
+  char text[1024];
   int n = settings_format(&settings, text, sizeof text);
   write_file(settings_path, text, (size_t)n);
 }
@@ -241,7 +241,13 @@ static void apply_window_settings(SDL_Window *win) {
 
 static float volume_gain(bool muted) { return muted ? 0.0f : settings.volume / 10.0f; }
 
-static uint64_t show_status(SDL_Window *win, const char *title, const char *status, uint64_t frames);
+// A message shown over the screen for two seconds (state saved, item set, ...).
+static char toast[40];
+static uint64_t toast_until;
+static void show_status(const char *msg) {
+  snprintf(toast, sizeof toast, "%s", msg);
+  toast_until = SDL_GetTicks() + 2000;
+}
 
 static void apply_game_settings(void) {
   features.fast_text = settings.fast_text;
@@ -268,11 +274,11 @@ static void item_buttons_store(const char *dir) {
 }
 
 // X/Y: in the inventory they take the highlighted item; in play they use theirs while held.
-static void item_button(GB *gb, const char *dir, int slot, bool down, SDL_Window *win, const char *title, uint64_t *title_reset, uint64_t frames) {
+static void item_button(GB *gb, const char *dir, int slot, bool down) {
   if (!down) { features_slot_release(gb, slot); slot_joy[slot] = 0; return; }
   if (features_assign_slot(gb, slot)) {
     item_buttons_store(dir);
-    *title_reset = show_status(win, title, slot ? "item set on Y" : "item set on X", frames);
+    show_status(slot ? "ITEM SET ON Y" : "ITEM SET ON X");
     return;
   }
   slot_joy[slot] = features_slot_press(gb, slot);
@@ -331,7 +337,9 @@ static bool poll_event(SDL_Event *ev) {
 }
 
 // Sharp and uncorrected frames go straight to the 160x144 texture; filters render at the layout's
-// integer scale into a texture of that size, shown 1:1. The overlay is drawn in game pixels too.
+// integer scale into a texture of that size, shown 1:1. A fractional (fill) scale renders at the
+// next whole scale and shrinks that smoothly, so pixels stay sharp without uneven widths. The
+// overlay is drawn in game pixels too.
 #define MAX_FILTER_SCALE 12
 static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
   static SDL_Texture *big, *over;
@@ -341,19 +349,26 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
   SDL_GetCurrentRenderOutputSize(ren, &w, &h);
   SDL_Rect safe = {0, 0, w, h};
   SDL_GetRenderSafeArea(ren, &safe);
-  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots);
+  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots, settings.fill);
+  if (toast[0] && SDL_GetTicks() < toast_until && overlay_font && overlay_font->loaded) {
+    static UiCanvas with_toast;
+    memcpy(with_toast.px, rgb, sizeof with_toast.px);
+    ui_toast(&with_toast, overlay_font, &overlay_theme, toast);
+    rgb = &with_toast.px[0][0][0];
+  }
   static int logged_w, logged_h, logged_scale;
   if (w != logged_w || h != logged_h || layout.scale != logged_scale) {
     fprintf(stderr, "screen %dx%d, safe area %d,%d %dx%d, scale %d\n", w, h, safe.x, safe.y, safe.w, safe.h, layout.scale);
     logged_w = w; logged_h = h; logged_scale = layout.scale;
   }
-  int scale = SDL_min(layout.scale, MAX_FILTER_SCALE);
-  SDL_FRect dst = {(float)(layout.game.x * layout.scale), (float)(layout.game.y * layout.scale), (float)(FB_W * layout.scale), (float)(FB_H * layout.scale)};
+  bool fractional = layout.game_px.w % FB_W != 0;
+  int scale = SDL_min(fractional ? (layout.game_px.w + FB_W - 1) / FB_W : layout.scale, MAX_FILTER_SCALE);
+  SDL_FRect dst = {(float)layout.game_px.x, (float)layout.game_px.y, (float)layout.game_px.w, (float)layout.game_px.h};
   if (touch_on) SDL_SetRenderDrawColor(ren, overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b, 255);
   SDL_RenderClear(ren);
   SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
   if (touch_on) SDL_RenderFillRect(ren, &dst);
-  if ((settings.filter == FILTER_SHARP || scale < 2) && !settings.gbc_colours) {
+  if (!fractional && (settings.filter == FILTER_SHARP || scale < 2) && !settings.gbc_colours) {
     SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
     SDL_RenderTexture(ren, tex, NULL, &dst);
   } else {
@@ -365,6 +380,7 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
       buf = malloc((size_t)FB_W * scale * FB_H * scale * 3);
       big_scale = scale;
     }
+    SDL_SetTextureScaleMode(big, fractional ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
     ui_filter(rgb, settings.gbc_colours, scale < 2 ? FILTER_SHARP : settings.filter, scale, buf);
     SDL_UpdateTexture(big, NULL, buf, FB_W * scale * 3);
     SDL_RenderTexture(ren, big, NULL, &dst);
@@ -682,12 +698,6 @@ static uint8_t boot_input(GB *gb, BootDriver *d, uint64_t frame) {
 #define NO_SAVE UINT64_MAX
 #define PARK_TIMEOUT 600
 
-static uint64_t show_status(SDL_Window *win, const char *title, const char *status, uint64_t frames) {
-  char msg[96];
-  snprintf(msg, sizeof msg, "%s - %s", title, status);
-  SDL_SetWindowTitle(win, msg);
-  return frames + 120;
-}
 
 typedef enum { GAME_TO_LAUNCHER, GAME_QUIT, GAME_FAILED } GameEnd;
 typedef enum { MODE_PLAY, MODE_PAUSING, MODE_PAUSED, MODE_QUITTING } GameMode;
@@ -776,7 +786,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   gb->input_at = live_input;
   live_joy = slot_joy[0] = slot_joy[1] = 0;
   item_buttons_load(dir);
-  uint64_t frames = 0, title_reset = 0, save_from = NO_SAVE, park_from = 0;
+  uint64_t frames = 0, save_from = NO_SAVE, park_from = 0;
   bool muted = false, parked = false, fast = false;
   GameMode mode = MODE_PLAY;
   GameEnd end = GAME_QUIT;
@@ -814,11 +824,11 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
           if (slot == -2) { end = GAME_QUIT; running = false; if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); }
           else if (slot >= 0 && item == PAUSE_SAVE) {
             bool ok = slot_save(gb, dir, slot, paused_rgb);
-            title_reset = show_status(win, title, ok ? "state saved" : "could not save state", frames);
+            show_status(ok ? "STATE SAVED" : "COULD NOT SAVE STATE");
             pause.can_load = pause.can_load || ok;
           } else if (slot >= 0) {
             bool ok = slot_load(gb, dir, slot);
-            title_reset = show_status(win, title, ok ? "state loaded" : "could not load state", frames);
+            show_status(ok ? "STATE LOADED" : "COULD NOT LOAD STATE");
             if (ok) { mode = MODE_PLAY; if (audio) SDL_ResumeAudioStreamDevice(audio); }
           }
         } else if (a == MENU_PICK && item == PAUSE_SETTINGS) {
@@ -841,11 +851,12 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R) {
           bool ok = slot_load(gb, dir, 0);
           if (ok) { live_joy = 0; save_from = NO_SAVE; }
-          title_reset = show_status(win, title, ok ? "state 1 loaded" : "no state in slot 1", frames);
+          show_status(ok ? "STATE 1 LOADED" : "NO STATE IN SLOT 1");
         }
         else if (ev.key.scancode == SDL_SCANCODE_M) {
           muted = !muted;
           if (audio) SDL_SetAudioStreamGain(audio, volume_gain(muted));
+          show_status(muted ? "SOUND OFF" : "SOUND ON");
         }
         else press |= action_bit(bindings_key_action(&settings.bindings, (int)ev.key.scancode));
         break;
@@ -869,12 +880,12 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         if (press >> a & 1) {
           if (a == ACT_FAST) fast = true;
           else if (a == ACT_SWAP) features_quick_swap(gb);
-          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, true, win, title, &title_reset, frames);
+          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, true);
           else live_joy |= joy_of((Action)a);
         }
         if (release >> a & 1) {
           if (a == ACT_FAST) fast = false;
-          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, false, win, title, &title_reset, frames);
+          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, false);
           else live_joy &= (uint8_t)~joy_of((Action)a);
         }
       }
@@ -927,13 +938,12 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     if (save_from != NO_SAVE && threads_parked(gb)) {
       framebuffer_to_rgb(gb->sample->framebuffer, rgb);
       bool ok = slot_save(gb, dir, 0, rgb);
-      title_reset = show_status(win, title, ok ? "state 1 saved" : "could not save state", frames);
+      show_status(ok ? "STATE 1 SAVED" : "COULD NOT SAVE STATE");
       save_from = NO_SAVE;
     } else if (save_from != NO_SAVE && frames - save_from > PARK_TIMEOUT) {
-      title_reset = show_status(win, title, "could not save state here", frames);
+      show_status("CAN'T SAVE HERE");
       save_from = NO_SAVE;
     }
-    if (title_reset && frames >= title_reset) { SDL_SetWindowTitle(win, title); title_reset = 0; }
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (audio && mode == MODE_PLAY) SDL_PutAudioStreamData(audio, samples, n * 4);
     framebuffer_to_rgb(gb->sample->framebuffer, rgb);

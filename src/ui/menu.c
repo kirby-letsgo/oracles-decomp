@@ -8,6 +8,17 @@ void ui_dim_rgb(UiCanvas *c, const uint8_t *rgb) {
       for (int k = 0; k < 3; k++) c->px[y][x][k] = rgb[(y * UI_W + x) * 3 + k] / 3;
 }
 
+// Sized to the text's ink, so it fits in the strip under the pause menu's box.
+void ui_toast(UiCanvas *c, const UiFont *font, const UiTheme *t, const char *msg) {
+  int top, bottom;
+  if (!ui_text_ink(font, msg, &top, &bottom)) return;
+  int w = ui_text_width(msg) + 10, h = bottom - top + 1 + 4;
+  if (w > UI_W) w = UI_W;
+  int x = (UI_W - w) / 2, y = UI_H - h;
+  ui_box(c, x, y, w, h, t->border, t->panel);
+  ui_text(c, font, x + 5, y + 2 - top, msg, t->text);
+}
+
 static const char *const pause_labels[PAUSE_ITEMS] = {"RESUME", "SAVE STATE", "LOAD STATE", "SETTINGS", "QUIT"};
 
 static bool pause_enabled(const PauseMenu *m, PauseItem i) {

@@ -36,5 +36,8 @@ void ui_glyph(UiCanvas *c, const UiFont *font, int x, int y, uint8_t ch, UiColor
 // Draws text at pixel (x, y); returns the width in pixels. Characters outside the font are skipped.
 int ui_text(UiCanvas *c, const UiFont *font, int x, int y, const char *s, UiColor color);
 int ui_text_width(const char *s);
+// The first and last glyph rows with ink in the text (the font's letters sit low in their cells);
+// false when nothing in it has ink.
+bool ui_text_ink(const UiFont *font, const char *s, int *top, int *bottom);
 // Copies the canvas into a packed RGB24 buffer (UI_W * UI_H * 3 bytes).
 void ui_to_rgb(const UiCanvas *c, uint8_t *rgb);
