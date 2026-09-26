@@ -194,6 +194,22 @@ static void settings_menu_changes_values(void) {
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
   ASSERT_EQ(m.sel, SET_CONTROLS);
+  settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_ACCEPT, &row);
+  ASSERT(s.four_slots);
+  settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_ACCEPT, &row);
+  ASSERT(s.quick_swap);
+  settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_ACCEPT, &row);
+  ASSERT(s.fast_menus);
+  settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_ACCEPT, &row);
+  ASSERT(s.fast_text);
+  settings_press(&m, &s, UI_DOWN, &row);
+  settings_press(&m, &s, UI_DOWN, &row);
+  settings_press(&m, &s, UI_DOWN, &row);
+  settings_press(&m, &s, UI_DOWN, &row);
   ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
   ASSERT_EQ(row, SET_CONTROLS);
   ASSERT_EQ(settings_press(&m, &s, UI_BACK, &row), MENU_BACK);
@@ -234,8 +250,11 @@ static void bindings_remap_and_persist(void) {
   settings_default(&back);
   settings_parse(&back, buf);
   ASSERT(memcmp(&back.bindings, &s.bindings, sizeof s.bindings) == 0);
-  settings_parse(&back, "keys=1,2;3\n");                        // truncated: ignored
+  settings_parse(&back, "keys=1,2;3\n");                        // malformed: ignored
   ASSERT(memcmp(&back.bindings, &s.bindings, sizeof s.bindings) == 0);
+  settings_parse(&back, "keys=4,-1\n");                         // older, shorter line: the rest kept
+  ASSERT_EQ(back.bindings.key[ACT_UP][0], 4);
+  ASSERT_EQ(back.bindings.key[ACT_DOWN][0], s.bindings.key[ACT_DOWN][0]);
   ControlsMenu m;
   controls_open(&m);
   controls_press(&m, &s.bindings, UI_DOWN);                     // DOWN

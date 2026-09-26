@@ -6,7 +6,7 @@
 #include "ui/launcher.h"
 #include "ui/menu.h"
 
-typedef enum { ACT_UP, ACT_DOWN, ACT_LEFT, ACT_RIGHT, ACT_A, ACT_B, ACT_START, ACT_SELECT, ACT_PAUSE, ACT_FAST, ACTIONS } Action;
+typedef enum { ACT_UP, ACT_DOWN, ACT_LEFT, ACT_RIGHT, ACT_A, ACT_B, ACT_START, ACT_SELECT, ACT_PAUSE, ACT_FAST, ACT_SWAP, ACT_ITEM_X, ACT_ITEM_Y, ACTIONS } Action;
 #define KEYS_PER_ACTION 2
 #define NO_BINDING (-1)
 #define PAD_RIGHT_TRIGGER 100   // the right trigger, an axis, stands in as a button

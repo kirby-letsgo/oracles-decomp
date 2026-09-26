@@ -12,10 +12,14 @@ typedef struct {
   bool fullscreen;
   ScreenFilter filter;
   bool gbc_colours;             // the Game Boy Color screen's paler, warmer colours
+  bool fast_text;               // each line of a text box appears at once
+  bool quick_swap;              // the Swap button exchanges the A and B items
+  bool fast_menus;              // quick fades into and out of the inventory and map
+  bool four_slots;              // Item X / Item Y buttons, assigned in the inventory
   Bindings bindings;
 } Settings;
 
-typedef enum { SET_VOLUME, SET_SCREEN, SET_COLOURS, SET_FULLSCREEN, SET_CONTROLS, SET_ROWS } SettingsRow;
+typedef enum { SET_VOLUME, SET_SCREEN, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_QUICK_SWAP, SET_FOUR_SLOTS, SET_CONTROLS, SET_ROWS } SettingsRow;
 
 typedef struct {
   SettingsRow sel;

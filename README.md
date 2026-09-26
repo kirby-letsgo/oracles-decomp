@@ -72,8 +72,11 @@ from the last quit), Load state, and the title screen. Choosing a file boots str
 Controls: arrow keys to move, `X` / `Z` for A / B, Return for Start, Backspace or Right Shift for
 Select, `M` to mute, F11 or Cmd+F for fullscreen, hold Tab (gamepad: right trigger) to fast-forward.
 The window resizes in whole-pixel steps. Settings (from the launcher or the pause menu): volume,
-screen filter (sharp, scanlines, LCD grid, CRT), Game Boy Color colours, fullscreen, and
-controls: every button, Pause and Fast-forward can be remapped for keyboard and gamepad.
+screen filter (sharp, scanlines, LCD grid, CRT), Game Boy Color colours, fullscreen, controls
+(every button, Pause, Fast-forward, Swap and the item buttons remap for keyboard and gamepad), and
+optional quality-of-life toggles, all off by default: fast text, faster menus, quick swap (`C`
+swaps the A and B items) and 4 slots (`A`/`S` are two more item buttons: highlight an item in the
+inventory and press one to assign it, then hold it in play to use the item).
 
 - `oracles-native`: Esc (or the gamepad's Guide button) pauses: Resume, Save state, Load state (4
   slots with thumbnails) and Quit, which saves a Resume state and returns to the launcher. Cmd+S /

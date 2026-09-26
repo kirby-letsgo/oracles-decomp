@@ -4,12 +4,14 @@
 #include <string.h>
 
 // SDL scancodes: UP 82, DOWN 81, LEFT 80, RIGHT 79, X 27, Z 29, RETURN 40, ESCAPE 41, BACKSPACE 42,
-// TAB 43, RSHIFT 229. SDL gamepad buttons: SOUTH 0, WEST 2, BACK 4, GUIDE 5, START 6, DPAD 11-14.
+// TAB 43, RSHIFT 229, C 6, A 4, S 22. SDL gamepad buttons: SOUTH 0, EAST 1, WEST 2, NORTH 3, BACK 4,
+// GUIDE 5, START 6, LEFT_SHOULDER 9, DPAD 11-14.
 static const int default_keys[ACTIONS][KEYS_PER_ACTION] = {
   {82, NO_BINDING}, {81, NO_BINDING}, {80, NO_BINDING}, {79, NO_BINDING}, {27, NO_BINDING},
-  {29, NO_BINDING}, {40, NO_BINDING}, {42, 229}, {41, NO_BINDING}, {43, NO_BINDING},
+  {29, NO_BINDING}, {40, NO_BINDING}, {42, 229}, {41, NO_BINDING}, {43, NO_BINDING}, {6, NO_BINDING},
+  {4, NO_BINDING}, {22, NO_BINDING},
 };
-static const int default_pads[ACTIONS] = {11, 12, 13, 14, 0, 2, 6, 4, 5, PAD_RIGHT_TRIGGER};
+static const int default_pads[ACTIONS] = {11, 12, 13, 14, 0, 2, 6, 4, 5, PAD_RIGHT_TRIGGER, 9, 3, 1};
 
 void bindings_default(Bindings *b) {
   memcpy(b->key, default_keys, sizeof b->key);
@@ -56,11 +58,12 @@ int bindings_format(const Bindings *b, char *out, size_t size) {
   return n;
 }
 
-// Parsed into a copy first, so a truncated or malformed line changes nothing.
+// Parsed into a copy first, so a malformed line changes nothing. A line that simply ends early (a
+// file from before an action existed) keeps the remaining actions' current bindings.
 void bindings_parse_line(Bindings *b, const char *key, const char *value) {
   Bindings t = *b;
   const char *p = value;
-  for (int a = 0; a < ACTIONS; a++) {
+  for (int a = 0; a < ACTIONS && *p; a++) {
     char *end;
     if (!strcmp(key, "keys")) {
       for (int k = 0; k < KEYS_PER_ACTION; k++) {
@@ -112,7 +115,7 @@ void controls_capture_pad(ControlsMenu *m, Bindings *b, int button) {
 
 void controls_draw(const ControlsMenu *m, const Bindings *b, const UiFont *font, const UiTheme *t, const uint8_t *game_rgb,
                    const char *(*key_name)(int), const char *(*pad_name)(int), UiCanvas *c) {
-  static const char *const labels[CTRL_ROWS] = {"UP", "DOWN", "LEFT", "RIGHT", "A", "B", "START", "SELECT", "PAUSE", "FAST", "RESET"};
+  static const char *const labels[CTRL_ROWS] = {"UP", "DOWN", "LEFT", "RIGHT", "A", "B", "START", "SELECT", "PAUSE", "FAST", "SWAP", "ITEM X", "ITEM Y", "RESET"};
   if (game_rgb) ui_dim_rgb(c, game_rgb);
   else ui_clear(c, t->bg);
   ui_box(c, 0, 0, UI_W, UI_H, t->border, t->panel);

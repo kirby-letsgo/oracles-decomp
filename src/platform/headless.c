@@ -5,6 +5,7 @@
 #include "platform/tas.h"
 #include "platform/setup.h"
 #include "game/game.h"
+#include "game/features.h"
 #include "assets/assets.h"
 #include "hooks/hooks.h"
 #include "rt/fibers.h"
@@ -20,7 +21,8 @@ extern int dbg_log_dma, dbg_log_lcdc, dbg_log_ints;
 
 
 static uint64_t tas_input_offset;
-static uint8_t tas_input_cb(void *ctx, uint64_t frame) { const Tas *t = ctx; return t->count ? tas_input_at(t, frame + tas_input_offset) : 0; }
+static uint8_t extra_joy;       // buttons a feature test holds on top of the movie
+static uint8_t tas_input_cb(void *ctx, uint64_t frame) { const Tas *t = ctx; return (t->count ? tas_input_at(t, frame + tas_input_offset) : 0) | extra_joy; }
 
 static void serial_print(void *ctx, uint8_t b) { (void)ctx; fputc(b, stdout); fflush(stdout); }
 
@@ -84,6 +86,17 @@ static void on_frame(GB *gb, const GBSample *sm, void *ctx) {
       }
     }
   }
+  features_frame(gb);
+  // SLOT_TEST="item:from-to" puts item on X and holds X over those frames
+  if (getenv("SLOT_TEST")) {
+    unsigned item = 0; unsigned long long from = 0, to = 0;
+    sscanf(getenv("SLOT_TEST"), "%x:%llu-%llu", &item, &from, &to);
+    features.slot_item[0] = (uint8_t)item;
+    if (frame == from) { extra_joy = features_slot_press(gb, 0); fprintf(stderr, "slot press at %llu: joy %02x, B now %02x\n", (unsigned long long)frame, extra_joy, sm->wram[0][wInventoryB & 0xfff]); }
+    if (frame == to) { features_slot_release(gb, 0); extra_joy = 0; fprintf(stderr, "slot release at %llu\n", (unsigned long long)frame); }
+  }
+  if (getenv("SWAP_AT") && frame == strtoull(getenv("SWAP_AT"), NULL, 10))
+    fprintf(stderr, "quick swap at frame %llu: %s\n", (unsigned long long)frame, features_quick_swap(gb) ? "swapped" : "not allowed now");
   if (c->out_dir && ((c->shot_every && frame % c->shot_every == 0) || screenshot_wanted(c->shot_at, frame))) {
     char path[1024];
     snprintf(path, sizeof path, "%s/frame_%07llu.png", c->out_dir, (unsigned long long)frame);
@@ -173,6 +186,8 @@ int main(int argc, char **argv) {
   }
   const char *init_ram = arg_value(argc, argv, "--init-ram");
   if (arg_flag(argc, argv, "--serial")) gb->serial_out = serial_print;
+  // ORACLES_FEATURES="fast_text,..." turns on the app's optional behaviour, to test it headless
+  if ((p = getenv("ORACLES_FEATURES"))) { features.fast_text = strstr(p, "fast_text") != NULL; features.quick_swap = strstr(p, "quick_swap") != NULL; features.fast_menus = strstr(p, "fast_menus") != NULL; features.four_slots = strstr(p, "four_slots") != NULL; }
   if (getenv("PCTRACE") || getenv("HOOKLOG")) setvbuf(stdout, NULL, _IOLBF, 0);
   hooks_init();
   static uint64_t il_a, il_b; if (getenv("INTLOG")) sscanf(getenv("INTLOG"), "%llu-%llu", (unsigned long long *)&il_a, (unsigned long long *)&il_b);

@@ -11,6 +11,10 @@ void settings_default(Settings *s) {
   s->fullscreen = false;
   s->filter = FILTER_SHARP;
   s->gbc_colours = false;
+  s->fast_text = false;
+  s->quick_swap = false;
+  s->fast_menus = false;
+  s->four_slots = false;
   bindings_default(&s->bindings);
 }
 
@@ -25,6 +29,10 @@ void settings_parse(Settings *s, const char *text) {
       if (!strcmp(key, "volume")) { int v = atoi(value); if (v >= 0 && v <= 10) s->volume = v; }
       else if (!strcmp(key, "fullscreen")) s->fullscreen = !strcmp(value, "on");
       else if (!strcmp(key, "gbc_colours")) s->gbc_colours = !strcmp(value, "on");
+      else if (!strcmp(key, "fast_text")) s->fast_text = !strcmp(value, "on");
+      else if (!strcmp(key, "quick_swap")) s->quick_swap = !strcmp(value, "on");
+      else if (!strcmp(key, "fast_menus")) s->fast_menus = !strcmp(value, "on");
+      else if (!strcmp(key, "four_slots")) s->four_slots = !strcmp(value, "on");
       else if (!strcmp(key, "filter")) {
         for (int i = 0; i < FILTERS; i++) if (!strcmp(value, filter_keys[i])) s->filter = (ScreenFilter)i;
       }
@@ -35,8 +43,9 @@ void settings_parse(Settings *s, const char *text) {
 }
 
 int settings_format(const Settings *s, char *out, size_t size) {
-  int n = snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\ngbc_colours=%s\n", s->volume,
-                   s->fullscreen ? "on" : "off", filter_keys[s->filter], s->gbc_colours ? "on" : "off");
+  int n = snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\ngbc_colours=%s\nfast_text=%s\nfast_menus=%s\nquick_swap=%s\nfour_slots=%s\n",
+                   s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->gbc_colours ? "on" : "off",
+                   s->fast_text ? "on" : "off", s->fast_menus ? "on" : "off", s->quick_swap ? "on" : "off", s->four_slots ? "on" : "off");
   if (n < (int)size) n += bindings_format(&s->bindings, out + n, size - n);
   return n;
 }
@@ -60,19 +69,27 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case SET_SCREEN: s->filter = (ScreenFilter)((s->filter + dir + FILTERS) % FILTERS); break;
   case SET_COLOURS: if (dir) s->gbc_colours = !s->gbc_colours; break;
   case SET_FULLSCREEN: if (dir) s->fullscreen = !s->fullscreen; break;
+  case SET_FAST_TEXT: if (dir) s->fast_text = !s->fast_text; break;
+  case SET_FAST_MENUS: if (dir) s->fast_menus = !s->fast_menus; break;
+  case SET_QUICK_SWAP: if (dir) s->quick_swap = !s->quick_swap; break;
+  case SET_FOUR_SLOTS: if (dir) s->four_slots = !s->four_slots; break;
   default: break;
   }
   return MENU_NONE;
 }
 
 void settings_draw(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, const uint8_t *game_rgb, UiCanvas *c) {
-  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "COLOURS", "FULLSCREEN", "CONTROLS"};
+  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS"};
   if (game_rgb) ui_dim_rgb(c, game_rgb);
   else ui_clear(c, t->bg);
   ui_box(c, 0, 0, UI_W, UI_H, t->border, t->panel);
   ui_text(c, font, 4, 0, "SETTINGS", t->highlight);
-  for (int i = 0; i < SET_ROWS; i++) {
-    int y = 20 + i * 18;
+  enum { VISIBLE = 6 };
+  int first = (int)m->sel - VISIBLE / 2;
+  if (first > SET_ROWS - VISIBLE) first = SET_ROWS - VISIBLE;
+  if (first < 0) first = 0;
+  for (int i = first; i < first + VISIBLE && i < SET_ROWS; i++) {
+    int y = 18 + (i - first) * 17;
     bool on = (int)m->sel == i;
     UiColor fg = on ? t->highlight : t->text;
     if (on) ui_glyph(c, font, 2, y, '>', t->highlight);
@@ -83,6 +100,10 @@ void settings_draw(const SettingsMenu *m, const Settings *s, const UiFont *font,
     case SET_SCREEN: snprintf(v, sizeof v, "%s", filter_names[s->filter]); break;
     case SET_COLOURS: snprintf(v, sizeof v, "%s", s->gbc_colours ? "GBC" : "VIVID"); break;
     case SET_FULLSCREEN: snprintf(v, sizeof v, "%s", s->fullscreen ? "ON" : "OFF"); break;
+    case SET_FAST_TEXT: snprintf(v, sizeof v, "%s", s->fast_text ? "ON" : "OFF"); break;
+    case SET_FAST_MENUS: snprintf(v, sizeof v, "%s", s->fast_menus ? "ON" : "OFF"); break;
+    case SET_QUICK_SWAP: snprintf(v, sizeof v, "%s", s->quick_swap ? "ON" : "OFF"); break;
+    case SET_FOUR_SLOTS: snprintf(v, sizeof v, "%s", s->four_slots ? "ON" : "OFF"); break;
     default: break;
     }
     if (*v) ui_text(c, font, UI_W - 4 - ui_text_width(v), y, v, fg);

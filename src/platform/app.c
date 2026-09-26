@@ -17,6 +17,7 @@
 #include "platform/window.h"
 #include "rt/fibers.h"
 #include "game/game.h"
+#include "game/features.h"
 #include "assets/assets.h"
 #include "ui/launcher.h"
 #include "ui/menu.h"
@@ -95,7 +96,7 @@ static bool cached(const char *cache, const char *game) {
 static Settings settings;
 
 static uint8_t joy_of(Action a) {
-  static const uint8_t bits[ACTIONS] = {JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT, JOY_A, JOY_B, JOY_START, JOY_SELECT, 0, 0};
+  static const uint8_t bits[ACTIONS] = {JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT, JOY_A, JOY_B, JOY_START, JOY_SELECT, 0, 0, 0, 0, 0};
   return a < ACTIONS ? bits[a] : 0;
 }
 static uint8_t key_bit(SDL_Scancode sc) { return joy_of(bindings_key_action(&settings.bindings, (int)sc)); }
@@ -116,8 +117,8 @@ static const char *pad_name(int button) {
   return buf;
 }
 
-static uint8_t live_joy;
-static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy; }
+static uint8_t live_joy, slot_joy[2];
+static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy | slot_joy[0] | slot_joy[1]; }
 
 static char picked[1200];
 static int pick_state;
@@ -229,6 +230,43 @@ static void apply_window_settings(SDL_Window *win) {
 }
 
 static float volume_gain(bool muted) { return muted ? 0.0f : settings.volume / 10.0f; }
+
+static uint64_t show_status(SDL_Window *win, const char *title, const char *status, uint64_t frames);
+
+static void apply_game_settings(void) {
+  features.fast_text = settings.fast_text;
+  features.quick_swap = settings.quick_swap;
+  features.fast_menus = settings.fast_menus;
+  features.four_slots = settings.four_slots;
+}
+
+// The items on X and Y, per game: two bytes in item_buttons.
+static void item_buttons_load(const char *dir) {
+  char path[1300];
+  size_t n;
+  snprintf(path, sizeof path, "%s/item_buttons", dir);
+  uint8_t *b = oracles_read_file(path, &n);
+  features.slot_item[0] = b && n >= 2 ? b[0] : 0;
+  features.slot_item[1] = b && n >= 2 ? b[1] : 0;
+  free(b);
+}
+
+static void item_buttons_store(const char *dir) {
+  char path[1300];
+  snprintf(path, sizeof path, "%s/item_buttons", dir);
+  write_file(path, features.slot_item, 2);
+}
+
+// X/Y: in the inventory they take the highlighted item; in play they use theirs while held.
+static void item_button(GB *gb, const char *dir, int slot, bool down, SDL_Window *win, const char *title, uint64_t *title_reset, uint64_t frames) {
+  if (!down) { features_slot_release(gb, slot); slot_joy[slot] = 0; return; }
+  if (features_assign_slot(gb, slot)) {
+    item_buttons_store(dir);
+    *title_reset = show_status(win, title, slot ? "item set on Y" : "item set on X", frames);
+    return;
+  }
+  slot_joy[slot] = features_slot_press(gb, slot);
+}
 
 // Sharp and uncorrected frames go straight to the 160x144 texture; filters render at the window's
 // integer scale into a texture of that size, which the logical presentation then shows 1:1.
@@ -422,6 +460,7 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       if (a == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, font, theme, game_rgb)) return false;
       if (settings.fullscreen != was_full) apply_window_settings(win);
       if (audio) SDL_SetAudioStreamGain(audio, volume_gain(false));
+      apply_game_settings();
       settings_store();
     }
     settings_draw(&m, &settings, font, theme, game_rgb, &canvas);
@@ -586,7 +625,8 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   static SlotsMenu slots;
   PauseMenu pause;
   gb->input_at = live_input;
-  live_joy = 0;
+  live_joy = slot_joy[0] = slot_joy[1] = 0;
+  item_buttons_load(dir);
   uint64_t frames = 0, title_reset = 0, save_from = NO_SAVE, park_from = 0;
   bool muted = false, parked = false, fast = false;
   GameMode mode = MODE_PLAY;
@@ -659,10 +699,15 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
           if (audio) SDL_SetAudioStreamGain(audio, volume_gain(muted));
         }
         else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_FAST) fast = true;
+        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_SWAP) { if (!ev.key.repeat) features_quick_swap(gb); }
+        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_X) { if (!ev.key.repeat) item_button(gb, dir, 0, true, win, title, &title_reset, frames); }
+        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_Y) { if (!ev.key.repeat) item_button(gb, dir, 1, true, win, title, &title_reset, frames); }
         else live_joy |= key_bit(ev.key.scancode);
         break;
       case SDL_EVENT_KEY_UP:
         if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_FAST) fast = false;
+        if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_X) item_button(gb, dir, 0, false, win, title, &title_reset, frames);
+        if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_ITEM_Y) item_button(gb, dir, 1, false, win, title, &title_reset, frames);
         live_joy &= ~key_bit(ev.key.scancode);
         break;
       case SDL_EVENT_GAMEPAD_AXIS_MOTION:
@@ -670,10 +715,15 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_FAST) fast = true;
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_SWAP) features_quick_swap(gb);
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_X) item_button(gb, dir, 0, true, win, title, &title_reset, frames);
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_Y) item_button(gb, dir, 1, true, win, title, &title_reset, frames);
         live_joy |= pad_bit(ev.gbutton.button);
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_UP:
         if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_FAST) fast = false;
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_X) item_button(gb, dir, 0, false, win, title, &title_reset, frames);
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_ITEM_Y) item_button(gb, dir, 1, false, win, title, &title_reset, frames);
         live_joy &= ~pad_bit(ev.gbutton.button);
         break;
       }
@@ -689,17 +739,17 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
 
     if (boot.phase != BOOT_OFF) {
       // fast-forward the logos and menus, silently
-      for (int i = 0; i < 8 && boot.phase != BOOT_OFF; i++) { live_joy = boot_input(gb, &boot, frames); gb_run_frame(gb); frames++; }
+      for (int i = 0; i < 8 && boot.phase != BOOT_OFF; i++) { live_joy = boot_input(gb, &boot, frames); features_frame(gb); gb_run_frame(gb); frames++; }
       if (boot.phase == BOOT_OFF) { live_joy = 0; fprintf(stderr, "boot into file %d done at frame %llu\n", boot.file + 1, (unsigned long long)frames); }
       apu_read_samples(&gb->apu, samples, APU_RING);
     } else if (fast && mode == MODE_PLAY) {
       // fast-forward: up to 4 frames per shown frame, paced by the display, without sound
-      for (int i = 0; i < 4; i++) { gb_run_frame(gb); frames++; }
+      for (int i = 0; i < 4; i++) { features_frame(gb); gb_run_frame(gb); frames++; }
       apu_read_samples(&gb->apu, samples, APU_RING);
       SDL_Delay(16);
     } else {
       if (mode == MODE_PLAY && audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
-      gb_run_frame(gb);
+      features_frame(gb); gb_run_frame(gb);
       frames++;
     }
 
@@ -775,6 +825,7 @@ int main(int argc, char **argv) {
     if (z) { z[settings_size] = 0; settings_parse(&settings, z); free(z); } else free(settings_text);
   }
   apply_window_settings(win);
+  apply_game_settings();
 
   // a ROM or --game on the command line starts that game directly; quitting it opens the launcher
   char game[16] = "";
