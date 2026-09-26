@@ -128,6 +128,25 @@ describe('files', () => {
     ]);
   });
 
+  it('lists the current files as plain text for the game', async () => {
+    const code = await newAccount();
+    await upload(code, 'seasons', 'sram.sav', Buffer.from('a'), { 'x-device': 'my phone' });
+    await upload(code, 'seasons', 'state_1', Buffer.from('s'), { 'x-format-version': '7' });
+    await upload(code, 'seasons', 'sram.sav', Buffer.from('b'));
+    const res = await app.inject({ method: 'GET', url: `/accounts/${code}/manifest` });
+    expect(res.headers['content-type']).toMatch(/^text\/plain/);
+    const lines = res.body
+      .trim()
+      .split('\n')
+      .map((l) => l.split(' '));
+    expect(lines).toHaveLength(2);
+    expect(lines[0]!.slice(0, 3)).toEqual(['seasons', 'sram.sav', '2']);
+    expect(lines[0]![4]).toBe('-');
+    expect(lines[1]!.slice(0, 5)).toEqual(['seasons', 'state_1', '1', lines[1]![3], '7']);
+    expect(lines[1]![3]).toMatch(/^[0-9a-f]{64}$/);
+    expect(Number(lines[1]![5])).toBeGreaterThan(1_700_000_000);
+  });
+
   it('only accepts the synced files', async () => {
     const code = await newAccount();
     for (const [game, name] of [

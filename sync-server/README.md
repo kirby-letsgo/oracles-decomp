@@ -14,6 +14,7 @@ new version; the last three are kept.
 | ------ | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `POST` | `/accounts`                                 | new account: `201 {"code": "4827-1930-5561-0284"}` (10 per hour per address)                                      |
 | `GET`  | `/accounts/:code`                           | the current version of every file (game, name, version, size, sha256, device, formatVersion, updatedAt)           |
+| `GET`  | `/accounts/:code/manifest`                  | the same as plain text, one line per file: `game name version sha256 formatVersion\|- updatedAt(unix s) device`   |
 | `PUT`  | `/accounts/:code/files/:game/:name`         | upload (`application/octet-stream`, up to 1 MB): `201 {version, sha256}`, or `200` when unchanged                 |
 | `GET`  | `/accounts/:code/files/:game/:name`         | download the current version (`?version=N` for an older one); headers `x-version`, `x-sha256`, `x-format-version` |
 | `GET`  | `/accounts/:code/files/:game/:name/history` | the kept versions                                                                                                 |

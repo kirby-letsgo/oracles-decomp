@@ -111,6 +111,31 @@ export async function buildApp({
     return `code:${normalizeCode(code ?? '') ?? req.ip}`;
   };
 
+  // The same list as plain text for the game (written in C, no JSON parser): one line per file,
+  // "game name version sha256 formatVersion|- updatedAtUnixSeconds device", the device last.
+  app.get('/accounts/:code/manifest', async (req, reply) => {
+    const { code } = z.object({ code: z.string() }).parse(req.params);
+    const account = await findAccount(code);
+    if (!account) return reply.code(404).type('text/plain').send('no such account\n');
+    const current = await db
+      .selectDistinctOn([files.game, files.name], fileMeta)
+      .from(files)
+      .where(eq(files.accountId, account.id))
+      .orderBy(files.game, files.name, desc(files.version));
+    const lines = current.map((f) =>
+      [
+        f.game,
+        f.name,
+        f.version,
+        f.sha256,
+        f.formatVersion ?? '-',
+        Math.floor(f.updatedAt.getTime() / 1000),
+        (f.device ?? '').replace(/[\r\n]/g, ' '),
+      ].join(' '),
+    );
+    return reply.type('text/plain').send(lines.map((l) => l + '\n').join(''));
+  });
+
   app.put(
     '/accounts/:code/files/:game/:name',
     {
