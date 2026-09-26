@@ -3,6 +3,8 @@
 #include "ui/savefile.h"
 #include "ui/launcher.h"
 #include "ui/menu.h"
+#include "ui/settings.h"
+#include "ui/filter.h"
 
 static uint8_t rom[0x80000];
 
@@ -74,6 +76,9 @@ static void launcher_navigates_and_starts(void) {
   launcher_press(&l, UI_DOWN); launcher_press(&l, UI_DOWN);
   ASSERT_EQ(launcher_press(&l, UI_ACCEPT).file, -1);    // the title-screen row
   launcher_press(&l, UI_DOWN);
+  ASSERT_EQ(l.row, ROW_SETTINGS);
+  ASSERT_EQ(launcher_press(&l, UI_ACCEPT).action, LAUNCH_SETTINGS);
+  launcher_press(&l, UI_DOWN);
   ASSERT_EQ(l.row, 0);                                  // wraps
   launcher_press(&l, UI_LEFT);
   ASSERT_EQ(l.game, UI_GAME_AGES);
@@ -108,7 +113,8 @@ static void pause_menu_skips_disabled_items(void) {
   pause_open(&m, false, false);
   PauseItem picked;
   pause_press(&m, UI_DOWN, &picked);
-  ASSERT_EQ(m.sel, PAUSE_QUIT);                         // save and load are unavailable
+  ASSERT_EQ(m.sel, PAUSE_SETTINGS);                     // save and load are unavailable
+  pause_press(&m, UI_DOWN, &picked);
   ASSERT_EQ(pause_press(&m, UI_ACCEPT, &picked), MENU_PICK);
   ASSERT_EQ(picked, PAUSE_QUIT);
   pause_open(&m, true, true);
@@ -155,6 +161,62 @@ static void themes_come_from_the_title_palettes(void) {
   ASSERT_EQ(t.border.r, 213);                           // Seasons gold
 }
 
+static void settings_round_trip(void) {
+  Settings s, back;
+  settings_default(&s);
+  ASSERT_EQ(s.volume, 10);
+  s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true;
+  char buf[256];
+  settings_format(&s, buf, sizeof buf);
+  settings_default(&back);
+  settings_parse(&back, buf);
+  ASSERT_EQ(back.volume, 3);
+  ASSERT_EQ(back.filter, FILTER_CRT);
+  ASSERT(back.gbc_colours && back.fullscreen);
+  settings_parse(&back, "volume=99\nfilter=weird\nunknown=1\n  volume = 7\n");
+  ASSERT_EQ(back.volume, 7);                            // 99 rejected, spaced line accepted
+  ASSERT_EQ(back.filter, FILTER_CRT);
+}
+
+static void settings_menu_changes_values(void) {
+  Settings s;
+  SettingsMenu m;
+  settings_default(&s);
+  settings_menu_open(&m);
+  SettingsRow row;
+  settings_press(&m, &s, UI_RIGHT, &row);
+  ASSERT_EQ(s.volume, 10);                              // capped
+  settings_press(&m, &s, UI_LEFT, &row);
+  ASSERT_EQ(s.volume, 9);
+  settings_press(&m, &s, UI_DOWN, &row);
+  settings_press(&m, &s, UI_LEFT, &row);
+  ASSERT_EQ(s.filter, FILTER_CRT);                      // wraps backwards
+  settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_UP, &row);
+  ASSERT_EQ(m.sel, SET_CONTROLS);
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
+  ASSERT_EQ(row, SET_CONTROLS);
+  ASSERT_EQ(settings_press(&m, &s, UI_BACK, &row), MENU_BACK);
+}
+
+static void filters_keep_pixel_alignment(void) {
+  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 4 * UI_H * 4 * 3];
+  memset(src, 200, sizeof src);
+  ui_filter(src, false, FILTER_SHARP, 4, dst);
+  ASSERT_EQ(dst[0], 200);
+  ASSERT_EQ(dst[(3 * UI_W * 4 + 3) * 3], 200);
+  ui_filter(src, false, FILTER_SCANLINES, 4, dst);
+  ASSERT_EQ(dst[0], 200);
+  ASSERT_EQ(dst[(3 * UI_W * 4) * 3], 100);              // the last row of each pixel is darker
+  ui_filter(src, false, FILTER_LCD, 4, dst);
+  ASSERT_EQ(dst[3 * 3], 150);                           // the last column too
+  ui_filter(src, false, FILTER_CRT, 4, dst);
+  ASSERT_EQ(dst[0], 0);                                 // the curved screen leaves the corner black
+  uint8_t in[3] = {255, 255, 255}, out[3];
+  ui_gbc_colour(in, out);
+  ASSERT(out[0] < 255 && out[2] < out[0]);              // paler and warm
+}
+
 int main(void) {
   RUN(font_loads_from_the_rom_offset);
   RUN(text_draws_glyph_pixels);
@@ -164,5 +226,8 @@ int main(void) {
   RUN(pause_menu_skips_disabled_items);
   RUN(slots_load_only_used_slots);
   RUN(themes_come_from_the_title_palettes);
+  RUN(settings_round_trip);
+  RUN(settings_menu_changes_values);
+  RUN(filters_keep_pixel_alignment);
   return 0;
 }

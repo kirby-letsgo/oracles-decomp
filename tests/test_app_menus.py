@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Drives oracles-native's menus headless (SDL dummy drivers, ORACLES_TEST_KEYS) through a fresh
-cache: install the ROM, boot into file 1, pause, save to slot 1, resume, pause, load slot 1, quit
-to the launcher (which writes the auto state), quit the app.
+cache: install the ROM, boot into file 1, pause, save to slot 1, resume, pause, load slot 1, open
+Settings from the pause menu and lower the volume, quit to the launcher (which writes the auto
+state), quit the app.
 usage: test_app_menus.py ORACLES_NATIVE ROM   (exit 77 when the ROM is missing)"""
 import os, subprocess, sys, tempfile
 
@@ -11,11 +12,14 @@ env = dict(os.environ, SDL_VIDEO_DRIVER='dummy', SDL_AUDIO_DRIVER='dummy')
 with tempfile.TemporaryDirectory() as cache:
     r = subprocess.run([app, rom, '--cache', cache, '--frames', '1'], env=env, capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
-    keys = '200:Escape,210:Down,220:X,230:X,240:Z,300:Escape,310:Down,320:Down,330:X,340:X,400:Escape,410:Up,420:X,460:Z'
+    keys = ('200:Escape,210:Down,220:X,230:X,240:Z,300:Escape,310:Down,320:Down,330:X,340:X,'
+            '360:Escape,370:Up,380:Up,390:X,400:Left,410:Z,420:Z,'
+            '460:Escape,470:Up,480:X,520:Z')
     r = subprocess.run([app, '--game', 'seasons', '--cache', cache], env=dict(env, ORACLES_TEST_KEYS=keys), capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
     d = os.path.join(cache, 'seasons')
     for f in ('state_1', 'state_1.thumb', 'state_auto', 'state_auto.thumb', 'sram.sav'):
         assert os.path.exists(os.path.join(d, f)), f'missing {f}; stderr: {r.stderr}'
     assert os.path.getsize(os.path.join(d, 'state_1.thumb')) == 160 * 144 * 3
+    assert 'volume=9' in open(os.path.join(cache, 'settings.ini')).read()
 print('ok app_menus')

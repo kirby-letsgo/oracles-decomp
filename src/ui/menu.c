@@ -8,7 +8,7 @@ void ui_dim_rgb(UiCanvas *c, const uint8_t *rgb) {
       for (int k = 0; k < 3; k++) c->px[y][x][k] = rgb[(y * UI_W + x) * 3 + k] / 3;
 }
 
-static const char *const pause_labels[PAUSE_ITEMS] = {"RESUME", "SAVE STATE", "LOAD STATE", "QUIT"};
+static const char *const pause_labels[PAUSE_ITEMS] = {"RESUME", "SAVE STATE", "LOAD STATE", "SETTINGS", "QUIT"};
 
 static bool pause_enabled(const PauseMenu *m, PauseItem i) {
   return (i != PAUSE_SAVE || m->can_save) && (i != PAUSE_LOAD || m->can_load);
@@ -36,11 +36,11 @@ MenuAction pause_press(PauseMenu *m, UiButton b, PauseItem *picked) {
 
 void pause_draw(const PauseMenu *m, const UiFont *font, const UiTheme *t, const uint8_t *game_rgb, UiCanvas *c) {
   ui_dim_rgb(c, game_rgb);
-  int w = 112, h = 4 + PAUSE_ITEMS * 18 + 22, x = (UI_W - w) / 2, y = (UI_H - h) / 2;
+  int w = 112, h = 4 + PAUSE_ITEMS * 18 + 20, x = (UI_W - w) / 2, y = (UI_H - h) / 2;
   ui_box(c, x, y, w, h, t->border, t->panel);
   ui_text(c, font, x + (w - ui_text_width("PAUSED")) / 2, y + 2, "PAUSED", t->highlight);
   for (int i = 0; i < PAUSE_ITEMS; i++) {
-    int ry = y + 22 + i * 18;
+    int ry = y + 20 + i * 18;
     bool on = (int)m->sel == i, enabled = pause_enabled(m, (PauseItem)i);
     if (on) ui_glyph(c, font, x + 4, ry, '>', t->highlight);
     ui_text(c, font, x + 14, ry, pause_labels[i], !enabled ? t->dim : on ? t->highlight : t->text);

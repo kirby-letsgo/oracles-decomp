@@ -23,7 +23,7 @@ void launcher_init(Launcher *l, UiGame initial) {
 }
 
 static void step(Launcher *l, int dir) {
-  do l->row = (LauncherRow)((l->row + dir + ROW_TITLE + 1) % (ROW_TITLE + 1));
+  do l->row = (LauncherRow)((l->row + dir + ROW_SETTINGS + 1) % (ROW_SETTINGS + 1));
   while (!row_shown(l, l->row));
 }
 
@@ -35,6 +35,7 @@ LaunchResult launcher_press(Launcher *l, UiButton b) {
   case UI_DOWN: step(l, 1); break;
   case UI_BACK: r.action = LAUNCH_QUIT; break;
   case UI_ACCEPT:
+    if (l->row == ROW_SETTINGS) { r.action = LAUNCH_SETTINGS; break; }
     if (!l->games[l->game].installed) { r.action = LAUNCH_ADD_ROM; break; }
     r.action = LAUNCH_PLAY;
     r.file = l->row <= ROW_FILE3 ? (int)l->row : l->row == ROW_RESUME ? LAUNCH_RESUME : l->row == ROW_SLOTS ? LAUNCH_SLOTS : LAUNCH_TITLE;
@@ -82,14 +83,16 @@ void launcher_draw(const Launcher *l, const UiFont *font, UiCanvas *c) {
   }
   ui_box(c, 0, 28, UI_W, 92, t->border, t->panel);
   if (g->installed) {
-    int step = g->has_resume && g->has_slots ? 15 : 18, y = 30;
+    int rows = 5 + g->has_resume + g->has_slots, step = 88 / rows, y = 30;
     for (int i = 0; i < UI_FILES; i++, y += step) draw_file(c, font, t, y, i, &g->files[i], l->row == (LauncherRow)i);
     if (g->has_resume) { draw_row(c, font, t, y, "RESUME", l->row == ROW_RESUME); y += step; }
     if (g->has_slots) { draw_row(c, font, t, y, "LOAD STATE", l->row == ROW_SLOTS); y += step; }
     draw_row(c, font, t, y, "TITLE SCREEN", l->row == ROW_TITLE);
+    draw_row(c, font, t, y + step, "SETTINGS", l->row == ROW_SETTINGS);
   } else {
     ui_text(c, font, 12, 40, "NOT INSTALLED", t->dim);
-    draw_row(c, font, t, 72, "ADD ROM...", true);
+    draw_row(c, font, t, 72, "ADD ROM...", l->row != ROW_SETTINGS);
+    draw_row(c, font, t, 96, "SETTINGS", l->row == ROW_SETTINGS);
   }
   ui_text(c, font, 4, 124, "A:PLAY  B:QUIT", t->dim);
 }

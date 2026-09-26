@@ -20,6 +20,8 @@
 #include "assets/assets.h"
 #include "ui/launcher.h"
 #include "ui/menu.h"
+#include "ui/settings.h"
+#include "ui/filter.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -219,12 +221,53 @@ static bool any_slot(const char *dir) {
   return false;
 }
 
+static Settings settings;
+static char settings_path[1100];
+
+static void settings_store(void) {
+  char text[256];
+  int n = settings_format(&settings, text, sizeof text);
+  write_file(settings_path, text, (size_t)n);
+}
+
+static void apply_window_settings(SDL_Window *win) {
+  if (!!(SDL_GetWindowFlags(win) & SDL_WINDOW_FULLSCREEN) != settings.fullscreen) SDL_SetWindowFullscreen(win, settings.fullscreen);
+}
+
+static float volume_gain(bool muted) { return muted ? 0.0f : settings.volume / 10.0f; }
+
+// Sharp and uncorrected frames go straight to the 160x144 texture; filters render at the window's
+// integer scale into a texture of that size, which the logical presentation then shows 1:1.
+#define MAX_FILTER_SCALE 12
 static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
-  SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
+  static SDL_Texture *big;
+  static int big_scale;
+  static uint8_t *buf;
+  int w = 0, h = 0, scale = 1;
+  if (SDL_GetCurrentRenderOutputSize(ren, &w, &h)) scale = SDL_min(w / FB_W, h / FB_H);
+  scale = SDL_clamp(scale, 1, MAX_FILTER_SCALE);
   SDL_RenderClear(ren);
-  SDL_RenderTexture(ren, tex, NULL, NULL);
+  if ((settings.filter == FILTER_SHARP || scale < 2) && !settings.gbc_colours) {
+    SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
+    SDL_RenderTexture(ren, tex, NULL, NULL);
+  } else {
+    if (!big || big_scale != scale) {
+      if (big) SDL_DestroyTexture(big);
+      big = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FB_W * scale, FB_H * scale);
+      SDL_SetTextureScaleMode(big, SDL_SCALEMODE_NEAREST);
+      free(buf);
+      buf = malloc((size_t)FB_W * scale * FB_H * scale * 3);
+      big_scale = scale;
+    }
+    ui_filter(rgb, settings.gbc_colours, scale < 2 ? FILTER_SHARP : settings.filter, scale, buf);
+    SDL_UpdateTexture(big, NULL, buf, FB_W * scale * 3);
+    SDL_RenderTexture(ren, big, NULL, NULL);
+  }
   SDL_RenderPresent(ren);
 }
+
+// A modal settings screen; returns false when the window is closed. Changes apply as they are made.
+static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb, SDL_AudioStream *audio);
 
 // Installed games, their save files and save state, each game's colours, and the font from whichever
 // ROM image is cached.
@@ -281,6 +324,13 @@ static void test_keys(void) {
   }
 }
 
+// F11 / Cmd+F toggles fullscreen and remembers it
+static bool window_key(SDL_Window *win, const SDL_KeyboardEvent *key) {
+  if (!oracles_window_key(win, key)) return false;
+  if (!key->repeat) { settings.fullscreen = !settings.fullscreen; settings_store(); }
+  return true;
+}
+
 static bool menu_button(const SDL_Event *ev, UiButton *b) {
   if (ev->type == SDL_EVENT_KEY_DOWN) {
     switch (ev->key.scancode) {
@@ -315,7 +365,7 @@ static int pick_slot(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, Slots
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return -2;
-      if (ev.type == SDL_EVENT_KEY_DOWN && oracles_window_key(win, &ev.key)) continue;
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
       UiButton b;
       if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
       int slot;
@@ -324,6 +374,32 @@ static int pick_slot(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, Slots
       if (a == MENU_BACK) return -1;
     }
     slots_draw(m, font, theme, game_rgb, &canvas);
+    present(ren, tex, &canvas.px[0][0][0]);
+    SDL_Delay(16);
+  }
+}
+
+static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb, SDL_AudioStream *audio) {
+  static UiCanvas canvas;
+  SettingsMenu m;
+  settings_menu_open(&m);
+  for (;;) {
+    test_keys();
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) return false;
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
+      UiButton b;
+      if (!menu_button(&ev, &b)) continue;
+      SettingsRow row;
+      bool was_full = settings.fullscreen;
+      MenuAction a = settings_press(&m, &settings, b, &row);
+      if (a == MENU_BACK) { settings_store(); return true; }
+      if (settings.fullscreen != was_full) apply_window_settings(win);
+      if (audio) SDL_SetAudioStreamGain(audio, volume_gain(false));
+      settings_store();
+    }
+    settings_draw(&m, &settings, font, theme, game_rgb, &canvas);
     present(ren, tex, &canvas.px[0][0][0]);
     SDL_Delay(16);
   }
@@ -347,12 +423,13 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
-      if (ev.type == SDL_EVENT_KEY_DOWN && oracles_window_key(win, &ev.key)) continue;
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
       if (ev.type == SDL_EVENT_GAMEPAD_ADDED) SDL_OpenGamepad(ev.gdevice.which);
       UiButton b;
       if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
       LaunchResult r = launcher_press(&l, b);
       if (r.action == LAUNCH_QUIT) return false;
+      if (r.action == LAUNCH_SETTINGS && !run_settings(win, ren, tex, &font, &l.games[l.game].theme, NULL, NULL)) return false;
       if (r.action == LAUNCH_ADD_ROM) {
         char game[16];
         if (pick_rom(game, cache)) { UiGame g = l.game; launcher_load(&l, &font, cache); launcher_init(&l, g); }
@@ -476,7 +553,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   SDL_SetWindowTitle(win, title);
   SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
   SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
-  if (audio) SDL_ResumeAudioStreamDevice(audio);
+  if (audio) { SDL_SetAudioStreamGain(audio, volume_gain(false)); SDL_ResumeAudioStreamDevice(audio); }
 
   static uint8_t rgb[FB_W * FB_H * 3], paused_rgb[FB_W * FB_H * 3];
   static int16_t samples[APU_RING * 2];
@@ -486,7 +563,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   gb->input_at = live_input;
   live_joy = 0;
   uint64_t frames = 0, title_reset = 0, save_from = NO_SAVE, park_from = 0;
-  bool muted = false, parked = false;
+  bool muted = false, parked = false, fast = false;
   GameMode mode = MODE_PLAY;
   GameEnd end = GAME_QUIT;
   BootDriver boot = {gs->start_file >= 0 ? BOOT_TO_FILE_SELECT : BOOT_OFF, gs->start_file, gs->open_file, 0};
@@ -506,7 +583,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         continue;
       }
       if (ev.type == SDL_EVENT_GAMEPAD_ADDED) { SDL_OpenGamepad(ev.gdevice.which); continue; }
-      if (ev.type == SDL_EVENT_KEY_DOWN && oracles_window_key(win, &ev.key)) continue;
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
       if (mode == MODE_PAUSED) {
         UiButton b;
         if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
@@ -529,6 +606,9 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
             title_reset = show_status(win, title, ok ? "state loaded" : "could not load state", frames);
             if (ok) { mode = MODE_PLAY; if (audio) SDL_ResumeAudioStreamDevice(audio); }
           }
+        } else if (a == MENU_PICK && item == PAUSE_SETTINGS) {
+          if (!run_settings(win, ren, tex, &font, &theme, paused_rgb, NULL)) { end = GAME_QUIT; running = false; if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); }
+          if (audio) SDL_SetAudioStreamGain(audio, volume_gain(muted));
         } else if (a == MENU_PICK && item == PAUSE_QUIT) {
           if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb);
           end = GAME_TO_LAUNCHER;
@@ -551,11 +631,18 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         }
         else if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
           muted = !muted;
-          if (audio) SDL_SetAudioStreamGain(audio, muted ? 0.0f : 1.0f);
+          if (audio) SDL_SetAudioStreamGain(audio, volume_gain(muted));
         }
+        else if (ev.key.scancode == SDL_SCANCODE_TAB) fast = true;
         else live_joy |= key_bit(ev.key.scancode);
         break;
-      case SDL_EVENT_KEY_UP: live_joy &= ~key_bit(ev.key.scancode); break;
+      case SDL_EVENT_KEY_UP:
+        if (ev.key.scancode == SDL_SCANCODE_TAB) fast = false;
+        live_joy &= ~key_bit(ev.key.scancode);
+        break;
+      case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+        if (ev.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) fast = ev.gaxis.value > 16000;
+        break;
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: live_joy |= pad_bit(ev.gbutton.button); break;
       case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
       }
@@ -574,6 +661,11 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
       for (int i = 0; i < 8 && boot.phase != BOOT_OFF; i++) { live_joy = boot_input(gb, &boot, frames); gb_run_frame(gb); frames++; }
       if (boot.phase == BOOT_OFF) { live_joy = 0; fprintf(stderr, "boot into file %d done at frame %llu\n", boot.file + 1, (unsigned long long)frames); }
       apu_read_samples(&gb->apu, samples, APU_RING);
+    } else if (fast && mode == MODE_PLAY) {
+      // fast-forward: up to 4 frames per shown frame, paced by the display, without sound
+      for (int i = 0; i < 4; i++) { gb_run_frame(gb); frames++; }
+      apu_read_samples(&gb->apu, samples, APU_RING);
+      SDL_Delay(16);
     } else {
       if (mode == MODE_PLAY && audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
       gb_run_frame(gb);
@@ -643,6 +735,15 @@ int main(int argc, char **argv) {
   char window_size[1100];
   snprintf(window_size, sizeof window_size, "%swindow.txt", cache);
   if (!oracles_open_window("Oracles", window_size, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
+  settings_default(&settings);
+  snprintf(settings_path, sizeof settings_path, "%ssettings.ini", cache);
+  size_t settings_size;
+  char *settings_text = (char *)oracles_read_file(settings_path, &settings_size);
+  if (settings_text) {
+    char *z = realloc(settings_text, settings_size + 1);
+    if (z) { z[settings_size] = 0; settings_parse(&settings, z); free(z); } else free(settings_text);
+  }
+  apply_window_settings(win);
 
   // a ROM or --game on the command line starts that game directly; quitting it opens the launcher
   char game[16] = "";

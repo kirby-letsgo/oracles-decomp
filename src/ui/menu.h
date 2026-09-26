@@ -6,7 +6,7 @@
 
 typedef enum { MENU_NONE, MENU_PICK, MENU_BACK } MenuAction;
 
-typedef enum { PAUSE_RESUME, PAUSE_SAVE, PAUSE_LOAD, PAUSE_QUIT, PAUSE_ITEMS } PauseItem;
+typedef enum { PAUSE_RESUME, PAUSE_SAVE, PAUSE_LOAD, PAUSE_SETTINGS, PAUSE_QUIT, PAUSE_ITEMS } PauseItem;
 typedef struct {
   PauseItem sel;
   bool can_save;                // false when no frame with parked threads was reached

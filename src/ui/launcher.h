@@ -7,8 +7,8 @@
 
 typedef enum { UI_UP, UI_DOWN, UI_LEFT, UI_RIGHT, UI_ACCEPT, UI_BACK } UiButton;
 typedef enum { UI_GAME_AGES, UI_GAME_SEASONS, UI_GAMES } UiGame;
-typedef enum { LAUNCH_NONE, LAUNCH_PLAY, LAUNCH_ADD_ROM, LAUNCH_QUIT } LaunchAction;
-typedef enum { ROW_FILE1, ROW_FILE2, ROW_FILE3, ROW_RESUME, ROW_SLOTS, ROW_TITLE } LauncherRow;
+typedef enum { LAUNCH_NONE, LAUNCH_PLAY, LAUNCH_ADD_ROM, LAUNCH_SETTINGS, LAUNCH_QUIT } LaunchAction;
+typedef enum { ROW_FILE1, ROW_FILE2, ROW_FILE3, ROW_RESUME, ROW_SLOTS, ROW_TITLE, ROW_SETTINGS } LauncherRow;
 
 #define LAUNCH_TITLE (-1)
 #define LAUNCH_RESUME (-2)      // the state written when the game was last quit
