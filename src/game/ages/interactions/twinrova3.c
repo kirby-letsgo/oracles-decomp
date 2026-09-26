@@ -357,7 +357,7 @@ state1: // interactionCodebc@state1
     if (target == b_+176) goto subid0Substate1;
     if (target == b_+209) goto subid0Substate2;
     if (target == b_+240) goto subid0Substate3;
-    if (target == b_+291) { CYC(b_+291, b_+294); interactionAnimate_hook(gb); return; } // subid0Substate4: jp @animate
+    if (target == b_+291) { CYC(b_+291, b_+294); CYC(SYM(interactionCodebc__animate), (SYM(interactionCodebc__animate) + 3)); interactionAnimate_hook(gb); return; } // subid0Substate4: jp @animate
     // target == 0x6e69 falls through to subid0Substate0
   }
 
@@ -366,7 +366,7 @@ state1: // interactionCodebc@state1
   CYC(b_+129, b_+132); interactionCodebc_updateAnimationIndex(gb, sp0_, b_+132); // call
   CYC(b_+132, b_+135); interactionCodebc_checkReachedTargetPosition(gb, sp0_); // call
   if (F & FC) { CYCT(b_+135, b_+138); interactionCodebc_nextTargetPosition(gb, sp0_); } else { CYC(b_+135, b_+138); } // call c
-  if (!(F & FC)) { CYCT(b_+138, b_+141); interactionAnimate_hook(gb); return; } // jp nc @animate
+  if (!(F & FC)) { CYCT(b_+138, b_+141); CYC(SYM(interactionCodebc__animate), (SYM(interactionCodebc__animate) + 3)); interactionAnimate_hook(gb); return; } // jp nc @animate
   CYC(b_+138, b_+141);
   CYC(b_+141, b_+142); H = D;
   CYC(b_+142, b_+144); L = INTERACTION_BASE + OBJ_SUBSTATE;
@@ -393,7 +393,7 @@ l6e93:
 
 l6e95:
   CALL_C(b_+170, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+173);
-  CYC(b_+173, b_+176); TAIL(interactionAnimate); // jp @animate
+  CYC(b_+173, b_+176); CYC(SYM(interactionCodebc__animate), (SYM(interactionCodebc__animate) + 3)); TAIL(interactionAnimate); // jp @animate
 
 subid0Substate1: // interactionCodebc@subid0Substate1
   CYC(b_+176, b_+179); interactionCodebc_updateFloating(gb); // call
@@ -405,7 +405,7 @@ subid0Substate1: // interactionCodebc@subid0Substate1
   CYC(b_+188, b_+189); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+189, b_+191); L = INTERACTION_BASE + OBJ_COUNTER2;
   CYC(b_+191, b_+193); mem_wr(gb, HL, 40);
-  interactionCodebc_func_6eac(gb); return; // falls through into @func_6eac, no call
+  interactionCodebc_func_6eac(gb); ret_effect(gb); return; // falls through into @func_6eac, whose ret ends the hook
 
 subid0Substate2: // interactionCodebc@subid0Substate2
   CYC(b_+209, b_+212); interactionCodebc_updateFloating(gb); // call
@@ -424,7 +424,7 @@ subid0Substate2: // interactionCodebc@subid0Substate2
   CYC(b_+232, b_+234); L = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+234, b_+235); A = mem_rd(gb, HL);
   CYC(b_+235, b_+237); alu_add(gb, 0x04);
-  CYC(b_+237, b_+240); interactionCodebc_readPositionTable(gb); return; // jp
+  CYC(b_+237, b_+240); interactionCodebc_readPositionTable(gb); ret_effect(gb); return; // jp; its ret ends the hook
 
 subid0Substate3: // interactionCodebc@subid0Substate3
   CYC(b_+240, b_+243); interactionCodebc_moveTowardTargetPosition(gb, sp0_, b_+243); // call
@@ -439,7 +439,7 @@ subid0Substate3: // interactionCodebc@subid0Substate3
   if (!(F & FZ)) { CYCT(b_+259, b_+262); interactionCodebc_updateAnimationIndex(gb, sp0_, b_+262); } else { CYC(b_+259, b_+262); } // call nz
   CYC(b_+262, b_+265); interactionCodebc_checkReachedTargetPosition(gb, sp0_); // call
   if (F & FC) { CYCT(b_+265, b_+268); interactionCodebc_nextTargetPosition(gb, sp0_); } else { CYC(b_+265, b_+268); } // call c
-  if (!(F & FC)) { CYCT(b_+268, b_+270); interactionAnimate_hook(gb); return; } // jr nc @animate
+  if (!(F & FC)) { CYCT(b_+268, b_+270); CYC(SYM(interactionCodebc__animate), (SYM(interactionCodebc__animate) + 3)); interactionAnimate_hook(gb); return; } // jr nc @animate
   CYC(b_+268, b_+270);
 
 looped: // interactionCodebc@subid0Substate3@looped

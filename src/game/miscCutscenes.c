@@ -1848,7 +1848,7 @@ void nayruWarpToMakuTreeCutsceneHandler__stateB_hook(GB *gb) {
   CYC(b_+424, b_+426); A = 0x08;
   CYC(b_+426, b_+429); mem_wr(gb, wTmpcfc0_armosStatue_killedArmosPositions, A);
   CYC(b_+429, b_+431);
-  TAIL(cutscene_incCutsceneState);
+  CYC(SYM(nayruWarpToMakuTreeCutsceneHandler__incCutsceneState), (SYM(nayruWarpToMakuTreeCutsceneHandler__incCutsceneState) + 3)); TAIL(cutscene_incCutsceneState); // jr to @incCutsceneState, a jp
 }
 
 void nayruWarpToMakuTreeCutsceneHandler__func_6838_hook(GB *gb) {

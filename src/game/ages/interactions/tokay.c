@@ -787,7 +787,7 @@ void wildTokayParticipantSubstate2_hook(GB *gb) {
   CYC(b_+13, b_+15); E = 0x7c;
   CYC(b_+15, b_+16); A = mem_rd(gb, DE);
   CYC(b_+16, b_+17); alu_or(gb, A);
-  if (F & FZ) { CYC(b_+17, b_+19); CYC(b_+19, b_+21); A = 0xff; CYC(b_+21, b_+24); mem_wr(gb, wTmpcfc0_genericCutscene_cfde, A); CYC(b_+24, b_+26); interactionDelete_hook(gb); return; }
+  if (F & FZ) { CYC(b_+17, b_+19); CYC(b_+19, b_+21); A = 0xff; CYC(b_+21, b_+24); mem_wr(gb, wTmpcfc0_genericCutscene_cfde, A); CYC(b_+24, b_+26); CYC(SYM(wildTokayParticipantSubstate2__delete), (SYM(wildTokayParticipantSubstate2__delete) + 3)); interactionDelete_hook(gb); return; }
   CYCT(b_+17, b_+19);
   CYC(b_+26, b_+28); E = 0x59;
   CYC(b_+28, b_+29); A = mem_rd(gb, DE);

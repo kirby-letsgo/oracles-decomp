@@ -271,14 +271,14 @@ void forestFairy_subid00State2_hook(GB *gb) {
   return;
 delete:
   CALL_C(b_+22, objectCreatePuff_hook, SYM(objectCreatePuff), b_+25);
-  CYC(b_+25, b_+27); TAIL(interactionDelete);
+  CYC(b_+25, b_+27); CYC(SYM(forestFairy_deleteSelf), (SYM(forestFairy_deleteSelf) + 3)); TAIL(interactionDelete); // jr to forestFairy_deleteSelf, a jp
 }
 
 void forestFairy_subid00State3_hook(GB *gb) {
   BASE(forestFairy_subid00State3);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+0, b_+3); push_effect(gb, b_+3); forestFairy_subid00State1_hook(gb);
-  if (F & FC) { CYCT(b_+3, b_+5); interactionDelete_hook(gb); return; }
+  if (F & FC) { CYCT(b_+3, b_+5); CYC(SYM(forestFairy_deleteSelf), (SYM(forestFairy_deleteSelf) + 3)); interactionDelete_hook(gb); return; }
   CYC(b_+3, b_+5);
   CYC(b_+5, b_+7); E = 0x4b;
   CYC(b_+7, b_+8); A = mem_rd(gb, DE);
