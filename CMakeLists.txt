@@ -13,6 +13,21 @@ if(ANDROID)
 else()
   option(ORACLES_SDL "Build the SDL3 frontend" ON)
 endif()
+# Release builds (and Android) compile SDL from source and link it statically, so each app is one
+# binary; otherwise an installed SDL3 is used when there is one.
+option(ORACLES_SDL_VENDORED "Build SDL3 from source and link it statically" OFF)
+
+macro(oracles_fetch_sdl)
+  include(FetchContent)
+  set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+  set(SDL_STATIC ON CACHE BOOL "" FORCE)
+  set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(SDL3
+    URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz
+    URL_HASH SHA256=7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68)
+  FetchContent_MakeAvailable(SDL3)
+  set(ORACLES_SDL_TARGET SDL3::SDL3-static)
+endmacro()
 
 file(GLOB_RECURSE ORACLES_GAME_SRC CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/game/*.c")
 set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
@@ -50,24 +65,24 @@ add_executable(lockstep-native tools/lockstep_native.c tools/lockstep_native_eng
 target_link_libraries(lockstep-native oraclescore)
 
 if(ORACLES_SDL)
-  find_package(SDL3 CONFIG QUIET)
-  if(NOT SDL3_FOUND)
-    include(FetchContent)
-    FetchContent_Declare(SDL3
-      GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-      GIT_TAG release-3.2.10)
-    FetchContent_MakeAvailable(SDL3)
+  if(NOT ORACLES_SDL_VENDORED)
+    find_package(SDL3 CONFIG QUIET)
+  endif()
+  if(SDL3_FOUND)
+    set(ORACLES_SDL_TARGET SDL3::SDL3)
+  else()
+    oracles_fetch_sdl()
   endif()
   add_executable(oracles src/platform/sdl_main.c src/platform/window.c)
-  target_link_libraries(oracles oraclescore SDL3::SDL3)
+  target_link_libraries(oracles oraclescore ${ORACLES_SDL_TARGET})
   add_executable(oracles-native src/platform/app.c src/platform/window.c)
-  target_link_libraries(oracles-native oraclesnative oraclesui SDL3::SDL3)
+  target_link_libraries(oracles-native oraclesnative oraclesui ${ORACLES_SDL_TARGET})
   target_compile_definitions(oracles-native PRIVATE ORACLES_NATIVE=1)
   if(APPLE)
     set(ORACLES_ICNS ${CMAKE_SOURCE_DIR}/icon/Oracles.icns)
     set_source_files_properties(${ORACLES_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     add_executable(oracles-native-app MACOSX_BUNDLE src/platform/app.c src/platform/window.c ${ORACLES_ICNS})
-    target_link_libraries(oracles-native-app oraclesnative oraclesui SDL3::SDL3)
+    target_link_libraries(oracles-native-app oraclesnative oraclesui ${ORACLES_SDL_TARGET})
     target_compile_definitions(oracles-native-app PRIVATE ORACLES_NATIVE=1)
     set_target_properties(oracles-native-app PROPERTIES
       OUTPUT_NAME "Oracles"
@@ -88,16 +103,9 @@ endif()
 # The Android app: SDL3 from source, linked statically into libmain.so with the engine and the UI.
 if(ANDROID)
   enable_language(CXX)   # SDL's Android HIDAPI is C++, so libmain links the C++ runtime
-  include(FetchContent)
-  set(SDL_SHARED OFF CACHE BOOL "" FORCE)
-  set(SDL_STATIC ON CACHE BOOL "" FORCE)
-  set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
-  FetchContent_Declare(SDL3
-    URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz
-    URL_HASH SHA256=7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68)
-  FetchContent_MakeAvailable(SDL3)
+  oracles_fetch_sdl()
   add_library(main SHARED src/platform/app.c src/platform/window.c)
-  target_link_libraries(main oraclesnative oraclesui SDL3::SDL3-static log)
+  target_link_libraries(main oraclesnative oraclesui ${ORACLES_SDL_TARGET} log)
   target_compile_definitions(main PRIVATE ORACLES_NATIVE=1)
   set_target_properties(main PROPERTIES LINKER_LANGUAGE CXX)
   return()

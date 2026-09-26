@@ -47,7 +47,13 @@ cmake --build build
 ctest --test-dir build
 ```
 
-`-DORACLES_SDL=OFF` builds only the headless tools.
+`-DORACLES_SDL=OFF` builds only the headless tools. `-DORACLES_SDL_VENDORED=ON` builds SDL 3.4.16
+from source and links it statically (release builds do this); otherwise an installed SDL3 is used
+when there is one.
+
+Linux (Debian/Ubuntu; other distros need the same libraries): `tools/linux_deps.sh` installs the
+compiler, CMake, Ninja and SDL's build dependencies, then build as above with
+`-DORACLES_SDL_VENDORED=ON` (distributions rarely ship SDL3 yet).
 
 ## Playing
 

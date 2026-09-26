@@ -13,3 +13,4 @@ __pycache__/
 .claude/
 tas/*.inputs.state
 *.savestate
+build-win/
