@@ -8,7 +8,8 @@ burn_rom services interrupts at instruction boundaries, so an interrupt that lan
 instruction runs before the ROM's access but after the C's, and the C sees (or leaves) the old
 value. Reported: a CYC/CYCT over exactly one memory-accessing instruction (checked against the Ages
 ROM) preceded, since the previous burn, by a statement that reads or writes memory.
-usage: tools/audit_burn_order.py [--all]   (default: only accesses of RAM/IO an interrupt can touch)"""
+usage: tools/audit_burn_order.py [--risky]   (--risky: only IO/HRAM and RAM an interrupt can touch; the
+default checks every access, since VRAM and OAM reads also depend on the PPU mode at that cycle)"""
 import glob, re, sys
 ROM = open('roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc', 'rb').read()
 h = open('src/game/syms.h').read(); c = open('src/game/syms.c').read()
@@ -36,7 +37,7 @@ def mem_insn(op, nxt):
 
 MEM = re.compile(r'\b(?:mem_rd|mem_wr|W8|H8|W16|hram_wr|hram_rd|rd16|wr16|IO_\w+)\b')
 BURN = re.compile(r'\b(CYCT?)\(b_\+(\d+), b_\+(\d+)\)')
-show_all = '--all' in sys.argv
+show_all = '--risky' not in sys.argv
 bad = 0
 for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     if '/gen_' in p or '/seasons/' in p or p.endswith(('syms.c', 'ofs.c')): continue

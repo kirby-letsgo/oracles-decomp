@@ -30,7 +30,7 @@ state0:
   CYC(b_+20, b_+22); mem_wr(gb, HL, 0xf1);
   CYC(b_+22, b_+25); SET_BC((hSoundChannelAddresses + 14));
   CALL_C(b_+25, objectSetSpeedZ_hook, SYM(objectSetSpeedZ), b_+28);
-  CYC(b_+28, b_+29); A = 0x00; // xor a
+  CYC(b_+28, b_+29); alu_xor(gb, A);
   CALL_C(b_+29, partSetAnimation_hook, SYM(partSetAnimation), b_+32);
   CALL_C(b_+32, objectSetVisible81_hook, SYM(objectSetVisible81), b_+35);
 

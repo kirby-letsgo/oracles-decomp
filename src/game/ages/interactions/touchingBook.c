@@ -51,7 +51,7 @@ void interactionCodea5_updateMapleAngle_hook(GB *gb) {
 
 l_5d27:
   CALL_C(b_+278, objectGetRelativeAngle_hook, SYM(objectGetRelativeAngle), b_+281);
-  CYC(b_+281, b_+283); A = (uint8_t)(A ^ 0x10);
+  CYC(b_+281, b_+283); alu_xor(gb, 0x10);
   CYC(b_+283, b_+286); mem_wr(gb, w1Companion_angle, A);
   CYC(b_+286, b_+287); alu_or(gb, D);
   RET(b_+287); return;
@@ -157,7 +157,7 @@ state4:
   CYC(b_+152, b_+154); A = 0xff;
   CYC(b_+154, b_+155); mem_wr(gb, HL, A); SET_HL(HL - 1); // ldd (hl),a
   CYC(b_+155, b_+156); A = mem_rd(gb, HL); // [w1Companion.direction]
-  CYC(b_+156, b_+158); A = (uint8_t)(A ^ 0x02);
+  CYC(b_+156, b_+158); alu_xor(gb, 0x02);
   CYC(b_+158, b_+159); H = alu_dec8(gb, H);
   CYC(b_+159, b_+160); mem_wr(gb, HL, A); // [w1Link.direction]
   CALL_C(b_+160, interactionIncState_hook, SYM(interactionIncState), b_+163);
@@ -167,7 +167,7 @@ state4:
 state5:
   CALL_C(b_+169, retIfTextIsActive_hook, SYM(retIfTextIsActive), b_+172);
   CYC(b_+172, b_+175); A = mem_rd(gb, w1Companion_direction);
-  CYC(b_+175, b_+177); A = (uint8_t)(A ^ 0x02);
+  CYC(b_+175, b_+177); alu_xor(gb, 0x02);
   CYC(b_+177, b_+179); A = (uint8_t)(A | (1 << 7));
   CYC(b_+179, b_+182); mem_wr(gb, w1Companion_direction, A);
   CALL_C(b_+182, interactionIncState_hook, SYM(interactionIncState), b_+185);

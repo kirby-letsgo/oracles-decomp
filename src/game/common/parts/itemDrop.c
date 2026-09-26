@@ -369,13 +369,13 @@ void itemDrop_initGfx_hook(GB *gb) {
   CYC(b_+6, b_+7); itemDrop_addDoubleIndexToHl_from_rst(gb, b_+7);
   CYC(b_+7, b_+9); E = 0xdd; // Part.oamTileIndexBase
   CYC(b_+9, b_+10); A = mem_rd(gb, DE);
-  CYC(b_+10, b_+11); A = A + mem_rd(gb, HL);
+  CYC(b_+10, b_+11); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+11, b_+12); mem_wr(gb, DE, A);
   CYC(b_+12, b_+13); SET_HL(HL + 1);
-  CYC(b_+13, b_+14); E = 0xdc; // Part.oamFlags
+  CYC(b_+13, b_+14); E = alu_dec8(gb, E); // Part.oamFlags
   CYC(b_+14, b_+15); A = mem_rd(gb, HL);
   CYC(b_+15, b_+16); mem_wr(gb, DE, A); // [oamFlags]
-  CYC(b_+16, b_+17); E = 0xdb; // Part.oamFlagsBackup
+  CYC(b_+16, b_+17); E = alu_dec8(gb, E); // Part.oamFlagsBackup
   CYC(b_+17, b_+18); mem_wr(gb, DE, A); // [oamFlagsBackup]
   CYC(b_+18, b_+21); TAIL(objectSetVisiblec1); // jp
 }
@@ -440,7 +440,7 @@ fairy:
   CYC(b_+16, b_+17); A = mem_rd(gb, HL);
   CYC(b_+17, b_+19); mem_wr(gb, HL, 0x00);
   CYC(b_+19, b_+21); L = 0xcb; // Part.yh
-  CYC(b_+21, b_+22); A = A + mem_rd(gb, HL);
+  CYC(b_+21, b_+22); alu_add(gb, mem_rd(gb, HL));
   CYC(b_+22, b_+23); mem_wr(gb, HL, A);
   CYC(b_+23, b_+26); TAIL(itemDrop_chooseRandomFairyMovement); // jp
 }
@@ -523,7 +523,7 @@ after_sign:
   if (F & FC) { RET_TAKEN(b_+36); return; } // ret c
   CYC(b_+36, b_+37);
   CYC(b_+37, b_+38); mem_wr(gb, HL, B); // [speedZ+1]
-  CYC(b_+38, b_+39); L = L - 1;
+  CYC(b_+38, b_+39); L = alu_dec8(gb, L);
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x00); // [speedZ]
 
 checkY:
@@ -640,7 +640,7 @@ void itemDrop_chooseRandomFairyMovement_hook(GB *gb) {
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+3);
   CYC(b_+3, b_+5); alu_and(gb, 0x3e);
-  CYC(b_+5, b_+7); A = A + 0x08;
+  CYC(b_+5, b_+7); alu_add(gb, 0x08);
   CYC(b_+7, b_+9); E = 0xc7; // Part.counter2
   CYC(b_+9, b_+10); mem_wr(gb, DE, A);
   CALL_C(b_+10, getRandomNumber_noPreserveVars_hook, SYM(getRandomNumber_noPreserveVars), b_+13);

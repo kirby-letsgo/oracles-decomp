@@ -1984,7 +1984,7 @@ line_end:
     CYC(b_+64, b_+65);
     CYC(b_+65, b_+66); push_effect(gb, BC);
     CYC(b_+66, b_+68); alu_sub(gb, 0x11);
-    CYC(b_+68, b_+69); A = (uint8_t)~A;
+    CYC(b_+68, b_+69); alu_cpl(gb);
     CYC(b_+69, b_+71); L = 0xed;
     CYC(b_+71, b_+72); mem_wr(gb, HL, A);
     CYC(b_+72, b_+74); alu_and(gb, 0x0e);

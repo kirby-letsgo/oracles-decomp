@@ -59,13 +59,15 @@ void clearMemoryBc(GB *gb, uint16_t dst, unsigned n) {
   fillMemoryBc(gb, dst, 0, n);
 }
 
-static void copy_loop(GB *gb, uint16_t base, uint16_t dst, uint16_t src, unsigned n) {
+static uint8_t copy_loop(GB *gb, uint16_t base, uint16_t dst, uint16_t src, unsigned n) {
+  uint8_t v = 0;
   for (unsigned i = 0; i < n; i++) {
-    CYC(base, base + 1); uint8_t v = mem_rd(gb, src + i);
+    CYC(base, base + 1); v = mem_rd(gb, src + i);
     CYC(base + 1, base + 2); mem_wr(gb, dst + i, v);
     if (i + 1 < n) CYCT(base + 2, base + 6); else CYC(base + 2, base + 6);
   }
   CYC(base + 6, base + 7);
+  return v;
 }
 
 static void copy_bc_loop(GB *gb, uint16_t base, uint16_t dst, uint16_t src, unsigned n) {
@@ -77,7 +79,7 @@ static void copy_bc_loop(GB *gb, uint16_t base, uint16_t dst, uint16_t src, unsi
   CYC(base + 8, base + 9);
 }
 
-void copyMemory(GB *gb, uint16_t dst, uint16_t src, unsigned n) { copy_loop(gb, SYM(copyMemory), dst, src, n); }
+void copyMemory(GB *gb, uint16_t dst, uint16_t src, unsigned n) { (void)copy_loop(gb, SYM(copyMemory), dst, src, n); }
 void copyMemoryBc(GB *gb, uint16_t dst, uint16_t src, unsigned n) { copy_bc_loop(gb, SYM(copyMemoryBc), dst, src, n); }
 
 static void fill_done(GB *gb, unsigned n) {
@@ -123,8 +125,8 @@ void clearMemoryBc_hook(GB *gb) {
   fill_bc_done(gb, n);
 }
 
-static void copy_done(GB *gb, uint16_t src, unsigned n) {
-  A = mem_rd(gb, src + n - 1);
+static void copy_done(GB *gb, uint8_t last, unsigned n) {
+  A = last;
   SET_HL(HL + n);
   SET_DE(DE + n);
   B = 0;
@@ -134,14 +136,12 @@ static void copy_done(GB *gb, uint16_t src, unsigned n) {
 
 void copyMemory_hook(GB *gb) {
   unsigned n = B ? B : 256;
-  copy_loop(gb, SYM(copyMemory), DE, HL, n);
-  copy_done(gb, HL, n);
+  copy_done(gb, copy_loop(gb, SYM(copyMemory), DE, HL, n), n);
 }
 
 void copyMemoryReverse_hook(GB *gb) {
   unsigned n = B ? B : 256;
-  copy_loop(gb, SYM(copyMemoryReverse), HL, DE, n);
-  copy_done(gb, DE, n);
+  copy_done(gb, copy_loop(gb, SYM(copyMemoryReverse), HL, DE, n), n);
 }
 
 static void copy_bc_done(GB *gb, unsigned n) {
@@ -7571,8 +7571,7 @@ void copy256BytesFromBank_hook(GB *gb) {
   E = 0x00;
   B = 0x00;
   CYC(b_+9, b_+16);
-  copy_loop(gb, SYM(copyMemory), DE, HL, 256);
-  copy_done(gb, HL, 256);
+  copy_done(gb, copy_loop(gb, SYM(copyMemory), DE, HL, 256), 256);
 }
 
 // movement scripts (bank $0e bodies)

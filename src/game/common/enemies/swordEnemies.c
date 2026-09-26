@@ -462,9 +462,9 @@ void swordEnemy_chooseRandomAngleAndCounter1_chooseAngle_hook(GB *gb) {
   BASE(swordEnemy_chooseRandomAngleAndCounter1);
   CYC(b_+18, b_+19); A = C;
   CYC(b_+19, b_+20); alu_or(gb, A);
-  if (F & FZ) { CYCT(b_+20, (SYM(ecom_updateCardinalAngleAwayFromTarget_b0e) + 9)); ecom_updateCardinalAngleTowardTarget_b0e_hook(gb); return; } // jp z
+  if (F & FZ) { CYCT(b_+20, b_+23); TAIL(ecom_updateCardinalAngleTowardTarget_b0e); } // jp z
   CYC(b_+20, b_+23);
-  CYC(b_+23, (SYM(ecom_updateAngleTowardTarget_b0e) + 7)); TAIL(ecom_setRandomCardinalAngle_b0e); // jp
+  CYC(b_+23, b_+26); TAIL(ecom_setRandomCardinalAngle_b0e); // jp
 }
 
 // 0e:56fa, bare global; called from swordEnemy_state8.

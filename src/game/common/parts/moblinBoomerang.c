@@ -126,7 +126,7 @@ state0:
   CYC(b_+36, b_+37); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
   CYC(b_+37, b_+39); L = 0xc6; // Part.counter1
   CYC(b_+39, b_+41); mem_wr(gb, HL, 0x2d);
-  CYC(b_+41, b_+42); L = L + 1;
+  CYC(b_+41, b_+42); L = alu_inc8(gb, L);
   CYC(b_+42, b_+44); mem_wr(gb, HL, 0x06);
   CYC(b_+44, b_+46); L = 0xd0; // Part.speed
   CYC(b_+46, b_+48); mem_wr(gb, HL, 0x50);

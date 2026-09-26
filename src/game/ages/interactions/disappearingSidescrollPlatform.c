@@ -123,7 +123,7 @@ state2:
 flickerVisibility:
   CYC(b_+89, b_+91); E = INTERACTION_BASE + OBJ_VISIBLE;
   CYC(b_+91, b_+92); A = mem_rd(gb, DE);
-  CYC(b_+92, b_+94); A = (uint8_t)(A ^ 0x80);
+  CYC(b_+92, b_+94); alu_xor(gb, 0x80);
   CYC(b_+94, b_+95); mem_wr(gb, DE, A);
   RET(b_+95); return;
 
