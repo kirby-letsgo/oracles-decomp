@@ -217,6 +217,40 @@ static void filters_keep_pixel_alignment(void) {
   ASSERT(out[0] < 255 && out[2] < out[0]);              // paler and warm
 }
 
+static void bindings_remap_and_persist(void) {
+  Settings s, back;
+  settings_default(&s);
+  ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_A);        // X
+  ASSERT_EQ(bindings_key_action(&s.bindings, 229), ACT_SELECT);  // right shift, a second key
+  ASSERT_EQ(bindings_pad_action(&s.bindings, 5), ACT_PAUSE);     // guide
+  bindings_bind_key(&s.bindings, ACT_B, 27);                    // X moves from A to B
+  ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_B);
+  ASSERT_EQ(s.bindings.key[ACT_A][0], NO_BINDING);
+  ASSERT_EQ(s.bindings.key[ACT_B][1], 29);                      // Z stays as B's second key
+  bindings_bind_pad(&s.bindings, ACT_FAST, 0);
+  ASSERT_EQ(s.bindings.pad[ACT_A], NO_BINDING);
+  char buf[512];
+  settings_format(&s, buf, sizeof buf);
+  settings_default(&back);
+  settings_parse(&back, buf);
+  ASSERT(memcmp(&back.bindings, &s.bindings, sizeof s.bindings) == 0);
+  settings_parse(&back, "keys=1,2;3\n");                        // truncated: ignored
+  ASSERT(memcmp(&back.bindings, &s.bindings, sizeof s.bindings) == 0);
+  ControlsMenu m;
+  controls_open(&m);
+  controls_press(&m, &s.bindings, UI_DOWN);                     // DOWN
+  controls_press(&m, &s.bindings, UI_ACCEPT);
+  ASSERT(m.waiting);
+  controls_capture_pad(&m, &s.bindings, 3);                      // keyboard page: ignored
+  controls_capture_key(&m, &s.bindings, 22);                     // S
+  ASSERT(!m.waiting);
+  ASSERT_EQ(bindings_key_action(&s.bindings, 22), ACT_DOWN);
+  ASSERT_EQ(s.bindings.key[ACT_DOWN][1], 81);
+  m.sel = CTRL_RESET;
+  controls_press(&m, &s.bindings, UI_ACCEPT);
+  ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_A);
+}
+
 int main(void) {
   RUN(font_loads_from_the_rom_offset);
   RUN(text_draws_glyph_pixels);
@@ -229,5 +263,6 @@ int main(void) {
   RUN(settings_round_trip);
   RUN(settings_menu_changes_values);
   RUN(filters_keep_pixel_alignment);
+  RUN(bindings_remap_and_persist);
   return 0;
 }

@@ -11,29 +11,34 @@ void settings_default(Settings *s) {
   s->fullscreen = false;
   s->filter = FILTER_SHARP;
   s->gbc_colours = false;
+  bindings_default(&s->bindings);
 }
 
 void settings_parse(Settings *s, const char *text) {
-  char key[32], value[32];
+  char key[32], value[256];
   for (const char *p = text; p && *p;) {
     const char *eol = strchr(p, '\n');
     size_t len = eol ? (size_t)(eol - p) : strlen(p);
-    char line[96];
+    char line[300];
     snprintf(line, sizeof line, "%.*s", (int)(len < sizeof line ? len : sizeof line - 1), p);
-    if (sscanf(line, " %31[a-z_] = %31s", key, value) == 2) {
+    if (sscanf(line, " %31[a-z_] = %255s", key, value) == 2) {
       if (!strcmp(key, "volume")) { int v = atoi(value); if (v >= 0 && v <= 10) s->volume = v; }
       else if (!strcmp(key, "fullscreen")) s->fullscreen = !strcmp(value, "on");
       else if (!strcmp(key, "gbc_colours")) s->gbc_colours = !strcmp(value, "on");
-      else if (!strcmp(key, "filter"))
+      else if (!strcmp(key, "filter")) {
         for (int i = 0; i < FILTERS; i++) if (!strcmp(value, filter_keys[i])) s->filter = (ScreenFilter)i;
+      }
+      else if (!strcmp(key, "keys") || !strcmp(key, "pads")) bindings_parse_line(&s->bindings, key, value);
     }
     p = eol ? eol + 1 : NULL;
   }
 }
 
 int settings_format(const Settings *s, char *out, size_t size) {
-  return snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\ngbc_colours=%s\n", s->volume,
-                  s->fullscreen ? "on" : "off", filter_keys[s->filter], s->gbc_colours ? "on" : "off");
+  int n = snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\ngbc_colours=%s\n", s->volume,
+                   s->fullscreen ? "on" : "off", filter_keys[s->filter], s->gbc_colours ? "on" : "off");
+  if (n < (int)size) n += bindings_format(&s->bindings, out + n, size - n);
+  return n;
 }
 
 void settings_menu_open(SettingsMenu *m) { m->sel = SET_VOLUME; }

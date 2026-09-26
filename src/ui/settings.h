@@ -3,6 +3,7 @@
 #include "ui/ui.h"
 #include "ui/launcher.h"
 #include "ui/menu.h"
+#include "ui/controls.h"
 
 typedef enum { FILTER_SHARP, FILTER_SCANLINES, FILTER_LCD, FILTER_CRT, FILTERS } ScreenFilter;
 
@@ -11,6 +12,7 @@ typedef struct {
   bool fullscreen;
   ScreenFilter filter;
   bool gbc_colours;             // the Game Boy Color screen's paler, warmer colours
+  Bindings bindings;
 } Settings;
 
 typedef enum { SET_VOLUME, SET_SCREEN, SET_COLOURS, SET_FULLSCREEN, SET_CONTROLS, SET_ROWS } SettingsRow;

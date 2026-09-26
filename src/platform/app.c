@@ -92,33 +92,28 @@ static bool cached(const char *cache, const char *game) {
   return ok;
 }
 
-static uint8_t key_bit(SDL_Scancode sc) {
-  switch (sc) {
-  case SDL_SCANCODE_UP: return JOY_UP;
-  case SDL_SCANCODE_DOWN: return JOY_DOWN;
-  case SDL_SCANCODE_LEFT: return JOY_LEFT;
-  case SDL_SCANCODE_RIGHT: return JOY_RIGHT;
-  case SDL_SCANCODE_X: return JOY_A;
-  case SDL_SCANCODE_Z: return JOY_B;
-  case SDL_SCANCODE_RETURN: return JOY_START;
-  case SDL_SCANCODE_RSHIFT:
-  case SDL_SCANCODE_BACKSPACE: return JOY_SELECT;
-  default: return 0;
-  }
-}
+static Settings settings;
 
-static uint8_t pad_bit(int button) {
-  switch (button) {
-  case SDL_GAMEPAD_BUTTON_DPAD_UP: return JOY_UP;
-  case SDL_GAMEPAD_BUTTON_DPAD_DOWN: return JOY_DOWN;
-  case SDL_GAMEPAD_BUTTON_DPAD_LEFT: return JOY_LEFT;
-  case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: return JOY_RIGHT;
-  case SDL_GAMEPAD_BUTTON_SOUTH: return JOY_A;
-  case SDL_GAMEPAD_BUTTON_WEST: return JOY_B;
-  case SDL_GAMEPAD_BUTTON_START: return JOY_START;
-  case SDL_GAMEPAD_BUTTON_BACK: return JOY_SELECT;
-  default: return 0;
-  }
+static uint8_t joy_of(Action a) {
+  static const uint8_t bits[ACTIONS] = {JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT, JOY_A, JOY_B, JOY_START, JOY_SELECT, 0, 0};
+  return a < ACTIONS ? bits[a] : 0;
+}
+static uint8_t key_bit(SDL_Scancode sc) { return joy_of(bindings_key_action(&settings.bindings, (int)sc)); }
+static uint8_t pad_bit(int button) { return joy_of(bindings_pad_action(&settings.bindings, button)); }
+
+static const char *key_name(int sc) {
+  static char buf[32];
+  snprintf(buf, sizeof buf, "%s", SDL_GetScancodeName((SDL_Scancode)sc));
+  for (char *p = buf; *p; p++) *p = (char)SDL_toupper(*p);
+  return *buf ? buf : "?";
+}
+static const char *pad_name(int button) {
+  static char buf[32];
+  if (button == PAD_RIGHT_TRIGGER) return "RT";
+  const char *s = SDL_GetGamepadStringForButton((SDL_GamepadButton)button);
+  snprintf(buf, sizeof buf, "%s", s ? s : "?");
+  for (char *p = buf; *p; p++) *p = (char)SDL_toupper(*p);
+  return buf;
 }
 
 static uint8_t live_joy;
@@ -221,7 +216,6 @@ static bool any_slot(const char *dir) {
   return false;
 }
 
-static Settings settings;
 static char settings_path[1100];
 
 static void settings_store(void) {
@@ -379,6 +373,36 @@ static int pick_slot(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, Slots
   }
 }
 
+static bool run_controls(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb) {
+  static UiCanvas canvas;
+  ControlsMenu m;
+  controls_open(&m);
+  for (;;) {
+    test_keys();
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) return false;
+      if (ev.type == SDL_EVENT_GAMEPAD_ADDED) SDL_OpenGamepad(ev.gdevice.which);
+      if (m.waiting) {
+        if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) controls_capture_key(&m, &settings.bindings, (int)ev.key.scancode);
+        else if (ev.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) controls_capture_pad(&m, &settings.bindings, ev.gbutton.button);
+        else if (ev.type == SDL_EVENT_GAMEPAD_AXIS_MOTION && ev.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER && ev.gaxis.value > 16000)
+          controls_capture_pad(&m, &settings.bindings, PAD_RIGHT_TRIGGER);
+        if (!m.waiting) settings_store();
+        continue;
+      }
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
+      UiButton b;
+      if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+      if (controls_press(&m, &settings.bindings, b) == MENU_BACK) { settings_store(); return true; }
+      settings_store();
+    }
+    controls_draw(&m, &settings.bindings, font, theme, game_rgb, key_name, pad_name, &canvas);
+    present(ren, tex, &canvas.px[0][0][0]);
+    SDL_Delay(16);
+  }
+}
+
 static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb, SDL_AudioStream *audio) {
   static UiCanvas canvas;
   SettingsMenu m;
@@ -395,6 +419,7 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       bool was_full = settings.fullscreen;
       MenuAction a = settings_press(&m, &settings, b, &row);
       if (a == MENU_BACK) { settings_store(); return true; }
+      if (a == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, font, theme, game_rgb)) return false;
       if (settings.fullscreen != was_full) apply_window_settings(win);
       if (audio) SDL_SetAudioStreamGain(audio, volume_gain(false));
       settings_store();
@@ -617,8 +642,8 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         continue;
       }
       if (mode != MODE_PLAY) continue;
-      bool pause_key = (ev.type == SDL_EVENT_KEY_DOWN && ev.key.scancode == SDL_SCANCODE_ESCAPE && !ev.key.repeat) ||
-                       (ev.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && ev.gbutton.button == SDL_GAMEPAD_BUTTON_GUIDE);
+      bool pause_key = (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat && bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_PAUSE) ||
+                       (ev.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_PAUSE);
       if (pause_key) { mode = MODE_PAUSING; park_from = frames; live_joy = 0; boot.phase = BOOT_OFF; continue; }
       switch (ev.type) {
       case SDL_EVENT_KEY_DOWN:
@@ -633,18 +658,24 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
           muted = !muted;
           if (audio) SDL_SetAudioStreamGain(audio, volume_gain(muted));
         }
-        else if (ev.key.scancode == SDL_SCANCODE_TAB) fast = true;
+        else if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_FAST) fast = true;
         else live_joy |= key_bit(ev.key.scancode);
         break;
       case SDL_EVENT_KEY_UP:
-        if (ev.key.scancode == SDL_SCANCODE_TAB) fast = false;
+        if (bindings_key_action(&settings.bindings, (int)ev.key.scancode) == ACT_FAST) fast = false;
         live_joy &= ~key_bit(ev.key.scancode);
         break;
       case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-        if (ev.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) fast = ev.gaxis.value > 16000;
+        if (ev.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER && settings.bindings.pad[ACT_FAST] == PAD_RIGHT_TRIGGER) fast = ev.gaxis.value > 16000;
         break;
-      case SDL_EVENT_GAMEPAD_BUTTON_DOWN: live_joy |= pad_bit(ev.gbutton.button); break;
-      case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
+      case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_FAST) fast = true;
+        live_joy |= pad_bit(ev.gbutton.button);
+        break;
+      case SDL_EVENT_GAMEPAD_BUTTON_UP:
+        if (bindings_pad_action(&settings.bindings, ev.gbutton.button) == ACT_FAST) fast = false;
+        live_joy &= ~pad_bit(ev.gbutton.button);
+        break;
       }
     }
     if (!running) break;
