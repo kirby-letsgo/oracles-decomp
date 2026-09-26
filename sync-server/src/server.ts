@@ -8,7 +8,7 @@ if (!url) {
 }
 
 const { db, close } = await connect(url);
-const app = await buildApp({ db, logger: true });
+const app = await buildApp({ db, logger: true, trustProxy: process.env.TRUST_PROXY !== 'false' });
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {
     void app.close().then(close);

@@ -24,6 +24,13 @@ Codes are accepted with or without dashes. Upload headers: `x-device` (a name to
 `x-base-version` (the version the device last saw; a different current version answers `409` with it,
 so a device never overwrites a newer save by accident).
 
+## Rate limits
+
+Per client address: 300 requests a minute on every route, and 10 new accounts an hour. Per sync
+code: 60 uploads a minute, from any address. Over a limit the server answers `429` with
+`retry-after`. The client address is taken from the proxy's `X-Forwarded-For` (Coolify's Traefik);
+set `TRUST_PROXY=false` when the server is reachable directly, or anyone could fake their address.
+
 ## Development
 
 ```bash

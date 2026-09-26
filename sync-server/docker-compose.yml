@@ -7,6 +7,7 @@ services:
       - DATABASE_URL=postgres://${SERVICE_USER_POSTGRES}:${SERVICE_PASSWORD_POSTGRES}@db:5432/oracles_sync
       - PORT=3000
       - HOST=0.0.0.0
+      - TRUST_PROXY=true
     depends_on:
       db:
         condition: service_healthy

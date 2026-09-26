@@ -8,10 +8,25 @@ import type { Db } from './db/index.js';
 import { accounts, files } from './db/schema.js';
 import { KEEP_VERSIONS, MAX_FILE_BYTES, allowedFile, needsFormatVersion } from './files.js';
 
+export interface Limits {
+  requestsPerMinute: number; // per address, every route
+  accountsPerHour: number; // per address
+  uploadsPerMinute: number; // per sync code, from any address
+}
+
+export const DEFAULT_LIMITS: Limits = {
+  requestsPerMinute: 300,
+  accountsPerHour: 10,
+  uploadsPerMinute: 60,
+};
+
 export interface AppOptions {
   db: Db;
   logger?: boolean;
-  accountsPerHour?: number;
+  limits?: Partial<Limits>;
+  // Behind a reverse proxy (Coolify's Traefik) the client address comes from X-Forwarded-For;
+  // without this every request would share the proxy's address, and its limits.
+  trustProxy?: boolean;
 }
 
 const fileParams = z.object({ code: z.string(), game: z.string(), name: z.string() });
@@ -35,10 +50,12 @@ const fileMeta = {
 export async function buildApp({
   db,
   logger = false,
-  accountsPerHour = 10,
+  limits = {},
+  trustProxy = false,
 }: AppOptions): Promise<FastifyInstance> {
-  const app = Fastify({ logger, bodyLimit: MAX_FILE_BYTES });
-  await app.register(rateLimit, { global: false });
+  const limit = { ...DEFAULT_LIMITS, ...limits };
+  const app = Fastify({ logger, bodyLimit: MAX_FILE_BYTES, trustProxy });
+  await app.register(rateLimit, { max: limit.requestsPerMinute, timeWindow: '1 minute' });
   app.addContentTypeParser('application/octet-stream', { parseAs: 'buffer' }, (_req, body, done) =>
     done(null, body),
   );
@@ -63,7 +80,7 @@ export async function buildApp({
 
   app.post(
     '/accounts',
-    { config: { rateLimit: { max: accountsPerHour, timeWindow: '1 hour' } } },
+    { config: { rateLimit: { max: limit.accountsPerHour, timeWindow: '1 hour' } } },
     async (_req, reply) => {
       for (let attempt = 0; attempt < 5; attempt++) {
         const [row] = await db
@@ -89,55 +106,73 @@ export async function buildApp({
     return { code: formatCode(account.code), createdAt: account.createdAt, files: current };
   });
 
-  app.put('/accounts/:code/files/:game/:name', async (req, reply) => {
-    const { code, game, name } = fileParams.parse(req.params);
-    if (!allowedFile(game, name)) return reply.code(400).send({ error: 'this file is not synced' });
-    if (!Buffer.isBuffer(req.body)) {
-      return reply.code(415).send({ error: 'send the file as application/octet-stream' });
-    }
-    const headers = uploadHeaders.parse(req.headers);
-    if (needsFormatVersion(name) && headers['x-format-version'] === undefined) {
-      return reply.code(400).send({ error: 'save states need x-format-version' });
-    }
-    const account = await findAccount(code);
-    if (!account) return reply.code(404).send({ error: 'no such account' });
+  const perCode = (req: { params: unknown; ip: string }) => {
+    const { code } = req.params as { code?: string };
+    return `code:${normalizeCode(code ?? '') ?? req.ip}`;
+  };
 
-    const data = req.body;
-    const sha256 = createHash('sha256').update(data).digest('hex');
-    const same = and(eq(files.accountId, account.id), eq(files.game, game), eq(files.name, name));
-    const result = await db.transaction(async (tx) => {
-      const [latest] = await tx
-        .select({ version: files.version, sha256: files.sha256 })
-        .from(files)
-        .where(same)
-        .orderBy(desc(files.version))
-        .limit(1);
-      const current = latest?.version ?? 0;
-      const base = headers['x-base-version'];
-      if (base !== undefined && base !== current) return { conflict: current };
-      if (latest?.sha256 === sha256) return { version: current, created: false };
-      const version = current + 1;
-      await tx.insert(files).values({
-        accountId: account.id,
-        game,
-        name,
-        version,
-        data,
-        size: data.length,
-        sha256,
-        device: headers['x-device'] ?? null,
-        formatVersion: headers['x-format-version'] ?? null,
+  app.put(
+    '/accounts/:code/files/:game/:name',
+    {
+      config: {
+        rateLimit: {
+          max: limit.uploadsPerMinute,
+          timeWindow: '1 minute',
+          keyGenerator: perCode,
+        },
+      },
+    },
+    async (req, reply) => {
+      const { code, game, name } = fileParams.parse(req.params);
+      if (!allowedFile(game, name))
+        return reply.code(400).send({ error: 'this file is not synced' });
+      if (!Buffer.isBuffer(req.body)) {
+        return reply.code(415).send({ error: 'send the file as application/octet-stream' });
+      }
+      const headers = uploadHeaders.parse(req.headers);
+      if (needsFormatVersion(name) && headers['x-format-version'] === undefined) {
+        return reply.code(400).send({ error: 'save states need x-format-version' });
+      }
+      const account = await findAccount(code);
+      if (!account) return reply.code(404).send({ error: 'no such account' });
+
+      const data = req.body;
+      const sha256 = createHash('sha256').update(data).digest('hex');
+      const same = and(eq(files.accountId, account.id), eq(files.game, game), eq(files.name, name));
+      const result = await db.transaction(async (tx) => {
+        const [latest] = await tx
+          .select({ version: files.version, sha256: files.sha256 })
+          .from(files)
+          .where(same)
+          .orderBy(desc(files.version))
+          .limit(1);
+        const current = latest?.version ?? 0;
+        const base = headers['x-base-version'];
+        if (base !== undefined && base !== current) return { conflict: current };
+        if (latest?.sha256 === sha256) return { version: current, created: false };
+        const version = current + 1;
+        await tx.insert(files).values({
+          accountId: account.id,
+          game,
+          name,
+          version,
+          data,
+          size: data.length,
+          sha256,
+          device: headers['x-device'] ?? null,
+          formatVersion: headers['x-format-version'] ?? null,
+        });
+        await tx.delete(files).where(and(same, lt(files.version, version - KEEP_VERSIONS + 1)));
+        return { version, created: true };
       });
-      await tx.delete(files).where(and(same, lt(files.version, version - KEEP_VERSIONS + 1)));
-      return { version, created: true };
-    });
-    if ('conflict' in result) {
-      return reply
-        .code(409)
-        .send({ error: 'the file changed on another device', version: result.conflict });
-    }
-    return reply.code(result.created ? 201 : 200).send({ version: result.version, sha256 });
-  });
+      if ('conflict' in result) {
+        return reply
+          .code(409)
+          .send({ error: 'the file changed on another device', version: result.conflict });
+      }
+      return reply.code(result.created ? 201 : 200).send({ version: result.version, sha256 });
+    },
+  );
 
   app.get('/accounts/:code/files/:game/:name', async (req, reply) => {
     const { code, game, name } = fileParams.parse(req.params);

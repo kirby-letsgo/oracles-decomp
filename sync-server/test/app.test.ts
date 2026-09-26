@@ -13,7 +13,10 @@ let app: FastifyInstance;
 beforeEach(async () => {
   const db = drizzle(new PGlite(), { schema });
   await migrate(db, { migrationsFolder });
-  app = await buildApp({ db, accountsPerHour: 3 });
+  app = await buildApp({
+    db,
+    limits: { accountsPerHour: 3, uploadsPerMinute: 10, requestsPerMinute: 40 },
+  });
 });
 
 afterEach(async () => {
@@ -54,6 +57,49 @@ describe('accounts', () => {
     for (let i = 0; i < 3; i++) await newAccount();
     const res = await app.inject({ method: 'POST', url: '/accounts' });
     expect(res.statusCode).toBe(429);
+  });
+});
+
+describe('rate limits', () => {
+  it('limits every route per address', async () => {
+    const code = await newAccount();
+    let status = 0;
+    for (let i = 0; i < 41 && status !== 429; i++) {
+      status = (await app.inject({ method: 'GET', url: `/accounts/${code}` })).statusCode;
+    }
+    expect(status).toBe(429);
+    const other = await app.inject({ method: 'GET', url: '/health', remoteAddress: '10.0.0.2' });
+    expect(other.statusCode).toBe(200);
+  });
+
+  it('limits uploads per sync code, whatever the address', async () => {
+    const code = await newAccount();
+    for (let i = 0; i < 10; i++) {
+      const res = await app.inject({
+        method: 'PUT',
+        url: `/accounts/${code}/files/ages/sram.sav`,
+        headers: { 'content-type': 'application/octet-stream' },
+        payload: Buffer.from(`save ${i}`),
+        remoteAddress: `10.0.1.${i}`,
+      });
+      expect(res.statusCode).toBe(201);
+    }
+    const blocked = await upload(code, 'ages', 'sram.sav', Buffer.from('one more'));
+    expect(blocked.statusCode).toBe(429);
+    const otherCode = await newAccount();
+    expect((await upload(otherCode, 'ages', 'sram.sav', Buffer.from('x'))).statusCode).toBe(201);
+  });
+
+  it('uses the forwarded address behind a proxy', async () => {
+    await app.close();
+    const db = drizzle(new PGlite(), { schema });
+    await migrate(db, { migrationsFolder });
+    app = await buildApp({ db, trustProxy: true, limits: { accountsPerHour: 1 } });
+    const from = (ip: string) =>
+      app.inject({ method: 'POST', url: '/accounts', headers: { 'x-forwarded-for': ip } });
+    expect((await from('1.1.1.1')).statusCode).toBe(201);
+    expect((await from('1.1.1.1')).statusCode).toBe(429);
+    expect((await from('2.2.2.2')).statusCode).toBe(201);
   });
 });
 
