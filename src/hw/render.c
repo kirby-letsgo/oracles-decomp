@@ -11,10 +11,37 @@ static inline int tile_pixel(const uint8_t *td, int bit) {
   return (((td[1] >> bit) & 1) << 1) | ((td[0] >> bit) & 1);
 }
 
+RenderLineRegs *render_line_regs(const GB *gb) {
+  static struct { const GB *gb; RenderLineRegs regs; } slots[8];
+  static int next;
+  for (int i = 0; i < 8; i++)
+    if (slots[i].gb == gb) return &slots[i].regs;
+  int i = next;
+  next = (next + 1) % 8;
+  memset(&slots[i], 0, sizeof slots[i]);
+  slots[i].gb = gb;
+  return &slots[i].regs;
+}
+
+void render_lines_blank(const GB *gb) { memset(render_line_regs(gb)->lcdc, 0, FB_H); }
+
 void render_scanline(GB *gb) {
   int ly = gb->io[R_LY];
   if (ly >= FB_H) return;
   uint8_t lcdc = gb->io[R_LCDC];
+  RenderLineRegs *lines = render_line_regs(gb);
+  lines->scx[ly] = gb->io[R_SCX];
+  lines->scy[ly] = gb->io[R_SCY];
+  lines->lcdc[ly] = lcdc;
+  lines->wx[ly] = gb->io[R_WX];
+  lines->wy[ly] = gb->io[R_WY];
+  if (ly == 0) {
+    lines->current ^= 1;
+    memcpy(lines->vram[lines->current], gb->vram, sizeof lines->vram[0]);
+    memcpy(lines->bg_pal[lines->current], gb->bg_pal, sizeof lines->bg_pal[0]);
+    memcpy(lines->oam[lines->current], gb->oam, sizeof lines->oam[0]);
+  }
+  lines->drawn[ly] = lines->current;
   uint16_t *row = &gb->framebuffer[ly * FB_W];
   uint8_t bg_ci[FB_W], bg_prio[FB_W];
   uint8_t scx = gb->io[R_SCX], scy = gb->io[R_SCY], wx = gb->io[R_WX], wy = gb->io[R_WY];

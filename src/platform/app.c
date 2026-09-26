@@ -27,6 +27,7 @@
 #include "ui/touch.h"
 #include "ui/syncui.h"
 #include "platform/sync_client.h"
+#include "wide/wide.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -357,7 +358,6 @@ static bool poll_event(SDL_Event *ev) {
 // next whole scale and shrinks that smoothly, so pixels stay sharp without uneven widths. The
 // overlay is drawn in game pixels too.
 #define MAX_FILTER_SCALE 12
-#define WIDE_W 256
 
 static uint64_t test_tick;
 
@@ -454,6 +454,21 @@ static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
   }
   shot_if_due(ren);
   SDL_RenderPresent(ren);
+}
+
+// A game frame: in widescreen the room around the camera fills the sides (the message stays centred).
+static void present_game(SDL_Renderer *ren, SDL_Texture *tex, const GBSample *sample, const uint8_t *rgb, bool seasons) {
+  if (!settings.widescreen) { present(ren, tex, rgb); return; }
+  static uint8_t wide[WIDE_W * FB_H * 3];
+  WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}};
+  wide_render(sample, &o, wide);
+  if (toast[0] && SDL_GetTicks() < toast_until && overlay_font && overlay_font->loaded) {
+    static UiCanvas middle;
+    for (int y = 0; y < FB_H; y++) memcpy(middle.px[y], wide + ((size_t)y * WIDE_W + WIDE_SIDE) * 3, FB_W * 3);
+    ui_toast(&middle, overlay_font, &overlay_theme, toast);
+    for (int y = 0; y < FB_H; y++) memcpy(wide + ((size_t)y * WIDE_W + WIDE_SIDE) * 3, middle.px[y], FB_W * 3);
+  }
+  present_frame(ren, wide, WIDE_W);
 }
 
 // A 160-wide picture (a menu, or the game where the sides are not drawn): with the current message,
@@ -1243,7 +1258,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (audio && mode == MODE_PLAY) SDL_PutAudioStreamData(audio, samples, n * 4);
     framebuffer_to_rgb(gb->sample->framebuffer, rgb);
-    present(ren, tex, rgb);
+    present_game(ren, tex, gb->sample, rgb, !ages);
     if (frames % 600 == 0) save_sram(gb, sav);
     if (gs->max_frames && frames >= gs->max_frames) running = false;
   }

@@ -37,6 +37,11 @@ typedef struct {
   uint32_t rom_bank;
   uint16_t framebuffer[FB_W * FB_H];
   bool joy_latched, joy_read;
+  // the scroll and LCDC each line was drawn with (for widescreen; not part of any hash)
+  uint8_t line_scx[FB_H], line_scy[FB_H], line_lcdc[FB_H], line_wx[FB_H], line_wy[FB_H];
+  // VRAM and BG palettes at the start of the last two LCD frames, and which of the two each line
+  // was drawn from (the sample is taken mid-LCD-frame, so its lines can come from both)
+  uint8_t drawn_vram[2][2][8192], drawn_bg_pal[2][64], drawn_oam[2][160], line_drawn[FB_H];
 } GBSample;
 
 typedef struct { uint16_t bank, addr; const char *name; uint64_t mcycles; } DispatchRec;

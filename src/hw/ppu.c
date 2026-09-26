@@ -1,4 +1,5 @@
 #include "core/gb.h"
+#include "hw/render.h"
 
 static void set_mode(GB *gb, uint8_t mode) {
   gb->ppu_mode = mode;
@@ -31,6 +32,7 @@ void ppu_write_lcdc(GB *gb, uint8_t v) {
     gb->stat_line = false;
     set_mode(gb, 0);
     for (int i = 0; i < FB_W * FB_H; i++) gb->framebuffer[i] = 0x7fff;
+    render_lines_blank(gb);
   } else if (!was_on && (v & 0x80)) {
     gb->io[R_LY] = 0;
     gb->ppu_dot = 0;

@@ -3,6 +3,7 @@
 #include "gb.h"
 #include "bus.h"
 #include "hash.h"
+#include "hw/render.h"
 #include <string.h>
 
 void gb_init(GB *gb) { memset(gb, 0, sizeof *gb); gb->samples = calloc(16, sizeof *gb->samples); gb->step = gb_step; }
@@ -127,6 +128,16 @@ void gb_tick(GB *gb) {
       memcpy(sm->bg_pal, gb->bg_pal, sizeof sm->bg_pal);
       memcpy(sm->ob_pal, gb->ob_pal, sizeof sm->ob_pal);
       memcpy(sm->framebuffer, gb->framebuffer, sizeof sm->framebuffer);
+      const RenderLineRegs *lines = render_line_regs(gb);
+      memcpy(sm->line_scx, lines->scx, FB_H);
+      memcpy(sm->line_scy, lines->scy, FB_H);
+      memcpy(sm->line_lcdc, lines->lcdc, FB_H);
+      memcpy(sm->line_wx, lines->wx, FB_H);
+      memcpy(sm->line_wy, lines->wy, FB_H);
+      memcpy(sm->drawn_vram, lines->vram, sizeof sm->drawn_vram);
+      memcpy(sm->drawn_bg_pal, lines->bg_pal, sizeof sm->drawn_bg_pal);
+      memcpy(sm->line_drawn, lines->drawn, FB_H);
+      memcpy(sm->drawn_oam, lines->oam, sizeof sm->drawn_oam);
       sm->ie = gb->ie; sm->rom_bank = gb->rom_bank; sm->ram_bank = gb->ram_bank;
       sm->joy_latched = gb->joy_latched; sm->joy_read = gb->joy_read;
       gb->sample_count++;
