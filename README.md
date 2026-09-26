@@ -64,6 +64,16 @@ cmake --build build-win
 wine build-win/test_native_tas.exe
 ```
 
+## Downloads
+
+Every push to `main` rebuilds the apps and replaces the rolling
+[nightly release](https://github.com/kirby-letsgo/oracles-decomp/releases/tag/nightly): macOS
+(universal DMG), Windows (x64 zip), Linux (x86_64 AppImage) and Android (arm64 APK). You need your
+own Oracle of Ages / Seasons (USA) ROMs. The workflow is `.github/workflows/release.yml`; the APK is
+signed with the release key from the repository secrets `ANDROID_KEYSTORE_B64`,
+`ANDROID_KEYSTORE_PASSWORD` and `ANDROID_KEY_ALIAS` (debug-signed, with a warning, when they are
+missing).
+
 ## Playing
 
 Two apps, same game:

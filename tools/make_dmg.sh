@@ -16,6 +16,7 @@ if [ -n "$sdl" ] && [ "${sdl#@}" = "$sdl" ]; then
   install_name_tool -change "$sdl" "@executable_path/../Frameworks/$(basename "$sdl")" "$exe"
   codesign --force --sign - "$app/Contents/Frameworks/$(basename "$sdl")" "$exe"
 fi
+codesign --force --deep --sign - "$app"
 rm -f "$out"
 hdiutil create -volname Oracles -srcfolder "$app" -ov -format UDZO "$out" >/dev/null
 echo "$out"

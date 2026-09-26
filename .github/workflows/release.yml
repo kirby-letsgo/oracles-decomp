@@ -1,0 +1,134 @@
+name: release
+# Builds the app for macOS, Windows, Linux and Android on every push to main and replaces the
+# assets of the rolling "nightly" pre-release with them.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install ninja
+      - name: Build (universal)
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DORACLES_SDL_VENDORED=ON \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+          cmake --build build --target oracles-native-app test_ui
+          ./build/test_ui
+      - name: Package
+        run: |
+          tools/make_dmg.sh build Oracles-macOS.dmg
+          lipo -archs build/Oracles.app/Contents/MacOS/Oracles
+      - uses: actions/upload-artifact@v4
+        with: { name: macos, path: Oracles-macOS.dmg }
+
+  windows:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends mingw-w64 ninja-build cmake
+      - name: Build (x64, MinGW-w64)
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DORACLES_SDL_VENDORED=ON \
+            -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake
+          cmake --build build --target oracles-native
+      - name: Package
+        run: |
+          mkdir Oracles && cp build/Oracles.exe Oracles/
+          zip -r Oracles-windows-x64.zip Oracles
+      - uses: actions/upload-artifact@v4
+        with: { name: windows, path: Oracles-windows-x64.zip }
+
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/linux_deps.sh
+      - name: Build (x86_64)
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DORACLES_SDL_VENDORED=ON
+          cmake --build build --target oracles-native test_ui
+          ./build/test_ui
+      - name: Package (AppImage)
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          sudo apt-get install -y --no-install-recommends file
+          curl -sSLo linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          cp icon/oracles-256.png AppDir/usr/share/icons/hicolor/256x256/apps/oracles.png
+          ./linuxdeploy --appdir AppDir --executable build/oracles-native \
+            --desktop-file packaging/oracles.desktop --icon-file icon/oracles-256.png --output appimage
+          mv Oracles-*.AppImage Oracles-linux-x86_64.AppImage
+      - uses: actions/upload-artifact@v4
+        with: { name: linux, path: Oracles-linux-x86_64.AppImage }
+
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - name: SDK packages
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;27.2.12479018" "cmake;3.31.6" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+      - name: Build (arm64)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ORACLES_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ORACLES_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORACLES_VERSION_CODE: ${{ github.run_number }}
+          ORACLES_VERSION_NAME: nightly-${{ github.run_number }}
+        working-directory: android
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            export ORACLES_KEYSTORE="$RUNNER_TEMP/release.jks"
+            ./gradlew assembleRelease --console=plain
+            cp app/build/outputs/apk/release/app-release.apk ../Oracles-android.apk
+          else
+            echo "::warning::No release keystore in the secrets: publishing a debug-signed APK"
+            ./gradlew assembleDebug --console=plain
+            cp app/build/outputs/apk/debug/app-debug.apk ../Oracles-android.apk
+          fi
+      - uses: actions/upload-artifact@v4
+        with: { name: android, path: Oracles-android.apk }
+
+  publish:
+    needs: [macos, windows, linux, android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: dist, merge-multiple: true }
+      - name: Replace the nightly release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la dist
+          git tag -f nightly
+          git push -f origin nightly
+          cat > notes.md <<EOF
+          Rolling build of \`main\` at ${GITHUB_SHA::7} ($(date -u +%Y-%m-%d)).
+
+          You need your own ROMs: The Legend of Zelda: Oracle of Ages and/or Oracle of Seasons (USA).
+          On first launch the app asks for one; it keeps the graphics, sound and data and never needs
+          the ROM again.
+
+          - **macOS** (Apple Silicon and Intel, 11+): open the DMG, drag Oracles out, then right-click > Open the first time (the app is not notarized).
+          - **Windows** (64-bit): unzip and run Oracles.exe (SmartScreen: More info > Run anyway).
+          - **Linux** (x86_64): \`chmod +x Oracles-linux-x86_64.AppImage\` and run it.
+          - **Android** (8+, arm64): install the APK (allow installs from your browser or file manager).
+          EOF
+          gh release delete nightly --yes || true
+          gh release create nightly dist/* --prerelease --title "Nightly" --notes-file notes.md --target "$GITHUB_SHA"
