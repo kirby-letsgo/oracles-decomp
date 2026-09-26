@@ -146,7 +146,7 @@ applySpeed:
   CALL_C(b_+129, objectApplySpeed_hook, SYM(objectApplySpeed), b_+132);
   CYC(b_+132, b_+135); A = mem_rd(gb, wLinkRidingObject);
   CYC(b_+135, b_+136); alu_cp(gb, D);
-  if (!(F & FZ)) { CYCT(b_+136, b_+137); ret_effect(gb); return; } // ret nz
+  if (!(F & FZ)) { CYCT(b_+136, b_+137); ret_effect(gb); goto afterUpdateState; } // ret nz
   CYC(b_+136, b_+137);
   CYC(b_+137, b_+139); E = INTERACTION_BASE + OBJ_ANGLE;
   CYC(b_+139, b_+140); A = mem_rd(gb, DE);

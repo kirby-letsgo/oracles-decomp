@@ -154,7 +154,7 @@ substate0:
   CYC(b_+23, b_+25); E = ENEMY_BASE + 0x03; // Enemy.var03
   CYC(b_+25, b_+26); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
-  flyingTile_saveTileDataAddress(gb); return; // fallthrough
+  flyingTile_saveTileDataAddress(gb); ret_effect(gb); return; // fallthrough
 
 substate1:
   CALL_C(b_+35, ecom_decCounter1_b0e_hook, SYM(ecom_decCounter1_b0e), b_+38);
@@ -168,7 +168,7 @@ substate1:
   CYC(b_+46, b_+47); A = mem_rd(gb, HL); SET_HL(HL + 1); // ldi a,(hl)
   CYC(b_+47, b_+48); C = A;
   PUSH(b_+48, HL);
-  CYC(b_+49, b_+52); flyingTile_saveTileDataAddress(gb);
+  CYC(b_+49, b_+52); push_effect(gb, b_+52); flyingTile_saveTileDataAddress(gb); ret_effect(gb);
   CYC(b_+52, b_+54); B = 0x52; // ENEMY_FLYING_TILE
   CALL_C(b_+54, ecom_spawnEnemyWithSubid01_b0e_hook, SYM(ecom_spawnEnemyWithSubid01_b0e), b_+57);
   if (!(F & FZ)) { CYCT(b_+57, b_+59); goto childDone; } // jr nz

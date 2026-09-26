@@ -422,7 +422,8 @@ haveIndex:
   CYC(b_+23, b_+25); E = ENEMY_BASE + OBJ_SPEED;
   CYC(b_+25, b_+26); A = mem_rd(gb, HL);
   CYC(b_+26, b_+27); mem_wr(gb, DE, A);
-  CYC(b_+27, b_+29); TAIL(enemyAnimate); // jr to the trampoline at 0d:55c1, which is just enemyAnimate
+  CYC(b_+27, b_+29); // jr to the trampoline ghini_subid02@animate
+  CYC((SYM(ghini_subid02) + 82), (SYM(ghini_subid02) + 85)); TAIL(enemyAnimate); // jp
 }
 
 // 0d:55fe, bare global.

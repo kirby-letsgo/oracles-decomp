@@ -23,6 +23,12 @@ README lists both Oracles under "Games requiring RAM clear"), so it runs without
 starts from. `tests/test_tas.c` replays the first 60,000 frames with hooks (`TAS_FRAMES` lifts it)
 and `tests/test_native_tas.c` the whole movie on the native build.
 
+The whole movie matches GBHawk 2.11.1: `--no-hooks --dump OUT` against `tools/bizhawk/lua/dump.lua`
+run on the `.bk2` gives the same WRAM hash (fnv over $c300-$cfff, the 8-field lines, every 60
+frames) at all 5358 checkpoints, with our frame f compared to GBHawk frame f+1. Compare the hash
+column only: `tools/compare_dumps.py`'s key-byte columns read Ages addresses (Seasons keeps its
+RNG and group/room elsewhere) and split at frame 452 on a matching run.
+
 Older attempts: `seasons.vbm` (SwordlessLink and Tompa 2012, VBA-rr, 309,433
 frames; `tools/vbm_to_inputs.py` converts it) reaches the file-select menu with ~220 blank
 frames prepended to account for VBA-rr skipping the boot ROM, then desyncs. `seasons.bk2` is a

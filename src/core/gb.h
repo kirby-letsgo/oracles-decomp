@@ -138,6 +138,8 @@ void timer_tick(GB *gb);
 void timer_write_div(GB *gb);
 void gb_speed_switch(GB *gb);
 void timer_write_tac(GB *gb, uint8_t v);
+uint8_t timer_io_read(GB *gb, uint8_t r);
+void timer_io_write(GB *gb, uint8_t r, uint8_t v);
 void ppu_tick(GB *gb, int dots);
 void ppu_write_lcdc(GB *gb, uint8_t v);
 void ppu_update_stat(GB *gb);
