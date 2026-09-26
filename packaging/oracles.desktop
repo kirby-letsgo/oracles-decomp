@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Oracles
+Comment=The Legend of Zelda: Oracle of Ages and Seasons, native (bring your own ROMs)
+Exec=oracles-native
+Icon=oracles
+Categories=Game;
+Terminal=false

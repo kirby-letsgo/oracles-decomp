@@ -3,20 +3,25 @@
 // registers on the outgoing stack, swaps stack pointers and restores from the incoming one; a
 // fresh fiber's stack holds an initial frame that "returns" into fiber_tramp, which calls
 // fiber_main with the GB. Stacks are mmap regions with a guard page at the low end. The switch is
-// file-scope assembly rather than naked functions, which GCC ignores on arm64.
+// file-scope assembly rather than naked functions, which GCC ignores on arm64. Windows uses its
+// own fibers (CreateFiber / SwitchToFiber), which also keep the thread's stack bounds right.
 #include "rt/fibers.h"
 #include "hooks/hooks.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/mman.h>
 #include <unistd.h>
+#endif
 
 #define NFIBERS 4
 #define STACK_SIZE (1u << 20)
 
 typedef struct {
-  void *sp;
+  void *sp;                     // saved stack pointer (Windows: the fiber)
   uint8_t *stack;
   bool live;
   HookCtx ctx;
@@ -26,12 +31,24 @@ typedef struct {
 struct Fibers {
   Fiber f[NFIBERS];
   int current, request;
-  void *kernel_sp;
+  void *kernel_sp;              // Windows: the kernel's fiber
   HookCtx kernel_ctx;
 };
 
 static void fiber_main(void *arg);
 
+#if defined(_WIN32)
+static void WINAPI fiber_entry(void *arg) { fiber_main(arg); }
+
+static void fiber_prepare(struct Fibers *F, Fiber *f, GB *gb) {
+  if (!F->kernel_sp) F->kernel_sp = IsThreadAFiber() ? GetCurrentFiber() : ConvertThreadToFiber(NULL);
+  if (f->sp) DeleteFiber(f->sp);
+  f->sp = CreateFiber(STACK_SIZE, fiber_entry, gb);
+  if (!f->sp) { fprintf(stderr, "fiber: CreateFiber failed (%lu)\n", (unsigned long)GetLastError()); abort(); }
+}
+static void fiber_enter(struct Fibers *F, Fiber *f) { (void)F; SwitchToFiber(f->sp); }
+static void fiber_leave(struct Fibers *F, Fiber *f) { (void)f; SwitchToFiber(F->kernel_sp); }
+#else
 
 #ifdef __APPLE__
 #define ASM_FUNC(name) ".globl _" #name "\n.p2align 4\n_" #name ":\n"
@@ -117,6 +134,7 @@ static void fiber_prepare(struct Fibers *F, Fiber *f, GB *gb) {
 }
 static void fiber_enter(struct Fibers *F, Fiber *f) { oracles_fiber_swap(&F->kernel_sp, f->sp); }
 static void fiber_leave(struct Fibers *F, Fiber *f) { oracles_fiber_swap(&f->sp, F->kernel_sp); }
+#endif
 
 static struct Fibers *fibers(GB *gb) {
   if (!gb->fib) { gb->fib = calloc(1, sizeof *gb->fib); gb->fib->current = -1; }

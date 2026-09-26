@@ -55,6 +55,25 @@ Linux (Debian/Ubuntu; other distros need the same libraries): `tools/linux_deps.
 compiler, CMake, Ninja and SDL's build dependencies, then build as above with
 `-DORACLES_SDL_VENDORED=ON` (distributions rarely ship SDL3 yet).
 
+Windows (64-bit) is cross-compiled with MinGW-w64 (`brew install mingw-w64` or `apt install
+mingw-w64`); the result is a single `Oracles.exe` that needs only system DLLs. Wine runs the tests.
+
+```bash
+cmake -S . -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DORACLES_SDL_VENDORED=ON
+cmake --build build-win
+wine build-win/test_native_tas.exe
+```
+
+## Downloads
+
+Every push to `main` rebuilds the apps and replaces the rolling
+[nightly release](https://github.com/kirby-letsgo/oracles-decomp/releases/tag/nightly): macOS
+(universal DMG), Windows (x64 zip), Linux (x86_64 AppImage) and Android (arm64 APK). You need your
+own Oracle of Ages / Seasons (USA) ROMs. The workflow is `.github/workflows/release.yml`; the APK is
+signed with the release key from the repository secrets `ANDROID_KEYSTORE_B64`,
+`ANDROID_KEYSTORE_PASSWORD` and `ANDROID_KEY_ALIAS` (debug-signed, with a warning, when they are
+missing).
+
 ## Playing
 
 Two apps, same game:
@@ -96,6 +115,19 @@ inventory and press one to assign it, then hold it in play to use the item).
 
 `ORACLES_TOUCH=1 ./build/oracles-native` shows the phone's touch controls on the desktop, with the
 mouse as a finger.
+
+## Save sync
+
+Settings > SYNC keeps saves in step across devices through the sync server (`sync-server/`): CREATE
+ACCOUNT gives a 16-digit code, and ENTER CODE on another device joins it (no passwords). Synced:
+each game's save, save-state slots with their pictures and item buttons, and the shared settings;
+never the ROM-derived files. It syncs when the launcher opens, before a game starts, and when you
+leave a game or the app; SYNC NOW does it by hand. When a save changed on two devices since they
+last synced, a KEEP WHICH? screen shows both (files and hearts, or the state's picture) and you pick.
+A save state only moves between builds with the same state format. The server address is the CMake
+setting `ORACLES_SYNC_URL`; a device can use another one with `url=` in `sync.ini` in its app folder.
+HTTP uses the system's own TLS: libcurl (macOS, Linux; sync is off without it), WinHTTP, and
+Android's HttpURLConnection. `ORACLES_SYNC_URL=http://host test_sync_http` checks a server.
 
 ## Android
 

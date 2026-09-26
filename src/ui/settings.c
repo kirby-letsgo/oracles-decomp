@@ -61,7 +61,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case UI_DOWN: m->sel = (SettingsRow)((m->sel + 1) % SET_ROWS); return MENU_NONE;
   case UI_BACK: return MENU_BACK;
   case UI_ACCEPT:
-    if (m->sel == SET_CONTROLS) { *picked = m->sel; return MENU_PICK; }
+    if (m->sel == SET_CONTROLS || m->sel == SET_SYNC) { *picked = m->sel; return MENU_PICK; }
     dir = 1;
     break;
   default: break;
@@ -81,19 +81,14 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   return MENU_NONE;
 }
 
-void settings_draw(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, const uint8_t *game_rgb, UiCanvas *c) {
-  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "SCALE", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS"};
-  if (game_rgb) ui_dim_rgb(c, game_rgb);
-  else ui_clear(c, t->bg);
-  ui_box(c, 0, 0, UI_W, UI_H, t->border, t->panel);
-  ui_text(c, font, 4, 0, "SETTINGS", t->highlight);
-  enum { VISIBLE = 6 };
-  int first = (int)m->sel - VISIBLE / 2;
-  if (first > SET_ROWS - VISIBLE) first = SET_ROWS - VISIBLE;
+void settings_draw_list(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, int y0, int visible, bool focused, UiCanvas *c) {
+  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "SCALE", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS", "SYNC"};
+  int first = (int)m->sel - visible / 2;
+  if (first > SET_ROWS - visible) first = SET_ROWS - visible;
   if (first < 0) first = 0;
-  for (int i = first; i < first + VISIBLE && i < SET_ROWS; i++) {
-    int y = 18 + (i - first) * 17;
-    bool on = (int)m->sel == i;
+  for (int i = first; i < first + visible && i < SET_ROWS; i++) {
+    int y = y0 + (i - first) * 17;
+    bool on = focused && (int)m->sel == i;
     UiColor fg = on ? t->highlight : t->text;
     if (on) ui_glyph(c, font, 2, y, '>', t->highlight);
     ui_text(c, font, 10, y, labels[i], fg);
@@ -108,9 +103,18 @@ void settings_draw(const SettingsMenu *m, const Settings *s, const UiFont *font,
     case SET_FAST_MENUS: snprintf(v, sizeof v, "%s", s->fast_menus ? "ON" : "OFF"); break;
     case SET_QUICK_SWAP: snprintf(v, sizeof v, "%s", s->quick_swap ? "ON" : "OFF"); break;
     case SET_FOUR_SLOTS: snprintf(v, sizeof v, "%s", s->four_slots ? "ON" : "OFF"); break;
+    case SET_SYNC: snprintf(v, sizeof v, "%s", s->sync_label[0] ? s->sync_label : "OFF"); break;
     default: break;
     }
     if (*v) ui_text(c, font, UI_W - 4 - ui_text_width(v), y, v, fg);
   }
+}
+
+void settings_draw(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, const uint8_t *game_rgb, UiCanvas *c) {
+  if (game_rgb) ui_dim_rgb(c, game_rgb);
+  else ui_clear(c, t->bg);
+  ui_box(c, 0, 0, UI_W, UI_H, t->border, t->panel);
+  ui_text(c, font, 4, 0, "SETTINGS", t->highlight);
+  settings_draw_list(m, s, font, t, 18, 6, true, c);
   ui_text(c, font, 4, 124, "<>:CHANGE B:BACK", t->dim);
 }

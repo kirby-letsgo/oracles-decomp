@@ -175,7 +175,7 @@ static void verify(GB *gb, Hook *h) {
   uint64_t cyc_c = gb->mcycles - c0;
   { static int vlog = -1; if (vlog < 0) vlog = getenv("VERIFYLOG") != NULL; if (vlog) fprintf(stderr, "VERIFY= %s cycC %llu pc %04x sp %04x\n", h->name, (unsigned long long)cyc_c, gb->pc, gb->sp); }
   memcpy(after_c_p, gb, sizeof *after_c_p);
-  GB *samples_keep = gb->samples;
+  GBSample *samples_keep = gb->samples;
   memcpy(gb, snap, sizeof *snap);
   gb->samples = samples_keep;
   GB after_c_regs = *after_c_p;
