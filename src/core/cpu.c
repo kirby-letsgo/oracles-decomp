@@ -271,9 +271,11 @@ void gb_step(GB *gb) {
     gb->halted = false;
     gb_tick(gb);
   }
+  if (gb->irq_delay) pending = 0;
   if (gb->ime && pending && !hook_suppress_interrupts) { if (pending & INT_VBLANK) { dbg_vbl_step++; if (was_halted) dbg_vbl_step_halted++; } cpu_dispatch_interrupt(gb); return; }
   if (gb->ime_delay) { gb->ime = true; gb->ime_delay = false; }
-  if (hook_dispatch(gb)) return;
+  if (hook_dispatch(gb)) return;     // a hook's first burn consumes irq_delay
+  gb->irq_delay = false;
   { static long long tr_at = -1, tr_n = 0; if (tr_at < 0) { tr_at = 0; if (getenv("PCTRACE")) sscanf(getenv("PCTRACE"), "%lld,%lld", &tr_at, &tr_n); }
     if (tr_n > 0 && (long long)gb->mcycles >= tr_at) { fprintf(stderr, "PCT %04x bank %u sp %04x mc %llu%s\n", gb->pc, gb->rom_bank, gb->sp, (unsigned long long)gb->mcycles, gb->halted ? " halted" : ""); tr_n--; } }
   dbg_instr_count++;

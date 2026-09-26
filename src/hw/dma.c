@@ -45,4 +45,5 @@ void hdma5_write(GB *gb, uint8_t v) {
   for (int i = 0; i < stall; i++) gb_tick(gb);
   gb->hdma_len = 0;
   gb->hdma_active = false;
+  gb->irq_delay = true;
 }

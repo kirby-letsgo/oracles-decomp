@@ -25,7 +25,11 @@ uint8_t bus_read(GB *gb, uint16_t a) {
     }
     return gb->rom[off];
   }
-  if (a < 0xa000) return gb->vram[gb->io[R_VBK] & 1][a - 0x8000];
+  if (a < 0xa000) {
+    // the PPU owns VRAM in mode 3: CPU reads see $ff (vr_* ROMs, SameBoy and GBHawk)
+    if ((gb->io[R_LCDC] & 0x80) && gb->ppu_mode == 3) return 0xff;
+    return gb->vram[gb->io[R_VBK] & 1][a - 0x8000];
+  }
   if (a < 0xc000) {
     if (!gb->ram_enabled || gb->eram_size == 0) return 0xff;
     return gb->eram[(((uint32_t)gb->ram_bank << 13) | (a - 0xa000)) % gb->eram_size];
@@ -58,7 +62,11 @@ void bus_write(GB *gb, uint16_t a, uint8_t v) {
   if (!watch_init) { watch_init = 1; watch_addr = getenv("WATCH") ? (uint16_t)strtoul(getenv("WATCH"), NULL, 16) : 0; }
   if (watch_addr && (a == watch_addr || a == watch_addr + 1)) printf("WATCH %04x=%02x frame %llu mc %llu pc %04x hookpc %04x sp %04x\n", a, v, (unsigned long long)GRID_FRAME(gb->cycles), (unsigned long long)gb->mcycles, gb->pc, gb->hook_pc, gb->sp);
   if (a < 0x8000) { mbc_write(gb, a, v); return; }
-  if (a < 0xa000) { gb->vram[gb->io[R_VBK] & 1][a - 0x8000] = v; return; }
+  if (a < 0xa000) {
+    if ((gb->io[R_LCDC] & 0x80) && gb->ppu_mode == 3) return;     // ignored in mode 3 (vw_* ROMs)
+    gb->vram[gb->io[R_VBK] & 1][a - 0x8000] = v;
+    return;
+  }
   if (a < 0xc000) {
     if (gb->ram_enabled && gb->eram_size)
       gb->eram[(((uint32_t)gb->ram_bank << 13) | (a - 0xa000)) % gb->eram_size] = v;

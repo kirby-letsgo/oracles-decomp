@@ -46,6 +46,9 @@ typedef struct GB {
   uint8_t a, f, b, c, d, e, h, l;
   uint16_t sp, pc;
   bool ime, ime_delay, halted, halt_bug, hung;
+  // a GDMA ended inside the last instruction: the next opcode was fetched before the stall, so it
+  // runs before an interrupt that became pending during the transfer (SameBoy, GBHawk: gt_* ROMs)
+  bool irq_delay;
   bool double_speed, speed_armed;
 
   const uint8_t *rom;

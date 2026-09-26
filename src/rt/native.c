@@ -22,6 +22,7 @@ void gb_step(GB *gb) {
     gb->halted = false;
     gb_tick(gb);
   }
+  if (gb->irq_delay) pending = 0;     // the hook's first burn consumes it
   if (gb->ime && pending && !hook_suppress_interrupts) { if (pending & INT_VBLANK) { dbg_vbl_step++; if (was_halted) dbg_vbl_step_halted++; } cpu_dispatch_interrupt(gb); return; }
   if (gb->ime_delay) { gb->ime = true; gb->ime_delay = false; }
   if (hook_dispatch(gb)) return;

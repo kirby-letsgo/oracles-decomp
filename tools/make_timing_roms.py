@@ -287,3 +287,73 @@ for k in range(17):
     open('tests/timing/x_race%d.gbc' % k, 'wb').write(x_rom(k))
 rom = open('tests/timing/x_race0.gbc', 'rb').read()
 print('wrote X; halt pc %04x' % rom.find(b'\x76\x00\xcb\x7e\x20\xfa'))
+
+# Test GD: GDMA duration and CPU stall (the Seasons room load at frame 156092 issues 24-block GDMAs in
+# double speed with the LCD off, and GBHawk and we disagree by hundreds of M-cycles across them).
+# Layout (fixed so the same PC anchors work in every emulator): 16 nops at 0x190..0x1a0 calibrate
+# M-cycles, `ld a,n-1` at 0x1a0, `ldh (HDMA5),a` at 0x1a2, first instruction after the GDMA at 0x1a4;
+# then DIV, TIMA and LY go to C000..C002. src 4000 (ROM), dst 8000 (VRAM). gd_{s,d}{on,off}_{1,24,128}:
+# single/double speed, LCD on (the GDMA starts in VBlank) or off.
+PRELUDE_SS = (b'\xf3' b'\x31\xfe\xff' b'\xaf\xe0\xff' b'\x3e\x05\xe0\x07' b'\xaf\xe0\x06' b'\xe0\x05')
+GD_HDMA_SRC_DST = b'\x3e\x40\xe0\x51' + b'\xaf\xe0\x52' + b'\x3e\x80\xe0\x53' + b'\xaf\xe0\x54'
+GD_RECORD = b'\xf0\x04\xea\x00\xc0' b'\xf0\x05\xea\x01\xc0' b'\xf0\x44\xea\x02\xc0' b'\x18\xfe'
+
+def gd_code(double, lcd_on, blocks, before_dma=b''):
+    head = (PRELUDE if double else PRELUDE_SS) + wait_ly(0x90)
+    if not lcd_on: head += b'\xaf\xe0\x40'
+    head += GD_HDMA_SRC_DST + before_dma
+    assert len(head) <= 0x190 - 0x150, len(head)
+    code = head + b'\x00' * (0x190 - 0x150 - len(head)) + b'\x00' * 16
+    code += bytes([0x3e, blocks - 1]) + b'\xe0\x55' + GD_RECORD
+    assert code[0x1a2 - 0x150] == 0xe0 and code[0x1a3 - 0x150] == 0x55
+    return code
+
+for double in (False, True):
+    for lcd_on in (True, False):
+        for blocks in (1, 24, 128):
+            name = 'gd_%s%s_%d' % ('d' if double else 's', 'on' if lcd_on else 'off', blocks)
+            open('tests/timing/%s.gbc' % name, 'wb').write(rom_with(gd_code(double, lcd_on, blocks)))
+
+# Test GT: a timer interrupt armed to fire before, during or after a 24-block double-speed GDMA with
+# the LCD off. TAC=5, TIMA=0xff-t just before the GDMA, IE=timer, ei. The handler at 0x300 runs once:
+# it stores DIV and TIMA to C010/C011 and the interrupted return address to C013/C014, then clears IE.
+# Its PC (0x300) and 0x1a4 are the anchors.
+gt_handler = (b'\xe5\xf5'                                   # push hl; push af
+              b'\xf0\x04\xea\x10\xc0' b'\xf0\x05\xea\x11\xc0'   # DIV, TIMA
+              b'\xf8\x04' b'\x2a\xea\x13\xc0' b'\x7e\xea\x14\xc0' # ld hl,sp+4: return address
+              b'\xaf\xe0\xff'                                # IE=0
+              b'\xf1\xe1\xd9')                               # pop af; pop hl; reti
+for t in (2, 10, 30, 60):
+    arm = bytes([0x3e, 0xff - t, 0xe0, 0x05]) + b'\xaf\xe0\x0f' + b'\x3e\x04\xe0\xff' + b'\xfb'
+    open('tests/timing/gt_timer_mid_gdma_%d.gbc' % t, 'wb').write(rom_with(gd_code(True, False, 24, arm), timer=gt_handler))
+print('wrote GD, GT')
+
+# Test VR/VW: VRAM access during mode 3 (the Seasons room loader follows a pointer into VRAM and reads
+# it while the PPU draws; hardware returns $ff). One measurement per frame: halt with IME=0 on the
+# line-16 LYC interrupt (fixed wake-up), k nops, then `ld a,(8000)` (read in its 4th M-cycle; VRAM
+# holds $5a) stored to C000+k (VR), or `ld (8100+k),a` of k+1 (VW; after the last frame the LCD is
+# turned off and 8100..819f copied to C000). k = 0..159: the $5a -> $ff -> $5a steps (or the missing
+# writes) give the first and last blocked M-cycle, single (vr_s/vw_s) and double speed (vr_d/vw_d).
+def v_rom(double, write):
+    setup = (PRELUDE if double else PRELUDE_SS) + wait_ly(0x90) + b'\xaf\xe0\x40'      # LCD off
+    setup += b'\x3e\x5a\xea\x00\x80'                                              # (8000) = $5a
+    setup += b'\x21\x00\x81\xaf\x06\xc0\x22\x05\x20\xfc'                          # 8100..81bf = 0
+    setup += b'\x3e\x10\xe0\x45' + b'\x3e\x40\xe0\x41' + b'\x3e\x02\xe0\xff'      # LYC=16, STAT LYC int, IE=STAT
+    setup += b'\x3e\x91\xe0\x40'                                                  # LCD on, no sprites
+    code = bytearray(setup)
+    for k in range(160):
+        code += b'\xaf\xe0\x0f\x76'                        # IF=0; halt (IME=0: wakes at the LYC edge)
+        code += b'\x00' * k
+        if write: code += bytes([0x3e, k + 1, 0xea, k, 0x81])   # ld a,k+1; ld (8100+k),a
+        else: code += b'\xfa\x00\x80' + bytes([0xea, k, 0xc0])   # ld a,(8000); ld (c000+k),a
+    if write:
+        code += wait_ly(0x90) + b'\xaf\xe0\x40'                                   # LCD off
+        code += b'\x21\x00\x81\x11\x00\xc0\x06\xa0\x2a\x12\x13\x05\x20\xfa'         # copy 8100..819f -> c000
+    code += b'\x18\xfe'
+    assert 0x150 + len(code) < 0x8000, hex(len(code))
+    return rom_with(bytes(code))
+for double in (False, True):
+    sp = 'd' if double else 's'
+    open('tests/timing/vr_%s.gbc' % sp, 'wb').write(v_rom(double, False))
+    open('tests/timing/vw_%s.gbc' % sp, 'wb').write(v_rom(double, True))
+print('wrote VR, VW')

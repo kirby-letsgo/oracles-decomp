@@ -95,7 +95,9 @@ void gb_burn(GB *gb, int mcycles) {
   if (depth > 0 && hook_mode == HOOK_MODE_REPLACE) {
     if (gb->hdma_chunk_pending) { gb->hdma_chunk_pending = false; bus_hdma_chunk(gb); }
     uint16_t pc0 = gb->hook_pc;
-    while (gb->ime && (gb->ie & gb->io[R_IF] & 0x1f) && !gb->hung) {
+    bool delayed = gb->irq_delay;
+    gb->irq_delay = false;
+    while (!delayed && gb->ime && (gb->ie & gb->io[R_IF] & 0x1f) && !gb->hung) {
       if (gb->ie & gb->io[R_IF] & INT_VBLANK) dbg_vbl_midlogic++;
       gb->pc = pc0;
       run_interrupt(gb);
