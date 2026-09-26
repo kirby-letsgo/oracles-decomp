@@ -183,6 +183,10 @@ describe('files', () => {
     });
     expect(stale.statusCode).toBe(409);
     expect(stale.json()).toMatchObject({ version: 2 });
+    const retry = await upload(code, 'ages', 'sram.sav', Buffer.from('b'), {
+      'x-base-version': '1',
+    });
+    expect(retry.statusCode).toBe(200); // a retry of what the server already has is not a conflict
   });
 
   it('keeps the last versions as history and serves any of them', async () => {

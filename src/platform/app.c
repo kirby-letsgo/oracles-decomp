@@ -24,6 +24,8 @@
 #include "ui/settings.h"
 #include "ui/filter.h"
 #include "ui/touch.h"
+#include "ui/syncui.h"
+#include "platform/sync_client.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -571,6 +573,8 @@ static bool run_controls(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   }
 }
 
+static bool run_sync_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb);
+
 static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb, SDL_AudioStream *audio) {
   static UiCanvas canvas;
   SettingsMenu m;
@@ -588,6 +592,7 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       MenuAction a = settings_press(&m, &settings, b, &row);
       if (a == MENU_BACK) { settings_store(); return true; }
       if (a == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, font, theme, game_rgb)) return false;
+      if (a == MENU_PICK && row == SET_SYNC && !run_sync_page(win, ren, tex, font, theme, game_rgb)) return false;
       if (settings.fullscreen != was_full) apply_window_settings(win);
       if (audio) SDL_SetAudioStreamGain(audio, volume_gain(false));
       apply_game_settings();
@@ -597,6 +602,192 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
     present(ren, tex, &canvas.px[0][0][0]);
     SDL_Delay(16);
   }
+}
+
+// Save sync (sync-server/): this device's code and server, and what the last sync did.
+static SyncConfig sync_cfg;
+static char app_cache[1024];
+static char sync_status_line[24];
+static const char *playing;     // the game running now, whose files never sync mid-game
+
+static void sync_label_update(void) {
+  if (sync_cfg.code[0]) snprintf(settings.sync_label, sizeof settings.sync_label, "..%s", sync_cfg.code + 12);
+  else settings.sync_label[0] = 0;
+}
+
+// settings.ini as it is on disk (at start, and after a sync brought another device's)
+static void settings_reload(SDL_Window *win) {
+  settings_default(&settings);
+  size_t n;
+  char *text = (char *)oracles_read_file(settings_path, &n);
+  char *z = text ? realloc(text, n + 1) : NULL;
+  if (z) { z[n] = 0; settings_parse(&settings, z); free(z); } else free(text);
+  sync_label_update();
+  apply_window_settings(win);
+  apply_game_settings();
+}
+
+// Shows `rgb` with a SYNCING message until the sync thread has finished one sync of `game`.
+static bool sync_blocking(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb, const char *game, SyncResult *r) {
+  if (!sync_cfg.code[0]) return false;
+  SyncResult earlier;
+  while (sync_busy()) { show_status("SYNCING..."); present(ren, tex, rgb); SDL_Delay(16); SDL_PumpEvents(); }
+  sync_poll(&earlier);
+  if (!sync_start(&sync_cfg, app_cache, game)) return false;
+  while (!sync_poll(r)) {
+    SDL_Event ev;
+    while (poll_event(&ev)) {}
+    show_status("SYNCING...");
+    present(ren, tex, rgb);
+    SDL_Delay(16);
+  }
+  toast_until = 0;
+  return true;
+}
+
+static void side_when(ConflictSide *side, int64_t seconds) {
+  SDL_DateTime dt;
+  if (SDL_TimeToDateTime((SDL_Time)seconds * SDL_NS_PER_SECOND, &dt, true))
+    snprintf(side->when, sizeof side->when, "%02d %02d:%02d", dt.day, dt.hour, dt.minute);
+}
+
+static void side_fill(ConflictSide *side, const char *label, const char *game, const char *name, const uint8_t *data, size_t n, const uint8_t *thumb, size_t tn) {
+  snprintf(side->label, sizeof side->label, "%.9s", label);
+  for (char *p = side->label; *p; p++) *p = (char)SDL_toupper(*p);
+  if (!data) { side->missing = true; return; }
+  if (!strcmp(name, "sram.sav")) { side->has_files = true; ui_read_files(data, n, !strcmp(game, "ages"), side->files); }
+  if (thumb && tn == sizeof side->thumb) { side->has_thumb = true; memcpy(side->thumb, thumb, tn); }
+}
+
+// Each file that changed here and on the server: the player keeps one side. Returns false on quit.
+static bool run_conflicts(SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const SyncResult *r) {
+  static ConflictView v;
+  static UiCanvas canvas;
+  for (int i = 0; i < r->choices; i++) {
+    const SyncChoice *ch = &r->choice[i];
+    bool state = !strncmp(ch->name, "state_", 6);
+    char path[1300], thumb_name[40];
+    snprintf(thumb_name, sizeof thumb_name, "%s.thumb", ch->name);
+    size_t n = 0, tn = 0, rn = 0, rtn = 0;
+    snprintf(path, sizeof path, "%s%s/%s", app_cache, ch->game, ch->name);
+    uint8_t *mine = oracles_read_file(path, &n), *mine_thumb = NULL;
+    if (state) { snprintf(path, sizeof path, "%s%s/%s", app_cache, ch->game, thumb_name); mine_thumb = oracles_read_file(path, &tn); }
+    uint8_t *theirs = sync_fetch(&sync_cfg, ch->game, ch->name, &rn);
+    uint8_t *theirs_thumb = state ? sync_fetch(&sync_cfg, ch->game, thumb_name, &rtn) : NULL;
+    memset(&v, 0, sizeof v);
+    const char *what = !strcmp(ch->name, "sram.sav") ? "SAVE" : !strcmp(ch->name, "state_auto") ? "RESUME" : NULL;
+    if (what) snprintf(v.what, sizeof v.what, "%s %s", !strcmp(ch->game, "ages") ? "AGES" : "SEASONS", what);
+    else snprintf(v.what, sizeof v.what, "%s SLOT %c", !strcmp(ch->game, "ages") ? "AGES" : "SEASONS", ch->name[6]);
+    side_fill(&v.side[0], "HERE", ch->game, ch->name, mine, n, mine_thumb, tn);
+    side_when(&v.side[0], ch->local_mtime);
+    side_fill(&v.side[1], ch->remote.device[0] ? ch->remote.device : "OTHER", ch->game, ch->name, theirs, rn, theirs_thumb, rtn);
+    side_when(&v.side[1], ch->remote.updated);
+    free(mine); free(mine_thumb); free(theirs); free(theirs_thumb);
+    for (bool decided = false; !decided;) {
+      test_keys();
+      SDL_Event ev;
+      while (poll_event(&ev)) {
+        if (ev.type == SDL_EVENT_QUIT) return false;
+        UiButton b;
+        if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+        MenuAction a = conflict_press(&v, b);
+        if (a == MENU_BACK) decided = true;
+        if (a == MENU_PICK) {
+          show_status("SYNCING...");
+          conflict_draw(&v, font, theme, &canvas);
+          present(ren, tex, &canvas.px[0][0][0]);
+          show_status(sync_resolve(&sync_cfg, app_cache, ch, v.sel == 0) ? "KEPT" : "SYNC FAILED");
+          decided = true;
+        }
+      }
+      conflict_draw(&v, font, theme, &canvas);
+      present(ren, tex, &canvas.px[0][0][0]);
+      SDL_Delay(16);
+    }
+  }
+  return true;
+}
+
+// Toasts the outcome, loads settings that came from elsewhere, and asks about conflicts.
+static bool sync_finished(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const SyncResult *r) {
+  if (r->settings_changed) settings_reload(win);
+  SDL_DateTime dt;
+  SDL_Time now;
+  bool clock = SDL_GetCurrentTime(&now) && SDL_TimeToDateTime(now, &dt, true);
+  if (!r->ok) {
+    fprintf(stderr, "sync failed: %s\n", r->error);
+    snprintf(sync_status_line, sizeof sync_status_line, "SYNC FAILED");
+    show_status("SYNC FAILED");
+    return true;
+  }
+  if (r->error[0]) fprintf(stderr, "sync: %s\n", r->error);
+  if (clock) snprintf(sync_status_line, sizeof sync_status_line, "SYNCED %02d:%02d", dt.hour, dt.minute);
+  if (r->uploaded || r->downloaded) show_status("SYNCED");
+  return !r->choices || run_conflicts(ren, tex, font, theme, r);
+}
+
+// The sync page: the code, a new account, entering a code from another device, sync now, off.
+static bool run_sync_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb) {
+  static UiCanvas canvas;
+  SyncMenu m;
+  char code[20] = "";
+  // what SYNC NOW covers: every game, or during play every game but the running one
+  const char *scope = !playing ? SYNC_ALL_GAMES : !strcmp(playing, "ages") ? "seasons" : "ages";
+#define REOPEN() do { code[0] = 0; if (sync_cfg.code[0]) sync_format_code(sync_cfg.code, code); \
+    syncmenu_open(&m, sync_cfg.code[0] != 0, code, sync_status_line); } while (0)
+  REOPEN();
+  for (;;) {
+    test_keys();
+    SDL_Event ev;
+    while (poll_event(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) return false;
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
+      UiButton b;
+      if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+      SyncRow row;
+      MenuAction a = syncmenu_press(&m, b, &row);
+      if (a == MENU_BACK) return true;
+      if (a != MENU_PICK) continue;
+      bool new_code = false;
+      if (row == SYNCROW_CREATE) {
+        char nc[17], err[128];
+        show_status("CREATING...");
+        present(ren, tex, &canvas.px[0][0][0]);
+        if (sync_create_account(sync_cfg.url, nc, err, sizeof err)) { memcpy(sync_cfg.code, nc, 17); new_code = true; }
+        else { fprintf(stderr, "sync: %s\n", err); show_status("COULD NOT CREATE"); }
+      } else if (row == SYNCROW_ENTER) {
+        CodeEntry e;
+        codeentry_open(&e, sync_cfg.code);
+        for (bool done = false; !done;) {
+          test_keys();
+          while (poll_event(&ev)) {
+            if (ev.type == SDL_EVENT_QUIT) return false;
+            if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+            MenuAction ea = codeentry_press(&e, b);
+            if (ea == MENU_BACK) done = true;
+            if (ea == MENU_PICK) { memcpy(sync_cfg.code, e.digits, 17); new_code = done = true; }
+          }
+          codeentry_draw(&e, font, theme, &canvas);
+          present(ren, tex, &canvas.px[0][0][0]);
+          SDL_Delay(16);
+        }
+      } else if (row == SYNCROW_OFF) {
+        sync_cfg.code[0] = 0;
+        sync_config_store(&sync_cfg, app_cache);
+        sync_label_update();
+      }
+      if (new_code) { sync_config_store(&sync_cfg, app_cache); sync_label_update(); }
+      if (row == SYNCROW_NOW || new_code) {
+        SyncResult r;
+        if (sync_blocking(ren, tex, &canvas.px[0][0][0], scope, &r) && !sync_finished(win, ren, tex, font, theme, &r)) return false;
+      }
+      REOPEN();
+    }
+    syncmenu_draw(&m, font, theme, game_rgb, &canvas);
+    present(ren, tex, &canvas.px[0][0][0]);
+    SDL_Delay(16);
+  }
+#undef REOPEN
 }
 
 // Runs the launcher until a game is chosen (true) or the player quits (false).
@@ -614,8 +805,14 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   launcher_init(&l, UI_GAME_SEASONS);
   static SettingsMenu settings_menu;
   settings_menu_open(&settings_menu);
+  if (sync_cfg.code[0] && !sync_busy()) sync_start(&sync_cfg, cache, SYNC_ALL_GAMES);
   for (;;) {
     test_keys();
+    SyncResult synced;
+    if (sync_poll(&synced)) {
+      if (!sync_finished(win, ren, tex, &font, &l.games[l.game].theme, &synced)) return false;
+      launcher_load(&l, &font, cache);
+    }
     SDL_Event ev;
     while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
@@ -628,8 +825,12 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       if (r.action == LAUNCH_SETTINGS) {
         SettingsRow row;
         bool was_full = settings.fullscreen;
-        if (settings_press(&settings_menu, &settings, r.button, &row) == MENU_PICK && row == SET_CONTROLS &&
-            !run_controls(win, ren, tex, &font, &l.games[l.game].theme, NULL)) return false;
+        MenuAction sa = settings_press(&settings_menu, &settings, r.button, &row);
+        if (sa == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, &font, &l.games[l.game].theme, NULL)) return false;
+        if (sa == MENU_PICK && row == SET_SYNC) {
+          if (!run_sync_page(win, ren, tex, &font, &l.games[l.game].theme, NULL)) return false;
+          launcher_load(&l, &font, cache);
+        }
         if (settings.fullscreen != was_full) apply_window_settings(win);
         apply_game_settings();
         settings_store();
@@ -648,6 +849,11 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
         if (slot == -2) return false;
         if (slot < 0) continue;
         *slot_out = slot;
+      }
+      if (r.action == LAUNCH_PLAY && sync_cfg.code[0]) {
+        SyncResult pre;
+        if (sync_blocking(ren, tex, rgb, game_ids[r.game], &pre) && !sync_finished(win, ren, tex, &font, &l.games[r.game].theme, &pre)) return false;
+        launcher_load(&l, &font, cache);
       }
       if (r.action == LAUNCH_PLAY) {
         strcpy(game_out, game_ids[r.game]);
@@ -729,6 +935,7 @@ typedef struct {
   GameMode *mode;
   bool *parked, backgrounded;
   uint64_t *frames;
+  const char *game;
 } Session;
 static Session session;
 
@@ -751,6 +958,7 @@ static bool SDLCALL on_app_event(void *data, SDL_Event *ev) {
   }
   if (*session.parked && (session.backgrounded || *session.mode == MODE_PAUSED)) slot_save(gb, session.dir, SLOT_AUTO, session.paused_rgb);
   save_sram(gb, session.sav);
+  if (sync_cfg.code[0]) sync_start(&sync_cfg, app_cache, session.game);
   return true;
 }
 
@@ -807,10 +1015,13 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     if (!slot_load(gb, dir, slot)) fprintf(stderr, "could not load the state in slot %d\n", slot + 1);
   }
   framebuffer_to_rgb(gb->sample ? gb->sample->framebuffer : gb->framebuffer, rgb);
-  session = (Session){gb, dir, sav, paused_rgb, &mode, &parked, false, &frames};
+  session = (Session){gb, dir, sav, paused_rgb, &mode, &parked, false, &frames, gs->game};
+  playing = gs->game;
 
   for (bool running = true; running && !gb->hung;) {
     test_keys();
+    SyncResult synced;
+    if (sync_poll(&synced)) show_status(synced.ok ? "SYNCED" : "SYNC FAILED");
     SDL_Event ev;
     while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) {
@@ -966,6 +1177,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   else if (gs->max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
   save_sram(gb, sav);
   session.gb = NULL;
+  playing = NULL;
   if (audio) SDL_DestroyAudioStream(audio);
   SDL_SetWindowTitle(win, "Oracles");
   free(gb); free(rom); free(tab);
@@ -1031,16 +1243,10 @@ int main(int argc, char **argv) {
   char window_size[1100];
   snprintf(window_size, sizeof window_size, "%swindow.txt", cache);
   if (!oracles_open_window("Oracles", window_size, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
-  settings_default(&settings);
   snprintf(settings_path, sizeof settings_path, "%ssettings.ini", cache);
-  size_t settings_size;
-  char *settings_text = (char *)oracles_read_file(settings_path, &settings_size);
-  if (settings_text) {
-    char *z = realloc(settings_text, settings_size + 1);
-    if (z) { z[settings_size] = 0; settings_parse(&settings, z); free(z); } else free(settings_text);
-  }
-  apply_window_settings(win);
-  apply_game_settings();
+  snprintf(app_cache, sizeof app_cache, "%s", cache);
+  sync_config_load(&sync_cfg, cache);
+  settings_reload(win);
 
   // a ROM or --game on the command line starts that game directly; quitting it opens the launcher
   char game[16] = "";
@@ -1064,11 +1270,18 @@ int main(int argc, char **argv) {
     if (!direct && !run_launcher(win, ren, tex, cache, game, &gs.start_file, &gs.open_file, &gs.start_slot)) break;
     direct = false;
     GameEnd end = run_game(win, ren, tex, &gs);
+    if (sync_cfg.code[0] && end != GAME_FAILED && !max_frames) {
+      sync_wait(20000);
+      SyncResult earlier;
+      sync_poll(&earlier);
+      sync_start(&sync_cfg, cache, game);
+    }
     if (end == GAME_FAILED) { status = 1; break; }
     if (end == GAME_QUIT || max_frames) break;
     gs.start_file = LAUNCH_TITLE;
     gs.open_file = false;
   }
+  if (!sync_wait(20000)) fprintf(stderr, "sync still running at exit\n");
   oracles_close_window(win, window_size);
   SDL_Quit();
   return status;

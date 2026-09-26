@@ -116,6 +116,19 @@ inventory and press one to assign it, then hold it in play to use the item).
 `ORACLES_TOUCH=1 ./build/oracles-native` shows the phone's touch controls on the desktop, with the
 mouse as a finger.
 
+## Save sync
+
+Settings > SYNC keeps saves in step across devices through the sync server (`sync-server/`): CREATE
+ACCOUNT gives a 16-digit code, and ENTER CODE on another device joins it (no passwords). Synced:
+each game's save, save-state slots with their pictures and item buttons, and the shared settings;
+never the ROM-derived files. It syncs when the launcher opens, before a game starts, and when you
+leave a game or the app; SYNC NOW does it by hand. When a save changed on two devices since they
+last synced, a KEEP WHICH? screen shows both (files and hearts, or the state's picture) and you pick.
+A save state only moves between builds with the same state format. The server address is the CMake
+setting `ORACLES_SYNC_URL`; a device can use another one with `url=` in `sync.ini` in its app folder.
+HTTP uses the system's own TLS: libcurl (macOS, Linux; sync is off without it), WinHTTP, and
+Android's HttpURLConnection. `ORACLES_SYNC_URL=http://host test_sync_http` checks a server.
+
 ## Android
 
 `oracles-native` also builds as an Android app (arm64, Android 8+). Needs the Android SDK with

@@ -61,7 +61,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case UI_DOWN: m->sel = (SettingsRow)((m->sel + 1) % SET_ROWS); return MENU_NONE;
   case UI_BACK: return MENU_BACK;
   case UI_ACCEPT:
-    if (m->sel == SET_CONTROLS) { *picked = m->sel; return MENU_PICK; }
+    if (m->sel == SET_CONTROLS || m->sel == SET_SYNC) { *picked = m->sel; return MENU_PICK; }
     dir = 1;
     break;
   default: break;
@@ -82,7 +82,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
 }
 
 void settings_draw_list(const SettingsMenu *m, const Settings *s, const UiFont *font, const UiTheme *t, int y0, int visible, bool focused, UiCanvas *c) {
-  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "SCALE", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS"};
+  static const char *const labels[SET_ROWS] = {"VOLUME", "SCREEN", "SCALE", "COLOURS", "FULLSCREEN", "FAST TEXT", "FAST MENUS", "QUICK SWAP", "4 SLOTS", "CONTROLS", "SYNC"};
   int first = (int)m->sel - visible / 2;
   if (first > SET_ROWS - visible) first = SET_ROWS - visible;
   if (first < 0) first = 0;
@@ -103,6 +103,7 @@ void settings_draw_list(const SettingsMenu *m, const Settings *s, const UiFont *
     case SET_FAST_MENUS: snprintf(v, sizeof v, "%s", s->fast_menus ? "ON" : "OFF"); break;
     case SET_QUICK_SWAP: snprintf(v, sizeof v, "%s", s->quick_swap ? "ON" : "OFF"); break;
     case SET_FOUR_SLOTS: snprintf(v, sizeof v, "%s", s->four_slots ? "ON" : "OFF"); break;
+    case SET_SYNC: snprintf(v, sizeof v, "%s", s->sync_label[0] ? s->sync_label : "OFF"); break;
     default: break;
     }
     if (*v) ui_text(c, font, UI_W - 4 - ui_text_width(v), y, v, fg);

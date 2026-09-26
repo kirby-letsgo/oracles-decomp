@@ -6,6 +6,7 @@
 #include "ui/settings.h"
 #include "ui/filter.h"
 #include "ui/touch.h"
+#include "ui/syncui.h"
 
 static uint8_t rom[0x80000];
 
@@ -209,6 +210,10 @@ static void settings_menu_changes_values(void) {
   ASSERT(s.fill);
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_UP, &row);
+  ASSERT_EQ(m.sel, SET_SYNC);                           // the last row
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
+  ASSERT_EQ(row, SET_SYNC);
   settings_press(&m, &s, UI_UP, &row);
   ASSERT_EQ(m.sel, SET_CONTROLS);
   settings_press(&m, &s, UI_UP, &row);
@@ -436,6 +441,74 @@ static void touch_labels_centre_on_their_ink(void) {
   free(img);
 }
 
+static void sync_page_shows_the_rows_for_its_state(void) {
+  SyncMenu m;
+  SyncRow row;
+  syncmenu_open(&m, false, "", "");
+  ASSERT_EQ(m.sel, SYNCROW_CREATE);
+  syncmenu_press(&m, UI_DOWN, &row);
+  ASSERT_EQ(m.sel, SYNCROW_ENTER);
+  syncmenu_press(&m, UI_DOWN, &row);
+  ASSERT_EQ(m.sel, SYNCROW_CREATE);                     // off: only create and enter
+  syncmenu_open(&m, true, "4827-1930-5561-0284", "SYNCED 17:32");
+  ASSERT_EQ(m.sel, SYNCROW_NOW);
+  syncmenu_press(&m, UI_DOWN, &row);
+  ASSERT_EQ(m.sel, SYNCROW_ENTER);                      // on: no create
+  syncmenu_press(&m, UI_DOWN, &row);
+  ASSERT_EQ(syncmenu_press(&m, UI_ACCEPT, &row), MENU_PICK);
+  ASSERT_EQ(row, SYNCROW_OFF);
+  ASSERT_EQ(syncmenu_press(&m, UI_BACK, &row), MENU_BACK);
+  UiFont font;
+  ui_font_load(&font, rom, sizeof rom);
+  UiTheme t;
+  ui_theme_default(&t, false);
+  static UiCanvas c;
+  syncmenu_draw(&m, &font, &t, NULL, &c);
+}
+
+static void code_entry_edits_each_digit(void) {
+  CodeEntry e;
+  codeentry_open(&e, "");
+  ASSERT(!strcmp(e.digits, "0000000000000000"));
+  codeentry_press(&e, UI_DOWN);                         // 0 wraps to 9
+  codeentry_press(&e, UI_LEFT);                         // the first digit wraps to the last
+  codeentry_press(&e, UI_UP);
+  codeentry_press(&e, UI_UP);
+  ASSERT(!strcmp(e.digits, "9000000000000002"));
+  codeentry_open(&e, "4827193055610284");
+  codeentry_press(&e, UI_RIGHT);
+  codeentry_press(&e, UI_UP);
+  ASSERT(!strcmp(e.digits, "4927193055610284"));
+  ASSERT_EQ(codeentry_press(&e, UI_ACCEPT), MENU_PICK);
+  ASSERT_EQ(codeentry_press(&e, UI_BACK), MENU_BACK);
+}
+
+static void conflict_picks_a_side(void) {
+  static ConflictView v;
+  memset(&v, 0, sizeof v);
+  snprintf(v.what, sizeof v.what, "SEASONS SAVE");
+  v.side[0].has_files = true;
+  v.side[0].files[0].valid = true;
+  snprintf(v.side[0].files[0].name, sizeof v.side[0].files[0].name, "LINK");
+  v.side[0].files[0].max_health = 12;
+  v.side[1].missing = true;
+  ASSERT_EQ(v.sel, 0);
+  conflict_press(&v, UI_RIGHT);
+  ASSERT_EQ(v.sel, 1);
+  conflict_press(&v, UI_LEFT);
+  ASSERT_EQ(conflict_press(&v, UI_ACCEPT), MENU_PICK);
+  ASSERT_EQ(v.sel, 0);
+  ASSERT_EQ(conflict_press(&v, UI_BACK), MENU_BACK);
+  UiFont font;
+  ui_font_load(&font, rom, sizeof rom);
+  UiTheme t;
+  ui_theme_default(&t, true);
+  static UiCanvas c;
+  conflict_draw(&v, &font, &t, &c);
+  ASSERT_EQ(c.px[34][0][0], t.highlight.r);            // the chosen side's box is lit
+  ASSERT_EQ(c.px[34][80][0], t.dim.r);
+}
+
 int main(void) {
   RUN(font_loads_from_the_rom_offset);
   RUN(text_draws_glyph_pixels);
@@ -451,6 +524,9 @@ int main(void) {
   RUN(bindings_remap_and_persist);
   RUN(touch_layout_fits_screens);
   RUN(toast_boxes_a_message_near_the_bottom);
+  RUN(sync_page_shows_the_rows_for_its_state);
+  RUN(code_entry_edits_each_digit);
+  RUN(conflict_picks_a_side);
   RUN(touch_fill_scales_past_whole_pixels);
   RUN(touch_hits_each_control);
   RUN(touch_draw_lights_held_buttons);

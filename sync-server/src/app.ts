@@ -172,9 +172,10 @@ export async function buildApp({
           .orderBy(desc(files.version))
           .limit(1);
         const current = latest?.version ?? 0;
+        // the same bytes again (a retry) are fine whatever version the device thought it had
+        if (latest?.sha256 === sha256) return { version: current, created: false };
         const base = headers['x-base-version'];
         if (base !== undefined && base !== current) return { conflict: current };
-        if (latest?.sha256 === sha256) return { version: current, created: false };
         const version = current + 1;
         await tx.insert(files).values({
           accountId: account.id,

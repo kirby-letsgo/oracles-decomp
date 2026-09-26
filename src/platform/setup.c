@@ -46,6 +46,12 @@ typedef struct { char magic[8]; uint32_t version, size; } BootStateHeader;
 #define BOOT_STATE_MAGIC "ORCLBOOT"
 #define BOOT_STATE_VERSION 1
 
+// One number for "a state file this build can load", sent with synced save states: the header
+// version, the GB struct's size and whether long is 64-bit (Windows lays some structs out differently).
+int oracles_state_format(void) {
+  return (int)(BOOT_STATE_VERSION << 24 | (sizeof(long) == 8) << 23 | (sizeof(GB) & 0x7fffff));
+}
+
 bool oracles_save_boot_state(const GB *gb, const char *path) {
   FILE *f = fopen(path, "wb");
   if (!f) return false;
