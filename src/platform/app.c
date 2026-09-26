@@ -19,6 +19,7 @@
 #include "game/game.h"
 #include "assets/assets.h"
 #include "ui/launcher.h"
+#include "ui/menu.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -97,8 +98,7 @@ static uint8_t key_bit(SDL_Scancode sc) {
   case SDL_SCANCODE_RIGHT: return JOY_RIGHT;
   case SDL_SCANCODE_X: return JOY_A;
   case SDL_SCANCODE_Z: return JOY_B;
-  case SDL_SCANCODE_RETURN:
-  case SDL_SCANCODE_ESCAPE: return JOY_START;
+  case SDL_SCANCODE_RETURN: return JOY_START;
   case SDL_SCANCODE_RSHIFT:
   case SDL_SCANCODE_BACKSPACE: return JOY_SELECT;
   default: return 0;
@@ -152,6 +152,80 @@ static bool pick_rom(char *game_out, const char *cache) {
   return pick_state > 0 && extract(picked, cache, game_out);
 }
 
+// Save states: slots 1-4 (state_1..state_4) and the auto state written on quit (state_auto), each
+// with its frame as a thumbnail (state_N.thumb, raw RGB24) and its file time as the date.
+#define SLOT_AUTO UI_SLOTS
+
+static void slot_path(char *out, size_t n, const char *dir, int slot, const char *ext) {
+  if (slot == SLOT_AUTO) snprintf(out, n, "%s/state_auto%s", dir, ext);
+  else snprintf(out, n, "%s/state_%d%s", dir, slot + 1, ext);
+}
+
+static bool file_exists(const char *path) { return SDL_GetPathInfo(path, NULL); }
+
+// The single Cmd+S state of earlier versions becomes slot 1.
+static void migrate_state(const char *dir) {
+  char old[1300], slot1[1300];
+  snprintf(old, sizeof old, "%s/savestate", dir);
+  slot_path(slot1, sizeof slot1, dir, 0, "");
+  if (file_exists(old) && !file_exists(slot1)) SDL_RenamePath(old, slot1);
+}
+
+static bool slot_save(GB *gb, const char *dir, int slot, const uint8_t *rgb) {
+  char path[1300];
+  slot_path(path, sizeof path, dir, slot, "");
+  if (!oracles_save_boot_state(gb, path)) return false;
+  slot_path(path, sizeof path, dir, slot, ".thumb");
+  write_file(path, rgb, FB_W * FB_H * 3);
+  return true;
+}
+
+static bool slot_load(GB *gb, const char *dir, int slot) {
+  char path[1300];
+  slot_path(path, sizeof path, dir, slot, "");
+  if (!oracles_load_boot_state(gb, path)) return false;
+  fibers_reset(gb);
+  return true;
+}
+
+static void slots_scan(SlotsMenu *m, const char *dir) {
+  static const char *const months[12] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+  for (int i = 0; i < UI_SLOTS; i++) {
+    UiSlot *s = &m->slots[i];
+    char path[1300];
+    SDL_PathInfo info;
+    slot_path(path, sizeof path, dir, i, "");
+    s->used = SDL_GetPathInfo(path, &info);
+    if (!s->used) continue;
+    SDL_DateTime dt;
+    if (SDL_TimeToDateTime(info.modify_time, &dt, true))
+      snprintf(s->when, sizeof s->when, "%s%02d %02d:%02d", months[(dt.month - 1) % 12], dt.day, dt.hour, dt.minute);
+    else snprintf(s->when, sizeof s->when, "SAVED");
+    memset(s->thumb, 0, sizeof s->thumb);
+    slot_path(path, sizeof path, dir, i, ".thumb");
+    size_t n;
+    uint8_t *img = oracles_read_file(path, &n);
+    if (img && n == sizeof s->thumb) memcpy(s->thumb, img, n);
+    free(img);
+  }
+}
+
+static bool any_slot(const char *dir) {
+  for (int i = 0; i < UI_SLOTS; i++) {
+    char path[1300];
+    slot_path(path, sizeof path, dir, i, "");
+    if (file_exists(path)) return true;
+  }
+  return false;
+}
+
+static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
+  SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
+  SDL_RenderClear(ren);
+  SDL_RenderTexture(ren, tex, NULL, NULL);
+  SDL_RenderPresent(ren);
+}
+
 // Installed games, their save files and save state, each game's colours, and the font from whichever
 // ROM image is cached.
 static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
@@ -168,14 +242,42 @@ static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
     uint8_t *sram = oracles_read_file(path, &n);
     ui_read_files(sram, sram ? n : 0, g == UI_GAME_AGES, lg->files);
     free(sram);
-    snprintf(path, sizeof path, "%s%s/savestate", cache, game_ids[g]);
-    FILE *f = fopen(path, "rb");
-    if (f) { lg->has_state = true; fclose(f); }
+    char dir[1100];
+    snprintf(dir, sizeof dir, "%s%s", cache, game_ids[g]);
+    migrate_state(dir);
+    slot_path(path, sizeof path, dir, SLOT_AUTO, "");
+    lg->has_resume = file_exists(path);
+    lg->has_slots = any_slot(dir);
     snprintf(path, sizeof path, "%s%s/rom.bin", cache, game_ids[g]);
     uint8_t *rom = oracles_read_file(path, &n);
     ui_theme_load(&lg->theme, rom, rom ? n : 0, g == UI_GAME_AGES);
     if (!font->loaded) ui_font_load(font, rom, rom ? n : 0);
     free(rom);
+  }
+}
+
+// Test hook: ORACLES_TEST_KEYS="120:Escape,130:Down,140:X" presses each key at that loop tick (every
+// pass of the launcher, menu or game loop is a tick), so ctest can drive the menus headless.
+static uint64_t test_tick;
+static void test_keys(void) {
+  static const char *spec;
+  static bool init;
+  if (!init) { init = true; spec = getenv("ORACLES_TEST_KEYS"); }
+  test_tick++;
+  for (const char *p = spec; p && *p;) {
+    char name[32];
+    unsigned long long at;
+    int len = 0;
+    if (sscanf(p, "%llu:%31[^,]%n", &at, name, &len) != 2) break;
+    if (at == test_tick || at + 1 == test_tick) {
+      SDL_Event ev = {0};
+      ev.type = at == test_tick ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+      ev.key.scancode = SDL_GetScancodeFromName(name);
+      ev.key.down = at == test_tick;
+      SDL_PushEvent(&ev);
+    }
+    p += len;
+    if (*p == ',') p++;
   }
 }
 
@@ -205,8 +307,30 @@ static bool menu_button(const SDL_Event *ev, UiButton *b) {
   return false;
 }
 
+// A modal slot list; returns the slot, -1 for back, or -2 when the window is closed.
+static int pick_slot(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, SlotsMenu *m, const UiFont *font, const UiTheme *theme, const uint8_t *game_rgb) {
+  static UiCanvas canvas;
+  for (;;) {
+    test_keys();
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) return -2;
+      if (ev.type == SDL_EVENT_KEY_DOWN && oracles_window_key(win, &ev.key)) continue;
+      UiButton b;
+      if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+      int slot;
+      MenuAction a = slots_press(m, b, &slot);
+      if (a == MENU_PICK) return slot;
+      if (a == MENU_BACK) return -1;
+    }
+    slots_draw(m, font, theme, game_rgb, &canvas);
+    present(ren, tex, &canvas.px[0][0][0]);
+    SDL_Delay(16);
+  }
+}
+
 // Runs the launcher until a game is chosen (true) or the player quits (false).
-static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const char *cache, char *game_out, int *file_out, bool *file_used) {
+static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const char *cache, char *game_out, int *file_out, bool *file_used, int *slot_out) {
   static Launcher l;
   static UiFont font;
   static UiCanvas canvas;
@@ -219,6 +343,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   }
   launcher_init(&l, UI_GAME_SEASONS);
   for (;;) {
+    test_keys();
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
@@ -232,6 +357,17 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
         char game[16];
         if (pick_rom(game, cache)) { UiGame g = l.game; launcher_load(&l, &font, cache); launcher_init(&l, g); }
       }
+      if (r.action == LAUNCH_PLAY && r.file == LAUNCH_SLOTS) {
+        static SlotsMenu slots;
+        char dir[1100];
+        snprintf(dir, sizeof dir, "%s%s", cache, game_ids[r.game]);
+        slots_scan(&slots, dir);
+        slots_open(&slots, false);
+        int slot = pick_slot(win, ren, tex, &slots, &font, &l.games[r.game].theme, NULL);
+        if (slot == -2) return false;
+        if (slot < 0) continue;
+        *slot_out = slot;
+      }
       if (r.action == LAUNCH_PLAY) {
         strcpy(game_out, game_ids[r.game]);
         *file_out = r.file;
@@ -241,10 +377,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
     }
     launcher_draw(&l, &font, &canvas);
     ui_to_rgb(&canvas, rgb);
-    SDL_UpdateTexture(tex, NULL, rgb, UI_W * 3);
-    SDL_RenderClear(ren);
-    SDL_RenderTexture(ren, tex, NULL, NULL);
-    SDL_RenderPresent(ren);
+    present(ren, tex, rgb);
     SDL_Delay(16);
   }
 }
@@ -288,15 +421,202 @@ static uint8_t boot_input(GB *gb, BootDriver *d, uint64_t frame) {
   return 0;
 }
 
-// Cmd+S saves at the first frame whose threads are all parked at the top of their loops
-// (threads_parked), usually the same frame; a load then resumes them in C.
+// Saving needs a frame whose threads are all parked at the top of their loops (threads_parked):
+// Cmd+S and the pause menu wait for one, usually the same frame; a load then resumes them in C.
 #define NO_SAVE UINT64_MAX
+#define PARK_TIMEOUT 600
 
 static uint64_t show_status(SDL_Window *win, const char *title, const char *status, uint64_t frames) {
   char msg[96];
   snprintf(msg, sizeof msg, "%s - %s", title, status);
   SDL_SetWindowTitle(win, msg);
   return frames + 120;
+}
+
+typedef enum { GAME_TO_LAUNCHER, GAME_QUIT, GAME_FAILED } GameEnd;
+typedef enum { MODE_PLAY, MODE_PAUSING, MODE_PAUSED, MODE_QUITTING } GameMode;
+
+typedef struct {
+  const char *cache, *game;
+  int start_file;               // 0..2, LAUNCH_TITLE, LAUNCH_RESUME, LAUNCH_SLOTS
+  bool open_file;               // start_file holds a save: open it, not just highlight it
+  int start_slot;               // with LAUNCH_SLOTS
+  uint64_t max_frames;
+} GameStart;
+
+static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const GameStart *gs) {
+  char dir[1100], path[1300];
+  snprintf(dir, sizeof dir, "%s%s", gs->cache, gs->game);
+  migrate_state(dir);
+  size_t rom_size, tab_size;
+  snprintf(path, sizeof path, "%s/rom.bin", dir);
+  uint8_t *rom = oracles_read_file(path, &rom_size);
+  snprintf(path, sizeof path, "%s/cyctab.bin", dir);
+  uint8_t *tab = oracles_read_file(path, &tab_size);
+  if (!rom || !tab || tab_size != rom_size) { fprintf(stderr, "cache in %s is incomplete; run again with the ROM path\n", dir); return GAME_FAILED; }
+  bool ages = strcmp(gs->game, "ages") == 0;
+  static UiFont font;
+  UiTheme theme;
+  ui_font_load(&font, rom, rom_size);
+  ui_theme_load(&theme, rom, rom_size, ages);
+  GB *gb = calloc(1, sizeof *gb);
+  gb_init(gb);
+  if (!gb_load_rom(gb, rom, rom_size)) { fprintf(stderr, "cache in %s is not a ROM image\n", dir); return GAME_FAILED; }
+  gb->cyctab = tab;
+#ifndef NDEBUG
+  gb->code_bits = assets_code_bits(rom, rom_size);
+#endif
+  gb_reset(gb);
+  char sav[1300];
+  snprintf(sav, sizeof sav, "%s/sram.sav", dir);
+  load_sram(gb, sav);
+
+  char title[64];
+  snprintf(title, sizeof title, "Oracle of %s", ages ? "Ages" : "Seasons");
+  SDL_SetWindowTitle(win, title);
+  SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
+  SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
+  if (audio) SDL_ResumeAudioStreamDevice(audio);
+
+  static uint8_t rgb[FB_W * FB_H * 3], paused_rgb[FB_W * FB_H * 3];
+  static int16_t samples[APU_RING * 2];
+  static UiCanvas canvas;
+  static SlotsMenu slots;
+  PauseMenu pause;
+  gb->input_at = live_input;
+  live_joy = 0;
+  uint64_t frames = 0, title_reset = 0, save_from = NO_SAVE, park_from = 0;
+  bool muted = false, parked = false;
+  GameMode mode = MODE_PLAY;
+  GameEnd end = GAME_QUIT;
+  BootDriver boot = {gs->start_file >= 0 ? BOOT_TO_FILE_SELECT : BOOT_OFF, gs->start_file, gs->open_file, 0};
+  if (gs->start_file == LAUNCH_RESUME || gs->start_file == LAUNCH_SLOTS) {
+    int slot = gs->start_file == LAUNCH_RESUME ? SLOT_AUTO : gs->start_slot;
+    if (!slot_load(gb, dir, slot)) fprintf(stderr, "could not load the state in slot %d\n", slot + 1);
+  }
+  framebuffer_to_rgb(gb->sample ? gb->sample->framebuffer : gb->framebuffer, rgb);
+
+  for (bool running = true; running && !gb->hung;) {
+    test_keys();
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) {
+        if (mode == MODE_PAUSED) { end = GAME_QUIT; running = false; if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); }
+        else { mode = MODE_QUITTING; end = GAME_QUIT; park_from = frames; live_joy = 0; }
+        continue;
+      }
+      if (ev.type == SDL_EVENT_GAMEPAD_ADDED) { SDL_OpenGamepad(ev.gdevice.which); continue; }
+      if (ev.type == SDL_EVENT_KEY_DOWN && oracles_window_key(win, &ev.key)) continue;
+      if (mode == MODE_PAUSED) {
+        UiButton b;
+        if (!menu_button(&ev, &b) || (ev.type == SDL_EVENT_KEY_DOWN && ev.key.repeat)) continue;
+        PauseItem item;
+        MenuAction a = pause_press(&pause, b, &item);
+        if (a == MENU_BACK || (a == MENU_PICK && item == PAUSE_RESUME)) {
+          mode = MODE_PLAY;
+          if (audio) SDL_ResumeAudioStreamDevice(audio);
+        } else if (a == MENU_PICK && (item == PAUSE_SAVE || item == PAUSE_LOAD)) {
+          slots_scan(&slots, dir);
+          slots_open(&slots, item == PAUSE_SAVE);
+          int slot = pick_slot(win, ren, tex, &slots, &font, &theme, paused_rgb);
+          if (slot == -2) { end = GAME_QUIT; running = false; if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); }
+          else if (slot >= 0 && item == PAUSE_SAVE) {
+            bool ok = slot_save(gb, dir, slot, paused_rgb);
+            title_reset = show_status(win, title, ok ? "state saved" : "could not save state", frames);
+            pause.can_load = pause.can_load || ok;
+          } else if (slot >= 0) {
+            bool ok = slot_load(gb, dir, slot);
+            title_reset = show_status(win, title, ok ? "state loaded" : "could not load state", frames);
+            if (ok) { mode = MODE_PLAY; if (audio) SDL_ResumeAudioStreamDevice(audio); }
+          }
+        } else if (a == MENU_PICK && item == PAUSE_QUIT) {
+          if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb);
+          end = GAME_TO_LAUNCHER;
+          running = false;
+        }
+        continue;
+      }
+      if (mode != MODE_PLAY) continue;
+      bool pause_key = (ev.type == SDL_EVENT_KEY_DOWN && ev.key.scancode == SDL_SCANCODE_ESCAPE && !ev.key.repeat) ||
+                       (ev.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && ev.gbutton.button == SDL_GAMEPAD_BUTTON_GUIDE);
+      if (pause_key) { mode = MODE_PAUSING; park_from = frames; live_joy = 0; boot.phase = BOOT_OFF; continue; }
+      switch (ev.type) {
+      case SDL_EVENT_KEY_DOWN:
+        if (boot.phase != BOOT_OFF) { boot.phase = BOOT_OFF; live_joy = 0; }
+        if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S && !ev.key.repeat) save_from = frames;
+        else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R && !ev.key.repeat) {
+          bool ok = slot_load(gb, dir, 0);
+          if (ok) { live_joy = 0; save_from = NO_SAVE; }
+          title_reset = show_status(win, title, ok ? "state 1 loaded" : "no state in slot 1", frames);
+        }
+        else if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
+          muted = !muted;
+          if (audio) SDL_SetAudioStreamGain(audio, muted ? 0.0f : 1.0f);
+        }
+        else live_joy |= key_bit(ev.key.scancode);
+        break;
+      case SDL_EVENT_KEY_UP: live_joy &= ~key_bit(ev.key.scancode); break;
+      case SDL_EVENT_GAMEPAD_BUTTON_DOWN: live_joy |= pad_bit(ev.gbutton.button); break;
+      case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
+      }
+    }
+    if (!running) break;
+
+    if (mode == MODE_PAUSED) {
+      pause_draw(&pause, &font, &theme, paused_rgb, &canvas);
+      present(ren, tex, &canvas.px[0][0][0]);
+      SDL_Delay(16);
+      continue;
+    }
+
+    if (boot.phase != BOOT_OFF) {
+      // fast-forward the logos and menus, silently
+      for (int i = 0; i < 8 && boot.phase != BOOT_OFF; i++) { live_joy = boot_input(gb, &boot, frames); gb_run_frame(gb); frames++; }
+      if (boot.phase == BOOT_OFF) { live_joy = 0; fprintf(stderr, "boot into file %d done at frame %llu\n", boot.file + 1, (unsigned long long)frames); }
+      apu_read_samples(&gb->apu, samples, APU_RING);
+    } else {
+      if (mode == MODE_PLAY && audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
+      gb_run_frame(gb);
+      frames++;
+    }
+
+    // pausing and quitting wait for a frame the state can be saved at
+    if (mode == MODE_PAUSING || mode == MODE_QUITTING) {
+      parked = threads_parked(gb);
+      if (parked || frames - park_from > PARK_TIMEOUT) {
+        framebuffer_to_rgb(gb->sample->framebuffer, paused_rgb);
+        if (mode == MODE_QUITTING) { if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); running = false; break; }
+        mode = MODE_PAUSED;
+        pause_open(&pause, parked, any_slot(dir));
+        if (audio) { SDL_PauseAudioStreamDevice(audio); SDL_ClearAudioStream(audio); }
+        continue;
+      }
+    }
+
+    if (save_from != NO_SAVE && threads_parked(gb)) {
+      framebuffer_to_rgb(gb->sample->framebuffer, rgb);
+      bool ok = slot_save(gb, dir, 0, rgb);
+      title_reset = show_status(win, title, ok ? "state 1 saved" : "could not save state", frames);
+      save_from = NO_SAVE;
+    } else if (save_from != NO_SAVE && frames - save_from > PARK_TIMEOUT) {
+      title_reset = show_status(win, title, "could not save state here", frames);
+      save_from = NO_SAVE;
+    }
+    if (title_reset && frames >= title_reset) { SDL_SetWindowTitle(win, title); title_reset = 0; }
+    uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
+    if (audio && mode == MODE_PLAY) SDL_PutAudioStreamData(audio, samples, n * 4);
+    framebuffer_to_rgb(gb->sample->framebuffer, rgb);
+    present(ren, tex, rgb);
+    if (frames % 600 == 0) save_sram(gb, sav);
+    if (gs->max_frames && frames >= gs->max_frames) running = false;
+  }
+  if (gb->hung) { fprintf(stderr, "the engine stopped (pc %04x)\n", gb->pc); end = GAME_FAILED; }
+  else if (gs->max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
+  save_sram(gb, sav);
+  if (audio) SDL_DestroyAudioStream(audio);
+  SDL_SetWindowTitle(win, "Oracles");
+  free(gb); free(rom); free(tab);
+  return end;
 }
 
 int main(int argc, char **argv) {
@@ -324,124 +644,34 @@ int main(int argc, char **argv) {
   snprintf(window_size, sizeof window_size, "%swindow.txt", cache);
   if (!oracles_open_window("Oracles", window_size, &win, &ren, &tex)) { fprintf(stderr, "%s\n", SDL_GetError()); return 2; }
 
+  // a ROM or --game on the command line starts that game directly; quitting it opens the launcher
   char game[16] = "";
-  int start_file = -1;
-  bool start_file_used = false;
-  if (rom_arg) { if (!extract(rom_arg, cache, game)) return 2; }
+  GameStart gs = {cache, game, LAUNCH_TITLE, false, 0, max_frames};
+  bool direct = false;
+  if (rom_arg) { if (!extract(rom_arg, cache, game)) return 2; direct = true; }
   else if (game_arg) {
     if (!cached(cache, game_arg)) { fprintf(stderr, "%s is not installed; run once with its ROM path\n", game_arg); return 2; }
     snprintf(game, sizeof game, "%s", game_arg);
+    direct = true;
     if (file_arg >= 0 && file_arg < UI_FILES) {
-      Launcher probe;
-      UiFont font;
+      static Launcher probe;
+      static UiFont font;
       launcher_load(&probe, &font, cache);
-      start_file = file_arg;
-      start_file_used = probe.games[strcmp(game, "ages") == 0 ? UI_GAME_AGES : UI_GAME_SEASONS].files[file_arg].valid;
+      gs.start_file = file_arg;
+      gs.open_file = probe.games[strcmp(game, "ages") == 0 ? UI_GAME_AGES : UI_GAME_SEASONS].files[file_arg].valid;
     }
   }
-  else if (!run_launcher(win, ren, tex, cache, game, &start_file, &start_file_used)) { oracles_close_window(win, window_size); SDL_Quit(); return 0; }
-
-  char dir[1100], path[1300];
-  snprintf(dir, sizeof dir, "%s%s", cache, game);
-  size_t rom_size, tab_size;
-  snprintf(path, sizeof path, "%s/rom.bin", dir);
-  uint8_t *rom = oracles_read_file(path, &rom_size);
-  snprintf(path, sizeof path, "%s/cyctab.bin", dir);
-  uint8_t *tab = oracles_read_file(path, &tab_size);
-  if (!rom || !tab || tab_size != rom_size) { fprintf(stderr, "cache in %s is incomplete; run again with the ROM path\n", dir); return 2; }
-  GB *gb = calloc(1, sizeof *gb);
-  gb_init(gb);
-  if (!gb_load_rom(gb, rom, rom_size)) { fprintf(stderr, "cache in %s is not a ROM image\n", dir); return 2; }
-  gb->cyctab = tab;
-#ifndef NDEBUG
-  gb->code_bits = assets_code_bits(rom, rom_size);
-#endif
-  gb_reset(gb);
-  char sav[1300], state[1300];
-  snprintf(sav, sizeof sav, "%s/sram.sav", dir);
-  snprintf(state, sizeof state, "%s/savestate", dir);
-  load_sram(gb, sav);
-
-  char title[64];
-  snprintf(title, sizeof title, "Oracle of %s", strcmp(game, "ages") == 0 ? "Ages" : "Seasons");
-  SDL_SetWindowTitle(win, title);
-  SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, APU_SAMPLE_RATE};
-  SDL_AudioStream *audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
-  if (audio) SDL_ResumeAudioStreamDevice(audio);
-
-  static uint8_t rgb[FB_W * FB_H * 3];
-  static int16_t samples[APU_RING * 2];
-  gb->input_at = live_input;
-  uint64_t frames = 0;
-  bool running = true;
-  bool muted = false;
-  uint64_t title_reset = 0, save_from = NO_SAVE;
-  BootDriver boot = {start_file >= 0 ? BOOT_TO_FILE_SELECT : BOOT_OFF, start_file, start_file_used, 0};
-  if (start_file == LAUNCH_STATE) {
-    if (oracles_load_boot_state(gb, state)) fibers_reset(gb);
-    else fprintf(stderr, "load state failed: %s\n", state);
+  int status = 0;
+  for (;;) {
+    if (!direct && !run_launcher(win, ren, tex, cache, game, &gs.start_file, &gs.open_file, &gs.start_slot)) break;
+    direct = false;
+    GameEnd end = run_game(win, ren, tex, &gs);
+    if (end == GAME_FAILED) { status = 1; break; }
+    if (end == GAME_QUIT || max_frames) break;
+    gs.start_file = LAUNCH_TITLE;
+    gs.open_file = false;
   }
-  while (running && !gb->hung) {
-    SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
-      switch (ev.type) {
-      case SDL_EVENT_QUIT: running = false; break;
-      case SDL_EVENT_KEY_DOWN:
-        if (oracles_window_key(win, &ev.key)) break;
-        if (boot.phase != BOOT_OFF) { boot.phase = BOOT_OFF; live_joy = 0; }
-        if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_S && !ev.key.repeat) save_from = frames;
-        else if ((ev.key.mod & SDL_KMOD_GUI) && ev.key.scancode == SDL_SCANCODE_R && !ev.key.repeat) {
-          bool ok = oracles_load_boot_state(gb, state);
-          if (ok) { fibers_reset(gb); live_joy = 0; save_from = NO_SAVE; }
-          title_reset = show_status(win, title, ok ? "state loaded" : "no state to load", frames);
-          fprintf(stderr, "load state %s %s\n", ok ? "ok:" : "failed:", state);
-        }
-        else if (ev.key.scancode == SDL_SCANCODE_M && !ev.key.repeat) {
-          muted = !muted;
-          if (audio) SDL_SetAudioStreamGain(audio, muted ? 0.0f : 1.0f);
-        }
-        else live_joy |= key_bit(ev.key.scancode);
-        break;
-      case SDL_EVENT_KEY_UP: live_joy &= ~key_bit(ev.key.scancode); break;
-      case SDL_EVENT_GAMEPAD_ADDED: SDL_OpenGamepad(ev.gdevice.which); break;
-      case SDL_EVENT_GAMEPAD_BUTTON_DOWN: live_joy |= pad_bit(ev.gbutton.button); break;
-      case SDL_EVENT_GAMEPAD_BUTTON_UP: live_joy &= ~pad_bit(ev.gbutton.button); break;
-      }
-    }
-    if (boot.phase != BOOT_OFF) {
-      // fast-forward the logos and menus, silently
-      for (int i = 0; i < 8 && boot.phase != BOOT_OFF; i++) { live_joy = boot_input(gb, &boot, frames); gb_run_frame(gb); frames++; }
-      if (boot.phase == BOOT_OFF) { live_joy = 0; fprintf(stderr, "boot into file %d done at frame %llu\n", boot.file + 1, (unsigned long long)frames); }
-      apu_read_samples(&gb->apu, samples, APU_RING);
-    } else {
-      if (audio && SDL_GetAudioStreamQueued(audio) > AUDIO_TARGET_BYTES) { SDL_Delay(1); continue; }
-      gb_run_frame(gb);
-      frames++;
-    }
-    if (save_from != NO_SAVE && threads_parked(gb)) {
-      bool ok = oracles_save_boot_state(gb, state);
-      title_reset = show_status(win, title, ok ? "state saved" : "could not save state", frames);
-      fprintf(stderr, "save state %s %s\n", ok ? "ok:" : "failed:", state);
-      save_from = NO_SAVE;
-    } else if (save_from != NO_SAVE && frames - save_from > 600) {
-      title_reset = show_status(win, title, "could not save state here", frames);
-      save_from = NO_SAVE;
-    }
-    if (title_reset && frames >= title_reset) { SDL_SetWindowTitle(win, title); title_reset = 0; }
-    uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
-    if (audio) SDL_PutAudioStreamData(audio, samples, n * 4);
-    framebuffer_to_rgb(gb->sample->framebuffer, rgb);
-    SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
-    SDL_RenderClear(ren);
-    SDL_RenderTexture(ren, tex, NULL, NULL);
-    SDL_RenderPresent(ren);
-    if (frames % 600 == 0) save_sram(gb, sav);
-    if (max_frames && frames >= max_frames) running = false;
-  }
-  if (gb->hung) fprintf(stderr, "the engine stopped (pc %04x)\n", gb->pc);
-  else if (max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
-  save_sram(gb, sav);
   oracles_close_window(win, window_size);
   SDL_Quit();
-  return gb->hung ? 1 : 0;
+  return status;
 }

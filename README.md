@@ -51,7 +51,7 @@ ctest --test-dir build
 
 ## Playing
 
-Two apps, same game, same controls:
+Two apps, same game:
 
 - `oracles-native`, the real port: no CPU emulator. On first launch it reads your ROM once,
   keeps the graphics, sound and data, zeroes the code bytes, and caches the result; later
@@ -65,9 +65,19 @@ Two apps, same game, same controls:
   ./build/oracles "roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc" roms/cgb_boot.bin
   ```
 
-Controls: arrow keys to move, `X` / `Z` for A / B, Return or Esc for Start, Backspace or Right
-Shift for Select, `M` to mute, `F12` for a screenshot. In `oracles`, Cmd+S saves a state and
-Cmd+R loads it. The game's own save (battery RAM) is kept next to the ROM as `.sav`.
+Without arguments `oracles-native` opens a launcher: Ages and Seasons side by side (each in its own
+title-screen colours), each game's three save files with name, hearts and essences, Resume (the state
+from the last quit), Load state, and the title screen. Choosing a file boots straight into it.
+
+Controls: arrow keys to move, `X` / `Z` for A / B, Return for Start, Backspace or Right Shift for
+Select, `M` to mute, F11 or Cmd+F for fullscreen. The window resizes in whole-pixel steps.
+
+- `oracles-native`: Esc (or the gamepad's Guide button) pauses: Resume, Save state, Load state (4
+  slots with thumbnails) and Quit, which saves a Resume state and returns to the launcher. Cmd+S /
+  Cmd+R save and load slot 1. Everything lives in the per-user app folder
+  (`~/Library/Application Support/oracles-decomp/oracles/` on macOS), including the game's own save.
+- `oracles`: Esc is Start as well; Cmd+S / Cmd+R save and load one state next to the ROM, F12 takes a
+  screenshot, and the game's save (battery RAM) is kept next to the ROM as `.sav`.
 
 ## Recording a playthrough
 

@@ -5,14 +5,15 @@
 static const char *const game_names[UI_GAMES] = {"AGES", "SEASONS"};
 
 static bool row_shown(const Launcher *l, LauncherRow r) {
-  return r != ROW_STATE || l->games[l->game].has_state;
+  const LauncherGame *g = &l->games[l->game];
+  return (r != ROW_RESUME || g->has_resume) && (r != ROW_SLOTS || g->has_slots);
 }
 
-// the save state if there is one, else the first file with data, else the first file
+// Resume if there is one, else the first file with data, else the first file
 static void select_game(Launcher *l, UiGame g) {
   l->game = g;
   l->row = ROW_FILE1;
-  if (l->games[g].has_state) { l->row = ROW_STATE; return; }
+  if (l->games[g].has_resume) { l->row = ROW_RESUME; return; }
   for (int i = 0; i < UI_FILES; i++)
     if (l->games[g].files[i].valid) { l->row = (LauncherRow)i; break; }
 }
@@ -36,7 +37,7 @@ LaunchResult launcher_press(Launcher *l, UiButton b) {
   case UI_ACCEPT:
     if (!l->games[l->game].installed) { r.action = LAUNCH_ADD_ROM; break; }
     r.action = LAUNCH_PLAY;
-    r.file = l->row <= ROW_FILE3 ? (int)l->row : l->row == ROW_STATE ? LAUNCH_STATE : LAUNCH_TITLE;
+    r.file = l->row <= ROW_FILE3 ? (int)l->row : l->row == ROW_RESUME ? LAUNCH_RESUME : l->row == ROW_SLOTS ? LAUNCH_SLOTS : LAUNCH_TITLE;
     break;
   }
   return r;
@@ -81,9 +82,10 @@ void launcher_draw(const Launcher *l, const UiFont *font, UiCanvas *c) {
   }
   ui_box(c, 0, 28, UI_W, 92, t->border, t->panel);
   if (g->installed) {
-    for (int i = 0; i < UI_FILES; i++) draw_file(c, font, t, 30 + i * 18, i, &g->files[i], l->row == (LauncherRow)i);
-    int y = 30 + UI_FILES * 18;
-    if (g->has_state) { draw_row(c, font, t, y, "LOAD STATE", l->row == ROW_STATE); y += 18; }
+    int step = g->has_resume && g->has_slots ? 15 : 18, y = 30;
+    for (int i = 0; i < UI_FILES; i++, y += step) draw_file(c, font, t, y, i, &g->files[i], l->row == (LauncherRow)i);
+    if (g->has_resume) { draw_row(c, font, t, y, "RESUME", l->row == ROW_RESUME); y += step; }
+    if (g->has_slots) { draw_row(c, font, t, y, "LOAD STATE", l->row == ROW_SLOTS); y += step; }
     draw_row(c, font, t, y, "TITLE SCREEN", l->row == ROW_TITLE);
   } else {
     ui_text(c, font, 12, 40, "NOT INSTALLED", t->dim);

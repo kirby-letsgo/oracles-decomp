@@ -2,6 +2,7 @@
 #include "ui/ui.h"
 #include "ui/savefile.h"
 #include "ui/launcher.h"
+#include "ui/menu.h"
 
 static uint8_t rom[0x80000];
 
@@ -84,19 +85,61 @@ static void launcher_navigates_and_starts(void) {
   launcher_draw(&l, &font, &c);                         // draws without the game art too
 }
 
-static void launcher_offers_the_save_state(void) {
+static void launcher_offers_resume_and_slots(void) {
   Launcher l;
   memset(&l, 0, sizeof l);
   l.games[UI_GAME_AGES].installed = true;
-  l.games[UI_GAME_AGES].has_state = true;
+  l.games[UI_GAME_AGES].has_resume = true;
+  l.games[UI_GAME_AGES].has_slots = true;
   launcher_init(&l, UI_GAME_AGES);
-  ASSERT_EQ(l.row, ROW_STATE);
-  ASSERT_EQ(launcher_press(&l, UI_ACCEPT).file, LAUNCH_STATE);
+  ASSERT_EQ(l.row, ROW_RESUME);
+  ASSERT_EQ(launcher_press(&l, UI_ACCEPT).file, LAUNCH_RESUME);
+  launcher_press(&l, UI_DOWN);
+  ASSERT_EQ(launcher_press(&l, UI_ACCEPT).file, LAUNCH_SLOTS);
   launcher_press(&l, UI_DOWN);
   ASSERT_EQ(l.row, ROW_TITLE);
-  l.games[UI_GAME_AGES].has_state = false;
+  l.games[UI_GAME_AGES].has_resume = l.games[UI_GAME_AGES].has_slots = false;
   launcher_press(&l, UI_UP);
-  ASSERT_EQ(l.row, ROW_FILE3);                          // the hidden row is skipped
+  ASSERT_EQ(l.row, ROW_FILE3);                          // hidden rows are skipped
+}
+
+static void pause_menu_skips_disabled_items(void) {
+  PauseMenu m;
+  pause_open(&m, false, false);
+  PauseItem picked;
+  pause_press(&m, UI_DOWN, &picked);
+  ASSERT_EQ(m.sel, PAUSE_QUIT);                         // save and load are unavailable
+  ASSERT_EQ(pause_press(&m, UI_ACCEPT, &picked), MENU_PICK);
+  ASSERT_EQ(picked, PAUSE_QUIT);
+  pause_open(&m, true, true);
+  pause_press(&m, UI_DOWN, &picked);
+  ASSERT_EQ(m.sel, PAUSE_SAVE);
+  ASSERT_EQ(pause_press(&m, UI_BACK, &picked), MENU_BACK);
+}
+
+static void slots_load_only_used_slots(void) {
+  static SlotsMenu m;
+  memset(&m, 0, sizeof m);
+  m.slots[2].used = true;
+  slots_open(&m, false);
+  ASSERT_EQ(m.sel, 2);
+  int slot = -1;
+  slots_press(&m, UI_DOWN, &slot);
+  ASSERT_EQ(m.sel, 2);                                  // no other used slot to move to
+  ASSERT_EQ(slots_press(&m, UI_ACCEPT, &slot), MENU_PICK);
+  ASSERT_EQ(slot, 2);
+  slots_open(&m, true);
+  ASSERT_EQ(m.sel, 0);
+  slots_press(&m, UI_UP, &slot);
+  ASSERT_EQ(m.sel, 3);                                  // saving: every slot, wrapping
+  static uint8_t rgb[UI_W * UI_H * 3];
+  static UiCanvas c;
+  UiFont font;
+  UiTheme t;
+  ui_font_load(&font, rom, sizeof rom);
+  ui_theme_default(&t, true);
+  slots_draw(&m, &font, &t, rgb, &c);
+  slots_draw(&m, &font, &t, NULL, &c);
 }
 
 static void themes_come_from_the_title_palettes(void) {
@@ -117,7 +160,9 @@ int main(void) {
   RUN(text_draws_glyph_pixels);
   RUN(save_files_are_read_and_verified);
   RUN(launcher_navigates_and_starts);
-  RUN(launcher_offers_the_save_state);
+  RUN(launcher_offers_resume_and_slots);
+  RUN(pause_menu_skips_disabled_items);
+  RUN(slots_load_only_used_slots);
   RUN(themes_come_from_the_title_palettes);
   return 0;
 }

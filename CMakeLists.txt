@@ -72,7 +72,7 @@ if(ORACLES_SDL)
   endif()
 endif()
 
-add_library(oraclesui STATIC src/ui/ui.c src/ui/savefile.c src/ui/launcher.c)
+add_library(oraclesui STATIC src/ui/ui.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c)
 target_include_directories(oraclesui PUBLIC src)
 
 enable_testing()
@@ -89,6 +89,9 @@ set_tests_properties(native_tas PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
 set(NATIVE_BINARIES $<TARGET_FILE:oracles-native-run> $<TARGET_FILE:test_native_tas>)
 if(ORACLES_SDL)
   list(APPEND NATIVE_BINARIES $<TARGET_FILE:oracles-native>)
+  add_test(NAME app_menus COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_menus.py $<TARGET_FILE:oracles-native>
+    "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc")
+  set_tests_properties(app_menus PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
 endif()
 add_test(NAME native_binary COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/check_native_binary.py $<TARGET_FILE:oraclesnative> ${NATIVE_BINARIES})
 
