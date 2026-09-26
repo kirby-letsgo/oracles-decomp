@@ -342,6 +342,11 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
   SDL_Rect safe = {0, 0, w, h};
   SDL_GetRenderSafeArea(ren, &safe);
   touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots);
+  static int logged_w, logged_h, logged_scale;
+  if (w != logged_w || h != logged_h || layout.scale != logged_scale) {
+    fprintf(stderr, "screen %dx%d, safe area %d,%d %dx%d, scale %d\n", w, h, safe.x, safe.y, safe.w, safe.h, layout.scale);
+    logged_w = w; logged_h = h; logged_scale = layout.scale;
+  }
   int scale = SDL_min(layout.scale, MAX_FILTER_SCALE);
   SDL_FRect dst = {(float)(layout.game.x * layout.scale), (float)(layout.game.y * layout.scale), (float)(FB_W * layout.scale), (float)(FB_H * layout.scale)};
   if (touch_on) SDL_SetRenderDrawColor(ren, overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b, 255);

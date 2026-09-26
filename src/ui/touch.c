@@ -31,6 +31,12 @@ static void face_buttons(TouchLayout *l, int cx, int cy, bool item_buttons) {
   l->button[ACT_ITEM_Y] = circle(cx - 19, cy - 24, ITEM_R);
 }
 
+// The D-pad and face buttons (X/Y reach higher) centred between two rows of pills.
+static int cluster_y(int above, int below, bool item_buttons) {
+  int reach = item_buttons ? CLUSTER_ITEMS_H - DPAD / 2 : DPAD / 2;
+  return (above + below + reach - DPAD / 2) / 2;
+}
+
 void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, bool item_buttons) {
   memset(l, 0, sizeof *l);
   l->screen_w = screen_w;
@@ -38,16 +44,24 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
   l->overlay = overlay;
   l->portrait = overlay && screen_h > screen_w;
   if (safe.w <= 0 || safe.h <= 0) safe = (UiRect){0, 0, screen_w, screen_h};
-  int s = imax(imin(safe.w / UI_W, safe.h / UI_H), 1);
-  // portrait: the largest scale that leaves room below the game for the controls
-  int controls_h = 6 + PILL_H + 2 * 4 + (item_buttons ? CLUSTER_ITEMS_H : CLUSTER_H) + PILL_H;
-  while (l->portrait && s > 1 && ceil_div(screen_h, s) - ceil_div(safe.y, s) - ceil_div(screen_h - safe.y - safe.h, s) - 2 * MARGIN - UI_H < controls_h) s--;
+  // Safe areas include the rounded corners, which the game never reaches: in portrait it takes the
+  // full width and keeps clear of the top and bottom insets, in landscape the other way round.
+  bool tall = screen_h > screen_w;
+  int fit_w = tall ? screen_w : safe.w, fit_h = tall ? safe.h : screen_h;
+  int s = imax(imin(fit_w / UI_W, fit_h / UI_H), 1);
+  // the largest scale that leaves room for the controls: below the game in portrait, beside it
+  // (between the top and bottom rows of pills) in landscape
+  int cluster = item_buttons ? CLUSTER_ITEMS_H : CLUSTER_H;
+  int need = l->portrait ? UI_H + 6 + 2 * PILL_H + 2 * 4 + cluster : 2 * PILL_H + 2 * 4 + cluster;
+  while (overlay && s > 1 && ceil_div(screen_h, s) - ceil_div(safe.y, s) - ceil_div(screen_h - safe.y - safe.h, s) - 2 * MARGIN < need) s--;
   l->scale = s;
   l->w = ceil_div(screen_w, s);
   l->h = ceil_div(screen_h, s);
   int st = ceil_div(safe.y, s), sb = ceil_div(screen_h - safe.y - safe.h, s);
   int sl = ceil_div(safe.x, s), sr = ceil_div(screen_w - safe.x - safe.w, s);
-  l->game = (UiRect){(safe.x + imax(safe.w - UI_W * s, 0) / 2) / s, (safe.y + imax(safe.h - UI_H * s, 0) / 2) / s, UI_W, UI_H};
+  int gx = tall ? imax(screen_w - UI_W * s, 0) / 2 : safe.x + imax(safe.w - UI_W * s, 0) / 2;
+  int gy = tall ? safe.y + imax(safe.h - UI_H * s, 0) / 2 : imax(screen_h - UI_H * s, 0) / 2;
+  l->game = (UiRect){gx / s, gy / s, UI_W, UI_H};
   if (!overlay) return;
   int left = sl + MARGIN, right = l->w - sr - MARGIN, top = st + MARGIN, bottom = l->h - sb - MARGIN;
   if (l->portrait) {
@@ -57,14 +71,12 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
     l->button[ACT_PAUSE] = (UiRect){right - pill_w(ACT_PAUSE), row, pill_w(ACT_PAUSE), PILL_H};
     l->button[ACT_SELECT] = (UiRect){l->w / 2 - 4 - pill_w(ACT_SELECT), pills, pill_w(ACT_SELECT), PILL_H};
     l->button[ACT_START] = (UiRect){l->w / 2 + 4, pills, pill_w(ACT_START), PILL_H};
-    // the D-pad and the face buttons (X/Y reach higher) centred between the two rows of pills
-    int cluster_top = item_buttons ? CLUSTER_ITEMS_H - DPAD / 2 : DPAD / 2;
-    int cy = (row + PILL_H + pills + cluster_top - DPAD / 2) / 2, width = right - left;
+    int cy = cluster_y(row + PILL_H, pills, item_buttons), width = right - left;
     l->dpad = circle(left + imax(DPAD / 2 + 2, width * 22 / 100), cy, DPAD / 2);
     face_buttons(l, right - imax(19 + BUTTON_R + 2, width * 22 / 100), cy, item_buttons);
     return;
   }
-  int side = imax(l->game.x - sl - MARGIN, 0), cy = l->h * 3 / 5;
+  int side = imax(l->game.x - sl - MARGIN, 0), cy = cluster_y(top + PILL_H, bottom - PILL_H, item_buttons);
   int dpad_x = left + imax(DPAD / 2 + 2, side / 2), face_x = right - imax(19 + BUTTON_R + 2, side / 2);
   l->dpad = circle(dpad_x, cy, DPAD / 2);
   face_buttons(l, face_x, cy, item_buttons);

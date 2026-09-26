@@ -283,7 +283,7 @@ static void touch_layout_fits_screens(void) {
       touch_layout(&l, w, h, (UiRect){0, 90, w, h - 90 - 60}, true, items);
       ASSERT(l.scale >= 3);
       ASSERT(inside(l.game, w / l.scale, h / l.scale));
-      ASSERT(l.game.y * l.scale >= 90);
+      if (l.portrait) ASSERT(l.game.y * l.scale >= 90);
       UiRect controls[ACTIONS + 1];
       int n = 0;
       controls[n++] = l.dpad;
@@ -297,6 +297,12 @@ static void touch_layout_fits_screens(void) {
       }
     }
   TouchLayout l;
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false);   // Pixel 8: corners in the safe area
+  ASSERT_EQ(l.scale, 6);
+  ASSERT(l.game.y * 6 >= 164);
+  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false);
+  ASSERT_EQ(l.scale, 7);
+  ASSERT(l.game.x * 7 >= 132);
   touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, false);
   ASSERT(l.portrait);
   ASSERT_EQ(l.scale, 6);
