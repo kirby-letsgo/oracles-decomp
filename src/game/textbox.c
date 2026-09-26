@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/features.h"
 #include "game/gen.h"
 
 #undef CYC
@@ -2095,7 +2096,8 @@ timer_check:
 check_input:
   CYC(b_+17, b_+20); A = mem_rd(gb, wKeysJustPressed);
   CYC(b_+20, b_+22); alu_and(gb, 0x03);
-  if (!(F & FZ)) { CYCT(b_+22, b_+24); goto skip_to_line_end; }
+  // fast text takes the path of an A/B press: the rest of the line appears at once
+  if (!(F & FZ) || features.fast_text) { CYCT(b_+22, b_+24); goto skip_to_line_end; }
   CYC(b_+22, b_+24);
 countdown:
   CYC(b_+24, b_+26); L = 0xc6;
