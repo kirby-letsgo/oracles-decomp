@@ -4,7 +4,7 @@
 // against that room's own picture once the movie is in it. (Skipped without the ROM.)
 // WIDE_PNG=frame:path saves a widescreen frame (any frame, room changes included); WIDE_ONLY_NEIGHBOURS=1 runs only the neighbour
 // checks, WIDE_PAIRS=1 lists each pair, WIDE_PAIR_PNG=room:season:path (WIDE_PAIR_AGES=1 for Ages)
-// saves a pair's strips beside the real columns.
+// saves a pair's strips beside the real columns; WIDE_TIME=1 prints the renderer's cost per frame.
 #include "unit.h"
 #include "core/gb.h"
 #include "platform/tas.h"
@@ -14,6 +14,7 @@
 #include "wide/wide.h"
 #include "platform/png.h"
 #include <stdlib.h>
+#include <time.h>
 
 static uint8_t tas_cb(void *ctx, uint64_t frame) { return tas_input_at((const Tas *)ctx, frame); }
 
@@ -38,6 +39,19 @@ static bool under_sprite(const GBSample *s, int x, int y) {
 static void check_cb(GB *gb, const GBSample *s, void *ctx) {
   (void)gb;
   WideCheck *c = ctx;
+  if (getenv("WIDE_TIME") && c->seasons && s->frame >= 3000 && s->frame < 13000) {   // the renderer's cost per frame
+    static uint8_t wide[WIDE_W * FB_H * 3];
+    static double total, worst;
+    static int n;
+    WideOptions o = {c->seasons, true, {40, 32, 16}, c->rom, c->rom_size};
+    struct timespec t0, t1;
+    clock_gettime(CLOCK_MONOTONIC, &t0);
+    wide_render(s, &o, wide);
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    double ms = (t1.tv_sec - t0.tv_sec) * 1e3 + (t1.tv_nsec - t0.tv_nsec) / 1e6;
+    total += ms; n++; if (ms > worst) worst = ms;
+    if (s->frame == 12999) fprintf(stderr, "wide_render: %.3f ms average, %.3f ms worst over %d frames\n", total / n, worst, n);
+  }
   // WIDE_PNG=frame:path.png saves that frame's widescreen picture (checked frames only, every 7th)
   const char *png = getenv("WIDE_PNG");
   unsigned long long at;

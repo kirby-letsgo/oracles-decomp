@@ -116,6 +116,23 @@ inventory and press one to assign it, then hold it in play to use the item).
 `ORACLES_TOUCH=1 ./build/oracles-native` shows the phone's touch controls on the desktop, with the
 mouse as a finger.
 
+## Widescreen
+
+Settings > WIDESCREEN shows 256x144 (16:9 at the game's 144 lines): the game's own 160 pixels in the
+middle, unchanged, and 48 pixels each side of the rooms around it. Large rooms (dungeons) show more
+of themselves; past a room's edge come the neighbouring rooms, decoded from your ROM: the overworld
+grid (with the right season in Seasons) and, in dungeons, the rooms through a doorway once visited.
+The strips scroll along with every room change. Nothing moves in them (the game only runs the room
+you are in), they show a room as the ROM describes it (not opened chests or cut grass until you go
+there), and houses, caves, menus and cutscenes get the game's border colour. DIM SIDES (on by
+default) draws the strips a little darker than the live room.
+
+`test_wide` checks the renderer against the game through both TAS movies: the middle 160 columns
+drawn its way equal the PPU's picture exactly, and what a strip showed of the next room matches
+that room's own picture once the movie is in it (Seasons 96.8%, Ages 98.9% of the pixels; the rest
+are things the player changed). `test_room` checks the ROM room decoder against every room the
+movies load.
+
 ## Save sync
 
 Settings > SYNC keeps saves in step across devices through the sync server (`sync-server/`): CREATE
