@@ -290,7 +290,7 @@ bool wide_decode_room(const uint8_t *rom, size_t size, bool seasons, const WideR
   int t = b(&r, at(4, le(&r, at(4, r.t->tilesets_by_group + group * 2)) + key->room));
   size_t entry = at(4, r.t->tileset_data + (t & 0x7f) * 8);
   if (seasons && b(&r, entry) == 0xff) entry = at(4, le(&r, entry + 1) + (key->season & 3) * 8);
-  uint8_t tileset[8];
+  uint8_t *tileset = out->tileset;
   for (int i = 0; i < 8; i++) tileset[i] = b(&r, entry + (size_t)i);
   out->flags = tileset[1];
   if (key->group >= 1) {                                    // indoor rooms of the other world
@@ -318,6 +318,7 @@ bool wide_decode_room(const uint8_t *rom, size_t size, bool seasons, const WideR
   load_palette_header(&r, tileset[4], out);
   int unique = (tileset[2] | (t & 0x80)) & 0x7f;
   if (seasons && key->group == 0 && key->room == 0x96 && !(key->room_flags & 0x80)) unique = 0x20;
+  out->unique = unique;
   if (unique) load_gfx_headers(&r, at(4, le(&r, at(4, r.t->unique_gfx_headers + unique * 2))), false, out);
   initialize_animations(&r, tileset[7], seasons, out);
   int dungeon = (out->flags & TILESETFLAG_DUNGEON) ? tileset[0] & 0x0f : 0xff;

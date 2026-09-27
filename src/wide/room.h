@@ -10,6 +10,8 @@
 typedef struct {
   int width, height;            // in 8x8 tiles: 20x16 small, 30x22 large
   uint8_t flags;                // the tileset flags (dungeon, indoors, sidescroll, ...)
+  uint8_t tileset[8];           // the tileset entry (b3 gfx, b4 palettes); unique: its unique gfx
+  int unique;
   uint8_t layout[0xc0];         // metatiles, 16 a row
   uint8_t tiles[0x300], attrs[0x300];   // room-local tiles and CGB attributes, 32 a row
   uint8_t vram[2][0x1800];      // $8000-$97ff of both VRAM banks as the tileset loads them

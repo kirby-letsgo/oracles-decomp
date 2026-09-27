@@ -459,10 +459,10 @@ static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
 static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb);
 
 // A game frame: in widescreen the room around the camera fills the sides (the message stays centred).
-static void present_game(SDL_Renderer *ren, SDL_Texture *tex, const GBSample *sample, const uint8_t *rgb, bool seasons) {
+static void present_game(SDL_Renderer *ren, SDL_Texture *tex, const GBSample *sample, const uint8_t *rgb, bool seasons, const uint8_t *rom, size_t rom_size) {
   if (!settings.widescreen) { present(ren, tex, rgb); return; }
   static uint8_t wide[WIDE_W * FB_H * 3];
-  WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}};
+  WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}, rom, rom_size};
   wide_render(sample, &o, wide);
   if (toast[0] && SDL_GetTicks() < toast_until && overlay_font && overlay_font->loaded) {
     static UiCanvas middle;
@@ -1260,7 +1260,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (audio && mode == MODE_PLAY) SDL_PutAudioStreamData(audio, samples, n * 4);
     framebuffer_to_rgb(gb->sample->framebuffer, rgb);
-    present_game(ren, tex, gb->sample, rgb, !ages);
+    present_game(ren, tex, gb->sample, rgb, !ages, rom, rom_size);
     if (frames % 600 == 0) save_sram(gb, sav);
     if (gs->max_frames && frames >= gs->max_frames) running = false;
   }

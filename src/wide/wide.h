@@ -1,7 +1,9 @@
 #pragma once
 // Widescreen: a 256x144 frame built from a frame sample, read-only. The game's own 160 pixels go in
-// the middle unchanged; the 48 pixels each side come from the room's tile map around the camera,
-// or the border colour where there is nothing to show (menus, cutscenes, no room there).
+// the middle unchanged; the 48 pixels each side come from the room around the camera, past its
+// edges from the neighbouring rooms (decoded from the ROM: the overworld grid, and in dungeons the
+// visited rooms through a doorway), or the border colour where there is nothing to show (menus,
+// cutscenes, houses and caves, the map's edge).
 #include "core/gb.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -13,6 +15,8 @@ typedef struct {
   bool seasons;
   bool dim;                     // the side strips at 75% brightness
   uint8_t border[3];            // RGB where the strips show nothing
+  const uint8_t *rom;           // for the neighbouring rooms (the app's copy, code bytes zeroed, will do)
+  size_t rom_size;
 } WideOptions;
 
 // out: WIDE_W x FB_H RGB24.
