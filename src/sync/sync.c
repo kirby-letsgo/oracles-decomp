@@ -37,6 +37,7 @@ int sync_parse_manifest(const char *text, SyncRemote *out, int max) {
     memset(r, 0, sizeof *r);
     if (sscanf(line, "%7s %23s %d %64s %15s %lld %n", r->game, r->name, &r->version, r->sha, format, &updated, &used) < 6) continue;
     r->format = strcmp(format, "-") ? atoi(format) : -1;
+    if (r->format > 0) r->format &= ~(1 << 23);        // early builds marked 64-bit longs; the layout is the same
     r->updated = updated;
     if (used) snprintf(r->device, sizeof r->device, "%s", line + used);
     n++;

@@ -47,9 +47,12 @@ typedef struct { char magic[8]; uint32_t version, size; } BootStateHeader;
 #define BOOT_STATE_VERSION 1
 
 // One number for "a state file this build can load", sent with synced save states: the header
-// version, the GB struct's size and whether long is 64-bit (Windows lays some structs out differently).
+// version and the GB struct's size. The struct holds only fixed-size fields and 8-byte pointers
+// (replaced on load by oracles_copy_state), so every 64-bit little-endian build lays it out the
+// same: states move between macOS, Linux, Windows and Android (test_native_tas loads boot states
+// recorded on macOS on all of them).
 int oracles_state_format(void) {
-  return (int)(BOOT_STATE_VERSION << 24 | (sizeof(long) == 8) << 23 | (sizeof(GB) & 0x7fffff));
+  return (int)(BOOT_STATE_VERSION << 24 | (sizeof(GB) & 0x7fffff));
 }
 
 bool oracles_save_boot_state(const GB *gb, const char *path) {

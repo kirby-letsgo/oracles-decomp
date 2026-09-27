@@ -60,6 +60,9 @@ static void manifest_and_records_parse(void) {
   ASSERT(!strcmp(r[0].device, "Sara's Pixel 8"));
   ASSERT_EQ(r[0].format, -1);
   ASSERT_EQ(r[1].format, 7);
+  SyncRemote early[1];
+  ASSERT_EQ(sync_parse_manifest("ages state_1 1 bbbb 25360480 1790443900 x\n", early, 1), 1);
+  ASSERT_EQ(early[0].format, 25360480 & ~(1 << 23));         // an early build's number still matches
   ASSERT_EQ(r[1].updated, 1790443900);
   ASSERT(sync_find_remote(r, 2, "ages", "state_1") == &r[1]);
   ASSERT(sync_find_remote(r, 2, "ages", "sram.sav") == NULL);
