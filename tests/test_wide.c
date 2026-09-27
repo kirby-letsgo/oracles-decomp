@@ -2,7 +2,7 @@
 // is drawn by wide_room_pixel over the middle 160 columns too, and must equal the emulator's
 // picture wherever no sprite covers it. Then the neighbours: what a strip showed of the next room
 // against that room's own picture once the movie is in it. (Skipped without the ROM.)
-// WIDE_PNG=frame:path saves a widescreen frame; WIDE_ONLY_NEIGHBOURS=1 runs only the neighbour
+// WIDE_PNG=frame:path saves a widescreen frame (any frame, room changes included); WIDE_ONLY_NEIGHBOURS=1 runs only the neighbour
 // checks, WIDE_PAIRS=1 lists each pair, WIDE_PAIR_PNG=room:season:path (WIDE_PAIR_AGES=1 for Ages)
 // saves a pair's strips beside the real columns.
 #include "unit.h"
@@ -38,18 +38,6 @@ static bool under_sprite(const GBSample *s, int x, int y) {
 static void check_cb(GB *gb, const GBSample *s, void *ctx) {
   (void)gb;
   WideCheck *c = ctx;
-  if (s->frame % 7) return;
-  if (wide_room_pixel(s, c->seasons, 80, 80) < 0) return;          // not in normal play
-  c->checked++;
-  if (s->wram[0][0xd0a] > 20) c->large++;
-  for (int y = 16; y < FB_H; y++)
-    for (int x = 0; x < FB_W; x++) {
-      if (under_sprite(s, x, y) || wide_window_at(s, x, y)) continue;
-      int want = s->framebuffer[y * FB_W + x], got = wide_room_pixel(s, c->seasons, x, y);
-      if (!(s->line_lcdc[y] & 0x80) || got < 0) continue;     // a blank line, or outside the room (shake)
-      c->pixels++;
-      if (got != want) { if (!c->mismatches) c->first_bad = s->frame; c->mismatches++; }
-    }
   // WIDE_PNG=frame:path.png saves that frame's widescreen picture (checked frames only, every 7th)
   const char *png = getenv("WIDE_PNG");
   unsigned long long at;
@@ -63,6 +51,19 @@ static void check_cb(GB *gb, const GBSample *s, void *ctx) {
     fprintf(stderr, "saving frame %llu to %s: %d\n", (unsigned long long)s->frame, full, png_write_rgb(full, wide, WIDE_W, FB_H));
     c->saved = true;
   }
+  if (s->frame % 7) return;
+  if (wide_room_pixel(s, c->seasons, 80, 80) < 0) return;          // not in normal play
+  c->checked++;
+  if (s->wram[0][0xd0a] > 20) c->large++;
+  for (int y = 16; y < FB_H; y++)
+    for (int x = 0; x < FB_W; x++) {
+      if (under_sprite(s, x, y) || wide_window_at(s, x, y)) continue;
+      int want = s->framebuffer[y * FB_W + x], got = wide_room_pixel(s, c->seasons, x, y);
+      if (!(s->line_lcdc[y] & 0x80) || got < 0) continue;     // a blank line, or outside the room (shake)
+      c->pixels++;
+      if (got != want) { if (!c->mismatches) c->first_bad = s->frame; c->mismatches++; }
+    }
+
 }
 
 static void check_movie(const char *rom_path, const char *inputs, const char *state_path, uint64_t frames, bool seasons) {

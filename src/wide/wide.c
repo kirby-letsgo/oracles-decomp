@@ -24,14 +24,35 @@ static uint8_t rd(const GBSample *s, uint16_t a) {
   return s->wram[0][a - 0xc000];
 }
 
-// The room is shown around the camera only in normal play: the status bar split on, no menu
-// open, the camera following Link (no transition or scripted scene) and not a sidescrolling area.
+// When the strips show rooms: the status bar split on, no menu open, not a sidescrolling area, and
+// either normal play (scroll mode 1; bit 7 means the camera is moving) or a scrolling screen
+// transition (states 3-5), during which wActiveRoom is already the next room while the scroll and
+// wScreenOffsetX/Y still count from the previous one. Scroll mode 0 is a scripted scene.
+typedef struct {
+  bool shown;
+  bool moving;                  // a scrolling transition: every strip pixel comes from decoded rooms
+  int dx, dy;                   // the grid step from the previous room to the current one while moving
+} View;
+
+enum { W_TRANSITION_DIRECTION = 0xcd02, W_TRANSITION_STATE = 0xcd04 };
+
+static View view_of(const GBSample *s, const GameRam *r) {
+  View v = {false, false, 0, 0};
+  int split = rd(s, r->lcd_behaviour), mode = rd(s, W_SCROLL_MODE) & 0x0f;
+  if (!(split == 2 || split == 3) || rd(s, W_OPENED_MENU) || (rd(s, r->tileset_flags) & TILESETFLAG_SIDESCROLL)) return v;
+  if (mode == 0x01) { v.shown = true; return v; }
+  int state = rd(s, W_TRANSITION_STATE), dir = rd(s, W_TRANSITION_DIRECTION);
+  static const int step[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};  // up, right, down, left
+  if (!(mode & 0x0e) || state < 3 || state > 5 || dir > 3) return v;
+  v.shown = v.moving = true;
+  v.dx = step[dir][0];
+  v.dy = step[dir][1];
+  return v;
+}
+
 static bool room_shown(const GBSample *s, const GameRam *r) {
-  int split = rd(s, r->lcd_behaviour);                     // 2 or 3: the status bar split
-  // scroll mode 1 is normal play (bit 7: the camera is moving); 0 is a scripted scene, bits 1-3 a
-  // screen transition
-  return (split == 2 || split == 3) && rd(s, W_OPENED_MENU) == 0 && (rd(s, W_SCROLL_MODE) & 0x0f) == 0x01 &&
-         !(rd(s, r->tileset_flags) & TILESETFLAG_SIDESCROLL);
+  View v = view_of(s, r);
+  return v.shown && !v.moving;
 }
 
 // A register difference as a small signed offset (the camera plus the screen shake of up to 3)
@@ -89,23 +110,24 @@ int wide_room_pixel(const GBSample *s, bool seasons, int x, int y) {
   return c < 0 ? -1 : c;
 }
 
-// --- the neighbouring rooms ----------------------------------------------------------------------
+// --- the rooms around ---------------------------------------------------------------------------
 
-// The room beside the current one (dir -1 left, +1 right), or false where there is none to show:
-// the overworld's grid (Ages 14 wide, Seasons 16), a dungeon floor's 8x8 map through a doorway and
-// only once visited; houses, caves and the other groups have no neighbours.
-static bool neighbour_key(const GBSample *s, const WideOptions *o, int dir, WideRoomKey *key) {
+// The room at grid step (tx, ty) from the current one, or false where there is none to show: on
+// the overworld's grid (Ages 14 wide, Seasons 16) any room; in a dungeon the current room, while
+// moving the one it came from, and otherwise the rooms beside it through a doorway once visited.
+// Houses, caves and the other groups show nothing around the room.
+static bool room_at(const GBSample *s, const WideOptions *o, const View *v, int tx, int ty, WideRoomKey *key) {
   const GameRam *r = o->seasons ? &seasons_ram : &ages_ram;
   int group = rd(s, r->group), room = rd(s, r->room);
-  memset(key, 0, sizeof *key);
+  memset(key, 0, sizeof *key);                   // keys are compared as bytes, padding included
   key->group = group;
   key->season = rd(s, r->modifier) & 3;
   if (group <= 1) {
-    int col = room & 0x0f, last = o->seasons ? 15 : 13;
-    if ((dir < 0 && col == 0) || (dir > 0 && col >= last)) return false;
-    key->room = room + dir;
+    int col = (room & 0x0f) + tx, row = (room >> 4) + ty, last = o->seasons ? 15 : 13;
+    if (col < 0 || col > last || row < 0 || row > 15) return false;
+    key->room = row * 16 + col;
     key->room_flags = rd(s, (uint16_t)(0xc700 + group * 0x100 + key->room));
-    if (o->seasons && group == 0 && o->rom_size > (size_t)r->room_packs + 0x100) {
+    if (o->seasons && group == 0 && key->room != room && o->rom_size > (size_t)r->room_packs + 0x100) {
       int here = rd(s, r->pack), there = o->rom[r->room_packs + key->room];
       // another area starts in its own season (determineSeasonForRoomPack); while "always spring"
       // (global flag $30: before Din is captured, after Onox) only its low nibble picks the entry
@@ -116,17 +138,23 @@ static bool neighbour_key(const GBSample *s, const WideOptions *o, int dir, Wide
     return true;
   }
   if (rd(s, r->dungeon_index) == 0xff || !(rd(s, r->tileset_flags) & TILESETFLAG_DUNGEON)) return false;
-  int pos = rd(s, r->map_position), floor = rd(s, r->floor), col = pos & 7;
-  if ((dir < 0 && col == 0) || (dir > 0 && col == 7) || floor > 15) return false;
-  int flags_page = rd(s, r->dungeon_flags_h) << 8;
-  if (flags_page < 0xc000 || flags_page > 0xcf00) return false;
-  int exits = (rd(s, (uint16_t)(flags_page + room)) | rd(s, r->dungeon_properties)) & 0x0f;
-  if (!(exits & (dir > 0 ? 0x02 : 0x08))) return false;      // no doorway on that side
-  int next = s->wram[2][W2_DUNGEON_LAYOUT + floor * 0x40 + pos + dir];
+  int pos = rd(s, r->map_position), floor = rd(s, r->floor), flags_page = rd(s, r->dungeon_flags_h) << 8;
+  if (floor > 15 || flags_page < 0xc000 || flags_page > 0xcf00) return false;
+  if (!tx && !ty) { key->room = room; return true; }
+  bool back = v->moving && tx == -v->dx && ty == -v->dy;
+  bool beside = !v->moving && !ty && (tx == 1 || tx == -1);
+  if (!back && !beside) return false;
+  int col = (pos & 7) + tx, row = (pos >> 3) + ty;
+  if (col < 0 || col > 7 || row < 0 || row > 7) return false;
+  if (beside) {
+    int exits = (rd(s, (uint16_t)(flags_page + room)) | rd(s, r->dungeon_properties)) & 0x0f;
+    if (!(exits & (tx > 0 ? 0x02 : 0x08))) return false;     // no doorway on that side
+  }
+  int next = s->wram[2][W2_DUNGEON_LAYOUT + floor * 0x40 + row * 8 + col];
   if (!next) return false;
   key->room = next;
   key->room_flags = rd(s, (uint16_t)(flags_page + next));
-  return (key->room_flags & ROOMFLAG_VISITED) != 0;
+  return back || (key->room_flags & ROOMFLAG_VISITED);
 }
 
 // Decoded rooms, reused while they stay beside the camera. Least recently used goes first, so a
@@ -215,46 +243,75 @@ static int neighbour_pixel(const GBSample *s, const Neighbour *n, int nx, int ny
   return n->curve[0][stored & 31] | n->curve[1][stored >> 5 & 31] << 5 | n->curve[2][stored >> 10 & 31] << 10;
 }
 
-static void find_neighbours(const GBSample *s, const WideOptions *o, Neighbour side[2]) {
-  memset(side, 0, sizeof(Neighbour) * 2);
-  if (!o->rom) return;
-  const GameRam *r = o->seasons ? &seasons_ram : &ages_ram;
-  WideRoomKey here;
-  memset(&here, 0, sizeof here);                 // keys are compared as bytes, padding included
-  here.group = rd(s, r->group);
-  here.room = rd(s, r->room);
-  here.season = rd(s, r->modifier) & 3;
-  here.room_flags = here.group <= 1 ? rd(s, (uint16_t)(0xc700 + here.group * 0x100 + here.room)) : 0;
-  const WideRoom *cur = decoded(o, &here);
-  static uint8_t curve[3][32];
-  learn_curve(s, 100, curve);
-  for (int i = 0; i < 2; i++) {
+static int floor_div(int a, int b) { return a >= 0 ? a / b : -((-a + b - 1) / b); }
+
+// The rooms on the grid around the reference room this frame, looked up once each
+typedef struct {
+  const GBSample *s;
+  const WideOptions *o;
+  View v;
+  const WideRoom *current;
+  uint8_t curve[3][32];
+  bool resolved[5][5];
+  Neighbour cell[5][5];         // grid step -2..2 from the reference room
+} Around;
+
+static const Neighbour *around_cell(Around *a, int gx, int gy) {
+  if (gx < -2 || gx > 2 || gy < -2 || gy > 2) return NULL;
+  Neighbour *n = &a->cell[gy + 2][gx + 2];
+  if (!a->resolved[gy + 2][gx + 2]) {
+    a->resolved[gy + 2][gx + 2] = true;
+    memset(n, 0, sizeof *n);
     WideRoomKey key;
-    if (!neighbour_key(s, o, i ? 1 : -1, &key)) continue;
-    const WideRoom *n = decoded(o, &key);
-    if (!n || (n->flags & TILESETFLAG_SIDESCROLL)) continue;
-    bool same = cur && n->tileset[3] == cur->tileset[3] && n->tileset[4] == cur->tileset[4] && n->unique == cur->unique;
-    side[i].room = n;
-    side[i].live = same;
-    side[i].curve = curve;
+    // the reference is the previous room while moving: grid steps count from it
+    if (room_at(a->s, a->o, &a->v, gx - a->v.dx, gy - a->v.dy, &key)) {
+      const WideRoom *w = decoded(a->o, &key);
+      if (w && !(w->flags & TILESETFLAG_SIDESCROLL)) {
+        const WideRoom *c = a->current;
+        n->room = w;
+        n->live = !a->v.moving && c && w->tileset[3] == c->tileset[3] && w->tileset[4] == c->tileset[4] && w->unique == c->unique;
+        n->curve = a->curve;
+      }
+    }
   }
+  return n->room ? n : NULL;
 }
 
 void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
   static uint8_t middle[FB_W * FB_H * 3];
+  static Around a;
   framebuffer_to_rgb(s->framebuffer, middle);
-  Neighbour side[2];
-  find_neighbours(s, o, side);
-  int width = rd(s, W_ROOM_WIDTH);
+  const GameRam *r = o->seasons ? &seasons_ram : &ages_ram;
+  memset(a.resolved, 0, sizeof a.resolved);
+  a.s = s;
+  a.o = o;
+  a.v = view_of(s, r);
+  a.current = NULL;
+  if (a.v.shown && o->rom) {
+    WideRoomKey here;
+    if (room_at(s, o, &a.v, 0, 0, &here)) a.current = decoded(o, &here);
+    learn_curve(s, 100, a.curve);
+  }
+  int width = rd(s, W_ROOM_WIDTH) * 8, height = rd(s, W_ROOM_HEIGHT) * 8;
+  bool rooms = a.v.shown && o->rom && width > 0 && height > 0 && width <= 256 && height <= 256;
   for (int y = 0; y < FB_H; y++) {
     uint8_t *row = out + (size_t)y * WIDE_W * 3;
+    bool line = rooms && y >= STATUS_BAR_LINES && (s->line_lcdc[y] & 0x81) == 0x81 && !wide_window_at(s, 0, y);
+    int ox = (s->line_scx[y] - rd(s, W_OFFSET_X)) & 0xff, oy = (s->line_scy[y] - rd(s, W_OFFSET_Y)) & 0xff;
+    // the offset from the reference room's origin: a left or upward scroll only goes negative
+    ox = a.v.moving && a.v.dx < 0 ? (ox ? ox - 256 : 0) : wrap_offset(ox);
+    oy = a.v.moving && a.v.dy < 0 ? oy - 256 : wrap_offset(oy);
     for (int x = 0; x < WIDE_W; x++) {
       if (x == WIDE_SIDE) x += FB_W;
       if (x >= WIDE_W) break;
-      int rx, ry, c = room_or_outside(s, o->seasons, x - WIDE_SIDE, y, &rx, &ry);
-      if (c == OUTSIDE) {
-        const Neighbour *n = rx < 0 ? &side[0] : &side[1];
-        c = !n->room ? NOTHING : neighbour_pixel(s, n, rx < 0 ? n->room->width * 8 + rx : rx - width * 8, ry, y);
+      int c = NOTHING;
+      if (line) {
+        int rx = ox + x - WIDE_SIDE, ry = oy + y, gx = floor_div(rx, width), gy = floor_div(ry, height);
+        if (!a.v.moving && !gx && !gy) c = bg_pixel(s, x - WIDE_SIDE, y);
+        else {
+          const Neighbour *n = around_cell(&a, gx, gy);
+          if (n) c = neighbour_pixel(s, n, rx - gx * width, ry - gy * height, y);
+        }
       }
       if (!(s->line_lcdc[y] & 0x80)) c = 0x7fff;            // LCD off: blank white, as in the middle
       if (c < 0) memcpy(row + x * 3, o->border, 3);
