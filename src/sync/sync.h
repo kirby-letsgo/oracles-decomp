@@ -52,3 +52,13 @@ int sync_set_record(SyncRecord *r, int n, int max, const char *game, const char 
 // "4827-1930-5561-0284", "4827 1930 5561 0284" -> "4827193055610284"; false unless 16 digits
 bool sync_normalize_code(const char *in, char out[17]);
 void sync_format_code(const char *code, char out[20]);
+
+// A sync that failed (no server, or a file that did not go through) is tried again 5 s later, then
+// after twice as long each time, up to 5 minutes, until one succeeds.
+typedef struct {
+  int failures;                 // in a row
+  uint64_t next_ms;
+} SyncRetry;
+
+void sync_retry_note(SyncRetry *r, bool ok, uint64_t now_ms);
+bool sync_retry_due(const SyncRetry *r, uint64_t now_ms);

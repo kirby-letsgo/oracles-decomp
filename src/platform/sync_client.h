@@ -50,3 +50,10 @@ bool sync_busy(void);
 bool sync_poll(SyncResult *out);
 // Waits up to timeout_ms for a running sync; false if it is still going.
 bool sync_wait(int timeout_ms);
+
+// After a sync that failed (offline, or a file that did not go through): true once it is time to
+// try again (SyncRetry's backoff) and no sync runs. sync_retry_soon makes the next try due now
+// (the app came back to the foreground, where the network often came back too).
+bool sync_should_retry(void);
+void sync_retry_soon(void);
+int sync_failures(void);        // failed syncs in a row

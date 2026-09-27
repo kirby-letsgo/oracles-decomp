@@ -350,6 +350,7 @@ static void touch_event(const SDL_Event *ev) {
 static bool poll_event(SDL_Event *ev) {
   if (!SDL_PollEvent(ev)) return false;
   touch_event(ev);
+  if (ev->type == SDL_EVENT_DID_ENTER_FOREGROUND) sync_retry_soon();
   return true;
 }
 
@@ -530,6 +531,27 @@ static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
 
 // Test hook: ORACLES_TEST_KEYS="120:Escape,130:Down,140:X" presses each key at that loop tick (every
 // pass of the launcher, menu or game loop is a tick), so ctest can drive the menus headless.
+// "conflict+20:Left" counts from the tick the app last passed test_mark("conflict") instead, for
+// screens that open after something the tick count cannot predict (a sync over the network).
+static struct { char name[16]; uint64_t tick; } test_marks[4];
+
+static void test_mark(const char *name) {
+  int i = 0;
+  while (i < 3 && test_marks[i].name[0] && strcmp(test_marks[i].name, name)) i++;
+  snprintf(test_marks[i].name, sizeof test_marks[i].name, "%s", name);
+  test_marks[i].tick = test_tick + 1;
+}
+
+static bool test_key_tick(const char *p, unsigned long long *at, char name[32], int *len) {
+  char mark[16];
+  if (sscanf(p, "%15[a-z]+%llu:%31[^,]%n", mark, at, name, len) == 3) {
+    for (int i = 0; i < 4; i++)
+      if (!strcmp(test_marks[i].name, mark)) { *at += test_marks[i].tick; return true; }
+    *at = 0;
+    return true;
+  }
+  return sscanf(p, "%llu:%31[^,]%n", at, name, len) == 2;
+}
 
 // "#A", "#UP", ... in ORACLES_TEST_KEYS touch that control of the overlay (one finger).
 static void test_touch(const char *name, bool down) {
@@ -556,7 +578,7 @@ static void test_keys(void) {
     char name[32];
     unsigned long long at;
     int len = 0;
-    if (sscanf(p, "%llu:%31[^,]%n", &at, name, &len) != 2) break;
+    if (!test_key_tick(p, &at, name, &len)) break;
     if ((at == test_tick || at + 1 == test_tick) && name[0] == '#') test_touch(name + 1, at == test_tick);
     else if (at == test_tick || at + 1 == test_tick) {
       SDL_Event ev = {0};
@@ -773,6 +795,7 @@ static bool run_conflicts(SDL_Renderer *ren, SDL_Texture *tex, const UiFont *fon
     side_fill(&v.side[1], ch->remote.device[0] ? ch->remote.device : "OTHER", ch->game, ch->name, theirs, rn, theirs_thumb, rtn);
     side_when(&v.side[1], ch->remote.updated);
     free(mine); free(mine_thumb); free(theirs); free(theirs_thumb);
+    test_mark("conflict");
     for (bool decided = false; !decided;) {
       test_keys();
       SDL_Event ev;
@@ -807,10 +830,11 @@ static bool sync_finished(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, 
   if (!r->ok) {
     fprintf(stderr, "sync failed: %s\n", r->error);
     snprintf(sync_status_line, sizeof sync_status_line, "SYNC FAILED");
-    show_status("SYNC FAILED");
+    if (sync_failures() == 1) show_status("SYNC FAILED");         // not again for every retry
     return true;
   }
   if (r->error[0]) fprintf(stderr, "sync: %s\n", r->error);
+  else test_mark("synced");
   if (clock) snprintf(sync_status_line, sizeof sync_status_line, "SYNCED %02d:%02d", dt.hour, dt.minute);
   if (r->uploaded || r->downloaded) show_status("SYNCED");
   return !r->choices || run_conflicts(ren, tex, font, theme, r);
@@ -903,6 +927,7 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
       if (!sync_finished(win, ren, tex, &font, &l.games[l.game].theme, &synced)) return false;
       launcher_load(&l, &font, cache);
     }
+    if (sync_cfg.code[0] && sync_should_retry()) sync_start(&sync_cfg, cache, SYNC_ALL_GAMES);
     SDL_Event ev;
     while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) return false;
@@ -1112,7 +1137,12 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   for (bool running = true; running && !gb->hung;) {
     test_keys();
     SyncResult synced;
-    if (sync_poll(&synced)) show_status(synced.ok ? "SYNCED" : "SYNC FAILED");
+    if (sync_poll(&synced)) {
+      if (synced.ok && !synced.error[0]) show_status("SYNCED");
+      else if (sync_failures() == 1) show_status("SYNC FAILED");
+    }
+    // the running game's files wait for the game to end; the rest go as soon as the server answers
+    if (sync_cfg.code[0] && sync_should_retry()) sync_start(&sync_cfg, app_cache, strcmp(gs->game, "ages") ? "ages" : "seasons");
     SDL_Event ev;
     while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) {

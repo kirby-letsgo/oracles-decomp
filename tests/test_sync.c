@@ -91,11 +91,27 @@ static void codes_normalize(void) {
   ASSERT(!strcmp(f, "4827-1930-5561-0284"));
 }
 
+static void failed_syncs_retry_with_backoff(void) {
+  SyncRetry r = {0};
+  ASSERT(!sync_retry_due(&r, 0));
+  sync_retry_note(&r, false, 1000);
+  ASSERT(!sync_retry_due(&r, 5999));
+  ASSERT(sync_retry_due(&r, 6000));
+  sync_retry_note(&r, false, 6000);
+  ASSERT(!sync_retry_due(&r, 15999));
+  ASSERT(sync_retry_due(&r, 16000));
+  for (int i = 0; i < 20; i++) sync_retry_note(&r, false, 100000);
+  ASSERT_EQ(r.next_ms, 400000);                                  // never more than 5 minutes apart
+  sync_retry_note(&r, true, 400000);
+  ASSERT(!sync_retry_due(&r, 1000000));
+}
+
 int main(void) {
   RUN(sha256_matches_the_standard_vectors);
   RUN(decide_covers_every_case);
   RUN(states_need_the_same_format);
   RUN(manifest_and_records_parse);
   RUN(codes_normalize);
+  RUN(failed_syncs_retry_with_backoff);
   return 0;
 }

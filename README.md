@@ -139,12 +139,18 @@ Settings > SYNC keeps saves in step across devices through the sync server (`syn
 ACCOUNT gives a 16-digit code, and ENTER CODE on another device joins it (no passwords). Synced:
 each game's save, save-state slots with their pictures and item buttons, and the shared settings;
 never the ROM-derived files. It syncs when the launcher opens, before a game starts, and when you
-leave a game or the app; SYNC NOW does it by hand. When a save changed on two devices since they
-last synced, a KEEP WHICH? screen shows both (files and hearts, or the state's picture) and you pick.
-A save state only moves between builds with the same state format. The server address is the CMake
+leave a game or the app; SYNC NOW does it by hand. A sync that fails (offline, server down) is
+tried again after 5 s, then twice as long each time up to every 5 minutes, and at once when the app
+comes back to the foreground; the running game's own files wait for the game to end. When a save
+changed on two devices since they last synced, a KEEP WHICH? screen shows both (files and hearts, or
+the state's picture) and you pick. Save states move between every platform (all 64-bit builds share
+one layout); only a build with another state format refuses one. The server address is the CMake
 setting `ORACLES_SYNC_URL`; a device can use another one with `url=` in `sync.ini` in its app folder.
 HTTP uses the system's own TLS: libcurl (macOS, Linux; sync is off without it), WinHTTP, and
-Android's HttpURLConnection. `ORACLES_SYNC_URL=http://host test_sync_http` checks a server.
+Android's HttpURLConnection. `ORACLES_SYNC_URL=http://host test_sync_http` checks a server. The
+`sync_flow` test plays two devices against the real server on an in-memory database (`pnpm local` in
+`sync-server/`; needs its `pnpm install` and the Seasons ROM): a conflict kept each way, and a save
+made offline that the retry uploads.
 
 ## Android
 

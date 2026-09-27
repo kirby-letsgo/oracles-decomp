@@ -12,6 +12,8 @@
 static const char *const game_files[] = {"sram.sav", "item_buttons", "state_1", "state_2", "state_3", "state_4", "state_auto"};
 #define SHARED "shared"
 
+static SyncRetry retry;
+
 void sync_config_load(SyncConfig *c, const char *cache) {
   memset(c, 0, sizeof *c);
   snprintf(c->url, sizeof c->url, "%s", ORACLES_SYNC_URL);
@@ -305,6 +307,7 @@ bool sync_resolve(const SyncConfig *c, const char *cache, const SyncChoice *ch, 
     if (n >= 0) follow_thumb(c, cache, ch->game, ch->name, keep_local, remote, n, &rec, &r);
   }
   records_store(&rec, cache, c->code);
+  if (!ok) sync_retry_note(&retry, false, SDL_GetTicks());
   return ok;
 }
 
@@ -356,6 +359,7 @@ bool sync_poll(SyncResult *out) {
   bg.thread = NULL;
   *out = bg.result;
   SDL_SetAtomicInt(&bg.state, 0);
+  sync_retry_note(&retry, out->ok && !out->error[0], SDL_GetTicks());
   return true;
 }
 
@@ -363,3 +367,9 @@ bool sync_wait(int timeout_ms) {
   for (int t = 0; t < timeout_ms && SDL_GetAtomicInt(&bg.state) == 1; t += 10) SDL_Delay(10);
   return SDL_GetAtomicInt(&bg.state) != 1;
 }
+
+bool sync_should_retry(void) { return SDL_GetAtomicInt(&bg.state) == 0 && sync_retry_due(&retry, SDL_GetTicks()); }
+
+void sync_retry_soon(void) { retry.next_ms = 0; }
+
+int sync_failures(void) { return retry.failures; }

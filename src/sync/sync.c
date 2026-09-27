@@ -103,3 +103,16 @@ bool sync_normalize_code(const char *in, char out[17]) {
 void sync_format_code(const char *code, char out[20]) {
   snprintf(out, 20, "%.4s-%.4s-%.4s-%.4s", code, code + 4, code + 8, code + 12);
 }
+
+#define RETRY_FIRST_MS 5000
+#define RETRY_MAX_MS 300000
+
+void sync_retry_note(SyncRetry *r, bool ok, uint64_t now_ms) {
+  if (ok) { r->failures = 0; return; }
+  uint64_t delay = RETRY_FIRST_MS;
+  for (int i = 0; i < r->failures && delay < RETRY_MAX_MS; i++) delay *= 2;
+  r->failures++;
+  r->next_ms = now_ms + (delay < RETRY_MAX_MS ? delay : RETRY_MAX_MS);
+}
+
+bool sync_retry_due(const SyncRetry *r, uint64_t now_ms) { return r->failures > 0 && now_ms >= r->next_ms; }

@@ -40,6 +40,7 @@ cp .env.example .env
 pnpm db:up          # Postgres on localhost:5433 (compose.dev.yml)
 pnpm dev            # migrates, then serves on :3000
 pnpm test           # in-memory Postgres (PGlite), no Docker needed
+pnpm local          # the server on an in-memory database, on a free port (the app's sync_flow test)
 pnpm typecheck && pnpm lint
 ```
 
