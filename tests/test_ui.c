@@ -389,11 +389,23 @@ static void touch_fill_scales_past_whole_pixels(void) {
 
 static void touch_layout_takes_the_wide_picture(void) {
   TouchLayout l;
+  TouchLayout narrow;
+  touch_layout(&narrow, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false, UI_W);
   touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false, 256);
-  ASSERT_EQ(l.scale, 4);                                // 256 x 4 = 1024 of 1080
-  ASSERT_EQ(l.game_px.w, 1024);
-  ASSERT_EQ(l.game.w, 256);
+  ASSERT_EQ(l.scale, 6);                                // the controls stay as big as beside 160
+  ASSERT_EQ(l.game_px.w, 1024);                         // 256 x 4 = 1024 of 1080
+  ASSERT_EQ(l.game_px.x, 28);
+  ASSERT_EQ(l.dpad.w, narrow.dpad.w);
+  ASSERT_EQ(l.button[ACT_A].w, narrow.button[ACT_A].w);
   for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) ASSERT(!overlaps(l.button[a], l.game));
+  ASSERT(!overlaps(l.dpad, l.game));
+  touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, true, 256);
+  ASSERT_EQ(l.scale, 6);
+  ASSERT_EQ(l.game_px.w, 1080);                         // fill: the full width
+  for (int a = 0; a < ACTIONS; a++) if (l.button[a].w) ASSERT(!overlaps(l.button[a], l.game));
+  touch_layout(&l, 2400, 1080, (UiRect){132, 74, 2190, 922}, true, false, false, 256);
+  ASSERT_EQ(l.scale, 7);
+  ASSERT_EQ(l.game_px.w, 1792);
   touch_layout(&l, 1920, 1080, (UiRect){0, 0, 1920, 1080}, false, false, false, 256);
   ASSERT_EQ(l.scale, 7);
   ASSERT_EQ(l.game_px.w, 1792);

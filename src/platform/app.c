@@ -409,7 +409,7 @@ static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
     logged_w = w; logged_h = h; logged_scale = layout.scale;
   }
   bool fractional = layout.game_px.w % pic_w != 0;
-  int scale = SDL_min(fractional ? (layout.game_px.w + pic_w - 1) / pic_w : layout.scale, MAX_FILTER_SCALE);
+  int scale = SDL_min((layout.game_px.w + pic_w - 1) / pic_w, MAX_FILTER_SCALE);
   SDL_FRect dst = {(float)layout.game_px.x, (float)layout.game_px.y, (float)layout.game_px.w, (float)layout.game_px.h};
   if (touch_on) SDL_SetRenderDrawColor(ren, overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b, 255);
   SDL_RenderClear(ren);
