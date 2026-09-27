@@ -17,7 +17,7 @@ endif()
 # binary; otherwise an installed SDL3 is used when there is one.
 option(ORACLES_SDL_VENDORED "Build SDL3 from source and link it statically" OFF)
 # The save-sync server the app uses until the player sets another in sync.ini
-set(ORACLES_SYNC_URL "http://q4ycop2e9hkkq9sxwsg87i79.46.62.205.95.sslip.io" CACHE STRING "Default sync server URL")
+set(ORACLES_SYNC_URL "https://oracles.decomps-sync.top" CACHE STRING "Default sync server URL")
 
 macro(oracles_fetch_sdl)
   include(FetchContent)

@@ -25,7 +25,8 @@ void sync_config_load(SyncConfig *c, const char *cache) {
   z[n] = 0;
   for (char *line = strtok(z, "\n"); line; line = strtok(NULL, "\n")) {
     char value[256];
-    if (sscanf(line, "url=%255s", value) == 1) snprintf(c->url, sizeof c->url, "%s", value);
+    // a server of its own; the temporary address of the first builds moves to the default
+    if (sscanf(line, "url=%255s", value) == 1 && !strstr(value, "sslip.io")) snprintf(c->url, sizeof c->url, "%s", value);
     else if (sscanf(line, "code=%255s", value) == 1 && !sync_normalize_code(value, c->code)) c->code[0] = 0;
   }
   free(z);
@@ -34,7 +35,9 @@ void sync_config_load(SyncConfig *c, const char *cache) {
 void sync_config_store(const SyncConfig *c, const char *cache) {
   char path[1100], text[400];
   snprintf(path, sizeof path, "%ssync.ini", cache);
-  int n = snprintf(text, sizeof text, "url=%s\ncode=%s\n", c->url, c->code);
+  // the address only when it is not the default, so a new default reaches every device
+  int n = strcmp(c->url, ORACLES_SYNC_URL) ? snprintf(text, sizeof text, "url=%s\ncode=%s\n", c->url, c->code)
+                                           : snprintf(text, sizeof text, "code=%s\n", c->code);
   SDL_SaveFile(path, text, (size_t)n);
 }
 
