@@ -8,6 +8,15 @@ with the original code it replaces.
 
 You need your own US ROMs; none are included.
 
+
+---
+AI DISCLOSURE
+
+This native implementation has used help from generative AI, spefically claude opus.
+
+If you don't want to use it for that I completly understand.
+---
+
 ## Prerequisites
 
 - macOS (Linux and Windows build through CMake)
