@@ -22,7 +22,6 @@ export const accounts = pgTable('accounts', {
   lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-// Every upload is a new version of (game, name); the newest is current, older ones are history.
 export const files = pgTable(
   'files',
   {

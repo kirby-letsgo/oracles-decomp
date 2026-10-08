@@ -27,6 +27,8 @@ bool ui_theme_load(UiTheme *t, const uint8_t *rom, size_t rom_size, bool ages);
 
 // The dialogue font (1bpp, 8x16 per character, ASCII from $20, a clear bit is ink) at 1c:4720 in both games.
 bool ui_font_load(UiFont *font, const uint8_t *rom, size_t rom_size);
+// A built-in font for the launcher before a ROM is installed, when ui_font_load has nothing to read.
+void ui_font_builtin(UiFont *font);
 
 void ui_clear(UiCanvas *c, UiColor color);
 void ui_fill(UiCanvas *c, int x, int y, int w, int h, UiColor color);

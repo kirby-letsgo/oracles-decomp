@@ -25,11 +25,28 @@ If you don't want to use it for that I completly understand.
 - Xcode Command Line Tools (Clang)
 - CMake 3.15+ and Ninja
 - SDL3 (Homebrew, or fetched automatically on first configure)
-- Python 3, and wla-dx plus pyyaml to build the disassembly's symbol files
+- Python 3, and wla-dx plus pyyaml and pypng to build the disassembly's symbol files
 
 ```bash
 brew install cmake ninja sdl3 wla-dx
-pip3 install pyyaml
+pip3 install pyyaml pypng
+```
+
+Recent Python installs (Homebrew's included) refuse `pip3 install` into the system interpreter
+with an `externally-managed-environment` error. Either install the two packages for just your
+user, which is enough for the build to find them:
+
+```bash
+pip3 install --user --break-system-packages pyyaml pypng
+```
+
+or keep them out of your Python entirely with a virtualenv, which has to stay active for the
+`make -C ref/oracles-disasm` steps below:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pyyaml pypng
 ```
 
 ## Setup
@@ -91,7 +108,8 @@ Two apps, same game:
 
 - `oracles-native`, the real port: no CPU emulator. On first launch it reads your ROM once,
   keeps the graphics, sound and data, zeroes the code bytes, and caches the result; later
-  launches never touch the ROM again.
+  launches never touch the ROM again. The ROM it is given, here or in the launcher, may be
+  zipped (see below).
   ```bash
   ./build/oracles-native "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
   ```
@@ -104,6 +122,16 @@ Two apps, same game:
 Without arguments `oracles-native` opens a launcher: Ages and Seasons side by side (each in its own
 title-screen colours), each game's three save files with name, hearts and essences, Resume (the state
 from the last quit), Load state, and the title screen. Choosing a file boots straight into it.
+
+A game you have no ROM for yet shows NOT INSTALLED and an ADD ROM row, and the file picker opens only
+when you choose it -- the launcher is always what comes up first, on every platform.
+
+`oracles-native` takes the ROM as a plain `.gbc`/`.gb` or as a `.zip` or `.gz` holding one, so a
+freshly downloaded archive works without unpacking it. From a zip it takes the `.gbc`/`.gb` member,
+else the largest file; the magic bytes decide, so a ROM saved under the wrong extension still loads.
+`.7z` is not read (it would mean carrying an LZMA decoder) and says so -- extract it first. Whatever
+it was given, the ROM's SHA1 still has to match one of the two games. The development app `oracles`
+below takes a loose ROM only.
 
 Controls: arrow keys to move, `X` / `Z` for A / B, Return for Start, Backspace or Right Shift for
 Select, `M` to mute, F11 or Cmd+F for fullscreen, hold Tab (gamepad: right trigger) to fast-forward.
@@ -177,8 +205,9 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 The build runs this repo's CMake with SDL 3.4.16 from source (its Java glue is vendored in
 `android/app/src/main/java/org/libsdl/app`, same release) and optimises the engine in debug APKs too.
-On first launch the app opens the system file picker: choose the ROM (copy it to the phone's
-Downloads first, e.g. `adb push ROM /sdcard/Download/`); Add ROM in the launcher adds the other game.
+The app opens on the launcher; Add ROM there opens the system file picker for each game (copy the
+ROM to the phone's Downloads first, e.g. `adb push ROM /sdcard/Download/`). A zipped ROM is fine, so
+a download can be picked as it came.
 
 Touch controls sit under the game in portrait and at its sides in landscape: D-pad (diagonals by
 touching between arms), A, B, Start, Select, Pause and fast-forward (`>>`, hold), plus X and Y when 4
@@ -227,7 +256,10 @@ movies on the native build.
   Seasons-only code.
 - `src/hooks/`: the address-to-function tables and the lists the generators read.
 - `src/rt/`: the native runtime (no interpreter).
-- `src/platform/`: the SDL apps and the headless runner.
+- `src/platform/`: the SDL apps and the headless runner; `archive.c` reads the ROM, unpacking a
+  zip or gz with its own inflate so the apps need no compression library.
+- `src/ui/`: the launcher, menus and overlays, drawn with the ROM's own font -- plus a small
+  built-in one (`font_builtin.c`) for the launcher before any ROM is installed.
 - `tools/`: generators and the audits run on every change.
 - `tas/`: input movies and reference hashes.
 - `ref/oracles-disasm/`: the community disassembly (submodule), used for symbols and routines.

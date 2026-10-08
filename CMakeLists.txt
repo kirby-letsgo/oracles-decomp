@@ -45,6 +45,7 @@ set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
   src/core/hash.c
   src/hw/render.c
   src/platform/png.c
+  src/platform/archive.c
   src/platform/tas.c
   src/platform/setup.c
   src/hooks/hooks.c
@@ -101,7 +102,7 @@ if(ORACLES_SDL)
   endif()
 endif()
 
-add_library(oraclesui STATIC src/ui/ui.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c src/ui/touch.c src/ui/syncui.c)
+add_library(oraclesui STATIC src/ui/ui.c src/ui/font_builtin.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c src/ui/touch.c src/ui/syncui.c)
 target_include_directories(oraclesui PUBLIC src)
 add_library(oracleswide STATIC src/wide/wide.c src/wide/room.c)
 target_include_directories(oracleswide PUBLIC src)
@@ -172,7 +173,7 @@ if(ORACLES_SDL)
 endif()
 add_test(NAME native_binary COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/check_native_binary.py $<TARGET_FILE:oraclesnative> ${NATIVE_BINARIES})
 
-foreach(t sha1 bus cpu blargg ppu acid2 tas smoke)
+foreach(t sha1 bus cpu blargg ppu acid2 tas smoke archive)
   if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_${t}.c)
     add_executable(test_${t} tests/test_${t}.c)
     target_link_libraries(test_${t} oraclescore)

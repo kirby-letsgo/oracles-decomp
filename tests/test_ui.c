@@ -544,8 +544,52 @@ static void conflict_picks_a_side(void) {
   ASSERT_EQ(c.px[34][80][0], t.dim.r);
 }
 
+// The launcher draws its ADD ROM screen before a ROM exists, so the built-in font has to stand in
+// for the one in the ROM.
+static void builtin_font_covers_the_launcher_text(void) {
+  UiFont font;
+  memset(&font, 0, sizeof font);
+  ui_font_builtin(&font);
+  ASSERT(font.loaded);
+  int top, bottom;
+  // Everything the no-ROM launcher puts on screen has to be drawable.
+  ASSERT(ui_text_ink(&font, "ADD ROM...", &top, &bottom));
+  ASSERT(ui_text_ink(&font, "NOT INSTALLED", &top, &bottom));
+  ASSERT(ui_text_ink(&font, "AGES", &top, &bottom));
+  ASSERT(ui_text_ink(&font, "SEASONS", &top, &bottom));
+  ASSERT(ui_text_ink(&font, "A:PLAY  B:QUIT", &top, &bottom));
+  ASSERT(ui_text_ink(&font, "<>:CHANGE B:BACK", &top, &bottom));
+  // A space is blank, and every printable ASCII glyph but space carries ink.
+  ASSERT(!ui_text_ink(&font, " ", &top, &bottom));
+  for (char ch = '!'; ch <= '~'; ch++) {
+    const char one[2] = {ch, 0};
+    ASSERT(ui_text_ink(&font, one, &top, &bottom));
+  }
+  // The two non-ASCII glyphs the file rows use.
+  const char heart[2] = {UI_CH_HEART, 0}, cursor[2] = {UI_CH_CURSOR, 0};
+  ASSERT(ui_text_ink(&font, heart, &top, &bottom));
+  ASSERT(ui_text_ink(&font, cursor, &top, &bottom));
+}
+
+static void builtin_font_draws_at_the_normal_pitch(void) {
+  UiFont font;
+  ui_font_builtin(&font);
+  static UiCanvas c;
+  ui_clear(&c, UI_BLACK);
+  ASSERT_EQ(ui_text(&c, &font, 0, 0, "AB", UI_WHITE), 16);
+  // 'A' has its apex at column 2 of the first drawn row, 'B' a stem at column 0 of the same row.
+  ASSERT_EQ(c.px[4][2][0], UI_WHITE.r);
+  ASSERT_EQ(c.px[4][8][0], UI_WHITE.r);
+  // Glyphs stay inside their 8-pixel cell.
+  ui_clear(&c, UI_BLACK);
+  ui_text(&c, &font, 0, 0, "W", UI_WHITE);
+  for (int y = 0; y < UI_H; y++) ASSERT_EQ(c.px[y][7][0], UI_BLACK.r);
+}
+
 int main(void) {
   RUN(font_loads_from_the_rom_offset);
+  RUN(builtin_font_covers_the_launcher_text);
+  RUN(builtin_font_draws_at_the_normal_pitch);
   RUN(text_draws_glyph_pixels);
   RUN(save_files_are_read_and_verified);
   RUN(launcher_navigates_and_starts);

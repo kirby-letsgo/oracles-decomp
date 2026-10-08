@@ -1,5 +1,5 @@
-roms/*.gbc
-roms/*.bin
+roms/*
+!roms/.gitkeep
 .DS_Store
 build/
 build-sdl/

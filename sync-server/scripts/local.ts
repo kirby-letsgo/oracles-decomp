@@ -1,5 +1,3 @@
-// The server on an in-memory database, for the app's end-to-end sync test (tests/test_sync_flow.py):
-// prints its address once it listens. PORT=0 (the default) picks a free port.
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { migrate } from 'drizzle-orm/pglite/migrator';

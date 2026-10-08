@@ -1,12 +1,14 @@
 // The shipped app: native engine, no interpreter, no boot ROM, no ROM code. On first launch it
-// takes the user's ROM (argument or file dialog), checks its SHA1 against the two known games,
-// builds the cycle table from the original bytes, zeroes the code bytes and writes the result to
-// the per-platform cache; later launches load the cache and never see the ROM again. Saves are
-// the game's own SRAM image in that cache; Cmd+S / Cmd+R save and load one state slot there.
+// takes the user's ROM (argument, or the launcher's ADD ROM dialog; loose or in a zip or gz, see
+// platform/archive.c), checks its SHA1 against the two known games, builds the cycle table from the
+// original bytes, zeroes the code bytes and writes the result to the per-platform cache; later
+// launches load the cache and never see the ROM again. Saves are the game's own SRAM image in that
+// cache; Cmd+S / Cmd+R save and load one state slot there.
 //
 // usage: oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]
 //   --file N boots straight into save file N, as choosing it in the launcher does.
-//   With neither a ROM nor --game it opens the launcher (the ROM file dialog on first launch).
+//   With neither a ROM nor --game it opens the launcher, which asks for a ROM through its ADD ROM
+//   row rather than putting a file dialog on screen before anything is drawn.
 //   --frames N exits after N frames (tests run the app under SDL_VIDEO_DRIVER=dummy).
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -14,6 +16,7 @@
 #include "core/sha1.h"
 #include "hw/render.h"
 #include "platform/setup.h"
+#include "platform/archive.h"
 #include "platform/window.h"
 #include "platform/png.h"
 #include "rt/fibers.h"
@@ -59,12 +62,14 @@ static const char *game_of(const uint8_t *rom, size_t n) {
 
 // The cache holds, per game, the ROM image with its code bytes zeroed, the cycle table built
 // from the original bytes, and a manifest naming both.
-static bool extract(const char *rom_path, const char *cache, char *game_out) {
+// `err` takes a short reason the status line can show, since the player picking a file in the app
+// never sees stderr.
+static bool extract(const char *rom_path, const char *cache, char *game_out, char *err, size_t err_size) {
   size_t n;
-  uint8_t *rom = SDL_LoadFile(rom_path, &n);
-  if (!rom) { fprintf(stderr, "cannot read %s: %s\n", rom_path, SDL_GetError()); return false; }
+  uint8_t *rom = archive_read_rom(rom_path, &n, err, err_size);
+  if (!rom) { fprintf(stderr, "cannot read %s: %s\n", rom_path, *err ? err : "unreadable"); return false; }
   const char *game = game_of(rom, n);
-  if (!game) { SDL_free(rom); return false; }
+  if (!game) { snprintf(err, err_size, "NOT AN ORACLES ROM"); free(rom); return false; }
   char hex[41];
   sha1_hex(rom, n, hex);
   uint8_t *tab = cyctab_alloc(rom, n);
@@ -81,9 +86,9 @@ static bool extract(const char *rom_path, const char *cache, char *game_out) {
   snprintf(path, sizeof path, "%s/manifest.txt", dir);
   ok = ok && write_file(path, manifest, strlen(manifest));
   if (ok) fprintf(stderr, "extracted %s: %zu code bytes zeroed, cache %s\n", game, zeroed, dir);
-  else fprintf(stderr, "cannot write the cache in %s\n", dir);
+  else { fprintf(stderr, "cannot write the cache in %s\n", dir); snprintf(err, err_size, "CANNOT SAVE CACHE"); }
   strcpy(game_out, game);
-  SDL_free(rom); free(tab);
+  free(rom); free(tab);
   return ok;
 }
 
@@ -147,9 +152,11 @@ static void save_sram(GB *gb, const char *path) {
 static const char *const game_ids[UI_GAMES] = {"ages", "seasons"};
 
 static bool poll_event(SDL_Event *ev);
+static void show_status(const char *msg);
 
+// .7z is offered so picking one explains itself rather than being greyed out with no reason.
 static bool pick_rom(char *game_out, const char *cache) {
-  static const SDL_DialogFileFilter filters[] = {{"Game Boy Color ROM", "gbc;gb"}};
+  static const SDL_DialogFileFilter filters[] = {{"ROM or archive", "gbc;gb;zip;gz;7z"}};
   pick_state = 0;
 #ifdef __ANDROID__
   (void)filters;
@@ -158,7 +165,11 @@ static bool pick_rom(char *game_out, const char *cache) {
   SDL_ShowOpenFileDialog(on_pick, NULL, NULL, filters, 1, NULL, false);
 #endif
   while (!pick_state) { SDL_Event ev; while (poll_event(&ev)) if (ev.type == SDL_EVENT_QUIT) return false; SDL_Delay(10); }
-  return pick_state > 0 && extract(picked, cache, game_out);
+  if (pick_state < 0) return false;                 // the player cancelled the dialog
+  char err[40] = {0};
+  if (extract(picked, cache, game_out, err, sizeof err)) return true;
+  show_status(*err ? err : "CANNOT ADD THAT ROM");
+  return false;
 }
 
 // Save states: slots 1-4 (state_1..state_4) and the auto state written on quit (state_auto), each
@@ -527,6 +538,9 @@ static void launcher_load(Launcher *l, UiFont *font, const char *cache) {
     if (!font->loaded) ui_font_load(font, rom, rom ? n : 0);
     free(rom);
   }
+  // With no game installed there is no ROM to take the font from, and the launcher still has to draw
+  // its "ADD ROM" screen.
+  if (!font->loaded) ui_font_builtin(font);
 }
 
 // Test hook: ORACLES_TEST_KEYS="120:Escape,130:Down,140:X" presses each key at that loop tick (every
@@ -910,12 +924,9 @@ static bool run_launcher(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   static UiFont font;
   static UiCanvas canvas;
   static uint8_t rgb[UI_W * UI_H * 3];
+  // No ROM yet is not a special case: the launcher opens as usual and its ADD ROM row asks for one,
+  // rather than a file dialog appearing over nothing on first launch.
   launcher_load(&l, &font, cache);
-  if (!font.loaded) {
-    char game[16];
-    if (!pick_rom(game, cache)) return false;
-    launcher_load(&l, &font, cache);
-  }
   launcher_init(&l, UI_GAME_SEASONS);
   static SettingsMenu settings_menu;
   settings_menu_open(&settings_menu);
@@ -1374,7 +1385,8 @@ int main(int argc, char **argv) {
   char game[16] = "";
   GameStart gs = {cache, game, LAUNCH_TITLE, false, 0, max_frames};
   bool direct = false;
-  if (rom_arg) { if (!extract(rom_arg, cache, game)) return 2; direct = true; }
+  char rom_err[40] = {0};
+  if (rom_arg) { if (!extract(rom_arg, cache, game, rom_err, sizeof rom_err)) return 2; direct = true; }
   else if (game_arg) {
     if (!cached(cache, game_arg)) { fprintf(stderr, "%s is not installed; run once with its ROM path\n", game_arg); return 2; }
     snprintf(game, sizeof game, "%s", game_arg);

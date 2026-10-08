@@ -64,7 +64,6 @@ export async function buildApp({
     return reply.send(error);
   });
 
-  // The account behind a code (any spacing or dashes), touching its last-seen time.
   async function findAccount(input: string) {
     const code = normalizeCode(input);
     if (!code) return null;
@@ -172,7 +171,6 @@ export async function buildApp({
           .orderBy(desc(files.version))
           .limit(1);
         const current = latest?.version ?? 0;
-        // the same bytes again (a retry) are fine whatever version the device thought it had
         if (latest?.sha256 === sha256) return { version: current, created: false };
         const base = headers['x-base-version'];
         if (base !== undefined && base !== current) return { conflict: current };
