@@ -13,8 +13,10 @@ it. For playing, see the [README](README.md).
   in both games and so cannot be data the engine keeps on purpose.
 - Keep the apps dependency-free beyond SDL3 — the released builds are single self-contained
   files. Vendored source in `third_party/` is fine (it links in); a system library is not.
-- The project is **GPLv3** (`LICENSE`), because it vendors xBRZ (GPLv3) in `third_party/xbrz/`.
-  C++ is enabled for that one file; everything else is C.
+- The project is **GPLv3** (`LICENSE`), because it vendors xBRZ (GPLv3) in `third_party/xbrz/`; hqx
+  in `third_party/hqx/` is LGPL 2.1. C++ is enabled for xBRZ and the scaler wrapper; everything else
+  is C. The MinGW build links the C++ runtime statically, so the Windows app stays one file.
+- Keep the local changes to vendored code few, and write each one down in that folder's `README.md`.
 
 ## Requirements
 
@@ -239,7 +241,9 @@ warning, when they are missing).
   built-in one (`font_builtin.c`) for the launcher before any ROM is installed.
 - `src/wide/`: the widescreen renderer and the ROM room decoder.
 - `src/sync/`: the save-sync client.
-- `third_party/xbrz/`: the xBRZ pixel-art scaler (GPLv3), behind the XBRZ screen filter.
+- `third_party/xbrz/`, `third_party/hqx/`: the two pixel-art scalers (GPLv3 and LGPL 2.1) behind
+  the XBRZ and HQX screen filters, wrapped by `src/ui/upscale.cpp`. Each folder's `README.md`
+  lists what was changed locally.
 - `tools/`: generators and the audits run on every change.
 - `tas/`: input movies and reference hashes.
 - `sync-server/`: the save-sync server.

@@ -1,5 +1,5 @@
 #include "ui/filter.h"
-#include "ui/xbrz_filter.h"
+#include "ui/upscale.h"
 #include <math.h>
 #include <string.h>
 
@@ -26,23 +26,25 @@ static void source_pixel(const uint8_t *src, int src_w, bool gbc, int x, int y, 
 
 static uint8_t shade(uint8_t v, int num, int den) { return (uint8_t)(v * num / den); }
 
-// 0 for the filters that are not xBRZ, else the factor to run the scaler at.
-static int xbrz_factor(ScreenFilter f) {
-  return f == FILTER_XBRZ2 ? 2 : f == FILTER_XBRZ3 ? 3 : f == FILTER_XBRZ4 ? 4 : 0;
-}
+// How far the pixel-art scalers enlarge the picture themselves; the rest of the way to the window
+// is whole pixels. 3 rounds the diagonals off without softening small shapes -- see upscale.cpp.
+#define UPSCALE_FACTOR 3
+
+static bool is_upscaler(ScreenFilter f) { return f == FILTER_XBRZ || f == FILTER_HQX; }
 
 void ui_filter(const uint8_t *src, int src_w, bool gbc, ScreenFilter filter, int scale, uint8_t *dst) {
   int w = src_w * scale, h = UI_H * scale;
-  if (xbrz_factor(filter) && src_w <= FILTER_MAX_SRC_W) {
-    // xBRZ reads whole pixels, so the colour correction has to happen before it rather than after:
-    // it decides which pixels count as equal, and it is the shown colours it should compare.
+  if (is_upscaler(filter) && src_w <= FILTER_MAX_SRC_W) {
+    // The scalers read whole pixels, so the colour correction has to happen before them rather than
+    // after: they decide which pixels count as equal, and it is the shown colours they should compare.
     static uint8_t corrected[FILTER_MAX_SRC_W * UI_H * 3];
     const uint8_t *in = src;
     if (gbc) {
       for (int i = 0; i < src_w * UI_H; i++) ui_gbc_colour(src + i * 3, corrected + i * 3);
       in = corrected;
     }
-    ui_xbrz_scale(in, src_w, UI_H, xbrz_factor(filter), scale, dst);
+    if (filter == FILTER_XBRZ) ui_xbrz_scale(in, src_w, UI_H, UPSCALE_FACTOR, scale, dst);
+    else ui_hqx_scale(in, src_w, UI_H, UPSCALE_FACTOR, scale, dst);
     return;
   }
   if (filter != FILTER_CRT) {

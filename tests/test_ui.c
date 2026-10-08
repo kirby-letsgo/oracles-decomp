@@ -5,6 +5,7 @@
 #include "ui/menu.h"
 #include "ui/settings.h"
 #include "ui/filter.h"
+#include "ui/upscale.h"
 #include "ui/touch.h"
 #include "ui/syncui.h"
 
@@ -586,90 +587,50 @@ static void builtin_font_draws_at_the_normal_pitch(void) {
   for (int y = 0; y < UI_H; y++) ASSERT_EQ(c.px[y][7][0], UI_BLACK.r);
 }
 
-// xBRZ upscales by one of its own factors (2-6), so a window scale it does not support is covered
-// by enlarging whole pixels afterwards -- the picture must still land on the game's pixel grid.
-static void xbrz_fills_the_whole_picture(void) {
-  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 4 * UI_H * 4 * 3];
+// The scalers enlarge by 3x themselves and repeat whole pixels the rest of the way, so the picture
+// still lands on the game's pixel grid. XBRZ and HQX share the path, so each test covers both.
+static const ScreenFilter upscalers[2] = {FILTER_XBRZ, FILTER_HQX};
+
+static void upscalers_fill_the_whole_picture(void) {
+  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 3 * UI_H * 3 * 3];
   memset(src, 0, sizeof src);
-  memset(dst, 0xab, sizeof dst);
   for (int i = 0; i < UI_W * UI_H; i++) { src[i * 3] = 30; src[i * 3 + 1] = 60; src[i * 3 + 2] = 90; }
-  ui_filter(src, UI_W, false, FILTER_XBRZ2, 4, dst);
-  // One flat colour in means the same flat colour out, everywhere: nothing left unwritten.
-  for (int i = 0; i < UI_W * 4 * UI_H * 4; i++) {
-    ASSERT_EQ(dst[i * 3], 30);
-    ASSERT_EQ(dst[i * 3 + 1], 60);
-    ASSERT_EQ(dst[i * 3 + 2], 90);
+  for (int k = 0; k < 2; k++) {
+    memset(dst, 0xab, sizeof dst);                      // canary: every pixel must be overwritten
+    ui_filter(src, UI_W, false, upscalers[k], 3, dst);
+    // One flat colour in means the same flat colour out, everywhere: nothing left unwritten.
+    for (int i = 0; i < UI_W * 3 * UI_H * 3; i++) {
+      ASSERT_EQ(dst[i * 3], 30);
+      ASSERT_EQ(dst[i * 3 + 1], 60);
+      ASSERT_EQ(dst[i * 3 + 2], 90);
+    }
   }
 }
 
-static void xbrz_smooths_a_diagonal(void) {
-  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 4 * UI_H * 4 * 3];
-  memset(src, 0, sizeof src);
-  // A hard black/white staircase, the shape xBRZ exists to round off.
+// A hard black/white staircase, the shape these filters exist to round off.
+static void make_staircase(uint8_t *src) {
+  memset(src, 0, UI_W * UI_H * 3);
   for (int y = 0; y < UI_H; y++)
     for (int x = 0; x < UI_W; x++)
       if (x > y) memset(src + (y * UI_W + x) * 3, 255, 3);
-  ui_filter(src, UI_W, false, FILTER_XBRZ2, 4, dst);
-  int blended = 0;
-  for (int i = 0; i < UI_W * 4 * UI_H * 4; i++)
-    if (dst[i * 3] != 0 && dst[i * 3] != 255) blended++;
-  ASSERT(blended > 0);                                  // it interpolated along the edge
-  // The flat areas well away from the edge are untouched.
-  ASSERT_EQ(dst[((40 * 4) * UI_W * 4 + 4 * 4) * 3], 0);
-  ASSERT_EQ(dst[((40 * 4) * UI_W * 4 + 120 * 4) * 3], 255);
 }
 
-// XBRZ4 at scale 8 runs the scaler at 4x, so each of its pixels becomes a 2x2 block of output.
-static void xbrz_keeps_whole_pixels_at_unsupported_scales(void) {
-  static uint8_t src[UI_W * UI_H * 3];
-  static uint8_t dst[UI_W * 8 * UI_H * 8 * 3];
-  memset(src, 0, sizeof src);
-  for (int y = 0; y < UI_H; y++)
-    for (int x = 0; x < UI_W; x++)
-      if ((x ^ y) & 1) memset(src + (y * UI_W + x) * 3, 255, 3);
-  ui_filter(src, UI_W, false, FILTER_XBRZ4, 8, dst);
-  const int w = UI_W * 8;
-  for (int y = 0; y < UI_H * 8; y += 2)
-    for (int x = 0; x < w; x += 2) {
-      const uint8_t *a = dst + (y * w + x) * 3;
-      for (int dy = 0; dy < 2; dy++)
-        for (int dx = 0; dx < 2; dx++)
-          ASSERT_EQ(dst[((y + dy) * w + x + dx) * 3], a[0]);
-    }
+static void upscalers_smooth_a_diagonal(void) {
+  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 3 * UI_H * 3 * 3];
+  make_staircase(src);
+  for (int k = 0; k < 2; k++) {
+    ui_filter(src, UI_W, false, upscalers[k], 3, dst);
+    int blended = 0;
+    for (int i = 0; i < UI_W * 3 * UI_H * 3; i++)
+      if (dst[i * 3] != 0 && dst[i * 3] != 255) blended++;
+    ASSERT(blended > 0);                                // it interpolated along the edge
+    // The flat areas well away from the edge are untouched.
+    ASSERT_EQ(dst[((40 * 3) * UI_W * 3 + 4 * 3) * 3], 0);
+    ASSERT_EQ(dst[((40 * 3) * UI_W * 3 + 120 * 3) * 3], 255);
+  }
 }
 
-// The widescreen picture is 256 wide, so the filter must not assume the 160 of the plain one.
-// A lone pixel is no use as a probe here -- blending neighbours together is what xBRZ is for -- so
-// this checks the whole 256-wide output is written, and that each half stays on its own side.
-static void xbrz_takes_the_wide_picture(void) {
-  static uint8_t wide[256 * UI_H * 3], wdst[256 * 2 * UI_H * 2 * 3];
-  memset(wide, 7, sizeof wide);
-  memset(wdst, 0xab, sizeof wdst);                      // canary: every pixel must be overwritten
-  for (int y = 0; y < UI_H; y++)
-    for (int x = 128; x < 256; x++) wide[(y * 256 + x) * 3] = 250;
-  ui_filter(wide, 256, false, FILTER_XBRZ2, 2, wdst);
-  const int w = 256 * 2;
-  for (int i = 0; i < w * UI_H * 2; i++) ASSERT(wdst[i * 3] == 7 || wdst[i * 3] == 250);
-  ASSERT_EQ(wdst[0], 7);                                // far left
-  ASSERT_EQ(wdst[(w - 1) * 3], 250);                    // far right, the last column of the row
-  ASSERT_EQ(wdst[((UI_H * 2 - 1) * w + w - 1) * 3], 250);   // and the very last pixel
-}
-
-// Colour correction has to happen before xBRZ, so the pixels it compares are the ones shown.
-static void xbrz_applies_gbc_colours_first(void) {
-  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 2 * UI_H * 2 * 3];
-  memset(src, 255, sizeof src);
-  ui_filter(src, UI_W, true, FILTER_XBRZ2, 2, dst);
-  uint8_t in[3] = {255, 255, 255}, want[3];
-  ui_gbc_colour(in, want);
-  ASSERT_EQ(dst[0], want[0]);
-  ASSERT_EQ(dst[2], want[2]);
-}
-
-// Each strength runs the scaler at its own factor, and the rest of the way is whole pixels. At
-// scale 4 that is the difference: XBRZ2 scales 2x and then doubles, so its output is made of
-// uniform 2x2 blocks, while XBRZ4 scales the whole way and has detail inside those blocks.
-// (Counting blended pixels would not show this -- doubling copies them too.)
+// At scale 6 the scaler runs at 3x and each of its pixels becomes a 2x2 block of output.
 static int uniform_2x2_blocks(const uint8_t *px, int w, int h) {
   for (int y = 0; y < h; y += 2)
     for (int x = 0; x < w; x += 2)
@@ -679,39 +640,81 @@ static int uniform_2x2_blocks(const uint8_t *px, int w, int h) {
   return 1;
 }
 
-static void xbrz_strength_picks_the_scaler_factor(void) {
-  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 4 * UI_H * 4 * 3];
-  memset(src, 0, sizeof src);
-  for (int y = 0; y < UI_H; y++)
-    for (int x = 0; x < UI_W; x++)
-      if (x > y) memset(src + (y * UI_W + x) * 3, 255, 3);
-  ui_filter(src, UI_W, false, FILTER_XBRZ2, 4, dst);
-  ASSERT(uniform_2x2_blocks(dst, UI_W * 4, UI_H * 4));
-  ui_filter(src, UI_W, false, FILTER_XBRZ4, 4, dst);
-  ASSERT(!uniform_2x2_blocks(dst, UI_W * 4, UI_H * 4));
-  // Every strength still rounds the staircase off.
-  const ScreenFilter strengths[3] = {FILTER_XBRZ2, FILTER_XBRZ3, FILTER_XBRZ4};
-  for (int k = 0; k < 3; k++) {
-    int blended = 0;
-    ui_filter(src, UI_W, false, strengths[k], 4, dst);
-    for (int i = 0; i < UI_W * 4 * UI_H * 4; i++)
-      if (dst[i * 3] != 0 && dst[i * 3] != 255) blended++;
-    ASSERT(blended > 0);
+static void upscalers_keep_whole_pixels_past_their_factor(void) {
+  static uint8_t src[UI_W * UI_H * 3];
+  static uint8_t dst[UI_W * 6 * UI_H * 6 * 3];
+  make_staircase(src);
+  for (int k = 0; k < 2; k++) {
+    ui_filter(src, UI_W, false, upscalers[k], 6, dst);
+    ASSERT(uniform_2x2_blocks(dst, UI_W * 6, UI_H * 6));
+  }
+  // At scale 3 the scaler covers the whole enlargement, so there is detail inside those blocks.
+  static uint8_t exact[UI_W * 3 * UI_H * 3 * 3];
+  for (int k = 0; k < 2; k++) {
+    ui_filter(src, UI_W, false, upscalers[k], 3, exact);
+    ASSERT(!uniform_2x2_blocks(exact, UI_W * 3, UI_H * 3));
   }
 }
 
-// A strength above the window scale would mean scaling up then sampling back down, throwing away
-// the work; it is clamped to the scale instead.
-static void xbrz_strength_is_capped_at_the_window_scale(void) {
-  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 2 * UI_H * 2 * 3];
-  memset(src, 0, sizeof src);
+// The widescreen picture is 256 wide, so the filters must not assume the 160 of the plain one.
+// A lone pixel is no use as a probe here -- blending neighbours together is what these are for --
+// so this checks the whole output is written and that each half stays on its own side.
+static void upscalers_take_the_wide_picture(void) {
+  static uint8_t wide[256 * UI_H * 3], wdst[256 * 3 * UI_H * 3 * 3];
+  memset(wide, 7, sizeof wide);
+  for (int y = 0; y < UI_H; y++)
+    for (int x = 128; x < 256; x++) wide[(y * 256 + x) * 3] = 250;
+  const int w = 256 * 3;
+  for (int k = 0; k < 2; k++) {
+    memset(wdst, 0xab, sizeof wdst);
+    ui_filter(wide, 256, false, upscalers[k], 3, wdst);
+    for (int i = 0; i < w * UI_H * 3; i++) ASSERT(wdst[i * 3] == 7 || wdst[i * 3] == 250);
+    ASSERT_EQ(wdst[0], 7);                              // far left
+    ASSERT_EQ(wdst[(w - 1) * 3], 250);                  // far right of the first row
+    ASSERT_EQ(wdst[((UI_H * 3 - 1) * w + w - 1) * 3], 250);   // and the very last pixel
+  }
+}
+
+// Colour correction has to happen before the scalers, so the pixels they compare are the ones shown.
+static void upscalers_apply_gbc_colours_first(void) {
+  static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 3 * UI_H * 3 * 3];
+  memset(src, 255, sizeof src);
+  uint8_t in[3] = {255, 255, 255}, want[3];
+  ui_gbc_colour(in, want);
+  for (int k = 0; k < 2; k++) {
+    ui_filter(src, UI_W, true, upscalers[k], 3, dst);
+    ASSERT_EQ(dst[0], want[0]);
+    ASSERT_EQ(dst[2], want[2]);
+  }
+}
+
+// The two scalers are different algorithms, so they must not be quietly producing the same picture
+// (which would mean one of them was never wired up). A plain 45-degree two-colour edge is no use as
+// a probe -- both round it off the same obvious way -- so this uses several colours and curves.
+static void the_two_scalers_differ(void) {
+  static const uint8_t pal[5][3] = {{0,0,0},{255,255,255},{200,40,40},{40,200,80},{60,80,220}};
+  static uint8_t src[UI_W * UI_H * 3];
+  static uint8_t a[UI_W * 3 * UI_H * 3 * 3], b[UI_W * 3 * UI_H * 3 * 3];
   for (int y = 0; y < UI_H; y++)
     for (int x = 0; x < UI_W; x++)
-      if (x > y) memset(src + (y * UI_W + x) * 3, 255, 3);
-  static uint8_t two[UI_W * 2 * UI_H * 2 * 3];
-  ui_filter(src, UI_W, false, FILTER_XBRZ2, 2, two);
-  ui_filter(src, UI_W, false, FILTER_XBRZ4, 2, dst);
-  ASSERT_EQ(memcmp(two, dst, sizeof two), 0);           // XBRZ4 at scale 2 is XBRZ2
+      memcpy(src + (y * UI_W + x) * 3, pal[((x * x + y * y) / 97 + x / 7 + y / 5) % 5], 3);
+  ui_filter(src, UI_W, false, FILTER_XBRZ, 3, a);
+  ui_filter(src, UI_W, false, FILTER_HQX, 3, b);
+  ASSERT(memcmp(a, b, sizeof a) != 0);
+}
+
+// A factor above the window scale would mean scaling up and sampling back down, throwing the work
+// away; it is clamped to the scale instead.
+static void upscale_factor_is_capped_at_the_window_scale(void) {
+  static uint8_t src[UI_W * UI_H * 3];
+  static uint8_t asked[UI_W * 2 * UI_H * 2 * 3], capped[UI_W * 2 * UI_H * 2 * 3];
+  make_staircase(src);
+  ui_xbrz_scale(src, UI_W, UI_H, 6, 2, asked);
+  ui_xbrz_scale(src, UI_W, UI_H, 2, 2, capped);
+  ASSERT_EQ(memcmp(asked, capped, sizeof asked), 0);
+  ui_hqx_scale(src, UI_W, UI_H, 3, 2, asked);
+  ui_hqx_scale(src, UI_W, UI_H, 2, 2, capped);
+  ASSERT_EQ(memcmp(asked, capped, sizeof asked), 0);
 }
 
 int main(void) {
@@ -728,13 +731,13 @@ int main(void) {
   RUN(settings_round_trip);
   RUN(settings_menu_changes_values);
   RUN(filters_keep_pixel_alignment);
-  RUN(xbrz_fills_the_whole_picture);
-  RUN(xbrz_smooths_a_diagonal);
-  RUN(xbrz_keeps_whole_pixels_at_unsupported_scales);
-  RUN(xbrz_takes_the_wide_picture);
-  RUN(xbrz_applies_gbc_colours_first);
-  RUN(xbrz_strength_picks_the_scaler_factor);
-  RUN(xbrz_strength_is_capped_at_the_window_scale);
+  RUN(upscalers_fill_the_whole_picture);
+  RUN(upscalers_smooth_a_diagonal);
+  RUN(upscalers_keep_whole_pixels_past_their_factor);
+  RUN(upscalers_take_the_wide_picture);
+  RUN(upscalers_apply_gbc_colours_first);
+  RUN(the_two_scalers_differ);
+  RUN(upscale_factor_is_capped_at_the_window_scale);
   RUN(bindings_remap_and_persist);
   RUN(touch_layout_fits_screens);
   RUN(toast_boxes_a_message_near_the_bottom);

@@ -6,6 +6,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # C++ is only for the vendored xBRZ scaler in third_party/xbrz; everything else is C.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(MINGW)
+  # Linking any C++ makes the binaries want libstdc++-6.dll and libgcc_s_seh-1.dll beside them, and
+  # the Windows build is meant to be one file that needs only system DLLs.
+  add_link_options(-static-libstdc++ -static-libgcc -static)
+endif()
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -106,8 +111,8 @@ if(ORACLES_SDL)
 endif()
 
 add_library(oraclesui STATIC src/ui/ui.c src/ui/font_builtin.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c src/ui/touch.c src/ui/syncui.c
-  src/ui/xbrz_filter.cpp third_party/xbrz/xbrz.cpp)
-target_include_directories(oraclesui PUBLIC src PRIVATE third_party/xbrz)
+  src/ui/upscale.cpp third_party/xbrz/xbrz.cpp third_party/hqx/hq2x.c third_party/hqx/hq3x.c)
+target_include_directories(oraclesui PUBLIC src PRIVATE third_party/xbrz third_party/hqx)
 # oraclesui carries C++ objects, so anything linking it links with the C++ driver.
 set_target_properties(oraclesui PROPERTIES LINKER_LANGUAGE CXX)
 add_library(oracleswide STATIC src/wide/wide.c src/wide/room.c)

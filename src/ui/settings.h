@@ -5,11 +5,10 @@
 #include "ui/menu.h"
 #include "ui/controls.h"
 
-// The XBRZ entries are the scaler's strength: 2x rounds the worst jaggies and leaves the rest of
-// the art alone, 4x smooths hardest and softens small shapes. Whatever enlargement is left over
-// after the chosen factor is done with whole pixels.
+// XBRZ and HQX are the two pixel-art scalers: they round off the jagged diagonals instead of
+// enlarging each pixel into a square. See src/ui/upscale.h.
 typedef enum { FILTER_SHARP, FILTER_SCANLINES, FILTER_LCD, FILTER_CRT,
-               FILTER_XBRZ2, FILTER_XBRZ3, FILTER_XBRZ4, FILTERS } ScreenFilter;
+               FILTER_XBRZ, FILTER_HQX, FILTERS } ScreenFilter;
 
 typedef struct {
   int volume;                   // 0..10
