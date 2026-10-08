@@ -69,19 +69,25 @@ into it.
 
 ### Controls
 
-| | |
-|---|---|
-| Move | Arrow keys |
-| A / B | `X` / `Z` |
-| Start / Select | Return / Backspace or Right Shift |
-| Pause | Esc (gamepad: Guide) |
-| Fast-forward | Hold Tab (gamepad: right trigger) |
-| Mute | `M` |
-| Fullscreen | F11 or Cmd+F |
-| Save / load state slot 1 | Cmd+S / Cmd+R |
+| | Keyboard | Gamepad (Xbox / PlayStation) |
+|---|---|---|
+| Move | Arrow keys | D-pad or left stick |
+| A | `X` | A / Cross |
+| B | `Z` | X / Square |
+| Start | Return | Start / Options |
+| Select | Backspace or Right Shift | Back / Share |
+| Pause | Esc | Guide / PS button |
+| Fast-forward | Hold Tab | Hold RT / R2 |
+| Quick swap | `C` | LB / L1 |
+| Item X / Item Y | `A` / `S` | Y / Triangle, B / Circle |
+| Mute | `M` | |
+| Fullscreen | F11 or Cmd+F | |
+| Save / load state slot 1 | Cmd+S / Cmd+R | |
 
-Every button — plus Pause, Fast-forward, Swap and the item buttons — can be remapped for keyboard
-and gamepad in Settings > CONTROLS. The window resizes in whole-pixel steps.
+Every button, including Pause, Fast-forward, Swap and the item buttons, can be remapped in
+Settings > CONTROLS: pick a row, then press the key or controller button (triggers included) you
+want for it. Quick swap and the item buttons only do something once their gameplay toggles are on.
+The window resizes in whole-pixel steps.
 
 ### Settings
 

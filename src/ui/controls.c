@@ -74,7 +74,7 @@ void bindings_parse_line(Bindings *b, const char *key, const char *value) {
       }
     } else if (!strcmp(key, "pads")) {
       long v = strtol(p, &end, 10);
-      if (end == p || v < NO_BINDING || v > PAD_RIGHT_TRIGGER) return;
+      if (end == p || v < NO_BINDING || v > PAD_LEFT_TRIGGER) return;
       t.pad[a] = (int)v;
       p = end + (*end == ';');
     } else return;
@@ -100,14 +100,16 @@ MenuAction controls_press(ControlsMenu *m, Bindings *b, UiButton button) {
 }
 
 void controls_capture_key(ControlsMenu *m, Bindings *b, int key) {
-  if (!m->waiting || m->pad_page) return;
+  if (!m->waiting) return;
   bindings_bind_key(b, (Action)m->sel, key);
+  m->pad_page = false;
   m->waiting = false;
 }
 
 void controls_capture_pad(ControlsMenu *m, Bindings *b, int button) {
-  if (!m->waiting || !m->pad_page) return;
+  if (!m->waiting) return;
   bindings_bind_pad(b, (Action)m->sel, button);
+  m->pad_page = true;
   m->waiting = false;
 }
 

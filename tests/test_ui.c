@@ -290,11 +290,15 @@ static void bindings_remap_and_persist(void) {
   controls_press(&m, &s.bindings, UI_DOWN);                     // DOWN
   controls_press(&m, &s.bindings, UI_ACCEPT);
   ASSERT(m.waiting);
-  controls_capture_pad(&m, &s.bindings, 3);                      // keyboard page: ignored
   controls_capture_key(&m, &s.bindings, 22);                     // S
   ASSERT(!m.waiting);
   ASSERT_EQ(bindings_key_action(&s.bindings, 22), ACT_DOWN);
   ASSERT_EQ(s.bindings.key[ACT_DOWN][1], 81);
+  m.sel = ACT_PAUSE;
+  controls_press(&m, &s.bindings, UI_ACCEPT);
+  controls_capture_pad(&m, &s.bindings, 3);                      // a pad button binds from the keyboard page too
+  ASSERT(!m.waiting && m.pad_page);
+  ASSERT_EQ(bindings_pad_action(&s.bindings, 3), ACT_PAUSE);
   m.sel = CTRL_RESET;
   controls_press(&m, &s.bindings, UI_ACCEPT);
   ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_A);
