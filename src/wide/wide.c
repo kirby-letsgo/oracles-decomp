@@ -6,11 +6,11 @@
 // The RAM the renderer reads (the same address in both games unless two are given)
 typedef struct {
   uint16_t tileset_flags, lcd_behaviour, camera_y, camera_x;
-  uint16_t group, room, modifier, pack, dungeon_index, map_position, floor, dungeon_properties, dungeon_flags_h;
+  uint16_t group, room, modifier, pack, dungeon_index, map_position, floor, dungeon_properties, dungeon_flags_h, game_over;
   int room_packs, pack_seasons;       // Seasons ROM: roomPackData (bank 4), roomPackSeasonTable (bank 1)
 } GameRam;
-static const GameRam ages_ram = {0xcc34, 0xff9b, 0xffaa, 0xffac, 0xcc2d, 0xcc30, 0xcc32, 0xcc31, 0xcc39, 0xcc3a, 0xcc3b, 0xcc3c, 0xcc3d, 0, 0};
-static const GameRam seasons_ram = {0xcc50, 0xff99, 0xffa8, 0xffaa, 0xcc49, 0xcc4c, 0xcc4e, 0xcc4d, 0xcc55, 0xcc56, 0xcc57, 0xcc58, 0xcc59,
+static const GameRam ages_ram = {0xcc34, 0xff9b, 0xffaa, 0xffac, 0xcc2d, 0xcc30, 0xcc32, 0xcc31, 0xcc39, 0xcc3a, 0xcc3b, 0xcc3c, 0xcc3d, 0xcdd6, 0, 0};
+static const GameRam seasons_ram = {0xcc50, 0xff99, 0xffa8, 0xffaa, 0xcc49, 0xcc4c, 0xcc4e, 0xcc4d, 0xcc55, 0xcc56, 0xcc57, 0xcc58, 0xcc59, 0xcc35,
                                     4 * 0x4000 + 0x073c, 1 * 0x4000 + 0x3e50};
 enum {
   W_SCROLL_MODE = 0xcd00, W_OPENED_MENU = 0xcbcb, W_OFFSET_Y = 0xcd08, W_OFFSET_X = 0xcd09,
@@ -24,7 +24,8 @@ static uint8_t rd(const GBSample *s, uint16_t a) {
   return s->wram[0][a - 0xc000];
 }
 
-// When the strips show rooms: the status bar split on, no menu open, not a sidescrolling area, and
+// When the strips show rooms: the status bar split on, no menu open (the game-over screen is not
+// opened as a menu, so it has its own flag), not a sidescrolling area, and
 // either normal play (scroll mode 1; bit 7 means the camera is moving) or a scrolling screen
 // transition (states 3-5), during which wActiveRoom is already the next room while the scroll and
 // wScreenOffsetX/Y still count from the previous one. Scroll mode 0 is a scripted scene.
@@ -39,7 +40,7 @@ enum { W_TRANSITION_DIRECTION = 0xcd02, W_TRANSITION_STATE = 0xcd04 };
 static View view_of(const GBSample *s, const GameRam *r) {
   View v = {false, false, 0, 0};
   int split = rd(s, r->lcd_behaviour), mode = rd(s, W_SCROLL_MODE) & 0x0f;
-  if (!(split == 2 || split == 3) || rd(s, W_OPENED_MENU) || (rd(s, r->tileset_flags) & TILESETFLAG_SIDESCROLL)) return v;
+  if (!(split == 2 || split == 3) || rd(s, W_OPENED_MENU) || rd(s, r->game_over) || (rd(s, r->tileset_flags) & TILESETFLAG_SIDESCROLL)) return v;
   if (mode == 0x01) { v.shown = true; return v; }
   int state = rd(s, W_TRANSITION_STATE), dir = rd(s, W_TRANSITION_DIRECTION);
   static const int step[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};  // up, right, down, left
