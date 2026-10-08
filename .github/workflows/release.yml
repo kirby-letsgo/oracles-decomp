@@ -123,8 +123,8 @@ jobs:
           Rolling build of \`main\` at ${GITHUB_SHA::7} ($(date -u +%Y-%m-%d)).
 
           You need your own ROMs: The Legend of Zelda: Oracle of Ages and/or Oracle of Seasons (USA).
-          On first launch the app asks for one; it keeps the graphics, sound and data and never needs
-          the ROM again.
+          The app opens on its launcher; ADD ROM there asks for one (a .zip or .gz is fine). It keeps
+          the graphics, sound and data and never needs the ROM again.
 
           - **macOS** (Apple Silicon and Intel, 11+): open the DMG, drag Oracles out, then right-click > Open the first time (the app is not notarized).
           - **Windows** (64-bit): unzip and run Oracles.exe (SmartScreen: More info > Run anyway).

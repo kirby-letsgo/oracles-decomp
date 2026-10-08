@@ -1,265 +1,174 @@
-Native reimplementation of The Legend of Zelda: Oracle of Ages and Oracle of Seasons in C.
+# The Legend of Zelda: Oracle of Ages & Oracle of Seasons
 
-Every routine the games run is readable C: all of Ages, and 99% of Seasons (shared with Ages
-where the two games agree, hand-written where Seasons differs; the rest is generated C from the
-disassembly). The native build runs both games with no CPU emulator and no ROM code. Behaviour is
-checked against the original ROM by replaying full playthroughs and comparing every C routine
-with the original code it replaces.
+Native macOS, Windows, Linux and Android versions of **Oracle of Ages** and **Oracle of Seasons**
+(Capcom, 2001), rebuilt from the games' own code in C. There is no emulator underneath: the games
+run as native programs, which is what makes widescreen, save states and save sync across your
+devices possible.
 
-You need your own US ROMs; none are included.
+**No game data is included.** You need your own Oracle of Ages and/or Oracle of Seasons (USA) ROM.
+The app reads it once, keeps the graphics, sound and data, and never needs it again.
 
+## Quality-of-life improvements
+
+What this port adds on top of the original games:
+
+- **Widescreen (16:9)** — see the rooms around you, not just the one you're in
+- **Save states** — 4 slots with thumbnails, plus a Resume state from wherever you last quit
+- **Save sync** — your saves and states follow you between desktop and phone, no passwords
+- **Remappable controls** — every button, for keyboard and gamepad
+- **Fast-forward** — hold Tab, or the right trigger
+- **Screen filters** — sharp, scanlines, LCD grid or CRT, and true Game Boy Color colours
+- **Fast text and faster menus** — optional, off by default
+- **Quick swap and 4 item slots** — optional, off by default
+
+The gameplay toggles are all off until you turn them on, so the default is the game as it shipped.
 
 ---
 
-AI DISCLOSURE
+**AI DISCLOSURE**
 
-This native implementation has used help from generative AI, spefically claude opus.
+This native implementation has used help from generative AI, specifically Claude Opus.
 
-If you don't want to use it for that I completly understand.
+If you don't want to use it for that I completely understand.
 
 ---
 
-## Prerequisites
+## Download
 
-- macOS (Linux and Windows build through CMake)
-- Xcode Command Line Tools (Clang)
-- CMake 3.15+ and Ninja
-- SDL3 (Homebrew, or fetched automatically on first configure)
-- Python 3, and wla-dx plus pyyaml and pypng to build the disassembly's symbol files
+Get the latest build for your system from the
+[**nightly release**](https://github.com/kirby-letsgo/oracles-decomp/releases/tag/nightly), rebuilt
+automatically on every change:
 
-```bash
-brew install cmake ninja sdl3 wla-dx
-pip3 install pyyaml pypng
-```
+| System | File | First launch |
+|---|---|---|
+| macOS 11+ (Apple Silicon and Intel) | `Oracles-macOS.dmg` | Open the DMG and drag Oracles out. It isn't notarized, so the first time right-click it and choose **Open**. |
+| Windows 10/11 (64-bit) | `Oracles-windows-x64.zip` | Unzip and run `Oracles.exe`. If SmartScreen warns about an unknown publisher, choose **More info → Run anyway**. |
+| Linux (x86_64) | `Oracles-linux-x86_64.AppImage` | `chmod +x` the file, then run it. |
+| Android 8+ (arm64) | `Oracles-android.apk` | Install the APK (allow installs from your browser or file manager). |
 
-Recent Python installs (Homebrew's included) refuse `pip3 install` into the system interpreter
-with an `externally-managed-environment` error. Either install the two packages for just your
-user, which is enough for the build to find them:
+Each desktop download is a single self-contained file; nothing else needs installing.
 
-```bash
-pip3 install --user --break-system-packages pyyaml pypng
-```
+## Adding your ROM
 
-or keep them out of your Python entirely with a virtualenv, which has to stay active for the
-`make -C ref/oracles-disasm` steps below:
+The app opens on its launcher, with Ages and Seasons side by side. A game you have no ROM for yet
+shows **NOT INSTALLED** and an **ADD ROM...** row — choose it and the file picker opens. Do the same
+on the other tab to add the second game. Nothing is asked for before the launcher appears.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install pyyaml pypng
-```
+The ROM can be a plain `.gbc`/`.gb` file **or a `.zip` or `.gz`** holding one, so a freshly
+downloaded archive works as it came. From a zip the `.gbc`/`.gb` file inside is taken, otherwise the
+largest one. `.7z` isn't read — extract it first.
 
-## Setup
-
-```bash
-git clone git@github.com:kirby-letsgo/oracles-decomp.git
-cd oracles-decomp
-git submodule update --init --recursive
-make -C ref/oracles-disasm ages CPUS=4
-make -C ref/oracles-disasm seasons CPUS=4
-```
-
-Put the ROMs and the CGB boot ROM in `roms/` (git-ignored):
-
-| File | SHA1 |
-|---|---|
-| `roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc` | `880374fb978b18af4aa529e2e32f7ffb4d7dd2f4` |
-| `roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc` | `ba1268290fb2b1b70505d2d7b5825fc8a4816a4b` |
-| `roms/cgb_boot.bin` | the Game Boy Color boot ROM |
-
-## Build
-
-```bash
-cmake -S . -B build -G Ninja
-cmake --build build
-ctest --test-dir build
-```
-
-`-DORACLES_SDL=OFF` builds only the headless tools. `-DORACLES_SDL_VENDORED=ON` builds SDL 3.4.16
-from source and links it statically (release builds do this); otherwise an installed SDL3 is used
-when there is one.
-
-Linux (Debian/Ubuntu; other distros need the same libraries): `tools/linux_deps.sh` installs the
-compiler, CMake, Ninja and SDL's build dependencies, then build as above with
-`-DORACLES_SDL_VENDORED=ON` (distributions rarely ship SDL3 yet).
-
-Windows (64-bit) is cross-compiled with MinGW-w64 (`brew install mingw-w64` or `apt install
-mingw-w64`); the result is a single `Oracles.exe` that needs only system DLLs. Wine runs the tests.
-
-```bash
-cmake -S . -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DORACLES_SDL_VENDORED=ON
-cmake --build build-win
-wine build-win/test_native_tas.exe
-```
-
-## Downloads
-
-Every push to `main` rebuilds the apps and replaces the rolling
-[nightly release](https://github.com/kirby-letsgo/oracles-decomp/releases/tag/nightly): macOS
-(universal DMG), Windows (x64 zip), Linux (x86_64 AppImage) and Android (arm64 APK). You need your
-own Oracle of Ages / Seasons (USA) ROMs. The workflow is `.github/workflows/release.yml`; the APK is
-signed with the release key from the repository secrets `ANDROID_KEYSTORE_B64`,
-`ANDROID_KEYSTORE_PASSWORD` and `ANDROID_KEY_ALIAS` (debug-signed, with a warning, when they are
-missing).
+Your ROM has to be the USA release of either game; the app checks it and says so if it isn't. On
+Android, copy the ROM to the phone's Downloads first so the picker can reach it.
 
 ## Playing
 
-Two apps, same game:
+The launcher shows each game's three save files with name, hearts and essences, plus **Resume** (the
+state from when you last quit), **Load state** and the title screen. Choosing a file boots straight
+into it.
 
-- `oracles-native`, the real port: no CPU emulator. On first launch it reads your ROM once,
-  keeps the graphics, sound and data, zeroes the code bytes, and caches the result; later
-  launches never touch the ROM again. The ROM it is given, here or in the launcher, may be
-  zipped (see below).
-  ```bash
-  ./build/oracles-native "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
-  ```
-- `oracles`, the development app: runs the ROM on our emulator core with the C routines hooked
-  in, so it can boot the real boot ROM, record playthroughs and fall back to the original code.
-  ```bash
-  ./build/oracles "roms/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc" roms/cgb_boot.bin
-  ```
+### Controls
 
-Without arguments `oracles-native` opens a launcher: Ages and Seasons side by side (each in its own
-title-screen colours), each game's three save files with name, hearts and essences, Resume (the state
-from the last quit), Load state, and the title screen. Choosing a file boots straight into it.
+| | |
+|---|---|
+| Move | Arrow keys |
+| A / B | `X` / `Z` |
+| Start / Select | Return / Backspace or Right Shift |
+| Pause | Esc (gamepad: Guide) |
+| Fast-forward | Hold Tab (gamepad: right trigger) |
+| Mute | `M` |
+| Fullscreen | F11 or Cmd+F |
+| Save / load state slot 1 | Cmd+S / Cmd+R |
 
-A game you have no ROM for yet shows NOT INSTALLED and an ADD ROM row, and the file picker opens only
-when you choose it -- the launcher is always what comes up first, on every platform.
+Every button — plus Pause, Fast-forward, Swap and the item buttons — can be remapped for keyboard
+and gamepad in Settings > CONTROLS. The window resizes in whole-pixel steps.
 
-`oracles-native` takes the ROM as a plain `.gbc`/`.gb` or as a `.zip` or `.gz` holding one, so a
-freshly downloaded archive works without unpacking it. From a zip it takes the `.gbc`/`.gb` member,
-else the largest file; the magic bytes decide, so a ROM saved under the wrong extension still loads.
-`.7z` is not read (it would mean carrying an LZMA decoder) and says so -- extract it first. Whatever
-it was given, the ROM's SHA1 still has to match one of the two games. The development app `oracles`
-below takes a loose ROM only.
+### Settings
 
-Controls: arrow keys to move, `X` / `Z` for A / B, Return for Start, Backspace or Right Shift for
-Select, `M` to mute, F11 or Cmd+F for fullscreen, hold Tab (gamepad: right trigger) to fast-forward.
-The window resizes in whole-pixel steps. Settings (from the launcher or the pause menu): volume,
-screen filter (sharp, scanlines, LCD grid, CRT), scale (pixel: whole-pixel steps; fill: the
-largest size that fits, drawn sharp at the next whole scale and shrunk smoothly), Game Boy Color
-colours, fullscreen, controls
-(every button, Pause, Fast-forward, Swap and the item buttons remap for keyboard and gamepad), and
-optional quality-of-life toggles, all off by default: fast text, faster menus, quick swap (`C`
-swaps the A and B items) and 4 slots (`A`/`S` are two more item buttons: highlight an item in the
-inventory and press one to assign it, then hold it in play to use the item).
+From the launcher or the pause menu: volume, screen filter (sharp, scanlines, LCD grid, CRT), scale
+(**pixel** for whole-pixel steps, **fill** for the largest size that fits), Game Boy Color colours,
+fullscreen and controls.
 
-- `oracles-native`: messages (state saved, item set, sound off) show at the bottom of the screen.
-  Esc (or the gamepad's Guide button) pauses: Resume, Save state, Load state (4
-  slots with thumbnails) and Quit, which saves a Resume state and returns to the launcher. Cmd+S /
-  Cmd+R save and load slot 1. Everything lives in the per-user app folder
-  (`~/Library/Application Support/oracles-decomp/oracles/` on macOS), including the game's own save.
-- `oracles`: Esc is Start as well; Cmd+S / Cmd+R save and load one state next to the ROM, F12 takes a
-  screenshot, and the game's save (battery RAM) is kept next to the ROM as `.sav`.
+There are also quality-of-life toggles, **all off by default**:
 
-`ORACLES_TOUCH=1 ./build/oracles-native` shows the phone's touch controls on the desktop, with the
-mouse as a finger.
+- **Fast text** and **faster menus**
+- **Quick swap**: `C` swaps the A and B items
+- **4 slots**: `A`/`S` become two more item buttons — highlight an item in the inventory and press
+  one to assign it, then hold it in play to use that item
+
+### Save states
+
+Esc pauses the game: Resume, Save state, Load state (4 slots, each with a thumbnail and its date)
+and Quit, which saves a Resume state and returns to the launcher. Cmd+S and Cmd+R are shortcuts for
+slot 1. Messages like *state saved* or *sound off* appear at the bottom of the screen.
+
+Save states work across every platform — all 64-bit builds share one layout, so a state made on your
+desktop loads on your phone.
 
 ## Widescreen
 
-Settings > WIDESCREEN shows 256x144 (16:9 at the game's 144 lines): the game's own 160 pixels in the
-middle, unchanged, and 48 pixels each side of the rooms around it. Large rooms (dungeons) show more
-of themselves; past a room's edge come the neighbouring rooms, decoded from your ROM: the overworld
-grid (with the right season in Seasons) and, in dungeons, the rooms through a doorway once visited.
-The strips scroll along with every room change. Nothing moves in them (the game only runs the room
-you are in), they show a room as the ROM describes it (not opened chests or cut grass until you go
-there), and houses, caves, menus and cutscenes get the game's border colour. DIM SIDES (on by
-default) draws the strips a little darker than the live room.
+Settings > WIDESCREEN widens the picture to 256x144 (16:9 at the game's own 144 lines). The game's
+original 160 pixels stay in the middle, untouched, with 48 pixels either side showing the rooms
+around you, decoded from your ROM: the overworld grid (with the right season in Seasons) and, in
+dungeons, the rooms through a doorway once you've visited them. Large dungeon rooms simply show more
+of themselves.
 
-`test_wide` checks the renderer against the game through both TAS movies: the middle 160 columns
-drawn its way equal the PPU's picture exactly, and what a strip showed of the next room matches
-that room's own picture once the movie is in it (Seasons 96.8%, Ages 98.9% of the pixels; the rest
-are things the player changed). `test_room` checks the ROM room decoder against every room the
-movies load.
+The sides scroll along with every room change. Nothing moves in them — the game only runs the room
+you're in — and they show each room as the ROM describes it, so a chest you opened or grass you cut
+won't update until you walk back there. Houses, caves, menus and cutscenes use the game's border
+colour instead. **DIM SIDES** (on by default) draws the sides slightly darker than the live room.
 
 ## Save sync
 
-Settings > SYNC keeps saves in step across devices through the sync server (`sync-server/`): CREATE
-ACCOUNT gives a 16-digit code, and ENTER CODE on another device joins it (no passwords). Synced:
-each game's save, save-state slots with their pictures and item buttons, and the shared settings;
-never the ROM-derived files. It syncs when the launcher opens, before a game starts, and when you
-leave a game or the app; SYNC NOW does it by hand. A sync that fails (offline, server down) is
-tried again after 5 s, then twice as long each time up to every 5 minutes, and at once when the app
-comes back to the foreground; the running game's own files wait for the game to end. When a save
-changed on two devices since they last synced, a KEEP WHICH? screen shows both (files and hearts, or
-the state's picture) and you pick. Save states move between every platform (all 64-bit builds share
-one layout); only a build with another state format refuses one. The server address is the CMake
-setting `ORACLES_SYNC_URL`; a device can use another one with `url=` in `sync.ini` in its app folder.
-HTTP uses the system's own TLS: libcurl (macOS, Linux; sync is off without it), WinHTTP, and
-Android's HttpURLConnection. `ORACLES_SYNC_URL=http://host test_sync_http` checks a server. The
-`sync_flow` test plays two devices against the real server on an in-memory database (`pnpm local` in
-`sync-server/`; needs its `pnpm install` and the Seasons ROM): a conflict kept each way, and a save
-made offline that the retry uploads.
+Settings > SYNC keeps your saves in step across devices, with no passwords: **CREATE ACCOUNT** gives
+you a 16-digit code, and **ENTER CODE** on another device joins the same account.
+
+Synced: each game's save, the save-state slots with their pictures and item buttons, and your
+settings. Never your ROM or anything derived from it.
+
+It syncs when the launcher opens, before a game starts, and when you leave a game or the app;
+**SYNC NOW** does it by hand. A sync that fails because you're offline is retried automatically, and
+again the moment the app comes back to the foreground. If the same save changed on two devices, a
+**KEEP WHICH?** screen shows you both — the files and hearts, or the state's picture — and you pick.
 
 ## Android
 
-`oracles-native` also builds as an Android app (arm64, Android 8+). Needs the Android SDK with
-platform 35, build-tools 35, NDK 27.2.12479018 and CMake 3.31.6 (`sdkmanager` installs them), and a
-JDK; `android/local.properties` names the SDK (`sdk.dir=...`).
-
-```bash
-cd android
-./gradlew assembleDebug
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-```
-
-The build runs this repo's CMake with SDL 3.4.16 from source (its Java glue is vendored in
-`android/app/src/main/java/org/libsdl/app`, same release) and optimises the engine in debug APKs too.
-The app opens on the launcher; Add ROM there opens the system file picker for each game (copy the
-ROM to the phone's Downloads first, e.g. `adb push ROM /sdcard/Download/`). A zipped ROM is fine, so
-a download can be picked as it came.
-
 Touch controls sit under the game in portrait and at its sides in landscape: D-pad (diagonals by
-touching between arms), A, B, Start, Select, Pause and fast-forward (`>>`, hold), plus X and Y when 4
-slots is on. They hide when a controller or keyboard is used and come back on the next touch. The
-back button pauses (and goes back in menus). Leaving the app saves the game and a Resume state, and
-coming back opens the pause menu. `adb logcat -s oracles` shows the engine's messages.
+touching between the arms), A, B, Start, Select, Pause and fast-forward (`>>`, hold), plus X and Y
+when 4 slots is on. They hide when you use a controller or keyboard and come back on the next touch.
+The back button pauses, and goes back in menus.
 
-## Recording a playthrough
+Leaving the app saves the game and a Resume state; coming back opens the pause menu.
 
-The recordings in `tas/` are the test suite. To extend the Seasons one:
+## Where your files are
 
-```bash
-./build/oracles "roms/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc" roms/cgb_boot.bin --record tas/seasons-play.inputs
-```
+Everything — the data read from your ROM, your saves, save states and settings — lives in one
+per-user folder:
 
-It resumes where the file ends (from a snapshot, without replaying) and writes the file every
-minute and on quit. Loading a save state while recording rewinds the recording to that point.
-See `tas/README.md` for re-recording the reference hashes afterwards.
+| System | Folder |
+|---|---|
+| macOS | `~/Library/Application Support/oracles-decomp/oracles/` |
+| Windows | `%APPDATA%\oracles-decomp\oracles\` |
+| Linux | `~/.local/share/oracles-decomp/oracles/` |
+| Android | the app's own storage (removed when you uninstall) |
 
-## Verification
+Deleting that folder resets the app; you'll be asked for your ROM again.
 
-```bash
-ctest --test-dir build                          # unit suites, TAS prefixes, whole native runs
-TAS_FRAMES=321712 ctest --test-dir build -R tas  # both whole movies with hooks too
-```
+## Reporting problems
 
-Two full-game movies are the main gate: the console-verified Ages TAS and the console-verified
-Seasons TAS (`tas/README.md`), plus a recorded Seasons playthrough.
+Please open an [issue](https://github.com/kirby-letsgo/oracles-decomp/issues) with your system, which
+game, and what you were doing. Never attach a ROM or a save made from one. On Android,
+`adb logcat -s oracles` shows the app's messages.
 
-The headless runner replays a movie and checks it:
+## How it works
 
-```bash
-./build/oracles-run --rom ROM --boot roms/cgb_boot.bin --init-ram tas/gbhawk-wram0.txt \
-  --tas tas/seasons-play.inputs --frames 265064 --verify-shadow --ref-check tas/seasons-play.ref
-```
+Every routine the games run is readable C: all of Ages, and 99% of Seasons (shared with Ages where
+the two games agree, hand-written where Seasons differs; the rest generated from the disassembly).
+The native build runs both games with no CPU emulator and no ROM code at all — on first launch the
+app takes the graphics, sound and data out of your ROM and zeroes the code bytes, because it no
+longer needs them.
 
-`--verify-shadow` runs every hooked C routine, replays the original code from the same state and
-compares registers, memory and cycles. `--ref-check` compares the machine state every 60 frames
-with the hashes the pure interpreter (`--no-hooks`) recorded. `oracles-native-run` replays
-movies on the native build.
+Behaviour is checked against the original ROM by replaying full playthroughs and comparing every C
+routine with the original code it replaces.
 
-## Layout
-
-- `src/core/`, `src/hw/`: SM83 CPU, memory bus, PPU, APU, timers.
-- `src/game/`: the game in C, one file per disassembly file; `src/game/seasons/` holds the
-  Seasons-only code.
-- `src/hooks/`: the address-to-function tables and the lists the generators read.
-- `src/rt/`: the native runtime (no interpreter).
-- `src/platform/`: the SDL apps and the headless runner; `archive.c` reads the ROM, unpacking a
-  zip or gz with its own inflate so the apps need no compression library.
-- `src/ui/`: the launcher, menus and overlays, drawn with the ROM's own font -- plus a small
-  built-in one (`font_builtin.c`) for the launcher before any ROM is installed.
-- `tools/`: generators and the audits run on every change.
-- `tas/`: input movies and reference hashes.
-- `ref/oracles-disasm/`: the community disassembly (submodule), used for symbols and routines.
+To build it yourself, or work on it, see [DEVELOPMENT.md](DEVELOPMENT.md).
