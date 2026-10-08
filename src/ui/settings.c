@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *const filter_names[FILTERS] = {"SHARP", "LINES", "LCD", "CRT"};
-static const char *const filter_keys[FILTERS] = {"sharp", "scanlines", "lcd", "crt"};
+static const char *const filter_names[FILTERS] = {"SHARP", "LINES", "LCD", "CRT", "XBRZ2", "XBRZ3", "XBRZ4"};
+static const char *const filter_keys[FILTERS] = {"sharp", "scanlines", "lcd", "crt", "xbrz2", "xbrz3", "xbrz4"};
 
 void settings_default(Settings *s) {
   s->volume = 10;

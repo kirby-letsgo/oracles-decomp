@@ -17,7 +17,7 @@ What this port adds on top of the original games:
 - **Save sync** — your saves and states follow you between desktop and phone, no passwords
 - **Remappable controls** — every button, for keyboard and gamepad
 - **Fast-forward** — hold Tab, or the right trigger
-- **Screen filters** — sharp, scanlines, LCD grid or CRT, and true Game Boy Color colours
+- **Screen filters** — sharp, scanlines, LCD grid, CRT, or xBRZ smoothing at three strengths, and true Game Boy Color colours
 - **Fast text and faster menus** — optional, off by default
 - **Quick swap and 4 item slots** — optional, off by default
 
@@ -85,7 +85,9 @@ and gamepad in Settings > CONTROLS. The window resizes in whole-pixel steps.
 
 ### Settings
 
-From the launcher or the pause menu: volume, screen filter (sharp, scanlines, LCD grid, CRT), scale
+From the launcher or the pause menu: volume, screen filter (sharp, scanlines, LCD grid, CRT, and
+XBRZ2/XBRZ3/XBRZ4 — the xBRZ pixel-art scaler, where the number is how hard it smooths: 2 rounds off
+jagged diagonals and leaves the rest of the art alone, 4 is smoothest but softens small shapes), scale
 (**pixel** for whole-pixel steps, **fill** for the largest size that fits), Game Boy Color colours,
 fullscreen and controls.
 

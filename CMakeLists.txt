@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.25)
-project(oracles C)
+project(oracles C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+# C++ is only for the vendored xBRZ scaler in third_party/xbrz; everything else is C.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -102,8 +105,11 @@ if(ORACLES_SDL)
   endif()
 endif()
 
-add_library(oraclesui STATIC src/ui/ui.c src/ui/font_builtin.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c src/ui/touch.c src/ui/syncui.c)
-target_include_directories(oraclesui PUBLIC src)
+add_library(oraclesui STATIC src/ui/ui.c src/ui/font_builtin.c src/ui/savefile.c src/ui/launcher.c src/ui/menu.c src/ui/settings.c src/ui/filter.c src/ui/controls.c src/ui/touch.c src/ui/syncui.c
+  src/ui/xbrz_filter.cpp third_party/xbrz/xbrz.cpp)
+target_include_directories(oraclesui PUBLIC src PRIVATE third_party/xbrz)
+# oraclesui carries C++ objects, so anything linking it links with the C++ driver.
+set_target_properties(oraclesui PROPERTIES LINKER_LANGUAGE CXX)
 add_library(oracleswide STATIC src/wide/wide.c src/wide/room.c)
 target_include_directories(oracleswide PUBLIC src)
 add_library(oraclessync STATIC src/sync/sha256.c src/sync/sync.c src/sync/http_common.c)

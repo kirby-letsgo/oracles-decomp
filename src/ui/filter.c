@@ -1,6 +1,12 @@
 #include "ui/filter.h"
+#include "ui/xbrz_filter.h"
 #include <math.h>
 #include <string.h>
+
+// The widest picture ui_filter is given: the widescreen 256 (WIDE_W), against the plain UI_W of 160.
+// Kept here rather than included so the UI stays independent of the widescreen renderer; a wider
+// picture than this simply falls through to the plain path below.
+#define FILTER_MAX_SRC_W 256
 
 // A common approximation of the GBC LCD's response: channels mix a little and the image is
 // compressed towards a warm mid-tone.
@@ -20,8 +26,25 @@ static void source_pixel(const uint8_t *src, int src_w, bool gbc, int x, int y, 
 
 static uint8_t shade(uint8_t v, int num, int den) { return (uint8_t)(v * num / den); }
 
+// 0 for the filters that are not xBRZ, else the factor to run the scaler at.
+static int xbrz_factor(ScreenFilter f) {
+  return f == FILTER_XBRZ2 ? 2 : f == FILTER_XBRZ3 ? 3 : f == FILTER_XBRZ4 ? 4 : 0;
+}
+
 void ui_filter(const uint8_t *src, int src_w, bool gbc, ScreenFilter filter, int scale, uint8_t *dst) {
   int w = src_w * scale, h = UI_H * scale;
+  if (xbrz_factor(filter) && src_w <= FILTER_MAX_SRC_W) {
+    // xBRZ reads whole pixels, so the colour correction has to happen before it rather than after:
+    // it decides which pixels count as equal, and it is the shown colours it should compare.
+    static uint8_t corrected[FILTER_MAX_SRC_W * UI_H * 3];
+    const uint8_t *in = src;
+    if (gbc) {
+      for (int i = 0; i < src_w * UI_H; i++) ui_gbc_colour(src + i * 3, corrected + i * 3);
+      in = corrected;
+    }
+    ui_xbrz_scale(in, src_w, UI_H, xbrz_factor(filter), scale, dst);
+    return;
+  }
   if (filter != FILTER_CRT) {
     for (int y = 0; y < UI_H; y++)
       for (int x = 0; x < src_w; x++) {
