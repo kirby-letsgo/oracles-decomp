@@ -129,8 +129,9 @@ its own item, instead of borrowing it to display the one you pressed.
 
 The sides scroll along with every room change. Nothing moves in them — the game only runs the room
 you're in — and they show each room as the ROM describes it, so a chest you opened or grass you cut
-won't update until you walk back there. Houses, caves, menus and cutscenes use the game's border
-colour instead. **DIM SIDES** (on by default) draws the sides slightly darker than the live room.
+won't update until you walk back there. Houses, caves and cutscenes use the game's border colour
+instead, while a menu fills them with its own colour and keeps the status bar across the top.
+**DIM SIDES** (on by default) draws the sides slightly darker than the live room.
 
 ## Save sync
 

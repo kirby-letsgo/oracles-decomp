@@ -15,6 +15,7 @@ static const GameRam seasons_ram = {0xcc50, 0xff99, 0xffa8, 0xffaa, 0xcc49, 0xcc
                                     4 * 0x4000 + 0x073c, 1 * 0x4000 + 0x3e50};
 enum {
   W_SCROLL_MODE = 0xcd00, W_OPENED_MENU = 0xcbcb, W_OFFSET_Y = 0xcd08, W_OFFSET_X = 0xcd09,
+  W_PALETTE_FADE = 0xc4ab,            // wPaletteThread_mode: non-zero while a screen is fading
   W_ROOM_WIDTH = 0xcd0a, W_ROOM_HEIGHT = 0xcd0b,
   W2_DUNGEON_LAYOUT = 0xc00,          // $dc00 in WRAM bank 2: $40 bytes a floor, 8x8
   TILESETFLAG_SIDESCROLL = 0x20, TILESETFLAG_DUNGEON = 0x08, STATUS_BAR_LINES = 16, ROOMFLAG_VISITED = 0x10,
@@ -347,6 +348,39 @@ static void draw_slot_icons(const GBSample *s, const SlotIcons *si, int y, uint8
   }
 }
 
+// The colour that goes beside a menu. The strips take the one colour its edges are mostly made of:
+// those edges are patterned (the inventory's frame alternates green and blue down the right), so
+// carrying each row's own pixel outwards would smear the pattern across the strips.
+static uint32_t dominant(const uint8_t *middle, bool edges) {
+  struct { uint32_t c; int n; } seen[8];
+  int used = 0;
+  for (int y = STATUS_BAR_LINES; y < FB_H; y += edges ? 1 : 4)
+    for (int i = 0; i < (edges ? 2 : FB_W / 4); i++) {
+      const uint8_t *p = middle + ((size_t)y * FB_W + (edges ? (i ? FB_W - 1 : 0) : i * 4)) * 3;
+      uint32_t c = (uint32_t)p[0] << 16 | (uint32_t)p[1] << 8 | p[2];
+      int k = 0;
+      while (k < used && seen[k].c != c) k++;
+      if (k < used) seen[k].n++;
+      else if (used < 8) { seen[used].c = c; seen[used].n = 1; used++; }
+    }
+  int best = 0;
+  for (int k = 1; k < used; k++)
+    if (seen[k].n > seen[best].n) best = k;
+  return used ? seen[best].c : 0;
+}
+
+// Only an edge colour that differs from what fills the body is the menu's own. While the game
+// redraws a page it whites the screen out -- edges included -- with the LCD still on and no fade
+// flagged, and taking that would flash the strips white on every page change.
+static bool menu_colour(const uint8_t *middle, uint8_t out[3]) {
+  uint32_t edge = dominant(middle, true);
+  if (edge == dominant(middle, false)) return false;
+  out[0] = (uint8_t)(edge >> 16);
+  out[1] = (uint8_t)(edge >> 8);
+  out[2] = (uint8_t)edge;
+  return true;
+}
+
 void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
   static uint8_t middle[FB_W * FB_H * 3];
   static Around a;
@@ -364,6 +398,26 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
   }
   static SlotIcons icons;
   slot_icons(s, o, &icons);
+  // The status bar is up whenever the split is on, menu or no menu, so it carries across the whole
+  // width in both. The strips below it follow the menu when there is one.
+  bool menu = rd(s, W_OPENED_MENU) != 0;
+  int split = rd(s, r->lcd_behaviour);
+  bool bar_shown = (split == 2 || split == 3) && (a.v.shown || menu);
+  // A menu's strips hold one steady colour. Between pages the game fades the screen to white and
+  // then blanks it, and the frame the fade ends on is still white, so the colour is taken only from
+  // a picture that has been settled for a couple of frames and kept the rest of the time -- strips
+  // that followed would flash white on every page change. The colour outlives the menu, so opening
+  // one again does not flash either.
+  static uint8_t menu_rgb[3];
+  static bool menu_rgb_set;
+  static int settled;
+  bool quiet = !rd(s, W_PALETTE_FADE) && (s->line_lcdc[STATUS_BAR_LINES] & 0x80);
+  settled = quiet ? (settled < 4 ? settled + 1 : settled) : 0;
+  // Once a colour is held only a settled picture replaces it; with nothing held yet, the first
+  // picture that offers one is taken, so the first menu of a session does not start on the border
+  // colour and jump.
+  if (menu && (settled >= 2 || !menu_rgb_set) && menu_colour(middle, menu_rgb)) menu_rgb_set = true;
+  const uint8_t *fill = menu && menu_rgb_set ? menu_rgb : o->border;
   int width = rd(s, W_ROOM_WIDTH) * 8, height = rd(s, W_ROOM_HEIGHT) * 8;
   bool rooms = a.v.shown && o->rom && width > 0 && height > 0 && width <= 256 && height <= 256;
   for (int y = 0; y < FB_H; y++) {
@@ -372,7 +426,7 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
     // show beside it. Its end colours carry on to the edges of the wider picture, so it reads as one
     // bar the whole way across instead of a box floating in the middle of a black band. Never
     // dimmed, unlike the room strips: half a dimmed bar would only put a seam down it.
-    if (a.v.shown && y < STATUS_BAR_LINES) {
+    if (bar_shown && y < STATUS_BAR_LINES) {
       const uint8_t *mid = middle + (size_t)y * FB_W * 3;
       int bar = WIDE_SIDE + (o->slots ? HUD_SHIFT : 0);
       for (int x = 0; x < bar; x++) memcpy(row + x * 3, mid, 3);
@@ -398,9 +452,12 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
           if (n) c = neighbour_pixel(s, n, rx - gx * width, ry - gy * height, y);
         }
       }
-      if (!(s->line_lcdc[y] & 0x80)) c = 0x7fff;            // LCD off: blank white, as in the middle
-      if (c < 0) memcpy(row + x * 3, o->border, 3);
-      else put555(row + x * 3, c, o->dim);
+      // LCD off: blank white, as in the middle -- and never dimmed, or the strips would turn grey
+      // against a white middle every time the game blanks the screen between menus.
+      bool blank = !(s->line_lcdc[y] & 0x80);
+      if (blank && !menu) c = 0x7fff;                     // a menu's strips keep their colour
+      if (c < 0) memcpy(row + x * 3, fill, 3);
+      else put555(row + x * 3, c, o->dim && !blank);
     }
     memcpy(row + WIDE_SIDE * 3, middle + (size_t)y * FB_W * 3, FB_W * 3);
   }
