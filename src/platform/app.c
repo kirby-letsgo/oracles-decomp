@@ -305,6 +305,9 @@ static void apply_game_settings(void) {
   features.quick_swap = settings.quick_swap;
   features.fast_menus = settings.fast_menus;
   features.four_slots = settings.four_slots;
+  // With the boxes on screen the B box must keep showing the B item, so holding X or Y should not
+  // repaint it with the item it lends to the B slot.
+  features.slot_boxes = settings.four_slots && settings.widescreen;
 }
 
 // The items on X and Y, per game: two bytes in item_buttons.
@@ -498,7 +501,10 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb);
 static void present_game(SDL_Renderer *ren, SDL_Texture *tex, const GBSample *sample, const uint8_t *rgb, bool seasons, const uint8_t *rom, size_t rom_size) {
   if (!settings.widescreen) { present(ren, tex, rgb); return; }
   static uint8_t wide[WIDE_W * FB_H * 3];
-  WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}, rom, rom_size};
+  // The X and Y items go in the space widescreen adds beside the status bar; the game has nowhere to
+  // put them, so without the wider picture there is no room to show them in.
+  WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}, rom, rom_size,
+                   settings.four_slots, {features.slot_item[0], features.slot_item[1]}};
   wide_render(sample, &o, wide);
   if (toast[0] && SDL_GetTicks() < toast_until && overlay_font && overlay_font->loaded) {
     static UiCanvas middle;

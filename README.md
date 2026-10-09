@@ -102,7 +102,8 @@ There are also quality-of-life toggles, **all off by default**:
 - **Fast text** and **faster menus**
 - **Quick swap**: `C` swaps the A and B items
 - **4 slots**: `A`/`S` become two more item buttons — highlight an item in the inventory and press
-  one to assign it, then hold it in play to use that item
+  one to assign it, then hold it in play to use that item. In widescreen they get their own X and Y
+  boxes at the left of the status bar, so all four items are on screen at once
 
 ### Save states
 
@@ -121,6 +122,11 @@ around you, decoded from your ROM: the overworld grid (with the right season in 
 dungeons, the rooms through a doorway once you've visited them. Large dungeon rooms simply show more
 of themselves.
 
+The status bar runs the whole way across rather than sitting in a box in the middle. With **4 slots**
+on, the X and Y items get their own boxes at its left end and the game's own bar slides right to make
+room, so the four item slots read across as X, Y, B, A. Holding X or Y then leaves the B box showing
+its own item, instead of borrowing it to display the one you pressed.
+
 The sides scroll along with every room change. Nothing moves in them — the game only runs the room
 you're in — and they show each room as the ROM describes it, so a chest you opened or grass you cut
 won't update until you walk back there. Houses, caves, menus and cutscenes use the game's border
@@ -138,6 +144,8 @@ It syncs when the launcher opens, before a game starts, and when you leave a gam
 **SYNC NOW** does it by hand. A sync that fails because you're offline is retried automatically, and
 again the moment the app comes back to the foreground. If the same save changed on two devices, a
 **KEEP WHICH?** screen shows you both — the files and hearts, or the state's picture — and you pick.
+The copy you turn down isn't thrown away: it stays in the game's folder as `<name>.bak` (a save
+state's picture too), until the next KEEP WHICH? about the same file replaces it.
 
 ## Android
 

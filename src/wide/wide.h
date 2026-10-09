@@ -17,6 +17,8 @@ typedef struct {
   uint8_t border[3];            // RGB where the strips show nothing
   const uint8_t *rom;           // for the neighbouring rooms (the app's copy, code bytes zeroed, will do)
   size_t rom_size;
+  bool slots;                   // 4 slots is on: the X and Y boxes take the left of the status bar
+  uint8_t slot_item[2];         // what is on each of them (0: the box is empty)
 } WideOptions;
 
 // out: WIDE_W x FB_H RGB24.

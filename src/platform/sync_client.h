@@ -40,7 +40,8 @@ typedef struct {
 void sync_run(const SyncConfig *c, const char *cache, const char *game, SyncResult *r);
 // The server's current bytes of a file, for showing a choice (malloc'd; NULL when missing).
 uint8_t *sync_fetch(const SyncConfig *c, const char *game, const char *name, size_t *size);
-// keep_local uploads this device's file over the server's, else the server's replaces it.
+// keep_local uploads this device's file over the server's, else the server's replaces it and
+// the replaced copy is kept as "<name>.bak" (a state's thumbnail too), one deep.
 bool sync_resolve(const SyncConfig *c, const char *cache, const SyncChoice *ch, bool keep_local);
 bool sync_create_account(const char *url, char code[17], char *error, size_t size);
 

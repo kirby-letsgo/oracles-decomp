@@ -56,7 +56,9 @@ uint8_t features_slot_press(GB *gb, int slot) {
   held_slot = slot;
   held_b = W8(wInventoryB);
   W8(wInventoryB) = item;
-  W8(wStatusBarNeedsRefresh) |= 0x01;
+  // Only redraw the bar when the item has nowhere else to be seen: with the X and Y boxes on screen
+  // the player can already see what they pressed, and the B box should keep its own item.
+  if (!features.slot_boxes) W8(wStatusBarNeedsRefresh) |= 0x01;
   return JOY_B;
 }
 
@@ -65,5 +67,5 @@ void features_slot_release(GB *gb, int slot) {
   held_slot = -1;
   if (W8(wInventoryB) != features.slot_item[slot]) return;
   W8(wInventoryB) = held_b;
-  W8(wStatusBarNeedsRefresh) |= 0x01;
+  if (!features.slot_boxes) W8(wStatusBarNeedsRefresh) |= 0x01;
 }

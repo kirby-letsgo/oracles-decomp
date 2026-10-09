@@ -3,8 +3,9 @@
 (sync-server/scripts/local.ts), driven headless through oracles-native's launcher:
   A saves slot 1 and syncs; B syncs and gets it; A changes it and syncs; B changes it too, and its
   "keep which?" screen keeps HERE (B's goes to the server); A changes it again and keeps OTHER (B's
-  replaces A's). Each time the slot's thumbnail follows. Last, A saves while the server is
-  unreachable, the server comes back, and the retry uploads it without another launch.
+  replaces A's, and A's is kept as .bak). Each time the slot's thumbnail follows. Last, A saves
+  while the server is unreachable, the server comes back, and the retry uploads it without another
+  launch.
 usage: test_sync_flow.py ORACLES_NATIVE ROM SYNC_SERVER_DIR   (exit 77 when the ROM or the server's
 node_modules are missing)"""
 import os, socket, subprocess, sys, tempfile, threading, time, urllib.request
@@ -111,6 +112,8 @@ try:
         assert local(a) == b'B2' * 1000, 'OTHER did not bring B\'s slot'
         assert local(a, 'state_1.thumb') == bytes([30]) * THUMB
         assert on_server('state_1') == b'B2' * 1000
+        assert local(a, 'state_1.bak') == b'A3' * 1000, 'OTHER did not keep A\'s slot as .bak'
+        assert local(a, 'state_1.thumb.bak') == bytes([40]) * THUMB
 
         with open(os.path.join(a, 'sync.ini'), 'w') as f: f.write(f'url=http://127.0.0.1:{offline_port}\ncode={code}\n')
         save(a, b'A4' * 1000, 50)

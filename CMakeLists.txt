@@ -115,7 +115,7 @@ add_library(oraclesui STATIC src/ui/ui.c src/ui/font_builtin.c src/ui/savefile.c
 target_include_directories(oraclesui PUBLIC src PRIVATE third_party/xbrz third_party/hqx)
 # oraclesui carries C++ objects, so anything linking it links with the C++ driver.
 set_target_properties(oraclesui PROPERTIES LINKER_LANGUAGE CXX)
-add_library(oracleswide STATIC src/wide/wide.c src/wide/room.c)
+add_library(oracleswide STATIC src/wide/wide.c src/wide/room.c src/wide/item.c)
 target_include_directories(oracleswide PUBLIC src)
 add_library(oraclessync STATIC src/sync/sha256.c src/sync/sync.c src/sync/http_common.c)
 target_include_directories(oraclessync PUBLIC src)

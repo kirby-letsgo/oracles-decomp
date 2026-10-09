@@ -57,6 +57,20 @@ static bool write_atomic(const char *path, const void *data, size_t n) {
   return SDL_RenamePath(tmp, path);
 }
 
+// The copy a KEEP WHICH? answer turns down, kept as "<name>.bak" beside the file the download is
+// about to write over. The server's history holds only versions that reached it, so the side the
+// player drops can be the last copy anywhere. Never synced (the server takes no such name), and
+// one deep: the next answer about the same file replaces it.
+static void keep_backup(const char *path) {
+  size_t n;
+  uint8_t *data = oracles_read_file(path, &n);
+  if (!data) return;
+  char bak[1216];
+  snprintf(bak, sizeof bak, "%s.bak", path);
+  write_atomic(bak, data, n);
+  free(data);
+}
+
 typedef struct {
   bool exists;
   char sha[65];
@@ -297,7 +311,15 @@ bool sync_resolve(const SyncConfig *c, const char *cache, const SyncChoice *ch, 
     if (ok) rec.n = sync_set_record(rec.rec, rec.n, SYNC_MAX_FILES, ch->game, ch->name, v, lf.sha);
   } else {
     int v;
-    char sha[65];
+    char sha[65], path[1200];
+    local_path(path, sizeof path, cache, ch->game, ch->name);
+    keep_backup(path);
+    if (is_state(ch->name)) {
+      char thumb[32];
+      snprintf(thumb, sizeof thumb, "%s.thumb", ch->name);
+      local_path(path, sizeof path, cache, ch->game, thumb);
+      keep_backup(path);               // the picture that says which save the .bak holds
+    }
     ok = download(c, cache, ch->game, ch->name, &v, sha, r.error, sizeof r.error);
     if (ok) rec.n = sync_set_record(rec.rec, rec.n, SYNC_MAX_FILES, ch->game, ch->name, v, sha);
   }

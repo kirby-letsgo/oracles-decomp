@@ -9,6 +9,7 @@ typedef struct {
   bool fast_menus;              // the fades into and out of the inventory and map take 4 frames
   bool four_slots;              // two more item buttons, X and Y
   uint8_t slot_item[2];         // the items on X and Y (0: none), assigned in the inventory
+  bool slot_boxes;              // their own boxes are drawn (widescreen), so leave the B box alone
 } Features;
 
 extern Features features;

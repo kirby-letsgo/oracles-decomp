@@ -186,7 +186,9 @@ with their pictures and item buttons, and the shared settings — never ROM-deri
 syncs when the launcher opens, before a game starts, and when leaving a game or the app. A failed
 sync is retried after 5 s, then twice as long each time up to every 5 minutes, and at once when the
 app returns to the foreground; a running game's files wait for the game to end. When a save changed
-on two devices since they last synced, the app shows a KEEP WHICH? screen.
+on two devices since they last synced, the app shows a KEEP WHICH? screen; the side the player
+turns down is kept as `<name>.bak` beside it, since the server's history holds only versions that
+reached it.
 
 Save states move between every platform (all 64-bit builds share one layout); only a build with a
 different state format refuses one.
@@ -239,7 +241,8 @@ warning, when they are missing).
   or gz with its own inflate so the apps need no compression library.
 - `src/ui/`: the launcher, menus and overlays, drawn with the ROM's own font -- plus a small
   built-in one (`font_builtin.c`) for the launcher before any ROM is installed.
-- `src/wide/`: the widescreen renderer and the ROM room decoder.
+- `src/wide/`: the widescreen renderer, the ROM room decoder, and `item.c`, which decodes an
+  item's status-bar icon from the ROM so the X and Y slots can be shown beside the bar.
 - `src/sync/`: the save-sync client.
 - `third_party/xbrz/`, `third_party/hqx/`: the two pixel-art scalers (GPLv3 and LGPL 2.1) behind
   the XBRZ and HQX screen filters, wrapped by `src/ui/upscale.cpp`. Each folder's `README.md`

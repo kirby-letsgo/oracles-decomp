@@ -1,4 +1,5 @@
 #include "wide/wide.h"
+#include "wide/item.h"
 #include "wide/room.h"
 #include "hw/render.h"
 #include <string.h>
@@ -278,6 +279,74 @@ static const Neighbour *around_cell(Around *a, int gx, int gy) {
   return n->room ? n : NULL;
 }
 
+// The X and Y items, which the game has no boxes for. They go at the left end of the status bar and
+// the game's own bar slides right by HUD_SHIFT to make room, so all four item slots read left to
+// right as X, Y, B, A. Each slot is a letter and then a box wide enough for the widest icon.
+// Laid out like the game's own boxes: the letter, then a bracket, the icon, and the closing
+// bracket, with the same eight pixels between one box and the next letter that the game leaves
+// between its B and A boxes. The game's brackets are a one-pixel stroke with two-pixel serifs
+// running from line 1 to line 14, so these are drawn the same way rather than copied, which would
+// tie us to wherever the bar happens to put its own.
+enum { HUD_SHIFT = 30, SLOT_LEFT = 2, SLOT_PITCH = 38,
+       SLOT_OPEN = 6, SLOT_ICON = 10, SLOT_CLOSE = 28, SLOT_BOX_W = 16,
+       SLOT_TOP = 1, SLOT_BOTTOM = 14 };
+
+// 'X' and 'Y' in the status bar's own lettering: four pixels wide and seven tall, a pixel in from
+// the left of the cell, which is how the bar draws its B and A. The small bar font has no letters
+// past those, so these follow the shapes the ROM's larger font uses.
+enum { SLOT_LETTER_TOP = 1, SLOT_LETTER_H = 7 };
+static const uint8_t slot_letter[2][SLOT_LETTER_H] = {
+  {0x48, 0x48, 0x30, 0x30, 0x30, 0x48, 0x48},         // X
+  {0x48, 0x48, 0x30, 0x30, 0x30, 0x30, 0x30},         // Y
+};
+
+typedef struct { bool show; bool on[2]; WideItemIcon icon[2]; int x[2]; } SlotIcons;
+
+static void slot_icons(const GBSample *s, const WideOptions *o, SlotIcons *si) {
+  si->show = o->slots;
+  for (int i = 0; i < 2; i++) {
+    si->on[i] = o->slots && o->rom && o->slot_item[i] &&
+                wide_item_icon(o->rom, o->rom_size, o->seasons, o->slot_item[i], &s->wram[0][0x600], &si->icon[i]);
+    if (!si->on[i]) continue;
+    // Centre a narrow icon in its box, so the two boxes line up whatever is in them.
+    si->x[i] = SLOT_LEFT + i * SLOT_PITCH + SLOT_ICON + (SLOT_BOX_W - si->icon[i].halves * 8) / 2;
+  }
+}
+
+static void draw_slot_icons(const GBSample *s, const SlotIcons *si, int y, uint8_t *row) {
+  if (!si->show || y >= 16) return;                     // an icon is as tall as the status bar
+  // The letters sit in the middle of the bar's height, in the colour the game writes its own text in.
+  const uint8_t *bg = s->drawn_bg_pal[s->line_drawn[y]];
+  int ink = bg[3 * 2] | (bg[3 * 2 + 1] << 8);           // BG palette 0, colour 3
+  for (int i = 0; i < 2; i++) {
+    int base = SLOT_LEFT + i * SLOT_PITCH;
+    if (y >= SLOT_LETTER_TOP && y < SLOT_LETTER_TOP + SLOT_LETTER_H) {
+      uint8_t bits = slot_letter[i][y - SLOT_LETTER_TOP];
+      for (int x = 0; x < 8; x++)
+        if (bits & (0x80 >> x)) put555(row + (base + x) * 3, ink, false);
+    }
+    if (y >= SLOT_TOP && y <= SLOT_BOTTOM) {
+      bool serif = y == SLOT_TOP || y == SLOT_BOTTOM;      // the short arms top and bottom
+      put555(row + (base + SLOT_OPEN) * 3, ink, false);
+      put555(row + (base + SLOT_CLOSE + 1) * 3, ink, false);
+      if (serif) {
+        put555(row + (base + SLOT_OPEN + 1) * 3, ink, false);
+        put555(row + (base + SLOT_CLOSE) * 3, ink, false);
+      }
+    }
+    if (!si->on[i]) continue;
+    // The status bar draws item icons as sprites (spr_item_icons, wBItemSpriteAttribute1), so they
+    // take an OBJ palette and colour 0 is clear, leaving the bar behind them.
+    const WideItemIcon *ic = &si->icon[i];
+    for (int x = 0; x < ic->halves * 8; x++) {
+      int ci = ic->ci[y][x];
+      if (!ci) continue;
+      int p = ic->pal[x >> 3] * 8 + ci * 2;
+      put555(row + (si->x[i] + x) * 3, s->ob_pal[p] | (s->ob_pal[p + 1] << 8), false);
+    }
+  }
+}
+
 void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
   static uint8_t middle[FB_W * FB_H * 3];
   static Around a;
@@ -293,10 +362,25 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
     if (room_at(s, o, &a.v, 0, 0, &here)) a.current = decoded(o, &here);
     learn_curve(s, 100, a.curve);
   }
+  static SlotIcons icons;
+  slot_icons(s, o, &icons);
   int width = rd(s, W_ROOM_WIDTH) * 8, height = rd(s, W_ROOM_HEIGHT) * 8;
   bool rooms = a.v.shown && o->rom && width > 0 && height > 0 && width <= 256 && height <= 256;
   for (int y = 0; y < FB_H; y++) {
     uint8_t *row = out + (size_t)y * WIDE_W * 3;
+    // The status bar is the game's own strip across the top 160 pixels, and there is no room to
+    // show beside it. Its end colours carry on to the edges of the wider picture, so it reads as one
+    // bar the whole way across instead of a box floating in the middle of a black band. Never
+    // dimmed, unlike the room strips: half a dimmed bar would only put a seam down it.
+    if (a.v.shown && y < STATUS_BAR_LINES) {
+      const uint8_t *mid = middle + (size_t)y * FB_W * 3;
+      int bar = WIDE_SIDE + (o->slots ? HUD_SHIFT : 0);
+      for (int x = 0; x < bar; x++) memcpy(row + x * 3, mid, 3);
+      for (int x = bar + FB_W; x < WIDE_W; x++) memcpy(row + x * 3, mid + (FB_W - 1) * 3, 3);
+      memcpy(row + (size_t)bar * 3, mid, FB_W * 3);
+      draw_slot_icons(s, &icons, y, row);
+      continue;
+    }
     bool line = rooms && y >= STATUS_BAR_LINES && (s->line_lcdc[y] & 0x81) == 0x81 && !wide_window_at(s, 0, y);
     int ox = (s->line_scx[y] - rd(s, W_OFFSET_X)) & 0xff, oy = (s->line_scy[y] - rd(s, W_OFFSET_Y)) & 0xff;
     // the offset from the reference room's origin: a left or upward scroll only goes negative

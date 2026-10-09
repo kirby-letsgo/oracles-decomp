@@ -12,6 +12,7 @@
 #include "game/game.h"
 #include "assets/assets.h"
 #include "wide/wide.h"
+#include "wide/item.h"
 #include "platform/png.h"
 #include <stdlib.h>
 #include <time.h>
@@ -43,7 +44,7 @@ static void check_cb(GB *gb, const GBSample *s, void *ctx) {
     static uint8_t wide[WIDE_W * FB_H * 3];
     static double total, worst;
     static int n;
-    WideOptions o = {c->seasons, true, {40, 32, 16}, c->rom, c->rom_size};
+    WideOptions o = {c->seasons, true, {40, 32, 16}, c->rom, c->rom_size, false, {0, 0}};
     struct timespec t0, t1;
     clock_gettime(CLOCK_MONOTONIC, &t0);
     wide_render(s, &o, wide);
@@ -58,7 +59,7 @@ static void check_cb(GB *gb, const GBSample *s, void *ctx) {
   char path[400];
   if (png && sscanf(png, "%llu:%399s", &at, path) == 2 && s->frame >= at && !c->saved) {
     static uint8_t wide[WIDE_W * FB_H * 3];
-    WideOptions o = {c->seasons, true, {40, 32, 16}, c->rom, c->rom_size};
+    WideOptions o = {c->seasons, true, {40, 32, 16}, c->rom, c->rom_size, false, {0, 0}};
     wide_render(s, &o, wide);
     char full[440];
     snprintf(full, sizeof full, "%s-%s.png", path, c->seasons ? "seasons" : "ages");
@@ -137,7 +138,7 @@ static void neighbour_cb(GB *gb, const GBSample *s, void *ctx) {
   RoomView *v = &c->views[c->n++];
   v->group = group; v->room = room; v->modifier = modifier; v->have_view = true;
   static uint8_t wide[WIDE_W * FB_H * 3];
-  WideOptions o = {c->seasons, false, {1, 2, 3}, c->rom, c->rom_size};
+  WideOptions o = {c->seasons, false, {1, 2, 3}, c->rom, c->rom_size, false, {0, 0}};
   wide_render(s, &o, wide);
   for (int y = 0; y < FB_H; y++)
     for (int x = 0; x < WIDE_SIDE; x++)
@@ -232,11 +233,51 @@ static void ages_room_pixels_match_the_ppu(void) {
               TAS_DIR "/ages-boot.state", 289518, false);
 }
 
+// The X and Y item icons, which the game never draws: decoded straight from the ROM, so the values
+// here are the ones in data/seasons/treasureDisplayData.s.
+static int icon_colours(const WideItemIcon *ic) {
+  bool seen[4] = {false, false, false, false};
+  int n = 0;
+  for (int y = 0; y < 16; y++)
+    for (int x = 0; x < ic->halves * 8; x++)
+      if (!seen[ic->ci[y][x]]) { seen[ic->ci[y][x]] = true; n++; }
+  return n;
+}
+
+static void item_icons_decode_from_the_rom(void) {
+  size_t n;
+  uint8_t *rom = oracles_read_file(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc", &n);
+  if (!rom) SKIP("ROM not present");
+  static uint8_t c600[256];
+  memset(c600, 1, sizeof c600);                         // every level and selection at 1
+  WideItemIcon ic;
+  ASSERT(!wide_item_icon(rom, n, true, 0, c600, &ic));  // no item in the slot, nothing to draw
+  ASSERT(wide_item_icon(rom, n, true, 0x03, c600, &ic));          // bombs
+  ASSERT_EQ(ic.halves, 1);
+  ASSERT_EQ(ic.pal[0], 4);                              // the record's attribute byte, $04
+  ASSERT(icon_colours(&ic) > 1);                        // and it actually has a picture in it
+  ASSERT(wide_item_icon(rom, n, true, 0x07, c600, &ic));          // rod of seasons, attribute $02
+  ASSERT_EQ(ic.pal[0], 2);
+  ASSERT(icon_colours(&ic) > 1);
+  ASSERT(wide_item_icon(rom, n, true, 0x19, c600, &ic));          // seed satchel: the bag and a seed
+  ASSERT_EQ(ic.halves, 2);
+  // An item with levels takes the variant the $c600 page names, so a different level is a different
+  // picture (the wooden and noble swords).
+  WideItemIcon lv1, lv2;
+  c600[0xb0] = 1;
+  ASSERT(wide_item_icon(rom, n, true, 0x05, c600, &lv1));
+  for (int i = 0; i < 256; i++) c600[i] = 2;
+  ASSERT(wide_item_icon(rom, n, true, 0x05, c600, &lv2));
+  ASSERT(memcmp(lv1.ci, lv2.ci, sizeof lv1.ci) != 0);
+  free(rom);
+}
+
 int main(void) {
   if (!getenv("WIDE_ONLY_NEIGHBOURS")) {
     RUN(seasons_room_pixels_match_the_ppu);
     RUN(ages_room_pixels_match_the_ppu);
   }
+  RUN(item_icons_decode_from_the_rom);
   RUN(seasons_neighbours_match_the_rooms);
   RUN(ages_neighbours_match_the_rooms);
   return 0;
