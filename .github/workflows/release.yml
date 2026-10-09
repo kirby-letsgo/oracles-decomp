@@ -15,7 +15,7 @@ jobs:
   macos:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install ninja
       - name: Build (universal)
         run: |
@@ -27,13 +27,13 @@ jobs:
         run: |
           tools/make_dmg.sh build Oracles-macOS.dmg
           lipo -archs build/Oracles.app/Contents/MacOS/Oracles
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: macos, path: Oracles-macOS.dmg }
 
   windows:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends mingw-w64 ninja-build cmake
       - name: Build (x64, MinGW-w64)
         run: |
@@ -44,13 +44,13 @@ jobs:
         run: |
           mkdir Oracles && cp build/Oracles.exe Oracles/
           zip -r Oracles-windows-x64.zip Oracles
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: windows, path: Oracles-windows-x64.zip }
 
   linux:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: tools/linux_deps.sh
       - name: Build (x86_64)
         run: |
@@ -69,17 +69,34 @@ jobs:
           ./linuxdeploy --appdir AppDir --executable build/oracles-native \
             --desktop-file packaging/oracles.desktop --icon-file icon/oracles-256.png --output appimage
           mv Oracles-*.AppImage Oracles-linux-x86_64.AppImage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: linux, path: Oracles-linux-x86_64.AppImage }
 
   android:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: 21 }
       - name: SDK packages
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;27.2.12479018" "cmake;3.31.6" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+        # The NDK download sometimes lands corrupt ("Error on ZipFile unknown archive"), so try a
+        # few times, clearing the half-finished download in between. The output is kept in a file
+        # and only printed when an attempt fails: discarding it leaves nothing in the log to go on.
+        run: |
+          for attempt in 1 2 3; do
+            if yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+                 "ndk;27.2.12479018" "cmake;3.31.6" "platforms;android-35" "build-tools;35.0.0" \
+                 > "$RUNNER_TEMP/sdkmanager.log" 2>&1; then
+              exit 0
+            fi
+            echo "::group::sdkmanager attempt $attempt failed"
+            tail -40 "$RUNNER_TEMP/sdkmanager.log"
+            echo "::endgroup::"
+            rm -rf "$ANDROID_HOME/.downloadIntermediates"
+            sleep 15
+          done
+          echo "::error::sdkmanager could not install the SDK packages"
+          exit 1
       - name: Build (arm64)
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
@@ -100,7 +117,7 @@ jobs:
             ./gradlew assembleDebug --console=plain
             cp app/build/outputs/apk/debug/app-debug.apk ../Oracles-android.apk
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: android, path: Oracles-android.apk }
 
   publish:
@@ -109,8 +126,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v8
         with: { path: dist, merge-multiple: true }
       - name: Replace the nightly release
         env:
