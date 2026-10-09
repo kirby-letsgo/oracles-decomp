@@ -285,6 +285,22 @@ static uint8_t *read_gzip(const uint8_t *gz, size_t size, size_t *out_size, char
 
 static const uint8_t sevenzip_magic[6] = {0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c};
 
+uint8_t *archive_rom_from_memory(const uint8_t *raw, size_t raw_size, size_t *out_size, char *err, size_t err_size) {
+  *err = 0;
+  // Trust the magic over the extension: a plain ROM named .zip, or the reverse, still works.
+  bool zip = raw_size >= 4 && le32(raw) == 0x04034b50;
+  bool gzip = raw_size >= 2 && raw[0] == 0x1f && raw[1] == 0x8b;
+  if (raw_size >= sizeof sevenzip_magic && !memcmp(raw, sevenzip_magic, sizeof sevenzip_magic)) {
+    snprintf(err, err_size, "7Z: UNZIP IT FIRST");
+    return NULL;
+  }
+  if (!zip && !gzip) {
+    *out_size = raw_size;
+    return copy_of(raw, raw_size);
+  }
+  return zip ? read_zip(raw, raw_size, out_size, err, err_size) : read_gzip(raw, raw_size, out_size, err, err_size);
+}
+
 uint8_t *archive_read_rom(const char *path, size_t *size, char *err, size_t err_size) {
   *err = 0;
   size_t raw_size;
@@ -294,16 +310,7 @@ uint8_t *archive_read_rom(const char *path, size_t *size, char *err, size_t err_
     snprintf(err, err_size, has_suffix(path, ".7z") ? "7Z: UNZIP IT FIRST" : "CANNOT READ FILE");
     return NULL;
   }
-  // Trust the magic over the extension: a plain ROM named .zip, or the reverse, still works.
-  bool zip = raw_size >= 4 && le32(raw) == 0x04034b50;
-  bool gzip = raw_size >= 2 && raw[0] == 0x1f && raw[1] == 0x8b;
-  if (raw_size >= sizeof sevenzip_magic && !memcmp(raw, sevenzip_magic, sizeof sevenzip_magic)) {
-    snprintf(err, err_size, "7Z: UNZIP IT FIRST");
-    free(raw);
-    return NULL;
-  }
-  if (!zip && !gzip) { *size = raw_size; return raw; }
-  uint8_t *out = zip ? read_zip(raw, raw_size, size, err, err_size) : read_gzip(raw, raw_size, size, err, err_size);
+  uint8_t *out = archive_rom_from_memory(raw, raw_size, size, err, err_size);
   free(raw);
   return out;
 }

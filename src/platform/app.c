@@ -65,8 +65,17 @@ static const char *game_of(const uint8_t *rom, size_t n) {
 // `err` takes a short reason the status line can show, since the player picking a file in the app
 // never sees stderr.
 static bool extract(const char *rom_path, const char *cache, char *game_out, char *err, size_t err_size) {
-  size_t n;
-  uint8_t *rom = archive_read_rom(rom_path, &n, err, err_size);
+  size_t n, raw_n;
+  // Read through SDL, not stdio: on Android the picker returns a content:// URI, which only
+  // SDL_IOFromFile can open -- the app asks for no storage permission and has no path to open.
+  uint8_t *raw = SDL_LoadFile(rom_path, &raw_n);
+  if (!raw) {
+    snprintf(err, err_size, "CANNOT READ FILE");
+    fprintf(stderr, "cannot read %s: %s\n", rom_path, SDL_GetError());
+    return false;
+  }
+  uint8_t *rom = archive_rom_from_memory(raw, raw_n, &n, err, err_size);
+  SDL_free(raw);
   if (!rom) { fprintf(stderr, "cannot read %s: %s\n", rom_path, *err ? err : "unreadable"); return false; }
   const char *game = game_of(rom, n);
   if (!game) { snprintf(err, err_size, "NOT AN ORACLES ROM"); free(rom); return false; }

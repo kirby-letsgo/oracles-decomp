@@ -1483,7 +1483,7 @@ static const char *write_tmp(const unsigned char *data, size_t n, const char *na
   if (!dir || !*dir) dir = getenv("TEMP");
   if (!dir || !*dir) dir = "/tmp";
   size_t len = strlen(dir);
-  const char *sep = len && (dir[len - 1] == '/' || dir[len - 1] == '\\\\') ? "" : "/";
+  const char *sep = len && (dir[len - 1] == '/' || dir[len - 1] == '\\') ? "" : "/";
   snprintf(path, sizeof path, "%s%stest_archive_%s", dir, sep, name);
   FILE *f = fopen(path, "wb");
   ASSERT(f);
@@ -1498,7 +1498,7 @@ static void unlink_tmp(const char *name) {
   if (!dir || !*dir) dir = getenv("TEMP");
   if (!dir || !*dir) dir = "/tmp";
   size_t len = strlen(dir);
-  const char *sep = len && (dir[len - 1] == '/' || dir[len - 1] == '\\\\') ? "" : "/";
+  const char *sep = len && (dir[len - 1] == '/' || dir[len - 1] == '\\') ? "" : "/";
   snprintf(path, sizeof path, "%s%stest_archive_%s", dir, sep, name);
   remove(path);
 }
@@ -1587,6 +1587,34 @@ static void a_damaged_gz_is_refused(void) {
   ASSERT(err[0]);
 }
 
+// The apps hand the bytes over rather than a path: on Android the picker returns a content:// URI
+// that only SDL can open, so the unpacking has to work on memory alone.
+static void memory_and_file_paths_agree(void) {
+  char err[40] = {0};
+  size_t from_file = 0, from_mem = 0;
+  unsigned char *a = archive_read_rom(write_tmp(fx_zip_named, sizeof fx_zip_named, "mem.zip"), &from_file, err, sizeof err);
+  ASSERT(a);
+  unsigned char *b = archive_rom_from_memory(fx_zip_named, sizeof fx_zip_named, &from_mem, err, sizeof err);
+  ASSERT(b);
+  ASSERT_EQ(from_mem, from_file);
+  ASSERT_EQ(memcmp(a, b, from_file), 0);
+  free(a);
+  free(b);
+  // A loose ROM comes back as its own bytes, and the caller still owns what it passed in.
+  static unsigned char plain[PAYLOAD_SIZE];
+  fill_payload(plain);
+  unsigned char *c = archive_rom_from_memory(plain, sizeof plain, &from_mem, err, sizeof err);
+  ASSERT(c);
+  ASSERT(c != plain);                                   // a copy, not the caller's buffer
+  ASSERT_EQ(from_mem, PAYLOAD_SIZE);
+  ASSERT_EQ(memcmp(c, plain, PAYLOAD_SIZE), 0);
+  free(c);
+  // And 7z is still refused by its magic, with nothing but bytes to go on.
+  static const unsigned char sevenzip[] = {0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0, 4, 1, 2, 3, 4};
+  ASSERT(!archive_rom_from_memory(sevenzip, sizeof sevenzip, &from_mem, err, sizeof err));
+  ASSERT(strstr(err, "7Z"));
+}
+
 int main(void) {
   RUN(deflated_zip_picks_the_rom_by_name);
   RUN(stored_zip_is_copied_out);
@@ -1599,6 +1627,7 @@ int main(void) {
   RUN(a_missing_file_reports_a_reason);
   RUN(a_damaged_zip_is_refused);
   RUN(a_damaged_gz_is_refused);
+  RUN(memory_and_file_paths_agree);
   unlink_tmp("named.zip");
   unlink_tmp("stored.zip");
   unlink_tmp("largest.zip");
@@ -1609,5 +1638,6 @@ int main(void) {
   unlink_tmp("renamed.gbc");
   unlink_tmp("cut.zip");
   unlink_tmp("cut.gz");
+  unlink_tmp("mem.zip");
   return 0;
 }
