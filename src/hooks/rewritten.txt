@@ -2911,6 +2911,7 @@ rabbitSubid2
 rabbitSubid5
 interactionCode4b_body__afterCall7825
 spawnNextRabbitThatTurnsToStone
+spawnRabbitWithSubid1
 interactionCodeb1_body
 tuniNut_state0
 tuniNut_state0__afterCall7b71

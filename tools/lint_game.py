@@ -45,17 +45,19 @@ def sym_addrs(game):
     m = re.search(r'syms_' + game + r'\[SYM_COUNT\] = \{(.*?)\n\};', syms_c, re.S)
     v = [int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]{8})', m.group(1))]
     return {n: (v[i] >> 16, v[i] & 0xffff) for i, n in enumerate(sym_order)}
-def hook_owners(path):
+def hook_owners(*paths):
     out = {}
-    for l in open(path):
-        p = l.split('#')[0].split()
-        if len(p) >= 2 and ':' in p[0]:
-            b, a = p[0].split(':')
-            out[(int(b, 16), int(a, 16))] = p[1]
+    for path in paths:
+        if not os.path.exists(path): continue
+        for l in open(path):
+            p = l.split('#')[0].split()
+            if len(p) >= 2 and ':' in p[0]:
+                b, a = p[0].split(':')
+                out[(int(b, 16), int(a, 16))] = p[1]
     return out
-tables = [(sym_addrs(g), hook_owners(f)) for g, f in (('ages', 'src/hooks/generated.txt'),
-                                                      ('seasons', 'src/hooks/generated_seasons.txt'))
-          if os.path.exists(f)]
+HOOK_LISTS = {'ages': ['src/hooks/generated.txt'],
+              'seasons': ['src/hooks/generated_seasons.txt', 'src/hooks/generated_seasons_gen.txt']}
+tables = [(g, sym_addrs(g), hook_owners(*HOOK_LISTS[g])) for g in HOOK_LISTS]
 TAIL = re.compile(r'\bTAIL(_S|_SG)?\((\w+)\)')
 for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     fn = None
@@ -65,10 +67,24 @@ for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
         for kind, target in TAIL.findall(line):
             callee = {'': target + '_hook', '_S': 's_' + target + '_hook', '_SG': 's_' + target}[kind]
             if callee == fn: continue
-            for addrs, owner in tables:
+            for _, addrs, owner in tables:
                 at = addrs.get(target)
                 if at and owner.get(at) == fn:
                     err(path, ln, f'TAIL({target}) re-enters {fn}: the table owns '
                                   f'{at[0]:02x}:{at[1]:04x} as {fn}, not {callee}; call {callee} directly')
+CALL_ROM = re.compile(r'\bCALL_ROM(?:_CC)?\([^,]+,\s*SYM\((\w+)\)\s*\)')
+# playSound's `skipWeirdCall` branch calls this only when bit 7 of a soundPointers entry's bank
+# byte is set; no entry of either game's 223-entry table has it, so the call never runs.
+CALL_ROM_DEAD = {'nonExistentFunction'}
+for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
+    for ln, line in enumerate(open(path), 1):
+        for target in CALL_ROM.findall(line):
+            if target in CALL_ROM_DEAD: continue
+            for g, addrs, owner in tables:
+                at = addrs.get(target)
+                if at is None or at == (0xffff, 0xffff): continue   # absent from that ROM
+                if at not in owner:
+                    err(path, ln, f'CALL_ROM({target}) has no hook at {at[0]:02x}:{at[1]:04x} in '
+                                  f'{g}: the native build has no code to run there')
 print('lint: %d problems' % bad)
 sys.exit(1 if bad else 0)

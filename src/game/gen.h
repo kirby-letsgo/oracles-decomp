@@ -964,6 +964,7 @@ void rabbitSubid5_hook(GB *gb);
 void rabbitSubid7_hook(GB *gb);
 void rabbitSubid2SetRandomSpawnDelay_hook(GB *gb);
 void spawnNextRabbitThatTurnsToStone_hook(GB *gb);
+void spawnRabbitWithSubid1_hook(GB *gb);
 void interactionCodeb1_body_hook(GB *gb);
 void tuniNut_state0_hook(GB *gb);
 void tuniNut_gotoState4_hook(GB *gb);

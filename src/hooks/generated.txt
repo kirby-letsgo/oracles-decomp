@@ -6854,3 +6854,4 @@
 0f:7f7c kingMoblin_setAngleStateAndAnimation_hook -
 0f:7f88 kingMoblin_setStateAndAnimation_hook -
 0f:4552 enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook -
+3f:7b49 spawnRabbitWithSubid1_hook -

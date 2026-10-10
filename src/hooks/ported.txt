@@ -5944,6 +5944,7 @@ rabbitSubid5
 rabbitSubid7
 rabbitSubid2SetRandomSpawnDelay
 spawnNextRabbitThatTurnsToStone
+spawnRabbitWithSubid1
 interactionCodeb1_body
 tuniNut_state0
 tuniNut_gotoState4

@@ -514,7 +514,7 @@ void spawnNextRabbitThatTurnsToStone_hook(GB *gb) {
   CYC(b_+14, b_+15); B = mem_rd(gb, HL);
   CYC(b_+15, b_+16); SET_HL(HL + 1);
   CYC(b_+16, b_+17); C = mem_rd(gb, HL);
-  CALL_ROM(b_+17, SYM(spawnRabbitWithSubid1));
+  CALL_C(b_+17, spawnRabbitWithSubid1_hook, SYM(spawnRabbitWithSubid1), b_+20);
   CYC(b_+20, b_+22); L = 0x46;
   CYC(b_+22, b_+24); mem_wr(gb, HL, 0x5f);
   CYC(b_+24, b_+25); ret_effect(gb);
@@ -557,9 +557,27 @@ void rabbitSubid2_hook(GB *gb) {
   CYC(b_+32, b_+33); A = alu_inc8(gb, A);
   CYC(b_+33, b_+35); alu_add(gb, 0xb0);
   CYC(b_+35, b_+36); C = A;
-  CALL_ROM(b_+36, SYM(spawnRabbitWithSubid1));
+  CALL_C(b_+36, spawnRabbitWithSubid1_hook, SYM(spawnRabbitWithSubid1), b_+39);
   CYC(b_+39, b_+42);
   TAIL(rabbitSubid2SetRandomSpawnDelay);
+}
+
+// 3f:7b49. The disassembly spells this label with a semicolon instead of a colon, so the porting
+// pass never saw a routine here and both callers fell back to the ROM -- which the native build
+// cannot follow, since it has no interpreter behind the hooks.
+void spawnRabbitWithSubid1_hook(GB *gb) {
+  BASE(spawnRabbitWithSubid1);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
+  if (!(F & FZ)) {
+    CYCT(b_+3, b_+4); ret_effect(gb);
+    return;
+  }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x4b);
+  CYC(b_+6, b_+7); L = alu_inc8(gb, L);
+  CYC(b_+7, b_+8); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  CYC(b_+8, b_+11); TAIL(interactionHSetPosition);
 }
 
 static void rabbit_subid5_substate0(GB *gb, uint16_t sp0_) {
