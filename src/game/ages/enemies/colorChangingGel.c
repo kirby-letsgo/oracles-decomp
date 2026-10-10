@@ -287,10 +287,23 @@ updateColor:
 updateStoredColor:
   CYC(b_+25, b_+28); push_effect(gb, b_+28); goto updateImmunity;
 
+// 0e:7048, what @updateStoredColor does once @updateImmunity returns. Entering a room with a
+// colour-changing gel stopped the engine here: the call was inlined as a goto but the code after
+// it was missing, so the C had nowhere to go and handed off to an address with no hook.
+afterUpdateImmunity:
+  if (F & FZ) { RET_TAKEN(b_+28); return; } // ret z
+  CYC(b_+28, b_+29);
+  SET_BC(POP(b_+29)); // pop bc
+  CYC(b_+30, b_+32); L = ENEMY_BASE + OBJ_COUNTER2;
+  CYC(b_+32, b_+34); mem_wr(gb, HL, 0x5a);
+  CYC(b_+34, b_+36); L = ENEMY_BASE + OBJ_VAR32;
+  CYC(b_+36, b_+37); mem_wr(gb, HL, E);
+  RET(b_+37); return; // ret
+
 updateImmunity:
   CALL_C(b_+38, objectGetTileAtPosition_hook, SYM(objectGetTileAtPosition), b_+41);
   CYC(b_+41, b_+43); alu_cp(gb, 0xda); // TILEINDEX_SOMARIA_BLOCK
-  if (F & FZ) { RET_TAKEN(b_+43); return; } // ret z
+  if (F & FZ) { RET_TAKEN(b_+43); if (gb->pc == b_+28 && gb->sp == sp0_) goto afterUpdateImmunity; return; } // ret z
   CYC(b_+43, b_+44);
   CYC(b_+44, b_+47); push_effect(gb, b_+47); colorChangingGel_lookupFloorColor_hook(gb, sp0_);
   CYC(b_+47, b_+48); alu_cp(gb, mem_rd(gb, HL));
@@ -302,7 +315,9 @@ updateImmunity:
 storeCollisionMode:
   CYC(b_+54, b_+56); L = ENEMY_BASE + OBJ_ENEMY_COLLISION_MODE;
   CYC(b_+56, b_+57); mem_wr(gb, HL, B);
-  RET(b_+57); return; // ret
+  RET(b_+57);
+  if (gb->pc == b_+28 && gb->sp == sp0_) goto afterUpdateImmunity;  // called from @updateStoredColor
+  return; // ret
 }
 
 // 0e:7081, bare global; called from enemyCode47. Sets the gel's color to something
