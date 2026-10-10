@@ -213,7 +213,10 @@ func_6588:
   CYC(b_+182, b_+183); mem_wr(gb, DE, A);
   CYC(b_+183, b_+184); A = B;
   CYC(b_+184, b_+187); partSetAnimation_hook(gb);
-  if (gb->pc == b_+67 && gb->sp == sp0_) goto func_6515_afterFunc6588;
+  // subid2_state0 also calls func_6515 (b_+213), one frame deeper, so the return from func_6588
+  // lands at b_+67 with sp0_-2 on that path. Resuming inline is right either way: the ret that
+  // follows pops whichever frame it is, and the checks after RET_TAKEN below route both.
+  if (gb->pc == b_+67 && (gb->sp == sp0_ || gb->sp == (uint16_t)(sp0_ - 2))) goto func_6515_afterFunc6588;
   return; // jp
 
 subid2_state0:
