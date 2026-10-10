@@ -15,10 +15,14 @@ alter what this test means.
 usage: test_sync_flow.py ORACLES_NATIVE ROM    (exit 77 when the ROM or the image is missing)"""
 import os, socket, subprocess, sys, tempfile, threading, time, urllib.error, urllib.request
 
-# TODO: pin by digest (ghcr.io/kirby-letsgo/save-sync-server@sha256:...) once one is published.
-# ORACLES_SYNC_IMAGE points at another one, to try a server built locally (pnpm image:test).
-SERVER_IMAGE = (
-    os.environ.get('ORACLES_SYNC_IMAGE') or 'ghcr.io/kirby-letsgo/save-sync-server:0.1.0-test'
+# save-sync-server's 'test' stage, pinned by digest and not by tag: a tag can be repointed, and
+# this test would then mean something else with no commit here saying so. This is the index digest,
+# which carries amd64 and arm64, so the pull resolves on either; it was the 0.1.1-test tag.
+# ORACLES_SYNC_IMAGE points at another image, to try a server built locally (pnpm image:test in
+# that repository).
+SERVER_IMAGE = os.environ.get('ORACLES_SYNC_IMAGE') or (
+    'ghcr.io/kirby-letsgo/save-sync-server'
+    '@sha256:956f6ca8b5c53a792b1eb417f13bd83407e098a9b012121d2ddacace204ce35a'
 )
 
 app, rom = (os.path.abspath(p) for p in sys.argv[1:3])
