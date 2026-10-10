@@ -12853,6 +12853,15 @@ void checkUseItems_b00_hook(GB *gb) {
   ret_effect(gb);
 }
 
+// the bank and DE restore both entries of parseGivenObjectData_b00 end with
+static void parse_given_object_data_b00_restore(GB *gb) {
+  BASE(parseGivenObjectData_b00);
+  CYC(b_+16, b_+17); SET_DE(pop_effect(gb));
+  bank_pop(gb, b_+17);
+  CYC(b_+23, b_+24);
+  ret_effect(gb);
+}
+
 void parseGivenObjectData_b00_hook(GB *gb) {
   BASE(parseGivenObjectData_b00);
   uint16_t sp0_ = gb->sp;
@@ -12862,10 +12871,15 @@ void parseGivenObjectData_b00_hook(GB *gb) {
   E = L;
   CYC(b_+11, b_+13);
   CALL_C(b_+13, parseGivenObjectData_b12_hook, ROM_b12_parseGivenObjectData, b_+16);
-  CYC(b_+16, b_+17); SET_DE(pop_effect(gb));
-  bank_pop(gb, b_+17);
-  CYC(b_+23, b_+24);
-  ret_effect(gb);
+  parse_given_object_data_b00_restore(gb);
+}
+
+// 00:3181, the `pop de` after the bank-12 parse returns. An object's own code can return two
+// frames at once, which leaves the parse returning with a stack CALL_C does not recognise, so it
+// hands off here and the native build needs a hook at the address.
+void parseGivenObjectData_b00__afterCall3181_hook(GB *gb) {
+  BASE(parseGivenObjectData_b00);
+  parse_given_object_data_b00_restore(gb);
 }
 
 void checkObjectIsCloseToPosition_b00_hook(GB *gb) {

@@ -856,6 +856,35 @@ void goronSubid01__afterCall7778_hook(GB *gb) {
   goron_subid01_face_down(gb, sp0_);
 }
 
+// 09:7780. goronSubid01@state1 is reached at ROM level too, not only through the subid dispatch
+// above, so the native build needs a hook at the address; without one, entering Ages room 2:ed or
+// 2:ef stopped the engine. The body is a copy of the state1 path rather than a shared helper so
+// the dispatched path stays exactly as it was.
+void goronSubid01__state1_hook(GB *gb) {
+  BASE(goronSubid01);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CYC(b_+21, b_+24); A = W8(wTmpcfc0_goronDance_linkStartedDance);
+  CYC(b_+24, b_+25); alu_or(gb, A);
+  if (!(F & FZ)) { CYCT(b_+25, b_+27); goto goto_state2; }
+  CYC(b_+25, b_+27);
+  CALL_C(b_+27, interactionRunScript_hook, SYM(interactionRunScript), b_+30);
+  if (F & FC) { CYCT(b_+30, b_+33); interactionDelete_hook(gb); return; }
+  CYC(b_+30, b_+33); CYC(b_+33, b_+36); npcFaceLinkAndAnimate_hook(gb); return;
+goto_state2:
+  CALL_C(b_+36, interactionIncState_hook, SYM(interactionIncState), b_+39);
+  CYC(b_+39, b_+41);
+  CYC(b_+47, b_+50); SET_HL(w1Link_yh + 3);
+  CYC(b_+50, b_+52); E = INTERACTION_BASE + OBJ_Z;
+  CYC(b_+52, b_+53); A = mem_rd(gb, HL); SET_HL(HL + 1);
+  CYC(b_+53, b_+54); mem_wr(gb, DE, A);
+  CYC(b_+54, b_+55); E = alu_inc8(gb, E);
+  CYC(b_+55, b_+56); A = mem_rd(gb, HL);
+  CYC(b_+56, b_+57); mem_wr(gb, DE, A);
+  CYC(b_+57, b_+60); A = W8(wTmpcfc0_goronDance_danceAnimation);
+  CALL_C(b_+60, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+63);
+  CYC(b_+63, b_+66); CYC(SYM(goronSubid00__pushLinkAway), (SYM(goronSubid00__pushLinkAway) + 3)); TAIL(interactionPushLinkAwayAndUpdateDrawPriority);
+}
+
 void goronSubid01_hook(GB *gb) {
   BASE(goronSubid01);
   uint16_t sp0_ = gb->sp;

@@ -6855,3 +6855,5 @@
 0f:7f88 kingMoblin_setStateAndAnimation_hook -
 0f:4552 enemyBoss_initializeRoomWithoutExtraGfx_b0f_hook -
 3f:7b49 spawnRabbitWithSubid1_hook -
+00:3181 parseGivenObjectData_b00__afterCall3181_hook -
+09:7780 goronSubid01__state1_hook -
