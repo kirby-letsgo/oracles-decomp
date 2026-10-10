@@ -232,16 +232,16 @@ static void execute(GB *gb, uint8_t op) {
       case 1: cb(gb); return;
       case 6: gb->ime = false; gb->ime_delay = false; gb->ime_writes++; return;
       case 7: gb->ime_delay = true; gb->ime_writes++; return;
-      default: gb->hung = true; return;
+      default: gb_stop(gb, "illegal opcode"); return;
       }
     case 4:
       if (y < 4) { uint16_t a = fetch16(gb); if (cond(gb, y)) { push(gb, gb->pc); gb->pc = a; } return; }
-      gb->hung = true;
+      gb_stop(gb, "illegal opcode");
       return;
     case 5:
       if (q == 0) { push(gb, get_rp2(gb, p)); return; }
       if (p == 0) { uint16_t a = fetch16(gb); push(gb, gb->pc); gb->pc = a; return; }
-      gb->hung = true;
+      gb_stop(gb, "illegal opcode");
       return;
     case 6:
       alu(gb, y, fetch(gb));

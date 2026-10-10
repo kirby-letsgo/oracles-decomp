@@ -153,6 +153,14 @@ void gb_run_cycles(GB *gb, uint64_t target) {
 }
 
 int64_t gb_grid_offset = GRID_OFFSET;
+char gb_stop_reason[GB_STOP_REASON];
+void gb_stop(GB *gb, const char *what) {
+  snprintf(gb_stop_reason, sizeof gb_stop_reason, "%s at %02x:%04x (frame %llu, sp %04x)", what,
+           gb->pc < 0x4000 || gb->pc >= 0x8000 ? 0 : gb->rom_bank, gb->pc,
+           (unsigned long long)GRID_FRAME(gb->cycles), gb->sp);
+  fprintf(stderr, "engine stopped: %s\n", gb_stop_reason);
+  gb->hung = true;
+}
 uint8_t gb_input_now(GB *gb) { return gb->input_at ? gb->input_at(gb->input_ctx, GRID_FRAME(gb->cycles)) : gb->joy; }
 
 uint64_t gb_run_frame(GB *gb) {

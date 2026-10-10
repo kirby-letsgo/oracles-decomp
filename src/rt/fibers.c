@@ -161,7 +161,7 @@ void fibers_reset(GB *gb) {
 int fiber_run(GB *gb, int n, void (*start)(GB *), uint16_t fallback_pc) {
   if (hook_mode == HOOK_MODE_VERIFY) { hook_handoff(gb, fallback_pc); return FIBER_YIELD; }
   struct Fibers *F = fibers(gb);
-  if (n < 0 || n >= NFIBERS) { fprintf(stderr, "fiber: bad thread %d\n", n); gb->hung = true; return FIBER_EXIT; }
+  if (n < 0 || n >= NFIBERS) { gb_stop(gb, "fiber: bad thread"); return FIBER_EXIT; }
   Fiber *f = &F->f[n];
   if (start) {
     if (!f->start) hook_ctx_init(&f->ctx);
@@ -170,8 +170,7 @@ int fiber_run(GB *gb, int n, void (*start)(GB *), uint16_t fallback_pc) {
     f->ctx.depth = f->ctx.jmp_depth = 0;
     f->live = true;
   } else if (!f->live) {
-    fprintf(stderr, "fiber: resume of a dead thread %d (frame %llu)\n", n, (unsigned long long)GRID_FRAME(gb->cycles));
-    gb->hung = true;
+    gb_stop(gb, "fiber: resume of a dead thread");
     return FIBER_EXIT;
   }
   F->current = n;
@@ -185,7 +184,7 @@ int fiber_run(GB *gb, int n, void (*start)(GB *), uint16_t fallback_pc) {
 void fiber_back(GB *gb, int request) {
   if (hook_mode == HOOK_MODE_VERIFY) { hook_handoff(gb, gb->pc); return; }
   struct Fibers *F = gb->fib;
-  if (!F || F->current < 0) { fprintf(stderr, "fiber: switch out of the kernel (pc %04x)\n", gb->pc); gb->hung = true; return; }
+  if (!F || F->current < 0) { gb_stop(gb, "fiber: switch out of the kernel"); return; }
   Fiber *f = &F->f[F->current];
   F->request = request;
   if (request != FIBER_YIELD) f->live = false;

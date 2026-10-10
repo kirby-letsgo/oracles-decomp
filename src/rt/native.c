@@ -28,6 +28,7 @@ void gb_step(GB *gb) {
   if (hook_dispatch(gb)) return;
   dbg_instr_count++;
   if (dbg_pc_hist) dbg_pc_hist[((gb->pc < 0x4000 ? 0 : gb->rom_bank & 0x7f) << 15) | (gb->pc & 0x7fff)]++;
-  fprintf(stderr, "native: no code at %02x:%04x (frame %llu, sp %04x, mc %llu)\n", gb->pc < 0x4000 || gb->pc >= 0x8000 ? 0 : gb->rom_bank, gb->pc, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, (unsigned long long)gb->mcycles);
+  snprintf(gb_stop_reason, sizeof gb_stop_reason, "no code at %02x:%04x (frame %llu, sp %04x, mc %llu)", gb->pc < 0x4000 || gb->pc >= 0x8000 ? 0 : gb->rom_bank, gb->pc, (unsigned long long)GRID_FRAME(gb->cycles), gb->sp, (unsigned long long)gb->mcycles);
+  fprintf(stderr, "native: %s\n", gb_stop_reason);
   gb->hung = true;
 }

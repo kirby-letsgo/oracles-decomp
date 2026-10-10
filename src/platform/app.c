@@ -32,6 +32,7 @@
 #include "platform/sync_client.h"
 #include "wide/wide.h"
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -1133,6 +1134,37 @@ static bool SDLCALL on_app_event(void *data, SDL_Event *ev) {
   return true;
 }
 
+// A player who launches the AppImage from a desktop launcher never sees stderr, so an engine stop
+// has to leave something behind: the address it stopped at is the whole diagnosis (issue #13 was
+// `no code at 01:7b6e`), and without it a report can only say the window disappeared.
+static void write_crash_log(const GB *gb, const char *dir, const char *game, bool ages, uint64_t frames) {
+  char path[1300];
+  snprintf(path, sizeof path, "%s/crash.log", dir);
+  FILE *f = fopen(path, "a");
+  if (!f) { fprintf(stderr, "could not write %s\n", path); return; }
+  time_t now = time(NULL);
+  char when[32] = "";
+  struct tm tm;
+#ifdef _WIN32
+  if (gmtime_s(&tm, &now) == 0) strftime(when, sizeof when, "%Y-%m-%dT%H:%M:%SZ", &tm);
+#else
+  if (gmtime_r(&now, &tm)) strftime(when, sizeof when, "%Y-%m-%dT%H:%M:%SZ", &tm);
+#endif
+  // the room is what makes it reproducible; the two games keep it at different addresses
+  unsigned group = gb->wram[0][(ages ? 0xcc2d : 0xcc49) - 0xc000];
+  unsigned room  = gb->wram[0][(ages ? 0xcc30 : 0xcc4c) - 0xc000];
+  unsigned cut   = gb->wram[0][0xcc04 - 0xc000];
+  fprintf(f, "%s the engine stopped\n", when);
+  fprintf(f, "  reason   %s\n", gb_stop_reason[0] ? gb_stop_reason : "(not recorded)");
+  fprintf(f, "  game     %s\n", game);
+  fprintf(f, "  room     group %02x room %02x, cutscene %02x\n", group, room, cut);
+  fprintf(f, "  cpu      pc %04x sp %04x bank %02x, frame %llu\n", gb->pc, gb->sp, gb->rom_bank,
+          (unsigned long long)frames);
+  fprintf(f, "  build    state format %08x\n", (unsigned)oracles_state_format());
+  fclose(f);
+  fprintf(stderr, "wrote %s\n", path);
+}
+
 static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const GameStart *gs) {
   char dir[1100], path[1300];
   snprintf(dir, sizeof dir, "%s%s", gs->cache, gs->game);
@@ -1351,7 +1383,10 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     if (frames % 600 == 0) save_sram(gb, sav);
     if (gs->max_frames && frames >= gs->max_frames) running = false;
   }
-  if (gb->hung) { fprintf(stderr, "the engine stopped (pc %04x)\n", gb->pc); end = GAME_FAILED; }
+  if (gb->hung) {
+    write_crash_log(gb, dir, gs->game, ages, frames);
+    end = GAME_FAILED;
+  }
   else if (gs->max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
   save_sram(gb, sav);
   session.gb = NULL;

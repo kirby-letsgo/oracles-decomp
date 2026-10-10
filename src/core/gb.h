@@ -150,4 +150,9 @@ void ppu_write_lcdc(GB *gb, uint8_t v);
 void ppu_update_stat(GB *gb);
 static inline uint8_t ppu_ly_read(const GB *gb) { return (gb->io[R_LY] == 153 && gb->ppu_dot >= 4) ? 0 : gb->io[R_LY]; }
 void render_scanline(GB *gb);
+// Why the engine stopped (gb->hung), for the crash log: set at every site that stops it.
+#define GB_STOP_REASON 192
+extern char gb_stop_reason[GB_STOP_REASON];
+// Record why and stop the engine; gb->hung ends the frame loop and the app shows the crash screen.
+void gb_stop(GB *gb, const char *what);
 #endif
