@@ -105,6 +105,7 @@ initialize:
     if (jt_ == b_+283) { goto initSubid00; }
     else if (jt_ == b_+212) { goto initSubid01; }
     else if (jt_ == b_+225) { goto initSubid02; }
+    else if (jt_ == b_+312) { goto initSubid09; }
     else { hook_continue(gb, HL, sp0_); return; }
   } while (0);
 
@@ -277,7 +278,10 @@ checkDoBridgeBuildingCutscene:
   if (!(F & FZ)) { CYCT(b_+310, b_+312); goto delete2; } // jr nz
   CYC(b_+310, b_+312);
 
-// @initSubid09 (falls into from @checkDoBridgeBuildingCutscene above)
+// @initSubid09 (falls into from @checkDoBridgeBuildingCutscene above). Subid 9 reaches it through
+// the init jump table as well; without that case the dispatch handed off to 0b:520f, which has no
+// hook, and entering the room stopped the engine.
+initSubid09:
   CALL_C(b_+312, objectMarkSolidPosition_hook, SYM(objectMarkSolidPosition), b_+315);
   CYC(b_+315, b_+317); E = INTERACTION_BASE + OBJ_SUBID;
   CYC(b_+317, b_+318); A = mem_rd(gb, DE);
