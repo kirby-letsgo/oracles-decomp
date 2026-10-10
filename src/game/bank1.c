@@ -1048,8 +1048,10 @@ void cutscene13_hook(GB *gb) {
   CYC(b_+11, b_+14); TAIL(updateAllObjects);
 }
 
+// The dispatch table owns 01:7b6e under the data label's name, so TAIL(cutscene13) would not
+// find cutscene13_hook there and would re-enter this stub for ever: call the routine directly.
 void tilesetLayoutGroup33_hook(GB *gb) {
-  TAIL(cutscene13);
+  cutscene13_hook(gb);
 }
 
 void cutscene14_hook(GB *gb) {
