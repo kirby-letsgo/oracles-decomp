@@ -179,7 +179,7 @@ if(ORACLES_SDL)
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc")
   set_tests_properties(app_menus PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
   add_test(NAME sync_flow COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_sync_flow.py $<TARGET_FILE:oracles-native>
-    "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc" ${CMAKE_SOURCE_DIR}/sync-server)
+    "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc")
   set_tests_properties(sync_flow PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
 endif()
 add_test(NAME native_binary COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/check_native_binary.py $<TARGET_FILE:oraclesnative> ${NATIVE_BINARIES})

@@ -1,7 +1,8 @@
 #pragma once
-// Save sync with the sync server (sync-server/): the files of the app folder that a player would
-// miss on another device, per game (sram.sav, save-state slots with their thumbnails,
-// item_buttons) plus the shared settings.ini. Files only: the game never runs while its files sync.
+// Save sync with the sync server (its own repository, save-sync-server): the files of the app
+// folder that a player would miss on another device, per game (sram.sav, save-state slots with
+// their thumbnails, item_buttons) plus the shared settings.ini. Files only: the game never runs
+// while its files sync.
 #include "sync/sync.h"
 #include <stdbool.h>
 #include <stddef.h>

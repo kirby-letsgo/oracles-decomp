@@ -1,30 +1,80 @@
 #!/usr/bin/env python3
-"""Two devices (two app folders) syncing through the real sync server on an in-memory database
-(sync-server/scripts/local.ts), driven headless through oracles-native's launcher:
+"""Two devices (two app folders) syncing through the real sync server, driven headless through
+oracles-native's launcher:
   A saves slot 1 and syncs; B syncs and gets it; A changes it and syncs; B changes it too, and its
   "keep which?" screen keeps HERE (B's goes to the server); A changes it again and keeps OTHER (B's
   replaces A's, and A's is kept as .bak). Each time the slot's thumbnail follows. Last, A saves
   while the server is unreachable, the server comes back, and the retry uploads it without another
   launch.
-usage: test_sync_flow.py ORACLES_NATIVE ROM SYNC_SERVER_DIR   (exit 77 when the ROM or the server's
-node_modules are missing)"""
-import os, socket, subprocess, sys, tempfile, threading, time, urllib.request
 
-app, rom, server_dir = (os.path.abspath(p) for p in sys.argv[1:4])
-tsx = os.path.join(server_dir, 'node_modules', '.bin', 'tsx')
+The server is no longer part of this repository (it lives in save-sync-server), so it runs here
+from a pinned container image: the one that serves an in-memory database and starts empty, so a
+run leaves nothing behind. Pin it by digest, never a moving tag, or a server change could quietly
+alter what this test means.
+
+usage: test_sync_flow.py ORACLES_NATIVE ROM    (exit 77 when the ROM or the image is missing)"""
+import os, socket, subprocess, sys, tempfile, threading, time, urllib.error, urllib.request
+
+# TODO: pin by digest (ghcr.io/kirby-letsgo/save-sync-server@sha256:...) once one is published.
+# ORACLES_SYNC_IMAGE points at another one, to try a server built locally (pnpm image:test).
+SERVER_IMAGE = (
+    os.environ.get('ORACLES_SYNC_IMAGE') or 'ghcr.io/kirby-letsgo/save-sync-server:0.1.0-test'
+)
+
+app, rom = (os.path.abspath(p) for p in sys.argv[1:3])
 if not os.path.exists(rom): print('skip: ROM not present'); sys.exit(77)
-if not os.path.exists(tsx): print('skip: sync-server dependencies not installed (pnpm install)'); sys.exit(77)
+
+
+def docker(*args, **kw):
+    return subprocess.run(['docker', *args], capture_output=True, text=True, **kw)
+
+
+def both_streams(done):
+    return (done.stdout + done.stderr).strip()
+
+
+def last_line(done):
+    return both_streams(done).splitlines()[-1:] or ['no output from docker']
+
+
+def skip(why):
+    print(f'skip: {why}')
+    sys.exit(77)
+
+
+try:
+    if docker('info').returncode != 0: skip('the docker daemon is not running')
+except FileNotFoundError:
+    skip('docker is not installed')
+if docker('image', 'inspect', SERVER_IMAGE).returncode != 0:
+    print(f'pulling {SERVER_IMAGE}')
+    pull = docker('pull', '--quiet', SERVER_IMAGE)
+    if pull.returncode != 0:
+        skip(f'the sync server image is not available: {last_line(pull)[0]}')
+
 env = dict(os.environ, SDL_VIDEO_DRIVER='dummy', SDL_AUDIO_DRIVER='dummy')
 THUMB = 160 * 144 * 3
 
-server = subprocess.Popen([tsx, 'scripts/local.ts'], cwd=server_dir, stdout=subprocess.PIPE, text=True)
+started = docker('run', '--rm', '-d', '-p', '127.0.0.1::3000', SERVER_IMAGE)
+assert started.returncode == 0, started.stderr
+container = started.stdout.strip()
 try:
-    url = server.stdout.readline().strip()
-    assert url.startswith('http://'), url
+    mapped = docker('port', container, '3000/tcp')
+    assert mapped.returncode == 0, mapped.stderr
+    url = 'http://' + mapped.stdout.strip().splitlines()[0]
 
     def request(method, path, data=None):
         with urllib.request.urlopen(urllib.request.Request(url + path, data=data, method=method), timeout=10) as r:
             return r.read()
+
+    for attempt in range(60):                  # the server migrates its in-memory database first
+        try:
+            if request('GET', '/health'): break
+        except (urllib.error.URLError, OSError):
+            time.sleep(1)
+    else:
+        logs = both_streams(docker('logs', container))
+        raise AssertionError(f'the server never answered /health; its logs:\n{logs}')
 
     code = request('POST', '/accounts').decode().split('"code":"')[1].split('"')[0].replace('-', '')
 
@@ -122,6 +172,5 @@ try:
         assert on_server('state_1') == b'A4' * 1000, 'the retry did not upload the slot saved offline'
         assert on_server('state_1.thumb') == bytes([50]) * THUMB
 finally:
-    server.terminate()
-    server.wait(timeout=10)
+    docker('rm', '-f', container)
 print('ok sync_flow')

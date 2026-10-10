@@ -773,7 +773,8 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
   }
 }
 
-// Save sync (sync-server/): this device's code and server, and what the last sync did.
+// Save sync (server in its own repository, save-sync-server): this device's code and server, and
+// what the last sync did.
 static SyncConfig sync_cfg;
 static char app_cache[1024];
 static char sync_status_line[24];

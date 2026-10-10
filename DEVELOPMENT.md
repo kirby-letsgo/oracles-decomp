@@ -177,9 +177,10 @@ and on quit. Loading a save state while recording rewinds the recording to that 
 
 ## Save sync server
 
-The server lives in `sync-server/` (Fastify, Drizzle, PostgreSQL). The address the apps use is the
-CMake setting `ORACLES_SYNC_URL`; a device can point elsewhere with `url=` in `sync.ini` in its app
-folder.
+The server is not in this repository: it lives in **save-sync-server** (Fastify, Drizzle,
+PostgreSQL), which serves this app through its `oracles` profile and is meant to serve others too. The address
+the apps use is the CMake setting `ORACLES_SYNC_URL`; a device can point elsewhere with `url=` in
+`sync.ini` in its app folder.
 
 Accounts are a 16-digit code, no passwords. Synced files are each game's save, the save-state slots
 with their pictures and item buttons, and the shared settings — never ROM-derived files. The app
@@ -200,9 +201,15 @@ Android's HttpURLConnection.
 ORACLES_SYNC_URL=http://host ./build/test_sync_http   # check a running server
 ```
 
-The `sync_flow` test plays two devices against the real server on an in-memory database (`pnpm local`
-in `sync-server/`; needs its `pnpm install` and the Seasons ROM): a conflict kept each way, and a
-save made offline that the retry uploads.
+The `sync_flow` test plays two devices against the real server: a conflict kept each way, and a
+save made offline that the retry uploads. It runs the server from the pinned container image named
+at the top of `tests/test_sync_flow.py` — the save-sync-server image that serves an in-memory
+database and starts empty — so it needs Docker and the Seasons ROM, and skips without either. Bump
+pin (by digest) when the server's API changes.
+
+```bash
+ORACLES_SYNC_IMAGE=save-sync-server:test ctest --test-dir build -R sync_flow   # built locally
+```
 
 ## Android
 
@@ -249,5 +256,4 @@ warning, when they are missing).
   lists what was changed locally.
 - `tools/`: generators and the audits run on every change.
 - `tas/`: input movies and reference hashes.
-- `sync-server/`: the save-sync server.
 - `ref/oracles-disasm/`: the community disassembly (submodule), used for symbols and routines.
