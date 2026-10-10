@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Lint hand-written files in src/game/: no emulated registers outside _hook shims, no raw RAM
-addresses, and no rewritten routine still generated.
+addresses, no rewritten routine still generated, and no TAIL that re-enters its own hook.
 
 usage: tools/lint_game.py
 """
@@ -33,5 +33,42 @@ gen_s = set(l.split()[1] for l in open('src/hooks/generated_seasons_gen.txt') if
 for n in sorted(rewritten_s):
     if 's_' + n.replace('@', '__').replace('.', '_') in gen_s: err('src/hooks/generated_seasons_gen.txt', 0, f'{n} is in rewritten_seasons.txt but still generated')
     if 's_' + n.replace('@', '__').replace('.', '_') + '_hook' not in gen_s: err('src/hooks/rewritten_seasons.txt', 0, f'{n} has no s_{n}_hook entry')
+# A TAIL whose callee lives at an address the table owns under the *enclosing* hook's name never
+# reaches that callee: hook_is() fails, hook_continue() resumes at the same address, and the table
+# dispatches this hook again with nothing changed, so it recurses until the thread's stack hits its
+# guard page. Ages 01:7b6e was that shape -- cutscene13 behind the tilesetLayoutGroup33 data label,
+# which crashed the app on entering the fairies' hide-and-seek cutscene. A TAIL back into the hook
+# under its own name is the ROM's own jump to the routine's start and is fine.
+sym_order = re.findall(r'^\s+S_(\w+),', open('src/game/syms.h').read(), re.M)
+syms_c = open('src/game/syms.c').read()
+def sym_addrs(game):
+    m = re.search(r'syms_' + game + r'\[SYM_COUNT\] = \{(.*?)\n\};', syms_c, re.S)
+    v = [int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]{8})', m.group(1))]
+    return {n: (v[i] >> 16, v[i] & 0xffff) for i, n in enumerate(sym_order)}
+def hook_owners(path):
+    out = {}
+    for l in open(path):
+        p = l.split('#')[0].split()
+        if len(p) >= 2 and ':' in p[0]:
+            b, a = p[0].split(':')
+            out[(int(b, 16), int(a, 16))] = p[1]
+    return out
+tables = [(sym_addrs(g), hook_owners(f)) for g, f in (('ages', 'src/hooks/generated.txt'),
+                                                      ('seasons', 'src/hooks/generated_seasons.txt'))
+          if os.path.exists(f)]
+TAIL = re.compile(r'\bTAIL(_S|_SG)?\((\w+)\)')
+for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
+    fn = None
+    for ln, line in enumerate(open(path), 1):
+        m = re.match(r'(?:static )?\w+ (\w+)\(GB \*gb\)', line)
+        if m: fn = m.group(1)
+        for kind, target in TAIL.findall(line):
+            callee = {'': target + '_hook', '_S': 's_' + target + '_hook', '_SG': 's_' + target}[kind]
+            if callee == fn: continue
+            for addrs, owner in tables:
+                at = addrs.get(target)
+                if at and owner.get(at) == fn:
+                    err(path, ln, f'TAIL({target}) re-enters {fn}: the table owns '
+                                  f'{at[0]:02x}:{at[1]:04x} as {fn}, not {callee}; call {callee} directly')
 print('lint: %d problems' % bad)
 sys.exit(1 if bad else 0)
