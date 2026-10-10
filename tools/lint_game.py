@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Lint hand-written files in src/game/: no emulated registers outside _hook shims, no raw RAM
-addresses, no rewritten routine still generated, and no TAIL that re-enters its own hook.
+addresses, no rewritten routine still generated, no TAIL that re-enters its own hook, and a hook
+behind every routine the scripts call.
 
 usage: tools/lint_game.py
 """
@@ -86,5 +87,30 @@ for path in sorted(glob.glob('src/game/**/*.c', recursive=True)):
                 if at not in owner:
                     err(path, ln, f'CALL_ROM({target}) has no hook at {at[0]:02x}:{at[1]:04x} in '
                                   f'{g}: the native build has no code to run there')
+# The script engine's asm15 command ($e0/$e1) calls a routine in bank 15 by address, so every
+# target needs a hook or the native build stops there mid-script. shootingGallery_beginGame was
+# missing exactly this: ages.sym spells two labels the same way -- the script and the routine --
+# and the tooling keeps whichever it reads first, so the routine was never ported at all. Resolve
+# by bank rather than by name, which is what hid it. Skips when the disassembly submodule is not
+# checked out, since everything above reads only files in this repository.
+SYM_DIR = 'ref/oracles-disasm'
+for g, lists in (('ages', ['src/hooks/generated.txt']),
+                 ('seasons', ['src/hooks/generated_seasons.txt', 'src/hooks/generated_seasons_gen.txt'])):
+    sym_path, script_path = f'{SYM_DIR}/{g}.sym', f'{SYM_DIR}/scripts/{g}/scripts.s'
+    if not (os.path.exists(sym_path) and os.path.exists(script_path)): continue
+    at_bank15 = {}
+    in_labels = False
+    for line in open(sym_path, errors='replace'):
+        line = line.strip()
+        if line.startswith('['): in_labels = line == '[labels]'; continue
+        m = re.match(r'15:([0-9a-f]{4}) (\S+)$', line) if in_labels else None
+        if m: at_bank15.setdefault(m.group(2), set()).add((0x15, int(m.group(1), 16)))
+    owner = hook_owners(*lists)
+    for target in sorted(set(re.findall(r'^\s*asm15\s+(?:scriptHelp\.)?(\w+)',
+                                        open(script_path, errors='replace').read(), re.M))):
+        for at in sorted(at_bank15.get(target, ())):
+            if at not in owner:
+                err(script_path, 0, f'asm15 {target}: no hook at {at[0]:02x}:{at[1]:04x} in {g}; '
+                                    f'the native build has no code to run there')
 print('lint: %d problems' % bad)
 sys.exit(1 if bad else 0)

@@ -5555,6 +5555,7 @@ blossom_decideInitialChildStatus
 blossom_openNameEntryMenu
 oldMan_takeRupees
 oldMan_giveRupees
+shootingGallery_beginGame
 shootingGallery_cpScore
 shootingGallery_equipSword
 shootingGallery_equipBiggoronSword

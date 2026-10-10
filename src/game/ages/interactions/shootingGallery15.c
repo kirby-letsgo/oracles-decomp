@@ -6,6 +6,7 @@
 #define CYC(from, to) burn_rom(gb, bk_, (from), (to), false)
 #define CYCT(from, to) burn_rom(gb, bk_, (from), (to), true)
 
+void shootingGallery_beginGame_hook(GB *gb);
 void shootingGallery_cpScore_hook(GB *gb);
 void shootingGallery_equipSword_hook(GB *gb);
 void shootingGallery_equipBiggoronSword_hook(GB *gb);
@@ -87,6 +88,31 @@ static void shootingGallery_cpScoreImpl(GB *gb, uint16_t sp0_) {
 notEqual:
   CYC(b_+27, b_+28); alu_xor(gb, A);
   RET(b_+28);
+}
+
+// 15:505f, the helper the attendant's script calls (asm15) to start the game. ages.sym carries
+// two labels spelled shootingGallery_beginGame -- the script at 0c:4fbb and this routine -- and
+// the tooling keeps the first it sees, so this one was never ported, SYM() has no entry for it,
+// and the script ran into an address the native build has no code for. Anchor the base to
+// cpScore, which begins at the byte after this routine's ret.
+void shootingGallery_beginGame_hook(GB *gb) {
+  BANKOF(shootingGallery_cpScore);
+  const uint16_t b_ = (uint16_t)(SYM(shootingGallery_cpScore) - 15);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
+  if (!(F & FZ)) {
+    CYCT(b_+3, b_+4); ret_effect(gb);
+    return;
+  }
+  CYC(b_+3, b_+4);
+  CYC(b_+4, b_+6); mem_wr(gb, HL, 0x30);   // INTERAC_SHOOTING_GALLERY
+  CYC(b_+6, b_+7); L = alu_inc8(gb, L);
+  CYC(b_+7, b_+9); mem_wr(gb, HL, 0x03);   // subid 3, the object that runs the game
+  CYC(b_+9, b_+10); L = alu_inc8(gb, L);
+  CYC(b_+10, b_+12); E = INTERACTION_BASE + OBJ_SUBID;
+  CYC(b_+12, b_+13); A = mem_rd(gb, DE);
+  CYC(b_+13, b_+14); mem_wr(gb, HL, A);    // the new object's var03 = the attendant's subid
+  CYC(b_+14, b_+15); ret_effect(gb);
 }
 
 void shootingGallery_cpScore_hook(GB *gb) {

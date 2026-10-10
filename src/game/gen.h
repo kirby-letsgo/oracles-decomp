@@ -5736,6 +5736,7 @@ void blossom_decideInitialChildStatus_hook(GB *gb);
 void blossom_openNameEntryMenu_hook(GB *gb);
 void oldMan_takeRupees_hook(GB *gb);
 void oldMan_giveRupees_hook(GB *gb);
+void shootingGallery_beginGame_hook(GB *gb);
 void shootingGallery_cpScore_hook(GB *gb);
 void shootingGallery_equipSword_hook(GB *gb);
 void shootingGallery_equipBiggoronSword_hook(GB *gb);

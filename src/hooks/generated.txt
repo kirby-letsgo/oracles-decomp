@@ -5730,6 +5730,7 @@
 15:5022 blossom_openNameEntryMenu_hook -
 15:5039 oldMan_takeRupees_hook -
 15:5050 oldMan_giveRupees_hook -
+15:505f shootingGallery_beginGame_hook -
 15:506e shootingGallery_cpScore_hook -
 15:509d shootingGallery_equipSword_hook -
 15:50b5 shootingGallery_equipBiggoronSword_hook -
