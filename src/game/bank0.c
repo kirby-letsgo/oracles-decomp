@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/vwf.h"
 #include "rt/fibers.h"
 #include "game/gen.h"
 #include "game/offscreen.h"
@@ -8408,6 +8409,7 @@ void func_13c6_hook(GB *gb) {
 
 void readByteFromW7ActiveBank_hook(GB *gb) {
   BASE(readByteFromW7ActiveBank);
+  if (vwf_is_text_bank(mem_rd(gb, w7ActiveBank))) { A = vwf_text_byte(mem_rd(gb, w7ActiveBank), HL); ret_effect(gb); return; }
   uint16_t bc = BC;
   CYC(b_+0, b_+4); A = mem_rd(gb, w7ActiveBank);
   CYC(b_+4, b_+6); H8(hRomBank) = A;

@@ -192,6 +192,7 @@ int main(int argc, char **argv) {
   if (arg_flag(argc, argv, "--serial")) gb->serial_out = serial_print;
   // ORACLES_FEATURES="fast_text,..." turns on the app's optional behaviour, to test it headless
   if ((p = getenv("ORACLES_FEATURES"))) { features.fast_text = strstr(p, "fast_text") != NULL; features.quick_swap = strstr(p, "quick_swap") != NULL; features.fast_menus = strstr(p, "fast_menus") != NULL; features.four_slots = strstr(p, "four_slots") != NULL; }
+  if ((p = getenv("ORACLES_VWF")) && !oracles_load_vwf(p)) { fprintf(stderr, "could not load VWF font %s\n", p); return 2; }
   if (getenv("PCTRACE") || getenv("HOOKLOG")) setvbuf(stdout, NULL, _IOLBF, 0);
   hooks_init();
   static uint64_t il_a, il_b; if (getenv("INTLOG")) sscanf(getenv("INTLOG"), "%llu-%llu", (unsigned long long *)&il_a, (unsigned long long *)&il_b);

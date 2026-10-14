@@ -1,4 +1,6 @@
 #include "platform/setup.h"
+#include "game/features.h"
+#include "game/vwf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,4 +96,18 @@ bool oracles_load_boot_state(GB *gb, const char *path) {
   if (n == sizeof *tmp) oracles_copy_state(gb, tmp);
   free(tmp);
   return n == sizeof *tmp;
+}
+
+bool oracles_load_vwf(const char *path) {
+  char spacing[1200];
+  size_t len = strlen(path);
+  if (len < 4 || len + 9 > sizeof spacing || strcmp(path + len - 4, ".bin")) return false;
+  snprintf(spacing, sizeof spacing, "%.*s_spacing.bin", (int)(len - 4), path);
+  size_t font_size = 0, widths_size = 0;
+  uint8_t *font = oracles_read_file(path, &font_size), *widths = oracles_read_file(spacing, &widths_size);
+  bool ok = vwf_set_font(font, font_size, widths, widths_size);
+  free(font);
+  free(widths);
+  features.vwf = ok;
+  return ok;
 }
