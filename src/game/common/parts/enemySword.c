@@ -28,7 +28,7 @@ void enemySword_func_5273_hook(GB *gb) {
   CYC(b_+146, b_+148); E = 0xf0; // Part.var30
   CYC(b_+148, b_+149); A = mem_rd(gb, DE);
   CYC(b_+149, b_+150); alu_cp(gb, mem_rd(gb, HL));
-  if (!(F & FZ)) { CYCT(b_+150, b_+151); return; } // ret nz
+  if (!(F & FZ)) { RET_TAKEN(b_+150); return; } // ret nz
   CYC(b_+150, b_+151);
   CYC(b_+151, b_+153); L = 0xb0;
   CYC(b_+153, b_+155); alu_bit(gb, 0, mem_rd(gb, HL));
@@ -46,7 +46,7 @@ void enemySword_func_5273_hook(GB *gb) {
   CYC(b_+167, b_+169);
   CYC(b_+169, b_+171); L = 0xbf;
   CYC(b_+171, b_+173); alu_bit(gb, 1, mem_rd(gb, HL));
-  if (F & FZ) { CYCT(b_+173, b_+174); return; } // ret z
+  if (F & FZ) { RET_TAKEN(b_+173); return; } // ret z
   CYC(b_+173, b_+174);
 
 L_5294:

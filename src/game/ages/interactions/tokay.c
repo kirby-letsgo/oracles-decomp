@@ -553,7 +553,9 @@ void tokayThiefSubstate0_hook(GB *gb) {
   CYC(b_+11, b_+12); alu_or(gb, A);
   if (F & FZ) CALL_C_CC(b_+12, interactionAnimateBasedOnSpeed_hook, SYM(interactionAnimateBasedOnSpeed), b_+15); else CYC(b_+12, b_+15);
   CALL_C(b_+15, interactionRunScript_hook, SYM(interactionRunScript), b_+18);
-  if (!(F & FC)) { CYCT(b_+18, b_+19); return; } CYC(b_+18, b_+19);
+  // take the `ret nc` at b_+18 here: burning it and returning leaves the ret to whoever resumes
+  // -- the dispatcher stepping the ROM, or the hook at that address -- and it is paid for twice.
+  if (!(F & FC)) { RET_TAKEN(b_+18); return; } CYC(b_+18, b_+19);
   CYC(b_+19, b_+21); A = 5;
   CALL_C(b_+21, interactionSetAnimation_hook, SYM(interactionSetAnimation), b_+24);
   CALL_C(b_+24, interactionIncSubstate_hook, SYM(interactionIncSubstate), b_+27);
@@ -594,7 +596,7 @@ void tokayInitHeldItem_hook(GB *gb) {
   BASE(tokayInitHeldItem);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+0, getFreeInteractionSlot_hook, SYM(getFreeInteractionSlot), b_+3);
-  if (!(F & FZ)) { CYCT(b_+3, b_+4); return; } CYC(b_+3, b_+4);
+  if (!(F & FZ)) { RET_TAKEN(b_+3); return; } CYC(b_+3, b_+4);
   CYC(b_+4, b_+5); L = alu_inc8(gb, L);
   CYC(b_+5, b_+6); A = B;
   CYC(b_+6, b_+9); SET_BC(SYM(tokayItemGraphics));

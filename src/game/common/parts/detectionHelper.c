@@ -206,7 +206,7 @@ void detectionHelper_spawnCollisionHelper_hook(GB *gb) {
   BASE(partCode0e);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CALL_C(b_+83, getFreePartSlot_hook, SYM(getFreePartSlot), b_+86);
-  if (!(F & FZ)) { CYCT(b_+86, b_+87); return; } // ret nz
+  if (!(F & FZ)) { RET_TAKEN(b_+86); return; } // ret nz
   CYC(b_+86, b_+87);
   CYC(b_+87, b_+89); mem_wr(gb, HL, 0x0e); // PART_DETECTION_HELPER
   CYC(b_+89, b_+90); L = alu_inc8(gb, L);

@@ -31,6 +31,11 @@ def length(op): return 3 if op in IMM16 else 2 if op in IMM8 else 1
 NOTTAKEN = re.compile(r'\bif \((!\(F & F[ZC]\)|\(F & F[ZC]\)|F & F[ZC])\)\s*\{?\s*CYC\(b_\+(?:(O|OE|S)\()?(\d+)\)?,[^;]*;[^{}]*\}?\s*else\s*\{?\s*CYCT\(b_\+(?:(O|OE|S)\()?(\d+)')
 NEG = {'!(F & FZ)': '(F & FZ)', '(F & FZ)': '!(F & FZ)', '!(F & FC)': '(F & FC)', '(F & FC)': '!(F & FC)'}
 TAKEN = re.compile(r'\bCYCT\(b_\+(?:(O|OE|S)\()?(\d+)\)?,\s*b_\+(?:(O|OE|S)\()?(\d+)\)?\)')
+# a taken burn that ends a hooked routine's C: the ret it charges for is performed by whoever
+# resumes, so the routine runs long by the cost of that ret
+RETBURN = re.compile(r'\bCYCT\(b_\+(?:(O|OE|S)\()?(\d+)\)?,\s*b_\+(?:(O|OE|S)\()?(\d+)\)?\);\s*return;')
+RET = {0xc0: 'ret nz', 0xc8: 'ret z', 0xd0: 'ret nc', 0xd8: 'ret c', 0xc9: 'ret'}
+FUNC = re.compile(r'^(static\s+)?(?:void|bool|int|uint\d+_t)\s+(\w+)\s*\(GB \*gb')
 BRANCH = re.compile(r'\bif \((!\(F & F[ZC]\)|\(F & F[ZC]\)|F & F[ZC])\)\s*\{?\s*(?:CYCT|RET_TAKEN|CALL_C_CC|CALL_L_CC)\(b_\+(?:(O|OE|S)\()?(\d+)')
 
 # reviewed taken ranges whose inner conditional is not taken on that path: `BASE_IDENT +N` lines
@@ -43,8 +48,10 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
     if '/gen_' in p or p.endswith(('syms.c', 'ofs.c')): continue
     seasons_file = '/seasons/' in p
     rom, sym = GAMES['Seasons' if seasons_file else 'Ages']
-    base = None
+    base = fn = None
     for ln, line in enumerate(open(p, errors='replace'), 1):
+        mf = FUNC.match(line)
+        if mf: fn = mf.group(2)
         mb = re.search(r'\bBASE\((\w+)\)', line)
         if mb: base, base_id = sym.get(mb.group(1)), mb.group(1)
         if base is None or base == 0xffffffff: continue
@@ -94,4 +101,35 @@ for p in sorted(glob.glob('src/game/**/*.c', recursive=True)):
                 if op in CC and CC[op][0] != 'call':
                     bad += 1
                     print(f'{p}:{ln}: CYCT(+{m.group(2)}, +{m.group(4)}) also charges the {CC[op][0]} {CC[op][1]} at +{pos - (base & 0xffff)} as not taken')
+        # A hooked routine that burns a `ret` and returns without taking it pays for that ret
+        # twice: its caller's CALL_C sees the stack unmoved, hands the rest to the dispatcher, and
+        # whoever resumes -- the interpreter stepping the ROM, or a hook at that address -- runs
+        # the ret and charges it again. RET_TAKEN charges it once and pops. tokayThiefSubstate0
+        # was this shape: interactionCode48 burned 317 cycles where the ROM burns 312, in every
+        # call that took the branch, which is every shadow failure in Crescent Island's tokay room.
+        #
+        # Only inside a *_hook, where the routine's caller is owed the pop. The same line in one of
+        # the hand-written `static` helpers that stand for inlined ROM fragments is correct: the
+        # helper's C caller never pushed a frame, nothing re-runs the ret, and the burn is the only
+        # charge -- RET_TAKEN there pops a frame that was never pushed and returns into whatever
+        # the stack happens to hold (write_palette_regs did exactly that: pc ran off to 00:c49d).
+        if fn and fn.endswith('_hook'):
+          for m in RETBURN.finditer(line.split('//')[0]):
+            w1, w2 = m.group(1), m.group(3)
+            if w1 != w2 and not (w1 in ('O', 'OE') and w2 in ('O', 'OE')): continue
+            if (w1 == 'S') != seasons_file and w1 is not None: continue
+            if seasons_file and w1 in ('O', 'OE'): continue
+            b, a0 = base >> 16, (base & 0xffff) + int(m.group(2))
+            end = (base & 0xffff) + int(m.group(4))
+            pos, last = a0, None
+            while pos < end:
+                fo = pos if pos < 0x4000 else b * 0x4000 + pos - 0x4000
+                if not 0 <= fo < len(rom): last = None; break
+                last = (pos, rom[fo]); pos += length(rom[fo])
+            if last is None or last[1] not in RET: continue
+            checked += 1
+            bad += 1
+            off = last[0] - (base & 0xffff)
+            print(f'{p}:{ln}: {fn} burns the {RET[last[1]]} at +{off} and returns without taking '
+                  f'it, so it is charged twice. Use RET_TAKEN(b_+{off}).')
 print(f'{bad} branch conditions differ from the ROM ({checked} checked)')
