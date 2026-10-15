@@ -224,3 +224,11 @@ Behaviour is checked against the original ROM by replaying full playthroughs and
 routine with the original code it replaces.
 
 To build it yourself, or work on it, see [DEVELOPMENT.md](DEVELOPMENT.md).
+
+## Credits
+
+- The variable-width font support is a port of Drenn's `vwf` branch of
+  [oracles-disasm](https://github.com/Stewmath/oracles-disasm/tree/vwf), the disassembly this
+  project is built on.
+- The variable-width font is by Toruzz, from the Link's Awakening DX VWF hack. It isn't bundled
+  yet: we're asking for permission first.

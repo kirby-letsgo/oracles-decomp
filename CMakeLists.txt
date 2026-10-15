@@ -274,7 +274,7 @@ if(ORACLES_SDL)
 endif()
 add_test(NAME native_binary COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/check_native_binary.py $<TARGET_FILE:oraclesnative> ${NATIVE_BINARIES})
 
-foreach(t sha1 bus cpu blargg ppu acid2 tas smoke archive)
+foreach(t sha1 bus cpu blargg ppu acid2 tas smoke archive vwf)
   if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_${t}.c)
     add_executable(test_${t} tests/test_${t}.c)
     target_link_libraries(test_${t} oraclescore)
