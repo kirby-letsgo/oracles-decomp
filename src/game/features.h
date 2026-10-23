@@ -8,6 +8,7 @@ typedef struct {
   bool quick_swap;              // a button swaps the A and B items
   bool fast_menus;              // the fades into and out of the inventory and map take 4 frames
   bool four_slots;              // two more item buttons, X and Y
+  bool vwf;                     // variable-width font with re-wrapped text (needs vwf_set_font)
   uint8_t slot_item[2];         // the items on X and Y (0: none), assigned in the inventory
   bool slot_boxes;              // their own boxes are on screen, so leave the B box alone
 } Features;
