@@ -60,6 +60,7 @@ set(ORACLES_SHARED_SRC ${ORACLES_GAME_SRC}
   src/core/hash.c
   src/hw/render.c
   src/platform/png.c
+  src/platform/error_log.c
   src/platform/archive.c
   src/platform/tas.c
   src/platform/setup.c
@@ -205,6 +206,9 @@ endif()
 enable_testing()
 set(TEST_ROM_DIR ${CMAKE_SOURCE_DIR}/tests/roms)
 set(GAME_ROM_DIR ${CMAKE_SOURCE_DIR}/roms)
+add_executable(test_error_log tests/test_error_log.c src/platform/error_log.c)
+target_include_directories(test_error_log PRIVATE src)
+add_test(NAME error_log COMMAND test_error_log)
 add_executable(test_ui tests/test_ui.c)
 target_link_libraries(test_ui oraclesui)
 add_test(NAME ui COMMAND test_ui)
@@ -284,6 +288,10 @@ set_tests_properties(wide PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
 set_tests_properties(native_tas PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
 set(NATIVE_BINARIES $<TARGET_FILE:oracles-native-run> $<TARGET_FILE:test_native_tas>)
 if(ORACLES_SDL)
+  add_executable(test_app_error tests/test_app_error.c src/platform/window.c src/platform/sync_client.c src/platform/haptic.c)
+  target_link_libraries(test_app_error oraclesnative oraclesgui oraclessync oracleswide oraclesmods ${ORACLES_SDL_TARGET})
+  target_compile_definitions(test_app_error PRIVATE ${ORACLES_APP_DEFS})
+  add_test(NAME app_error COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_error.py $<TARGET_FILE:test_app_error>)
   list(APPEND NATIVE_BINARIES $<TARGET_FILE:oracles-native>)
   add_test(NAME app_menus COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_menus.py $<TARGET_FILE:oracles-native>
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc")

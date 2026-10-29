@@ -215,7 +215,14 @@ static void settings_menu_changes_values(void) {
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
-  ASSERT_EQ(m.sel, SET_VERSION);                        // the last row
+  ASSERT_EQ(m.sel, SET_ERROR_LOG);                      // unavailable until a report exists
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_NONE);
+  s.error_log = true;
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
+  ASSERT_EQ(row, SET_ERROR_LOG);
+  ASSERT_EQ(settings_press(&m, &s, UI_LEFT, &row), MENU_NONE);
+  settings_press(&m, &s, UI_UP, &row);
+  ASSERT_EQ(m.sel, SET_VERSION);
   ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_NONE);   // nothing to download
   snprintf(s.update, sizeof s.update, "1.1.0");
   ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
@@ -282,6 +289,12 @@ static void settings_rows_follow_the_device(void) {
   ASSERT(settings_row_shown(&m, SET_HAPTICS));
   ASSERT(!settings_row_shown(&m, SET_FULLSCREEN));
   ASSERT(!settings_row_shown(&m, SET_PORTABLE));        // Android keeps its data where the system says
+  ASSERT(settings_row_shown(&m, SET_ERROR_LOG));
+  m.sel = SET_ERROR_LOG;
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_NONE);
+  s.error_log = true;
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
+  ASSERT_EQ(row, SET_ERROR_LOG);
   m.sel = SET_COLOURS;
   settings_press(&m, &s, UI_DOWN, &row);
   ASSERT_EQ(m.sel, SET_FAST_TEXT);

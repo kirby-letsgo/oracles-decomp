@@ -25,6 +25,9 @@ typedef struct {
 
 // The pause menu over the dimmed game, inside the game picture. Returns the PauseItem tapped.
 int gui_pause(PauseMenu *m, const GuiTheme *t, const GuiFrame *f);
+enum { ERROR_ISSUE, ERROR_COPY, ERROR_BACK, ERROR_ACTIONS };
+// A stopped game's report actions. The page stays open after copying or opening GitHub.
+int gui_error(int *sel, bool has_log, const GuiTheme *t, const GuiFrame *f);
 // The slot list, full screen: the slot tapped, GUI_BACK, or GUI_NONE. stamp changes when the
 // thumbnails do.
 int gui_slots(SlotsMenu *m, const GuiTheme *t, const GuiFrame *f, uint32_t stamp);

@@ -21,6 +21,7 @@ void settings_default(Settings *s) {
   s->haptics = true;
   s->pad_style = STYLE_AUTO;
   s->portable = false;
+  s->error_log = false;
   s->version[0] = s->update[0] = 0;
   bindings_default(&s->bindings);
 }
@@ -89,7 +90,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case UI_DOWN: step(m, 1); return MENU_NONE;
   case UI_BACK: return MENU_BACK;
   case UI_ACCEPT:
-    if (m->sel == SET_CONTROLS || m->sel == SET_SYNC || (m->sel == SET_VERSION && s->update[0])) { *picked = m->sel; return MENU_PICK; }
+    if (m->sel == SET_CONTROLS || m->sel == SET_SYNC || (m->sel == SET_VERSION && s->update[0]) || (m->sel == SET_ERROR_LOG && s->error_log)) { *picked = m->sel; return MENU_PICK; }
     dir = 1;
     break;
   default: break;

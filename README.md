@@ -254,8 +254,14 @@ isn't offered on Android.
 ## Reporting problems
 
 Please open an [issue](https://github.com/kirby-letsgo/oracles-decomp/issues) with your system, which
-game, and what you were doing. Never attach a ROM or a save made from one. On Android,
-`adb logcat -s oracles` shows the app's messages.
+game, and what you were doing. Never attach a ROM or a save made from one.
+
+**Settings → Copy error log** copies saved engine error reports so you can paste them into an
+issue, including on Android. The row is disabled when no report exists. If the game engine stops,
+the app shows a message with **Create issue**, **Copy error log**, and **Back to menu** buttons,
+and keeps the report available after restarting. Reports include
+the game/region, app version, platform, stop reason and room; long logs copy only their recent text.
+`adb logcat -s oracles` also shows the Android app's messages.
 
 ## How it works
 
