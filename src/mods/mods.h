@@ -409,3 +409,14 @@ const char *mods_queue_write(int addr, int value);
 int mods_take_writes(ModWrite *out, int cap);
 // For api.c: the running mod's declared api, or 0 when no mod's Lua is running.
 int mods_active_api(void);
+
+// After mods_init: load the bundled tracker, or return a diagnostic. No disk writes.
+const char *mods_load_official_tracker(void);
+
+// Display metadata from mod.ini. Missing optional fields are empty; text is escaped.
+typedef struct {
+  char name[64], description[256], author[64], version[64];
+  bool ages, seasons, changes_game;
+} ModInfo;
+ModInfo mods_info(int index);
+ModInfo mods_official_tracker_info(void);

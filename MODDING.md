@@ -13,7 +13,19 @@ Mods are new. The API below is small on purpose, and it is versioned (`api=2` to
 mod keeps working unchanged), so a mod written today keeps working as it grows. See [Stable and unstable](#stable-and-unstable) for what is safe to
 build on.
 
-## Installing a mod
+## Official mods
+
+Open **Settings → Mods** from the launcher or pause menu. Official mods are bundled with the
+app and work offline, including on Android. Essence Tracker is the first entry: turn it on to
+show your eight collected essences in either game. Your selection is saved in settings.ini.
+Changes take effect the next time you start a game; when playing, leave to the launcher first.
+Official scripts run in the same sandbox as folder mods.
+
+If you previously installed the `essence-tracker` folder manually, remove that copy before
+enabling the bundled one. The loader reports the conflict instead of running two copies.
+Folder mods are independent of the official-mod switches and continue loading as before.
+
+## Installing a folder mod
 
 A mod is a folder. Drop it in the `mods` folder inside the app's own folder — the same folder your
 saves live in:
@@ -29,8 +41,8 @@ Create `mods` yourself if it isn't there. Mods are picked up when a game starts,
 (leaving to the launcher and choosing a file again is enough) after adding or editing one. They load
 in alphabetical order by folder name, and at most 32 load at once.
 
-There is no in-app mod manager yet — no list, no on/off switches, no installer. A mod is installed by
-being in that folder and removed by deleting it.
+The Mods screen manages bundled official mods. For third-party folder mods there is no in-app
+installer or on/off switch yet: install by copying the folder and remove by deleting it.
 
 **Only install mods you trust.** A mod is a program, and the app keeps it boxed in deliberately: it
 cannot open your files (only its own small save file, through `oracles.store`), start other
@@ -62,7 +74,8 @@ Lines longer than 255 characters are cut.
 ```ini
 id=essence-tracker
 name=Essence Tracker
-version=1.0
+description=Eight tiny markers show your collected dungeon essences.
+version=1.1
 author=you
 api=1
 games=ages,seasons
@@ -74,10 +87,14 @@ games=ages,seasons
 | `api` | yes | Which version of the API the mod was written against. Must be 1 or more. This build supports up to **2**. |
 | `games` | yes | `ages`, `seasons`, or `ages,seasons`. A mod is only loaded for a game it names. Anything else in the list is reported and ignored, so a typo costs you that one word, not the mod. |
 | `name` | no | The display name. Defaults to the id. |
+| `description` | no | Short, single-line summary shown in the mod card (up to 255 bytes after escaping; keep the whole line within 255 bytes). |
+| `author` | no | Creator shown in the mod card (up to 63 bytes after escaping). |
+| `version` | no | Version shown in the mod card (up to 63 bytes after escaping). |
 | `changes_game` | no | `yes` lets an `api=2` mod change the game (see [Changing the game](#changing-the-game)). Leave it out, or write anything else, and the mod only watches and draws. |
 
-Any other key is ignored, so `version=` and `author=` above are documentation for whoever reads your
-package — the app does not read them today, and keeping them is harmless.
+Unknown keys are ignored. Optional display fields default to empty; control bytes are escaped.
+The official catalogue embeds the same `mod.ini` used by folder installs, so changing its name,
+description, author or version updates the card on the next build.
 
 Get `id`, `api` or `games` wrong and the folder is not treated as a mod at all: it is skipped, with a
 line on the app's log saying why. Declare an `api` higher than the build supports and the mod is kept
@@ -651,14 +668,15 @@ as `\x00` and logs the whole string; `oracles.draw_text` stops at it, drawing on
 
 **Settings do not persist, and have no menu yet.** See `oracles.setting`.
 
-**No mod manager.** No list, no enable/disable, no zip install. The only sign a player gets that
+**Folder mods have no manager yet.** The official catalogue has saved On/Off switches, but folder
+mods have no enable/disable or zip install UI. The sign a player gets that
 something went wrong is a **Mod disabled** message at the bottom of the screen the moment a mod is
 switched off; the reason goes to the log.
 
 ## A worked example: an essence tracker
 
-Eight pips across the top of the screen, one per essence, lit as you collect them — most of this
-page, in about thirty lines.
+Eight tiny pips near the bottom of the screen, one per essence, lit as you collect them. The
+bundled tracker uses a 33x5-pixel strip in the widescreen side area or at bottom centre.
 
 The essences live in one byte, `wEssencesObtained`, with one bit per essence — and that byte is at a
 **different address in each game**, which is what `oracles.game()` is for.
@@ -668,7 +686,8 @@ The essences live in one byte, `wEssencesObtained`, with one bit per essence —
 ```ini
 id=essence-tracker
 name=Essence Tracker
-version=1.0
+description=Eight tiny markers show your collected dungeon essences.
+version=1.1
 api=1
 games=ages,seasons
 ```
@@ -676,41 +695,41 @@ games=ages,seasons
 `mods/essence-tracker/main.lua`:
 
 ```lua
--- wEssencesObtained: one byte, one bit per essence. Both addresses are inside
--- oracles.rd's $c000-$cfff window.
+-- Read the current save directly: loading a state or switching files can remove
+-- essences as well as add them. No persistent progress or game writes needed.
+-- wEssencesObtained (USA and EU): Ages $c6bf, Seasons $c6bb.
 local ESSENCES = oracles.game() == "seasons" and 0xc6bb or 0xc6bf
-
--- RGB555: five bits each, red lowest.
-local function rgb(r, g, b) return r + g * 32 + b * 1024 end
-local LIT    = rgb(31, 27, 8)       -- warm yellow
-local UNLIT  = rgb(5, 5, 7)         -- nearly black
-local BORDER = rgb(0, 0, 0)
-
--- An ON/OFF row. There is no settings menu yet, so show() is your default for now -- written this
--- way so it starts working the day there is one.
 local show = oracles.setting("Show essences", true)
 
-local PIP, GAP = 5, 2               -- a pip is 5x5 with 2 pixels between
+local function rgb(r, g, b) return r + g * 32 + b * 1024 end
+local BACK = rgb(2, 3, 5)
+local EDGE = rgb(9, 11, 13)
+local EMPTY = rgb(5, 6, 8)
+local GOLD = rgb(31, 25, 7)
+local LIGHT = rgb(31, 31, 21)
+
+local function pip(x, y, have)
+  oracles.draw_rect(x, y, 3, 3, have and GOLD or EDGE)
+  oracles.draw_rect(x + 1, y + 1, 1, 1, have and LIGHT or EMPTY)
+end
 
 oracles.on_frame(function()
   if not show() then return end
+  -- room_x is absent in menus, cutscenes, room transitions and side-view areas.
+  local camera = oracles.camera()
+  if not camera or camera.room_x == nil then return end
 
   local bits = oracles.rd(ESSENCES)
-  local total = 8 * PIP + 7 * GAP
-  local x0 = (oracles.screen() - total) // 2        -- centred at either picture width
-  local y0 = 2
-
-  -- One dark plate behind the row, so pips stay readable over a bright room.
-  oracles.draw_rect(x0 - 2, y0 - 2, total + 4, PIP + 4, BORDER)
-
-  for i = 0, 7 do
-    local have = ((bits >> i) & 1) == 1
-    oracles.draw_rect(x0 + i * (PIP + GAP), y0, PIP, PIP, have and LIT or UNLIT)
-  end
+  local width = oracles.screen()
+  local side = (width - 160) // 2
+  -- 33x5 pixels: one row, no count or large backing panel. In widescreen
+  -- it fits entirely inside the side strip; otherwise centre it at the bottom.
+  local x = side >= 33 and (side - 33) // 2 or (width - 33) // 2
+  local y = 137
+  oracles.draw_rect(x, y, 33, 5, BACK)
+  for i = 0, 7 do pip(x + 1 + i * 4, y + 1, ((bits >> i) & 1) == 1) end
 end)
 
--- The surface is wiped every frame, so the handler above draws the whole row from scratch each
--- time. That is the intended shape: cheap, no saved state, nothing accumulating.
 oracles.log("essence-tracker ready")
 ```
 
@@ -718,12 +737,12 @@ Points worth taking from it:
 
 - **Pick addresses by game, once, at load.** `oracles.game()` works while `main.lua` is still
   running, so resolve the address there rather than branching on every frame.
-- **Ask for the width.** `oracles.screen()` is 160 or 256; centring with it means the mod is right in
-  widescreen without a second code path.
+- **Ask for the width.** `oracles.screen()` is 160 or 256; using it lets the tracker fit in a widescreen side strip
+  or centre itself on the original picture.
 - **Draw every frame.** The surface is wiped each frame; there is nothing to erase and nothing that
   stays.
 - **Read settings through the function.** `show()`, never a cached `show` value.
-- **Keep `oracles.on_frame` cheap.** One memory read and nine rectangles is nothing against the 4 ms
+- **Keep `oracles.on_frame` cheap.** One memory read and seventeen tiny rectangles is nothing against the 4 ms
   limit.
 
 To make it remember something — the most essences you have ever had, say — add this to the same

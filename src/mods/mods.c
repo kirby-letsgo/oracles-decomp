@@ -53,6 +53,7 @@ bool mods_id_valid(const char *id) {
 typedef struct {
   char id[MOD_FIELD_LEN];     // canonical: the validated folder name, never the mod.ini field directly
   char name[MOD_FIELD_LEN];
+  char description[256], author[64], version[64];
   char ini_id[MOD_FIELD_LEN]; // raw "id=" value from mod.ini (escaped; see mods_escape_into), kept
                               // only to cross-check against id
   bool ini_id_present;
@@ -428,6 +429,80 @@ static bool contains_nul(FILE *f) {
 // treated as hostile: over-long, empty, or full of coincidental '=' or '#' characters are all
 // handled, not just well-formed input. `label` is the mod's folder name, used only to name the
 // mod in this function's own error messages and in a per-token "games=" warning.
+static void parse_ini_line(char *line, const char *label, Mod *m) {
+  char *p = line;
+  while (*p == ' ' || *p == '\t') p++;
+  // The whitespace-skip above means an indented '#' is already at `p` by the time this check
+  // runs, so this is a readability nicety, not a safety boundary: `key` below always starts at
+  // `p`, trim() never strips '#', so a comment's "key" (e.g. "# api" from "# api=99") can never
+  // collide with a real keyword even if this exact check were deleted -- confirmed by mutation.
+  // The actual safety net for both comments and blank lines is the `!eq` fallthrough just below.
+  if (*p == '#' || *p == 0) return;
+
+  char *eq = strchr(p, '=');
+  if (!eq) return;
+  *eq = 0;
+  char *key = p, *value = eq + 1;
+  trim(key);
+  trim(value);
+  if (!*key) return;
+
+  if (!strcmp(key, "id")) {
+    mods_escape_into(m->ini_id, sizeof m->ini_id, value, strlen(value));
+    m->ini_id_present = true;
+  } else if (!strcmp(key, "name")) {
+    mods_escape_into(m->name, sizeof m->name, value, strlen(value));
+  } else if (!strcmp(key, "description")) {
+    mods_escape_into(m->description, sizeof m->description, value, strlen(value));
+  } else if (!strcmp(key, "author")) {
+    mods_escape_into(m->author, sizeof m->author, value, strlen(value));
+  } else if (!strcmp(key, "version")) {
+    mods_escape_into(m->version, sizeof m->version, value, strlen(value));
+  } else if (!strcmp(key, "api")) {
+    // This function's job is only to establish whether the (int) cast is well-defined and to
+    // record that the key was present at all -- not whether the resulting number is an
+    // *acceptable* api version. Folding that policy decision in here is what previously made
+    // "api=0" (a well-formed number) report as "missing or non-numeric" (a syntax complaint),
+    // which is simply false, and it hid the >= 1 policy bound behind the same sentinel as every
+    // syntax error, destroying mutation signal on the most security-relevant bound in the file.
+    // load_one owns the >= 1 policy check instead (api < 1 is a malformed declaration, refused
+    // outright); mods_init owns the separate > MODS_API_VERSION case (a well-formed declaration
+    // this build is simply too old for, which is listed disabled rather than refused -- see
+    // load_one's own comment on its api= branch for why those two get different treatment).
+    //
+    // The errno ERANGE check matters beyond the obvious "huge decimal string" case: on an
+    // LLP64 target (MinGW/Windows), `long` is only 32 bits, the same width as `int`, so strtol
+    // silently clamps an overflowing value to LONG_MAX (== INT_MAX there) unless errno is
+    // checked -- `v <= INT_MAX` alone can't tell "parsed exactly INT_MAX" apart from "overflowed
+    // and got clamped to it", so api=2147483648 would be wrongly accepted on Windows while
+    // correctly refused on a 64-bit-long host. Checking errno catches it on both.
+    m->api_present = true;
+    errno = 0;
+    char *end;
+    long v = strtol(value, &end, 10);
+    bool consumed_all = end != value && *end == 0;
+    m->api_parsed = consumed_all && errno != ERANGE && v >= INT_MIN && v <= INT_MAX;
+    m->api = m->api_parsed ? (int)v : 0;
+  } else if (!strcmp(key, "changes_game")) {
+    m->changes_game = !strcmp(value, "yes");
+  } else if (!strcmp(key, "games")) {
+    m->ages = m->seasons = false;
+    char buf[256];
+    snprintf(buf, sizeof buf, "%s", value);
+    for (char *tok = strtok(buf, ","); tok; tok = strtok(NULL, ",")) {
+      trim(tok);
+      if (!strcmp(tok, "ages")) m->ages = true;
+      else if (!strcmp(tok, "seasons")) m->seasons = true;
+      else if (*tok) {
+        char esc[128];
+        mods_escape_into(esc, sizeof esc, tok, strlen(tok));
+        fprintf(stderr, "mods: '%s' names unrecognised game '%s' in its games=, ignoring that token\n",
+                label, esc);
+      }
+    }
+  }
+}
+
 static bool read_ini(const char *path, const char *label, Mod *m) {
   FILE *f = fopen(path, "rb");
   if (!f) {
@@ -443,71 +518,7 @@ static bool read_ini(const char *path, const char *label, Mod *m) {
 
   char line[256];
   while (read_logical_line(f, line, sizeof line)) {
-    char *p = line;
-    while (*p == ' ' || *p == '\t') p++;
-    // The whitespace-skip above means an indented '#' is already at `p` by the time this check
-    // runs, so this is a readability nicety, not a safety boundary: `key` below always starts at
-    // `p`, trim() never strips '#', so a comment's "key" (e.g. "# api" from "# api=99") can never
-    // collide with a real keyword even if this exact check were deleted -- confirmed by mutation.
-    // The actual safety net for both comments and blank lines is the `!eq` fallthrough just below.
-    if (*p == '#' || *p == 0) continue;
-
-    char *eq = strchr(p, '=');
-    if (!eq) continue;
-    *eq = 0;
-    char *key = p, *value = eq + 1;
-    trim(key);
-    trim(value);
-    if (!*key) continue;
-
-    if (!strcmp(key, "id")) {
-      mods_escape_into(m->ini_id, sizeof m->ini_id, value, strlen(value));
-      m->ini_id_present = true;
-    } else if (!strcmp(key, "name")) {
-      mods_escape_into(m->name, sizeof m->name, value, strlen(value));
-    } else if (!strcmp(key, "api")) {
-      // This function's job is only to establish whether the (int) cast is well-defined and to
-      // record that the key was present at all -- not whether the resulting number is an
-      // *acceptable* api version. Folding that policy decision in here is what previously made
-      // "api=0" (a well-formed number) report as "missing or non-numeric" (a syntax complaint),
-      // which is simply false, and it hid the >= 1 policy bound behind the same sentinel as every
-      // syntax error, destroying mutation signal on the most security-relevant bound in the file.
-      // load_one owns the >= 1 policy check instead (api < 1 is a malformed declaration, refused
-      // outright); mods_init owns the separate > MODS_API_VERSION case (a well-formed declaration
-      // this build is simply too old for, which is listed disabled rather than refused -- see
-      // load_one's own comment on its api= branch for why those two get different treatment).
-      //
-      // The errno ERANGE check matters beyond the obvious "huge decimal string" case: on an
-      // LLP64 target (MinGW/Windows), `long` is only 32 bits, the same width as `int`, so strtol
-      // silently clamps an overflowing value to LONG_MAX (== INT_MAX there) unless errno is
-      // checked -- `v <= INT_MAX` alone can't tell "parsed exactly INT_MAX" apart from "overflowed
-      // and got clamped to it", so api=2147483648 would be wrongly accepted on Windows while
-      // correctly refused on a 64-bit-long host. Checking errno catches it on both.
-      m->api_present = true;
-      errno = 0;
-      char *end;
-      long v = strtol(value, &end, 10);
-      bool consumed_all = end != value && *end == 0;
-      m->api_parsed = consumed_all && errno != ERANGE && v >= INT_MIN && v <= INT_MAX;
-      m->api = m->api_parsed ? (int)v : 0;
-    } else if (!strcmp(key, "changes_game")) {
-      m->changes_game = !strcmp(value, "yes");
-    } else if (!strcmp(key, "games")) {
-      m->ages = m->seasons = false;
-      char buf[256];
-      snprintf(buf, sizeof buf, "%s", value);
-      for (char *tok = strtok(buf, ","); tok; tok = strtok(NULL, ",")) {
-        trim(tok);
-        if (!strcmp(tok, "ages")) m->ages = true;
-        else if (!strcmp(tok, "seasons")) m->seasons = true;
-        else if (*tok) {
-          char esc[128];
-          mods_escape_into(esc, sizeof esc, tok, strlen(tok));
-          fprintf(stderr, "mods: '%s' names unrecognised game '%s' in its games=, ignoring that token\n",
-                  label, esc);
-        }
-      }
-    }
+    parse_ini_line(line, label, m);
   }
   fclose(f);
   return true;
@@ -1100,30 +1111,33 @@ static bool load_one(const char *dir, const char *name, Mod *m) {
 // (a signal-based watchdog, abandoning Lua states on timeout) disproportionate to the risk at
 // this stage. MODDING.md carries it forward to mod authors, under "Limitations, honestly",
 // together with the advice it implies: install mods only from sources you trust.
-static bool run_main_lua(const char *dir, const char *name, Mod *m) {
-  char lua_path[1056];
-  int n = snprintf(lua_path, sizeof lua_path, "%s/%s/main.lua", dir, name);
-  if (n < 0 || (size_t)n >= sizeof lua_path) {
-    fprintf(stderr, "mods: '%s' path too long; disabling it for this session\n", name);
-    snprintf(m->error, sizeof m->error, "path too long");
-    return false;
-  }
+static bool run_main_lua(const char *dir, const char *name, Mod *m, const unsigned char *source, size_t source_size) {
+  if (!source) {
+    char lua_path[1056];
+    int n = snprintf(lua_path, sizeof lua_path, "%s/%s/main.lua", dir, name);
+    if (n < 0 || (size_t)n >= sizeof lua_path) {
+      fprintf(stderr, "mods: '%s' path too long; disabling it for this session\n", name);
+      snprintf(m->error, sizeof m->error, "path too long");
+      return false;
+    }
 
-  // Require a regular file before ever calling luaL_loadfilex on it, for exactly the same reason
-  // load_one's own mod.ini check does: a FIFO blocks fopen/fread indefinitely waiting for a writer
-  // that will never come, and a symlink to a character device (main.lua -> /dev/zero) streams
-  // forever with no newline for lauxlib's loader to stop on. stat() follows symlinks, so this
-  // catches that case too.
-  struct stat lua_st;
-  if (stat(lua_path, &lua_st) != 0) {
-    fprintf(stderr, "mods: '%s' has no main.lua; disabling it for this session\n", name);
-    snprintf(m->error, sizeof m->error, "has no main.lua");
-    return false;
-  }
-  if (!S_ISREG(lua_st.st_mode)) {
-    fprintf(stderr, "mods: '%s' has a main.lua that is not a regular file; disabling it for this session\n", name);
-    snprintf(m->error, sizeof m->error, "main.lua is not a regular file");
-    return false;
+    // Require a regular file before ever calling luaL_loadfilex on it, for exactly the same reason
+    // load_one's own mod.ini check does: a FIFO blocks fopen/fread indefinitely waiting for a writer
+    // that will never come, and a symlink to a character device (main.lua -> /dev/zero) streams
+    // forever with no newline for lauxlib's loader to stop on. stat() follows symlinks, so this
+    // catches that case too.
+    struct stat lua_st;
+    if (stat(lua_path, &lua_st) != 0) {
+      fprintf(stderr, "mods: '%s' has no main.lua; disabling it for this session\n", name);
+      snprintf(m->error, sizeof m->error, "has no main.lua");
+      return false;
+    }
+    if (!S_ISREG(lua_st.st_mode)) {
+      fprintf(stderr, "mods: '%s' has a main.lua that is not a regular file; disabling it for this session\n", name);
+      snprintf(m->error, sizeof m->error, "main.lua is not a regular file");
+      return false;
+    }
+
   }
 
   ModAlloc *a = malloc(sizeof *a);
@@ -1178,7 +1192,11 @@ static bool run_main_lua(const char *dir, const char *name, Mod *m) {
   // host-side half of that fix; `load` itself (the other half) is now withheld from mods
   // entirely rather than kept wrapped to force the same mode -- see mod_open_libs_hardened's own
   // comment in sandbox.c.
-  if (luaL_loadfilex(runner, lua_path, "t") != LUA_OK) {
+  char path[1056];
+  snprintf(path, sizeof path, "%s/%s/main.lua", dir, name);
+  int load_result = source ? luaL_loadbufferx(runner, (const char *)source, source_size, name, "t")
+                           : luaL_loadfilex(runner, path, "t");
+  if (load_result != LUA_OK) {
     failed = true;
     size_t elen = 0;
     const char *emsg = lua_tolstring(runner, -1, &elen);
@@ -1361,7 +1379,7 @@ bool mods_init(const char *dir, bool seasons) {
       // Only now -- known to apply to this game, known to still have a slot, and declaring an api
       // this build actually supports -- is it worth the cost and risk of actually running this
       // mod's Lua. run_main_lua already printed why, and filled m.error, on failure.
-      m.enabled = run_main_lua(dir, name, &m);
+      m.enabled = run_main_lua(dir, name, &m, NULL, 0);
     }
     mods[loaded++] = m;
   }
@@ -1372,6 +1390,57 @@ bool mods_init(const char *dir, bool seasons) {
   for (size_t i = 0; i < n; i++) free(names[i]);
   free(names);
   return true;
+}
+
+// Official scripts use exactly the same Lua sandbox as folder mods. The bytes are
+// embedded at build time, so releases remain self-contained on every platform.
+extern const unsigned char official_essence_tracker[];
+extern const unsigned int official_essence_tracker_size;
+extern const unsigned char official_tracker_ini[];
+extern const unsigned int official_tracker_ini_size;
+static Mod official_tracker_metadata(void) {
+  Mod m = {0};
+  size_t at = 0;
+  while (at < official_tracker_ini_size) {
+    char line[256];
+    size_t n = 0;
+    while (at < official_tracker_ini_size && official_tracker_ini[at] != '\n') {
+      if (n < sizeof line - 1) line[n++] = (char)official_tracker_ini[at];
+      at++;
+    }
+    at++;
+    line[n] = 0;
+    parse_ini_line(line, "official essence-tracker", &m);
+  }
+  snprintf(m.id, sizeof m.id, "%s", m.ini_id);
+  return m;
+}
+
+static ModInfo info_of(const Mod *m) {
+  ModInfo info = {.ages = m->ages, .seasons = m->seasons, .changes_game = m->changes_game};
+  snprintf(info.name, sizeof info.name, "%s", m->name);
+  snprintf(info.description, sizeof info.description, "%s", m->description);
+  snprintf(info.author, sizeof info.author, "%s", m->author);
+  snprintf(info.version, sizeof info.version, "%s", m->version);
+  return info;
+}
+ModInfo mods_info(int index) {
+  return index >= 0 && index < count ? info_of(&mods[index]) : (ModInfo){0};
+}
+ModInfo mods_official_tracker_info(void) {
+  Mod m = official_tracker_metadata();
+  return info_of(&m);
+}
+const char *mods_load_official_tracker(void) {
+  for (int i = 0; i < count; i++)
+    if (!strcmp(mods[i].id, "essence-tracker"))
+      return "Remove the folder copy of Essence Tracker first";
+  if (count >= MODS_MAX) return "Too many mods loaded";
+  Mod m = official_tracker_metadata();
+  m.on_frame_ref = m.on_room_change_ref = LUA_NOREF;
+  m.enabled = run_main_lua(mods_dir, m.id, &m, official_essence_tracker, official_essence_tracker_size);
+  mods[count++] = m;
+  return m.enabled ? NULL : mods[count - 1].error;
 }
 
 void mods_shutdown(void) {

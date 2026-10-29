@@ -4925,7 +4925,66 @@ static void the_treasure_list_matches_the_disassembly(void) {
   ASSERT(!mods_treasure_valid(true, 0x100, 0));
 }
 
+static void mod_metadata_is_read_and_escaped(void) {
+  clear_mods();
+  const char *dir = make_mod("metadata", "id=metadata\nname=Test\napi=1\ngames=ages,seasons\n"
+      "description= A small overlay = useful \nauthor=Someone\nversion=2.1\n", "");
+  ASSERT(mods_init(dir, true));
+  ModInfo info = mods_info(0);
+  ASSERT(!strcmp(info.description, "A small overlay = useful"));
+  ASSERT(!strcmp(info.author, "Someone"));
+  ASSERT(!strcmp(info.version, "2.1"));
+  ASSERT(info.ages && info.seasons && !info.changes_game);
+  info = mods_info(-1);
+  ASSERT(!info.description[0]);
+  make_mod("metadata", "id=metadata\napi=1\ngames=ages\ndescription=bad\x1b[31m\n", "");
+  ASSERT(mods_init(dir, false));
+  info = mods_info(0);
+  ASSERT(!strcmp(info.description, "bad\\x1b[31m"));
+  mods_shutdown();
+  info = mods_official_tracker_info();
+  ASSERT(info.description[0] && info.author[0] && info.version[0]);
+  ASSERT(info.ages && info.seasons && !info.changes_game);
+}
+
+static void official_tracker_loads_without_files_and_tracks_both_games(void) {
+  clear_mods();
+  for (int seasons = 0; seasons < 2; seasons++) {
+    char missing[640];
+    snprintf(missing, sizeof missing, "%s/not-installed", fixture_root());
+    ASSERT(mods_init(missing, seasons));
+    ASSERT_EQ(mods_count(), 0);
+    ASSERT(mods_load_official_tracker() == NULL);
+    ASSERT_EQ(mods_count(), 1);
+    ASSERT(mods_enabled(0));
+    ASSERT(mods_load_official_tracker() != NULL); // no duplicate handler
+    uint8_t ram[4096] = {0};
+    ModsFrame f = {.wram = ram, .seasons = seasons, .width = 160, .scroll = true, .origin = true};
+    ram[seasons ? 0x6bb : 0x6bf] = 1;
+    mods_frame(&f);
+    const ModOverlay *o = mods_overlay();
+    ASSERT(overlay_cover_at(o, 65, 139));
+    ASSERT_EQ(overlay_rgb_at(o, 65, 139)[0], 255); // collected highlight
+    ram[seasons ? 0x6bb : 0x6bf] = 0;
+    mods_frame(&f);
+    ASSERT(overlay_rgb_at(o, 65, 139)[0] < 100); // rewind clears it
+    f.width = 256;
+    mods_frame(&f);
+    ASSERT(overlay_cover_at(o, 7, 137));
+    ASSERT_EQ(overlay_cover_at(o, 48, 137), 0); // never covers the active room
+    f.origin = false;
+    mods_frame(&f);
+    ASSERT_EQ(overlay_cover_at(o, 7, 137), 0);
+    ASSERT(mods_enabled(0));
+    ASSERT(mods_init(missing, seasons)); // off on next game: no official load
+    ASSERT_EQ(mods_count(), 0);
+    mods_shutdown();
+  }
+}
+
 int main(void) {
+  RUN(mod_metadata_is_read_and_escaped);
+  RUN(official_tracker_loads_without_files_and_tracks_both_games);
   // The alarm handler's _exit(1) skips normal stdio teardown (deliberately: calling atexit
   // handlers or flushing from inside a signal handler is not safe), which means any buffered
   // "ok <test>" line not yet flushed to the terminal is simply lost on a real hang -- the

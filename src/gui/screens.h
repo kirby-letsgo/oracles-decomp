@@ -10,6 +10,7 @@
 #include "ui/controls.h"
 #include "ui/syncui.h"
 #include "ui/touch.h"
+#include "mods/mods.h"
 
 typedef struct {
   SDL_FRect game;               // the game picture on the screen, render pixels
@@ -62,3 +63,6 @@ void gui_wait(const char *msg, uint64_t ticks, const GuiTheme *t, const GuiFrame
 void gui_pad(const TouchLayout *l, uint32_t held, const GuiTheme *t);
 // "Today 14:02:37", "Yesterday 09:15:12", "Tue 21:40:05", "Sep 26 21:40".
 void gui_when(int64_t time, int64_t now, char *out, size_t size);
+
+// Official mod catalogue; returns the tapped entry, Back, or None.
+int gui_mods(const ModInfo *info, bool tracker, bool playing, const char *status, const GuiTheme *t, const GuiFrame *f);

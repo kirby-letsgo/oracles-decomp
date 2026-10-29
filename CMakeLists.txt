@@ -163,7 +163,7 @@ if(ORACLES_SDL OR ANDROID)
     COMMAND ${CMAKE_COMMAND} -DIN=${ORACLES_FONT} -DOUT=${CMAKE_BINARY_DIR}/gui_vt323.c -DNAME=gui_vt323 -P ${CMAKE_SOURCE_DIR}/cmake/embed.cmake
     DEPENDS ${ORACLES_FONT} ${CMAKE_SOURCE_DIR}/cmake/embed.cmake)
   add_library(oraclesgui STATIC src/gui/gui.c src/gui/widgets.c src/gui/pause.c src/gui/slots.c src/gui/settings.c
-    src/gui/home.c src/gui/controls.c src/gui/sync.c src/gui/pad.c src/gui/vendor.c ${CMAKE_BINARY_DIR}/gui_vt323.c)
+    src/gui/mods.c src/gui/home.c src/gui/controls.c src/gui/sync.c src/gui/pad.c src/gui/vendor.c ${CMAKE_BINARY_DIR}/gui_vt323.c)
   target_include_directories(oraclesgui PUBLIC src third_party/clay PRIVATE third_party/stb)
   set_source_files_properties(src/gui/vendor.c PROPERTIES COMPILE_OPTIONS "-w")
   # Clay's macros build its structs from partial initializers on purpose
@@ -174,7 +174,17 @@ if(ORACLES_SDL OR ANDROID)
   endif()
 endif()
 
-add_library(oraclesmods STATIC src/mods/overlay.c src/mods/mods.c src/mods/api.c src/mods/sandbox.c src/mods/treasures.c
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/official_essence_tracker.c
+  COMMAND ${CMAKE_COMMAND} -DIN=${CMAKE_SOURCE_DIR}/mods/essence-tracker/main.lua
+    -DOUT=${CMAKE_BINARY_DIR}/official_essence_tracker.c -DNAME=official_essence_tracker
+    -P ${CMAKE_SOURCE_DIR}/cmake/embed.cmake
+  DEPENDS mods/essence-tracker/main.lua cmake/embed.cmake)
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/official_tracker_ini.c
+  COMMAND ${CMAKE_COMMAND} -DIN=${CMAKE_SOURCE_DIR}/mods/essence-tracker/mod.ini
+    -DOUT=${CMAKE_BINARY_DIR}/official_tracker_ini.c -DNAME=official_tracker_ini
+    -P ${CMAKE_SOURCE_DIR}/cmake/embed.cmake
+  DEPENDS mods/essence-tracker/mod.ini cmake/embed.cmake)
+add_library(oraclesmods STATIC ${CMAKE_BINARY_DIR}/official_tracker_ini.c ${CMAKE_BINARY_DIR}/official_essence_tracker.c src/mods/overlay.c src/mods/mods.c src/mods/api.c src/mods/sandbox.c src/mods/treasures.c
   third_party/lua/lapi.c third_party/lua/lauxlib.c third_party/lua/lbaselib.c
   third_party/lua/lcode.c third_party/lua/lcorolib.c third_party/lua/lctype.c third_party/lua/ldblib.c
   third_party/lua/ldebug.c third_party/lua/ldo.c third_party/lua/ldump.c third_party/lua/lfunc.c
@@ -291,6 +301,8 @@ if(ORACLES_SDL)
   add_executable(test_app_error tests/test_app_error.c src/platform/window.c src/platform/sync_client.c src/platform/haptic.c)
   target_link_libraries(test_app_error oraclesnative oraclesgui oraclessync oracleswide oraclesmods ${ORACLES_SDL_TARGET})
   target_compile_definitions(test_app_error PRIVATE ${ORACLES_APP_DEFS})
+  add_test(NAME app_mods COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_mods.py $<TARGET_FILE:oracles-native>)
+  set_tests_properties(app_mods PROPERTIES TIMEOUT 60)
   add_test(NAME app_error COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_error.py $<TARGET_FILE:test_app_error>)
   list(APPEND NATIVE_BINARIES $<TARGET_FILE:oracles-native>)
   add_test(NAME app_menus COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_menus.py $<TARGET_FILE:oracles-native>

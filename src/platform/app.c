@@ -1392,6 +1392,46 @@ static bool run_error(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex) {
   return !quit;
 }
 
+static struct { int tap; bool playing; char status[128]; ModInfo info; } mods_ui;
+static void mods_layer(const GuiFrame *f) {
+  mods_ui.tap = gui_mods(&mods_ui.info, settings.essence_tracker, mods_ui.playing, mods_ui.status, &gui_t, f);
+}
+
+static bool run_mods(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *game_rgb) {
+  static const uint8_t black[FB_W * FB_H * 3];
+  mods_ui.info = mods_official_tracker_info();
+  mods_ui.playing = game_rgb != NULL;
+  mods_ui.status[0] = 0;
+  for (int i = 0; i < mods_count(); i++)
+    if (!strcmp(mods_id(i), "essence-tracker") && !mods_enabled(i))
+      snprintf(mods_ui.status, sizeof mods_ui.status, "%s", mods_error(i));
+  UiScope was = ui_enter(mods_layer, true);
+  bool done = false, quit = false;
+  while (!done && !quit) {
+    test_keys();
+    SDL_Event ev;
+    while (poll_event(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) { quit = true; break; }
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
+      UiButton b;
+      if (!menu_button(&ev, &b)) continue;
+      if (b == UI_BACK) { done = true; break; }
+      if (b == UI_ACCEPT || b == UI_LEFT || b == UI_RIGHT) {
+        settings.essence_tracker = !settings.essence_tracker;
+        settings_store();
+      }
+    }
+    if (done || quit) break;
+    mods_ui.tap = GUI_NONE;
+    present(ren, tex, game_rgb ? game_rgb : black);
+    if (mods_ui.tap == GUI_BACK) push_button(UI_BACK);
+    else if (mods_ui.tap == 0) push_button(UI_ACCEPT);
+    oracles_frame_wait();
+  }
+  ui_leave(was);
+  return !quit;
+}
+
 static struct { SettingsMenu *menu; GuiSettingsTap tap; bool back; } settings_ui;
 static void settings_layer(const GuiFrame *f) { settings_ui.back = gui_settings(settings_ui.menu, &settings, settings.sync_label, &gui_t, f, &settings_ui.tap); }
 
@@ -1420,6 +1460,7 @@ static bool run_settings_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *t
       MenuAction a = settings_press(&m, &settings, b, &row);
       if (settings.portable != was_portable) portable_switched();
       if (a == MENU_BACK) { settings_store(); return true; }
+      if (a == MENU_PICK && row == SET_MODS && !run_mods(win, ren, tex, game_rgb)) return false;
       if (a == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, game_rgb)) return false;
       if (a == MENU_PICK && row == SET_SYNC && !run_sync(win, ren, tex, game_rgb)) return false;
       if (a == MENU_PICK && row == SET_VERSION) update_open(ren, tex, game_rgb);
@@ -1743,6 +1784,7 @@ static bool run_home(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const
         bool was_full = settings.fullscreen, was_wide = settings.widescreen, was_portable = settings.portable;
         MenuAction sa = settings_press(&settings_menu, &settings, r.button, &row);
         if (settings.portable != was_portable) portable_switched();
+        if (sa == MENU_PICK && row == SET_MODS && !run_mods(win, ren, tex, NULL)) return false;
         if (sa == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, NULL)) return false;
         if (sa == MENU_PICK && row == SET_SYNC) {
           if (!run_sync(win, ren, tex, NULL)) return false;
@@ -1986,6 +2028,10 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   char mods_dir[1200];
   snprintf(mods_dir, sizeof mods_dir, "%smods", app_cache);
   mods_init(mods_dir, !ages);
+  if (settings.essence_tracker) {
+    const char *error = mods_load_official_tracker();
+    if (error) show_status(error);
+  }
   features.treasure_swap = mods_treasure_swap;
   // Tracks only true->false transitions below, so the player sees a status line the moment a mod
   // fails -- whether that's immediately (a bad main.lua) or frames into play (a runaway handler)

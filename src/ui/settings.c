@@ -19,6 +19,7 @@ void settings_default(Settings *s) {
   s->ff_speed = 3;
   s->four_slots = false;
   s->haptics = true;
+  s->essence_tracker = false;
   s->pad_style = STYLE_AUTO;
   s->portable = false;
   s->error_log = false;
@@ -45,6 +46,7 @@ void settings_parse(Settings *s, const char *text) {
       else if (!strcmp(key, "fast_menus")) s->fast_menus = !strcmp(value, "on");
       else if (!strcmp(key, "fast_forward")) { int v = atoi(value); if (v >= FF_SPEED_MIN && v <= FF_SPEED_MAX) s->ff_speed = v; }
       else if (!strcmp(key, "four_slots")) s->four_slots = !strcmp(value, "on");
+      else if (!strcmp(key, "essence_tracker")) s->essence_tracker = !strcmp(value, "on");
       else if (!strcmp(key, "haptics")) s->haptics = !strcmp(value, "on");
       else if (!strcmp(key, "filter")) {
         for (int i = 0; i < FILTERS; i++) if (!strcmp(value, filter_keys[i])) s->filter = (ScreenFilter)i;
@@ -63,6 +65,7 @@ int settings_format(const Settings *s, char *out, size_t size) {
                    s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->widescreen ? "on" : "off", s->dim_sides ? "on" : "off", s->gbc_colours ? "on" : "off",
                    s->fast_text ? "on" : "off", s->fast_menus ? "on" : "off", s->ff_speed, s->quick_swap ? "on" : "off", s->four_slots ? "on" : "off",
                    s->haptics ? "on" : "off", pad_style_keys[s->pad_style < STYLES ? s->pad_style : STYLE_AUTO]);
+  if (n < (int)size) n += snprintf(out + n, size - n, "essence_tracker=%s\n", s->essence_tracker ? "on" : "off");
   if (n < (int)size) n += bindings_format(&s->bindings, out + n, size - n);
   return n;
 }
@@ -90,7 +93,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case UI_DOWN: step(m, 1); return MENU_NONE;
   case UI_BACK: return MENU_BACK;
   case UI_ACCEPT:
-    if (m->sel == SET_CONTROLS || m->sel == SET_SYNC || (m->sel == SET_VERSION && s->update[0]) || (m->sel == SET_ERROR_LOG && s->error_log)) { *picked = m->sel; return MENU_PICK; }
+    if (m->sel == SET_MODS || m->sel == SET_CONTROLS || m->sel == SET_SYNC || (m->sel == SET_VERSION && s->update[0]) || (m->sel == SET_ERROR_LOG && s->error_log)) { *picked = m->sel; return MENU_PICK; }
     dir = 1;
     break;
   default: break;

@@ -21,7 +21,8 @@ What this port adds on top of the original games:
 - **Screen filters** — sharp, scanlines, LCD grid, CRT, or the xBRZ and hqx pixel-art scalers, and true Game Boy Color colours
 - **Fast text and faster menus** — optional, off by default
 - **Quick swap and 4 item slots** — optional, off by default
-- **Mods** — small Lua scripts that read the game and draw on top of it; see [MODDING.md](MODDING.md)
+- **Mods** — enable bundled official mods in Settings → Mods, starting with Essence Tracker,
+  or add your own Lua scripts; see [MODDING.md](MODDING.md)
 
 The gameplay toggles are all off until you turn them on, so the default is the game as it shipped.
 

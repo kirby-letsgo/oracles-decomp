@@ -4,7 +4,7 @@
 static const char *const filter_labels[FILTERS] = {"Sharp", "Lines", "LCD", "CRT", "xBRZ", "HQX"};
 static const char *const pad_style_labels[STYLES] = {"Auto", "Nintendo", "Xbox", "PlayStation"};
 static const char *const setting_labels[SET_ROWS] = {"Volume", "Screen", "Scale", "Widescreen", "Dim sides", "Colours", "Fullscreen",
-                                                     "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Item X/Y buttons", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version", "Copy error log"};
+                                                     "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Item X/Y buttons", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version", "Copy error log", "Mods"};
 
 static const char *section_before(int r) {
   switch (r) {
@@ -13,6 +13,7 @@ static const char *section_before(int r) {
   case SET_FAST_TEXT: return "Play";
   case SET_CONTROLS: return "System";
   case SET_VERSION: return "About";
+  case SET_MODS: return "Extras";
   default: return NULL;
   }
 }
@@ -41,6 +42,7 @@ static Clay_String value_of(const Settings *s, const char *sync_label, int r, in
   case SET_SCALE: return gui_str("< %s >", s->fill ? "Fill" : "Pixel");
   case SET_COLOURS: return gui_str("< %s >", s->gbc_colours ? "GBC" : "Vivid");
   case SET_FF_SPEED: return gui_str("< %dx >", s->ff_speed);
+  case SET_MODS:
   case SET_CONTROLS: return CLAY_STRING(">");
   case SET_PAD_STYLE: return gui_str("< %s >", pad_style_labels[s->pad_style < STYLES ? s->pad_style : STYLE_AUTO]);
   case SET_SYNC: return gui_str("%s  >", sync_label && sync_label[0] ? sync_label : "Off");

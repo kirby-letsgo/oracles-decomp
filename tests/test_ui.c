@@ -164,6 +164,8 @@ static void settings_round_trip(void) {
   Settings s, back;
   settings_default(&s);
   ASSERT_EQ(s.volume, 10);
+  ASSERT(!s.essence_tracker);
+  s.essence_tracker = true;
   s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true; s.fill = true;
   s.widescreen = true; s.dim_sides = false;
   ASSERT(s.haptics);                                    // on until the player turns it off
@@ -174,6 +176,7 @@ static void settings_round_trip(void) {
   settings_format(&s, buf, sizeof buf);
   settings_default(&back);
   settings_parse(&back, buf);
+  ASSERT(back.essence_tracker);
   ASSERT_EQ(back.volume, 3);
   ASSERT_EQ(back.filter, FILTER_CRT);
   ASSERT_EQ(back.ff_speed, FF_SPEED_MAX);
@@ -214,6 +217,10 @@ static void settings_menu_changes_values(void) {
   ASSERT(s.fill);
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_UP, &row);
+  settings_press(&m, &s, UI_UP, &row);
+  ASSERT_EQ(m.sel, SET_MODS);
+  ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_PICK);
+  ASSERT_EQ(row, SET_MODS);
   settings_press(&m, &s, UI_UP, &row);
   ASSERT_EQ(m.sel, SET_ERROR_LOG);                      // unavailable until a report exists
   ASSERT_EQ(settings_press(&m, &s, UI_ACCEPT, &row), MENU_NONE);

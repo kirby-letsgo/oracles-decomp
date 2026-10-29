@@ -89,7 +89,7 @@ with tempfile.TemporaryDirectory() as cache:
     for n, b in files.items():
         with open(os.path.join(srv, n), 'wb') as f: f.write(b)
     good, bad = release('latest.json', lambda n, b: b), release('bad.json', lambda n, b: b + b'!')
-    keys = '100:^Update,130:Right,140:Down,150:Up,155:Up,160:X,190:Z,200:Z'
+    keys = '100:^Update,130:Right,140:Down,150:Up,153:Up,155:Up,160:X,190:Z,200:Z'
     r = subprocess.run([app, '--cache', cache], env=dict(env, ORACLES_TOUCH='1', ORACLES_TEST_KEYS=keys, ORACLES_TEST_RELEASE=good), capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
     assert 'test tap: no' not in r.stderr, r.stderr
