@@ -4,7 +4,7 @@
 static const char *const filter_labels[FILTERS] = {"Sharp", "Lines", "LCD", "CRT", "xBRZ", "HQX"};
 static const char *const pad_style_labels[STYLES] = {"Auto", "Nintendo", "Xbox", "PlayStation"};
 static const char *const setting_labels[SET_ROWS] = {"Volume", "Screen", "Scale", "Widescreen", "Dim sides", "Colours", "Fullscreen",
-                                                     "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Item X/Y buttons", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version"};
+                                                     "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Item X/Y buttons", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version", "Copy error log"};
 
 static const char *section_before(int r) {
   switch (r) {
@@ -44,6 +44,7 @@ static Clay_String value_of(const Settings *s, const char *sync_label, int r, in
   case SET_CONTROLS: return CLAY_STRING(">");
   case SET_PAD_STYLE: return gui_str("< %s >", pad_style_labels[s->pad_style < STYLES ? s->pad_style : STYLE_AUTO]);
   case SET_SYNC: return gui_str("%s  >", sync_label && sync_label[0] ? sync_label : "Off");
+  case SET_ERROR_LOG: return s->error_log ? CLAY_STRING(">") : CLAY_STRING("No error log");
   case SET_VERSION: return s->update[0] ? gui_str("%s  Get %s  >", s->version, s->update) : gui_str("%s", s->version);
   default: return toggle ? gui_str("%s", toggle == 1 ? "On" : "Off") : (Clay_String){0};
   }
@@ -108,9 +109,10 @@ void settings_rows(SettingsMenu *m, const Settings *s, const char *sync_label, c
       continue;
     }
     int tg = toggle_of(s, r);
-    if (pick(id, true, &sel, r)) { tap->row = r; tap->button = UI_ACCEPT; }
+    bool enabled = r != SET_ERROR_LOG || s->error_log;
+    if (pick(id, enabled, &sel, r)) { tap->row = r; tap->button = UI_ACCEPT; }
     // unfocused (the main menu's tab row has the keys), nothing in the list shows as selected
-    row(t, (Row){.id = id, .label = gui_str("%s", setting_labels[r]), .value = value_of(s, sync_label, r, tg), .enabled = true, .toggle = tg,
+    row(t, (Row){.id = id, .label = gui_str("%s", setting_labels[r]), .value = value_of(s, sync_label, r, tg), .enabled = enabled, .toggle = tg,
                  .selected = focused && sel == r});
   }
   m->sel = (SettingsRow)sel;

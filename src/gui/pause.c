@@ -2,6 +2,25 @@
 #include "gui/widgets.h"
 #include <math.h>
 
+int gui_error(int *sel, bool has_log, const GuiTheme *t, const GuiFrame *f) {
+  static const char *const actions[] = {"Create issue", "Copy error log", "Back to menu"};
+  gui_begin(page_scale(f));
+  int tapped = GUI_NONE;
+  keep_visible(CLAY_ID("ErrorList"), CLAY_IDI("Error", *sel));
+  PAGE(t, f) {
+    if (header(t, "Game stopped", f->hints ? hint_of(f, "select", "back") : NULL)) tapped = ERROR_BACK;
+    LIST("ErrorList") {
+      paragraph(CLAY_STRING("Sorry this shouldn't have crashed"), TEXT, t->paper, 16, 12);
+      paragraph(CLAY_STRING("Please create an issue and attach the error log"), SMALL, t->muted, 0, 24);
+      for (int i = 0; i < ERROR_ACTIONS; i++) {
+        if (list_row(t, (Row){.id = CLAY_IDI("Error", i), .label = gui_str("%s", actions[i]),
+                            .enabled = i != ERROR_COPY || has_log}, sel, i)) tapped = i;
+      }
+    }
+  }
+  return tapped;
+}
+
 static const char *const pause_labels[PAUSE_ITEMS] = {"Resume", "Save state", "Load state", "Settings", "Quit to menu"};
 
 int gui_pause(PauseMenu *m, const GuiTheme *t, const GuiFrame *f) {

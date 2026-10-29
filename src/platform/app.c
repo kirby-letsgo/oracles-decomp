@@ -19,6 +19,7 @@
 #include "hw/render.h"
 #include "platform/setup.h"
 #include "platform/archive.h"
+#include "platform/error_log.h"
 #include "platform/window.h"
 #include "platform/png.h"
 #include "rt/fibers.h"
@@ -189,6 +190,13 @@ static bool cached(const char *cache, const char *game) {
 }
 
 static Settings settings;
+static char app_cache[1024];
+static char error_report[ERROR_LOG_SIZE];
+
+static void error_log_refresh(void) {
+  settings.error_log = error_log_read(app_cache, error_report);
+}
+
 
 // The device that sent the last input decides what the screen calls the buttons (touch_on covers
 // touch), and the last pad's type what Auto means.
@@ -1333,6 +1341,57 @@ static void update_open(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb)
   else if (!SDL_OpenURL(url)) fprintf(stderr, "could not open %s: %s\n", url, SDL_GetError());
 }
 
+static void copy_error_log(void) {
+  error_log_refresh();
+  if (!settings.error_log) { show_status("No error log available"); return; }
+  if (SDL_SetClipboardText(error_report)) show_status("Error log copied");
+  else {
+    fprintf(stderr, "copy error log: %s\n", SDL_GetError());
+    show_status("Couldn't copy the error log");
+  }
+}
+
+static struct { int sel, tap; } error_ui;
+static void error_layer(const GuiFrame *f) {
+  error_ui.tap = gui_error(&error_ui.sel, settings.error_log, &gui_t, f);
+}
+
+static bool run_error(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex) {
+  static const uint8_t rgb[FB_W * FB_H * 3];
+  error_log_refresh();
+  error_ui.sel = settings.error_log ? ERROR_COPY : ERROR_ISSUE;
+  UiScope was = ui_enter(error_layer, true);
+  bool done = false, quit = false;
+  while (!done && !quit) {
+    test_keys();
+    SDL_Event ev;
+    while (poll_event(&ev)) {
+      if (ev.type == SDL_EVENT_QUIT) { quit = true; break; }
+      if (ev.type == SDL_EVENT_KEY_DOWN && window_key(win, &ev.key)) continue;
+      UiButton b;
+      if (!menu_button(&ev, &b)) continue;
+      if (b == UI_BACK) { done = true; break; }
+      if (b == UI_UP || b == UI_DOWN) {
+        int dir = b == UI_UP ? -1 : 1;
+        do error_ui.sel = (error_ui.sel + dir + ERROR_ACTIONS) % ERROR_ACTIONS;
+        while (error_ui.sel == ERROR_COPY && !settings.error_log);
+      }
+      if (b != UI_ACCEPT) continue;
+      if (error_ui.sel == ERROR_BACK) { done = true; break; }
+      if (error_ui.sel == ERROR_COPY) copy_error_log();
+      if (error_ui.sel == ERROR_ISSUE && !SDL_OpenURL("https://github.com/" ORACLES_RELEASES "/issues/new"))
+        show_status("Couldn't open GitHub");
+    }
+    if (done || quit) break;
+    error_ui.tap = GUI_NONE;
+    present(ren, tex, rgb);
+    if (error_ui.tap >= 0) { error_ui.sel = error_ui.tap; push_button(UI_ACCEPT); }
+    oracles_frame_wait();
+  }
+  ui_leave(was);
+  return !quit;
+}
+
 static struct { SettingsMenu *menu; GuiSettingsTap tap; bool back; } settings_ui;
 static void settings_layer(const GuiFrame *f) { settings_ui.back = gui_settings(settings_ui.menu, &settings, settings.sync_label, &gui_t, f, &settings_ui.tap); }
 
@@ -1346,6 +1405,7 @@ static bool run_settings_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *t
   SettingsMenu m;
   settings_menu_open(&m, ON_PHONE);
   settings_ui.menu = &m;
+  error_log_refresh();
   for (;;) {
     test_keys();
     update_poll();
@@ -1363,6 +1423,7 @@ static bool run_settings_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *t
       if (a == MENU_PICK && row == SET_CONTROLS && !run_controls(win, ren, tex, game_rgb)) return false;
       if (a == MENU_PICK && row == SET_SYNC && !run_sync(win, ren, tex, game_rgb)) return false;
       if (a == MENU_PICK && row == SET_VERSION) update_open(ren, tex, game_rgb);
+      if (a == MENU_PICK && row == SET_ERROR_LOG) copy_error_log();
       if (settings.fullscreen != was_full) apply_window_settings(win);
       if (settings.widescreen != was_wide) fit_window_to_picture(win);
       if (audio) SDL_SetAudioStreamGain(audio, volume_gain(false));
@@ -1388,7 +1449,6 @@ static bool run_settings(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, c
 // Save sync (server in its own repository, save-sync-server): this device's code and server, and
 // what the last sync did.
 static SyncConfig sync_cfg;
-static char app_cache[1024];
 static char sync_status_line[24];
 static const char *playing;     // the game running now, whose files never sync mid-game
 
@@ -1406,6 +1466,7 @@ static void settings_reload(SDL_Window *win) {
   if (z) { z[n] = 0; settings_parse(&settings, z); free(z); } else free(text);
   sync_label_update();
   update_show();
+  error_log_refresh();
   settings.portable = portable_marked();
   apply_window_settings(win);
   apply_game_settings();
@@ -1652,6 +1713,7 @@ static bool run_home(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const
   // No ROM yet is not a special case: the menu opens as usual and its Add ROM row asks for one,
   // rather than a file dialog appearing over nothing on first launch.
   home_scan(&h, cache);
+  error_log_refresh();
   home_init(&h, UI_GAME_SEASONS);
   static SettingsMenu settings_menu;
   settings_menu_open(&settings_menu, ON_PHONE);
@@ -1687,6 +1749,7 @@ static bool run_home(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const
           home_scan(&h, cache);
         }
         if (sa == MENU_PICK && row == SET_VERSION) update_open(ren, tex, rgb);
+        if (sa == MENU_PICK && row == SET_ERROR_LOG) copy_error_log();
         if (settings.fullscreen != was_full) apply_window_settings(win);
         if (settings.widescreen != was_wide) fit_window_to_picture(win);
         apply_game_settings();
@@ -1786,7 +1849,7 @@ static uint8_t boot_input(GB *gb, BootDriver *d, uint64_t frame) {
 #define FF_MAX_LAG_NS 50000000
 
 
-typedef enum { GAME_TO_LAUNCHER, GAME_QUIT, GAME_FAILED } GameEnd;
+typedef enum { GAME_TO_LAUNCHER, GAME_QUIT, GAME_FAILED, GAME_STOPPED } GameEnd;
 typedef enum { MODE_PLAY, MODE_PAUSING, MODE_PAUSED, MODE_QUITTING } GameMode;
 
 typedef struct {
@@ -1817,10 +1880,12 @@ static bool SDLCALL on_app_event(void *data, SDL_Event *ev) {
   (void)data;
   if ((ev->type != SDL_EVENT_WILL_ENTER_BACKGROUND && ev->type != SDL_EVENT_TERMINATING) || !session.gb) return true;
   GB *gb = session.gb;
+  if (gb->hung) return true;
   if (*session.mode == MODE_PLAY || *session.mode == MODE_PAUSING) {
     static int16_t samples[APU_RING * 2];
     live_joy = 0;
-    for (int i = 0; i < PARK_TIMEOUT && !threads_parked(gb); i++) { features_frame(gb); gb_run_frame(gb); (*session.frames)++; }
+    for (int i = 0; i < PARK_TIMEOUT && !gb->hung && !threads_parked(gb); i++) { features_frame(gb); gb_run_frame(gb); (*session.frames)++; }
+    if (gb->hung) return true;
     apu_read_samples(&gb->apu, samples, APU_RING);
     *session.parked = threads_parked(gb);
     framebuffer_to_rgb(gb->sample->framebuffer, session.paused_rgb);
@@ -1855,6 +1920,7 @@ static void write_crash_log(const GB *gb, const char *dir, const char *game, boo
   fprintf(f, "%s the engine stopped\n", when);
   fprintf(f, "  reason   %s\n", gb_stop_reason[0] ? gb_stop_reason : "(not recorded)");
   fprintf(f, "  game     %s\n", game);
+  fprintf(f, "  version  %s, platform %s\n", ORACLES_VERSION[0] ? ORACLES_VERSION : "dev", SDL_GetPlatform());
   fprintf(f, "  room     group %02x room %02x, cutscene %02x\n", group, room, cut);
   fprintf(f, "  cpu      pc %04x sp %04x bank %02x, frame %llu\n", gb->pc, gb->sp, gb->rom_bank,
           (unsigned long long)frames);
@@ -1883,6 +1949,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   ui_font_load(&mod_font, rom, rom_size);
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);
+  gb_stop_reason[0] = 0;
   if (!gb_load_rom(gb, rom, rom_size)) { fprintf(stderr, "cache in %s is not a ROM image\n", dir); return GAME_FAILED; }
   gb->cyctab = tab;
 #ifndef NDEBUG
@@ -2099,7 +2166,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     }
     if (boot.phase != BOOT_OFF && boot.phase != BOOT_LANGUAGE) {
       // fast-forward the logos and menus, silently
-      for (int i = 0; i < 8 && boot.phase != BOOT_OFF && boot.phase != BOOT_LANGUAGE; i++) { live_joy = boot_input(gb, &boot, frames); features_frame(gb); gb_run_frame(gb); frames++; }
+      for (int i = 0; i < 8 && !gb->hung && boot.phase != BOOT_OFF && boot.phase != BOOT_LANGUAGE; i++) { live_joy = boot_input(gb, &boot, frames); features_frame(gb); gb_run_frame(gb); frames++; }
       if (boot.phase == BOOT_OFF) { live_joy = 0; fprintf(stderr, "boot into file %d done at frame %llu\n", boot.file + 1, (unsigned long long)frames); }
       apu_read_samples(&gb->apu, samples, APU_RING);
     } else if (fast && mode == MODE_PLAY) {
@@ -2110,7 +2177,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
       uint64_t now = SDL_GetTicksNS();
       if ((int64_t)(now - ff_due) > FF_MAX_LAG_NS) ff_due = now;
       if ((int64_t)(ff_due - now) > 0) { SDL_Delay(1); continue; }
-      while ((int64_t)(now - ff_due) >= 0) {
+      while (!gb->hung && (int64_t)(now - ff_due) >= 0) {
         features_frame(gb); gb_run_frame(gb); frames++; ff_due += GB_FRAME_NS / settings.ff_speed;
         uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
         if (audio && SDL_GetAudioStreamQueued(audio) <= AUDIO_TARGET_BYTES * ff_ratio) SDL_PutAudioStreamData(audio, samples, n * 4);
@@ -2121,6 +2188,8 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
       features_frame(gb); gb_run_frame(gb);
       frames++;
     }
+    // A stopped frame may have no sample and must never reach autosave or rendering.
+    if (gb->hung) break;
     live_joy = tap_frame_ran(&taps, live_joy);
 
     if (settings.widescreen && mode == MODE_PLAY && boot.phase == BOOT_OFF && wide_npcs_update(gb)) npcs_signal();
@@ -2162,10 +2231,10 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   }
   if (gb->hung) {
     write_crash_log(gb, dir, gs->game, ages, frames);
-    end = GAME_FAILED;
+    end = GAME_STOPPED;
   }
   else if (gs->max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
-  save_sram(gb, sav);
+  if (!gb->hung) save_sram(gb, sav);
   session.gb = NULL;
   playing = NULL;
   if (audio) SDL_DestroyAudioStream(audio);
@@ -2289,11 +2358,15 @@ int main(int argc, char **argv) {
     }
     direct = false;
     GameEnd end = run_game(win, ren, tex, &gs);
-    if (sync_cfg.code[0] && end != GAME_FAILED && !max_frames) {
+    if (sync_cfg.code[0] && end != GAME_FAILED && end != GAME_STOPPED && !max_frames) {
       sync_wait(20000);
       SyncResult earlier;
       sync_poll(&earlier);
       sync_start(&sync_cfg, cache, game);
+    }
+    if (end == GAME_STOPPED) {
+      if (max_frames) { status = 1; break; }
+      if (!run_error(win, ren, tex)) break;
     }
     if (end == GAME_FAILED) { status = 1; break; }
     if (end == GAME_QUIT || max_frames) break;

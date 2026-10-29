@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory() as cache:
     assert 'haptic' not in r.stderr, f'ticks with haptics=off; stderr: {r.stderr}'
     assert 'haptics=off' in open(os.path.join(cache, 'settings.ini')).read()
     # a newer release, served from here (ORACLES_TEST_RELEASE stands in for GitHub's API): the main
-    # menu's notice and the last settings row both give this system's file, printed instead of opened
+    # menu's notice and the Version row both give this system's file, printed instead of opened
     srv = os.path.join(cache, 'srv')
     os.mkdir(srv)
     class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -89,7 +89,7 @@ with tempfile.TemporaryDirectory() as cache:
     for n, b in files.items():
         with open(os.path.join(srv, n), 'wb') as f: f.write(b)
     good, bad = release('latest.json', lambda n, b: b), release('bad.json', lambda n, b: b + b'!')
-    keys = '100:^Update,130:Right,140:Down,150:Up,160:X,190:Z,200:Z'
+    keys = '100:^Update,130:Right,140:Down,150:Up,155:Up,160:X,190:Z,200:Z'
     r = subprocess.run([app, '--cache', cache], env=dict(env, ORACLES_TOUCH='1', ORACLES_TEST_KEYS=keys, ORACLES_TEST_RELEASE=good), capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
     assert 'test tap: no' not in r.stderr, r.stderr
