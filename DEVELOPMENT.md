@@ -164,6 +164,11 @@ TAS_FRAMES=321712 ctest --test-dir build -R tas   # both whole movies with hooks
 
 Tests that need a ROM skip (exit 77) when `roms/` is empty, so a fresh checkout still runs the rest.
 
+`ctest --test-dir build -R '^slot_hud$' checks issue #45 using the native HUD routines and local
+USA/EU ROMs. It simulates seed/bomb consumption while either extra slot borrows A or B, comparing
+HUD tiles, icon graphics and sprite attributes before, during and after the press. It covers Ages'
+underwater A slot and the fallback without separate X/Y boxes; gameplay keeps the borrowed item.
+
 Two full-game movies are the main gate: the console-verified Ages TAS and the console-verified
 Seasons TAS (`tas/README.md`), plus a recorded Seasons playthrough.
 
@@ -311,9 +316,9 @@ Push a ROM somewhere the picker can reach it, e.g. `adb push ROM /sdcard/Downloa
 
 ## Releases
 
-Every push to `main` rebuilds the apps and replaces the rolling
-[nightly release](https://github.com/kirby-letsgo/oracles-decomp/releases/tag/nightly): macOS
-(universal DMG), Windows (x64 zip), Linux (x86_64 AppImage) and Android (arm64 APK). The workflow is
+A change to `VERSION` pushed to `main` builds macOS (universal DMG), Windows (x64 zip),
+Linux (x86_64 AppImage) and Android (arm64 APK), then publishes `v<VERSION>` as the latest release.
+All four platform builds must succeed before publication. The workflow is
 `.github/workflows/release.yml`. The APK is signed with the release key from the repository secrets
 `ANDROID_KEYSTORE_B64`, `ANDROID_KEYSTORE_PASSWORD` and `ANDROID_KEY_ALIAS` (debug-signed, with a
 warning, when they are missing).

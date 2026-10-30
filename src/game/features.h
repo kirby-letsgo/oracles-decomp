@@ -30,6 +30,8 @@ bool features_assign_slot(struct GB *gb, int slot);
 // it on B for as long as the button is held; features_slot_release puts B's own item back.
 uint8_t features_slot_press(struct GB *gb, int slot);
 void features_slot_release(struct GB *gb, int slot);
+// The item shown on A/B, hiding an extra slot's temporary assignment when it has its own box.
+uint8_t features_hud_item(struct GB *gb, uint16_t addr);
 // The 4 treasureObjectData bytes of (id, subid), read from the ROM.
 void features_treasure_object(struct GB *gb, uint8_t id, uint8_t subid, uint8_t out[4]);
 // Called by interactionLoadTreasureData with the treasure object: applies treasure_swap, keeping

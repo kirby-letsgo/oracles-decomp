@@ -69,6 +69,15 @@ uint8_t features_slot_press(GB *gb, int slot) {
   return underwater ? JOY_A : JOY_B;
 }
 
+// HUD reads must not expose the temporary A/B assignment when X/Y have their own boxes.
+// Read through rather than swapping RAM around a draw: rendering can yield to other threads.
+uint8_t features_hud_item(GB *gb, uint16_t addr) {
+  uint8_t item = mem_rd(gb, addr);
+  if (held_slot >= 0 && !held_refresh && addr == held_addr && item == features.slot_item[held_slot])
+    return held_prev;
+  return item;
+}
+
 void features_slot_release(GB *gb, int slot) {
   if (held_slot != slot) return;
   held_slot = -1;

@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/gen.h"
+#include "game/features.h"
 void s_checkWhetherToDisplaySeasonInSubscreen_hook(GB *gb);
 void s_seasonsFunc_332f_hook(GB *gb);
 void s_checkPirateShipMoved_hook(GB *gb);
@@ -5064,13 +5065,13 @@ positions:
   if (!game_seasons) {      // the harp's wider icon: Ages only
     CYC(b_+219, b_+222); SET_HL(wInventoryB);
     CYC(b_+222, b_+224); A = 0x11;
-    CYC(b_+224, b_+225); alu_cp(gb, mem_rd(gb, HL));
+    CYC(b_+224, b_+225); alu_cp(gb, features_hud_item(gb, HL));
     if (!(F & FZ)) { CYCT(b_+225, b_+227); goto second_item; }
     CYC(b_+225, b_+227);
     CYC(b_+227, b_+229); E |= 0x08;
 second_item:
     CYC(b_+229, b_+230); L = alu_inc8(gb, L);
-    CYC(b_+230, b_+231); alu_cp(gb, mem_rd(gb, HL));
+    CYC(b_+230, b_+231); alu_cp(gb, features_hud_item(gb, HL));
     if (!(F & FZ)) { CYCT(b_+231, b_+233); goto write_sprites; }
     CYC(b_+231, b_+233);
     CYC(b_+233, b_+234); A = C;
@@ -5142,13 +5143,13 @@ void loadEquippedItemGfx_hook(GB *gb) {
   CYC(b_+6, b_+7); alu_rlca(gb);
   if (F & FC) { CYCT(b_+7, b_+8); ret_effect(gb); return; }
   CYC(b_+7, b_+8);
-  CYC(b_+8, b_+11); A = W8(wInventoryB);
+  CYC(b_+8, b_+11); A = features_hud_item(gb, wInventoryB);
   CYC(b_+11, b_+14); SET_DE(wBItemTreasure);
   CALL_C(b_+14, loadEquippedItemSpriteData_hook, SYM(loadEquippedItemSpriteData), b_+17);
   CYC(b_+17, b_+19); E = (uint8_t)w4ItemIconGfx;
   if (F & FC) CALL_C_CC(b_+19, loadItemIconGfx_hook, SYM(loadItemIconGfx), b_+22);
   else CYC(b_+19, b_+22);
-  CYC(b_+22, b_+25); A = W8(wInventoryA);
+  CYC(b_+22, b_+25); A = features_hud_item(gb, wInventoryA);
   CYC(b_+25, b_+28); SET_DE(wAItemTreasure);
   CALL_C(b_+28, loadEquippedItemSpriteData_hook, SYM(loadEquippedItemSpriteData), b_+31);
   CYC(b_+31, b_+33); E = (uint8_t)(w4ItemIconGfx + 0x40);
@@ -5266,10 +5267,10 @@ void drawItemTilesOnStatusBar_hook(GB *gb) {
   CYC(b_+5, b_+6);
   CYC(b_+6, b_+8); A = 0x04;
   CYC(b_+8, b_+10); hram_wr(gb, 0x70, A);
-  CYC(b_+10, b_+13); A = W8(wInventoryB);
+  CYC(b_+10, b_+13); A = features_hud_item(gb, wInventoryB);
   CYC(b_+13, b_+16); SET_DE(wBItemTreasure);
   CALL_C(b_+16, loadEquippedItemSpriteData_hook, SYM(loadEquippedItemSpriteData), b_+19);
-  CYC(b_+19, b_+22); A = W8(wInventoryA);
+  CYC(b_+19, b_+22); A = features_hud_item(gb, wInventoryA);
   CYC(b_+22, b_+25); SET_DE(wAItemTreasure);
   CALL_C(b_+25, loadEquippedItemSpriteData_hook, SYM(loadEquippedItemSpriteData), b_+28);
   CALL_C(b_+28, func_02_52f6_hook, SYM(func_02_52f6), b_+31);
@@ -5682,7 +5683,7 @@ void loadStatusBarMap_hook(GB *gb) {
   CYC(b_+5, b_+7); alu_cp(gb, 0x39);
   if (F & FC) CYCT(b_+7, b_+9);
   else { CYC(b_+7, b_+9); CYC(b_+9, b_+10); C = alu_inc8(gb, C); }
-  CYC(b_+10, b_+13); A = W8(wInventoryB);
+  CYC(b_+10, b_+13); A = features_hud_item(gb, wInventoryB);
   CYC(b_+13, b_+15); alu_cp(gb, 0x0c);
   if (!(F & FZ)) CYCT(b_+15, b_+17);
   else { CYC(b_+15, b_+17); CYC(b_+17, b_+19); C |= 0x80; }
