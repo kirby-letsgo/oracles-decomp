@@ -35,7 +35,7 @@ jobs:
           echo "version $v, publish $publish"
 
   macos:
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 30
     needs: version
     env:
