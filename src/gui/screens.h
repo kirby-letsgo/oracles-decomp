@@ -65,4 +65,4 @@ void gui_pad(const TouchLayout *l, uint32_t held, const GuiTheme *t);
 void gui_when(int64_t time, int64_t now, char *out, size_t size);
 
 // Official mod catalogue; returns the tapped entry, Back, or None.
-int gui_mods(const ModInfo *info, bool tracker, bool playing, const char *status, const GuiTheme *t, const GuiFrame *f);
+int gui_mods(const ModInfo *official, const bool *enabled, int selected, bool playing, const ModInstalled *installed, int installed_count, const char *status, const GuiTheme *t, const GuiFrame *f);

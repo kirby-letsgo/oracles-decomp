@@ -21,8 +21,8 @@ What this port adds on top of the original games:
 - **Screen filters** — sharp, scanlines, LCD grid, CRT, or the xBRZ and hqx pixel-art scalers, and true Game Boy Color colours
 - **Fast text and faster menus** — optional, off by default
 - **Quick swap and 4 item slots** — optional, off by default
-- **Mods** — enable bundled official mods in Settings → Mods, starting with Essence Tracker,
-  or add your own Lua scripts; see [MODDING.md](MODDING.md)
+- **Mods** — Lua folder mods; see [MODDING.md](MODDING.md). The in-app Mods screen is
+  hidden until the upcoming mods release.
 
 The gameplay toggles are all off until you turn them on, so the default is the game as it shipped.
 
@@ -205,6 +205,10 @@ main menu.
 More options:
 
 - `--file 1` (to `3`) boots straight into that save file.
+- `--state auto` resumes the automatic save state; `--state 1` (to `4`) loads a manual
+  save-state slot directly, skipping the launcher. Use with `--game` or a ROM path,
+  without `--file`. For example: `oracles --game seasons --state auto`.
+  Missing, corrupt or incompatible states report an error and exit without starting a new game.
 - `--game ages-eu` (or `seasons-eu`) picks the European ROM when you have added both releases of a
   game; plain `ages`/`seasons` starts the one the game's tab starts.
 - `--cache DIR` keeps everything (ROMs, saves, settings) in that folder instead of the usual one, as

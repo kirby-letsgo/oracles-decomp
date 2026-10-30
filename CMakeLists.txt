@@ -184,7 +184,19 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/official_tracker_ini.c
     -DOUT=${CMAKE_BINARY_DIR}/official_tracker_ini.c -DNAME=official_tracker_ini
     -P ${CMAKE_SOURCE_DIR}/cmake/embed.cmake
   DEPENDS mods/essence-tracker/mod.ini cmake/embed.cmake)
-add_library(oraclesmods STATIC ${CMAKE_BINARY_DIR}/official_tracker_ini.c ${CMAKE_BINARY_DIR}/official_essence_tracker.c src/mods/overlay.c src/mods/mods.c src/mods/api.c src/mods/sandbox.c src/mods/treasures.c
+foreach(part IN ITEMS main ini)
+  if(part STREQUAL "main")
+    set(randomizer_source mods/d1-randomizer/main.lua)
+  else()
+    set(randomizer_source mods/d1-randomizer/mod.ini)
+  endif()
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/official_randomizer_${part}.c
+    COMMAND ${CMAKE_COMMAND} -DIN=${CMAKE_SOURCE_DIR}/${randomizer_source}
+      -DOUT=${CMAKE_BINARY_DIR}/official_randomizer_${part}.c -DNAME=official_randomizer_${part}
+      -P ${CMAKE_SOURCE_DIR}/cmake/embed.cmake
+    DEPENDS ${randomizer_source} cmake/embed.cmake)
+endforeach()
+add_library(oraclesmods STATIC ${CMAKE_BINARY_DIR}/official_randomizer_main.c ${CMAKE_BINARY_DIR}/official_randomizer_ini.c ${CMAKE_BINARY_DIR}/official_tracker_ini.c ${CMAKE_BINARY_DIR}/official_essence_tracker.c src/mods/overlay.c src/mods/mods.c src/mods/api.c src/mods/sandbox.c src/mods/treasures.c
   third_party/lua/lapi.c third_party/lua/lauxlib.c third_party/lua/lbaselib.c
   third_party/lua/lcode.c third_party/lua/lcorolib.c third_party/lua/lctype.c third_party/lua/ldblib.c
   third_party/lua/ldebug.c third_party/lua/ldo.c third_party/lua/ldump.c third_party/lua/lfunc.c
@@ -214,6 +226,8 @@ if(ANDROID)
 endif()
 
 enable_testing()
+add_test(NAME randomizer COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_randomizer.py)
+set_tests_properties(randomizer PROPERTIES TIMEOUT 30)
 set(TEST_ROM_DIR ${CMAKE_SOURCE_DIR}/tests/roms)
 set(GAME_ROM_DIR ${CMAKE_SOURCE_DIR}/roms)
 add_executable(test_error_log tests/test_error_log.c src/platform/error_log.c)
@@ -262,6 +276,12 @@ add_executable(test_sync_http tests/test_sync_http.c)
 target_link_libraries(test_sync_http oraclessync)
 add_test(NAME sync_http COMMAND test_sync_http)
 set_tests_properties(sync_http PROPERTIES SKIP_RETURN_CODE 77)
+add_executable(test_randomizer_native tests/test_randomizer_native.c)
+target_link_libraries(test_randomizer_native oraclesnative oraclesmods)
+add_test(NAME randomizer_replay COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_randomizer_replay.py $<TARGET_FILE:test_randomizer_native>)
+set_tests_properties(randomizer_replay PROPERTIES LABELS "rom" SKIP_RETURN_CODE 77 TIMEOUT 330)
+
+target_compile_definitions(test_randomizer_native PRIVATE GAME_ROM_DIR="${GAME_ROM_DIR}" TAS_DIR="${CMAKE_SOURCE_DIR}/tas")
 add_executable(test_native_tas tests/test_native_tas.c)
 target_link_libraries(test_native_tas oraclesnative)
 target_compile_definitions(test_native_tas PRIVATE GAME_ROM_DIR="${GAME_ROM_DIR}" TAS_DIR="${CMAKE_SOURCE_DIR}/tas")
@@ -308,6 +328,10 @@ if(ORACLES_SDL)
   add_test(NAME app_menus COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_menus.py $<TARGET_FILE:oracles-native>
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc")
   set_tests_properties(app_menus PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")
+  add_test(NAME app_state COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_state.py $<TARGET_FILE:oracles-native>
+    "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
+    "${CMAKE_SOURCE_DIR}/tas/seasons-boot.state")
+  set_tests_properties(app_state PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom" TIMEOUT 180)
   add_test(NAME app_eu COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_eu.py $<TARGET_FILE:oracles-native>
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (Europe) (En,Fr,De,Es,It).gbc")

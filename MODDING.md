@@ -15,9 +15,18 @@ build on.
 
 ## Official mods
 
+The Mods UI is currently hidden pending the mods release. The following describes that upcoming UI.
+
 Open **Settings → Mods** from the launcher or pause menu. Official mods are bundled with the
-app and work offline, including on Android. Essence Tracker is the first entry: turn it on to
-show your eight collected essences in either game. Your selection is saved in settings.ini.
+app and work offline, including on Android. Both are disabled by default:
+
+- **Essence Tracker** shows your eight collected essences in either game.
+- **Randomizer (D1 preview)** uses the fixed seed `first` in Seasons, shuffling only the D1 map,
+  compass and Gasha chests. Progression stays vanilla. Use a fresh unlinked save and keep the
+  setting enabled throughout that run. This preview has no seed picker or full-game shuffle;
+  full-dungeon completion and EU playtesting are still outstanding.
+
+Your selections are saved in settings.ini. No download or folder installation is needed.
 Changes take effect the next time you start a game; when playing, leave to the launcher first.
 Official scripts run in the same sandbox as folder mods.
 
@@ -41,7 +50,9 @@ Create `mods` yourself if it isn't there. Mods are picked up when a game starts,
 (leaving to the launcher and choosing a file again is enough) after adding or editing one. They load
 in alphabetical order by folder name, and at most 32 load at once.
 
-The Mods screen manages bundled official mods. For third-party folder mods there is no in-app
+The Mods screen shows bundled official mods and an Installed mods section for folder mods,
+including their descriptions and, while playing, load status. The installed list includes both games
+and refreshes when you open the screen. For folder mods there is no in-app
 installer or on/off switch yet: install by copying the folder and remove by deleting it.
 
 **Only install mods you trust.** A mod is a program, and the app keeps it boxed in deliberately: it

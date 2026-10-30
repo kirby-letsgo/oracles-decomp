@@ -1398,19 +1398,21 @@ extern const unsigned char official_essence_tracker[];
 extern const unsigned int official_essence_tracker_size;
 extern const unsigned char official_tracker_ini[];
 extern const unsigned int official_tracker_ini_size;
-static Mod official_tracker_metadata(void) {
+extern const unsigned char official_randomizer_main[], official_randomizer_ini[];
+extern const unsigned int official_randomizer_main_size, official_randomizer_ini_size;
+static Mod official_metadata(const unsigned char *data, size_t size) {
   Mod m = {0};
   size_t at = 0;
-  while (at < official_tracker_ini_size) {
+  while (at < size) {
     char line[256];
     size_t n = 0;
-    while (at < official_tracker_ini_size && official_tracker_ini[at] != '\n') {
-      if (n < sizeof line - 1) line[n++] = (char)official_tracker_ini[at];
+    while (at < size && data[at] != '\n') {
+      if (n < sizeof line - 1) line[n++] = (char)data[at];
       at++;
     }
     at++;
     line[n] = 0;
-    parse_ini_line(line, "official essence-tracker", &m);
+    parse_ini_line(line, "official mod", &m);
   }
   snprintf(m.id, sizeof m.id, "%s", m.ini_id);
   return m;
@@ -1428,7 +1430,7 @@ ModInfo mods_info(int index) {
   return index >= 0 && index < count ? info_of(&mods[index]) : (ModInfo){0};
 }
 ModInfo mods_official_tracker_info(void) {
-  Mod m = official_tracker_metadata();
+  Mod m = official_metadata(official_tracker_ini, official_tracker_ini_size);
   return info_of(&m);
 }
 const char *mods_load_official_tracker(void) {
@@ -1436,9 +1438,26 @@ const char *mods_load_official_tracker(void) {
     if (!strcmp(mods[i].id, "essence-tracker"))
       return "Remove the folder copy of Essence Tracker first";
   if (count >= MODS_MAX) return "Too many mods loaded";
-  Mod m = official_tracker_metadata();
+  Mod m = official_metadata(official_tracker_ini, official_tracker_ini_size);
   m.on_frame_ref = m.on_room_change_ref = LUA_NOREF;
   m.enabled = run_main_lua(mods_dir, m.id, &m, official_essence_tracker, official_essence_tracker_size);
+  mods[count++] = m;
+  return m.enabled ? NULL : mods[count - 1].error;
+}
+
+ModInfo mods_official_randomizer_info(void) {
+  Mod m = official_metadata(official_randomizer_ini, official_randomizer_ini_size);
+  return info_of(&m);
+}
+const char *mods_load_official_randomizer(void) {
+  if (!host_seasons) return NULL;
+  for (int i = 0; i < count; i++)
+    if (!strcmp(mods[i].id, "d1-randomizer"))
+      return "Remove the folder copy of D1 Randomizer first";
+  if (count >= MODS_MAX) return "Too many mods loaded";
+  Mod m = official_metadata(official_randomizer_ini, official_randomizer_ini_size);
+  m.on_frame_ref = m.on_room_change_ref = LUA_NOREF;
+  m.enabled = run_main_lua(mods_dir, m.id, &m, official_randomizer_main, official_randomizer_main_size);
   mods[count++] = m;
   return m.enabled ? NULL : mods[count - 1].error;
 }
@@ -1488,3 +1507,27 @@ const char *mods_id(int i) { return i >= 0 && i < count ? mods[i].id : ""; }
 const char *mods_name(int i) { return i >= 0 && i < count ? mods[i].name : ""; }
 bool mods_enabled(int i) { return i >= 0 && i < count && mods[i].enabled; }
 const char *mods_error(int i) { return i >= 0 && i < count ? mods[i].error : ""; }
+
+static int installed_compare(const void *a, const void *b) {
+  return strcmp(((const ModInstalled *)a)->id, ((const ModInstalled *)b)->id);
+}
+int mods_scan_installed(const char *dir, ModInstalled *out, int capacity) {
+  if (!dir || !*dir || !out || capacity <= 0) return -1;
+  DIR *d = opendir(dir);
+  if (!d) return errno == ENOENT ? 0 : -1;
+  int n = 0;
+  struct dirent *e;
+  while ((e = readdir(d))) {
+    if (e->d_name[0] == '.') continue;
+    Mod m = {0};
+    if (!load_one(dir, e->d_name, &m)) continue;
+    ModInstalled entry = {.info = info_of(&m)};
+    snprintf(entry.id, sizeof entry.id, "%s", m.id);
+    // Keep the alphabetically first entries even when the menu capacity is reached.
+    if (n < capacity) out[n++] = entry;
+    else if (strcmp(entry.id, out[n - 1].id) < 0) out[n - 1] = entry;
+    qsort(out, n, sizeof *out, installed_compare);
+  }
+  closedir(d);
+  return n;
+}

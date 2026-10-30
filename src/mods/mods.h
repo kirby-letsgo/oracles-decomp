@@ -420,3 +420,11 @@ typedef struct {
 } ModInfo;
 ModInfo mods_info(int index);
 ModInfo mods_official_tracker_info(void);
+
+// Metadata-only discovery for the menu, across both games. Never executes Lua.
+typedef struct { char id[64]; ModInfo info; } ModInstalled;
+// Returns count, or -1 when the directory cannot be scanned. Sorted by folder id.
+int mods_scan_installed(const char *dir, ModInstalled *out, int capacity);
+
+ModInfo mods_official_randomizer_info(void);
+const char *mods_load_official_randomizer(void);

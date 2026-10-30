@@ -356,3 +356,19 @@ warning, when they are missing).
 - `tools/`: generators and the audits run on every change.
 - `tas/`: input movies and reference hashes.
 - `ref/oracles-disasm/`: the community disassembly (submodule), used for symbols and routines.
+
+## Randomizer prototype
+
+`tools/randomizer/generate.py` generates deterministic treasure placements from an authored world
+logic file, verifies progression independently, and exports an API 2 Lua mod with a spoiler.
+The `--preset seasons-d1-optional` preview shuffles the map, compass and Gasha chests in D1,
+with progression left vanilla. Full-game location logic, progressive items and save/seed binding
+are still required. See
+[the format and implementation checklist](tools/randomizer/README.md).
+
+`python3 tests/test_randomizer.py` (also the `randomizer` CTest) tests synthetic progression graphs,
+self-lock rejection, deterministic seeds, pool preservation and export. No ROM is required.
+
+`randomizer_replay` checks a generated D1 seed through real native-engine treasure pickups and
+inventory changes using the local Seasons USA ROM and recording. It is a pickup integration test,
+not a proof of full-dungeon completion; see the preset's validation limits in its README.

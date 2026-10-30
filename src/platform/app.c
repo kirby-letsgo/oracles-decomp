@@ -7,7 +7,7 @@
 // included, and the one added last is the one its game's tab starts (active.txt). Saves are the game's own SRAM image in that
 // cache; Cmd+S / Cmd+R save and load one state slot there.
 //
-// usage: oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]
+// usage: oracles-native [ROM] [--game ages|seasons [--file 1-3 | --state auto|1-4]] [--cache DIR] [--frames N]
 //   --file N boots straight into save file N, as choosing it in the launcher does.
 //   With neither a ROM nor --game it opens the launcher, which asks for a ROM through its ADD ROM
 //   row rather than putting a file dialog on screen before anything is drawn.
@@ -1392,18 +1392,24 @@ static bool run_error(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex) {
   return !quit;
 }
 
-static struct { int tap; bool playing; char status[128]; ModInfo info; } mods_ui;
+static struct { int tap, selected; bool playing; char status[128]; ModInfo info[2]; ModInstalled installed[MODS_MAX]; int installed_count; } mods_ui;
 static void mods_layer(const GuiFrame *f) {
-  mods_ui.tap = gui_mods(&mods_ui.info, settings.essence_tracker, mods_ui.playing, mods_ui.status, &gui_t, f);
+  bool enabled[] = {settings.essence_tracker, settings.d1_randomizer};
+  mods_ui.tap = gui_mods(mods_ui.info, enabled, mods_ui.selected, mods_ui.playing, mods_ui.installed, mods_ui.installed_count, mods_ui.status, &gui_t, f);
 }
 
 static bool run_mods(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *game_rgb) {
   static const uint8_t black[FB_W * FB_H * 3];
-  mods_ui.info = mods_official_tracker_info();
+  mods_ui.info[0] = mods_official_tracker_info();
+  mods_ui.info[1] = mods_official_randomizer_info();
+  mods_ui.selected = 0;
   mods_ui.playing = game_rgb != NULL;
+  char dir[1200];
+  snprintf(dir, sizeof dir, "%smods", app_cache);
+  mods_ui.installed_count = mods_scan_installed(dir, mods_ui.installed, MODS_MAX);
   mods_ui.status[0] = 0;
   for (int i = 0; i < mods_count(); i++)
-    if (!strcmp(mods_id(i), "essence-tracker") && !mods_enabled(i))
+    if ((!strcmp(mods_id(i), "essence-tracker") || !strcmp(mods_id(i), "d1-randomizer")) && !mods_enabled(i))
       snprintf(mods_ui.status, sizeof mods_ui.status, "%s", mods_error(i));
   UiScope was = ui_enter(mods_layer, true);
   bool done = false, quit = false;
@@ -1416,8 +1422,10 @@ static bool run_mods(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const
       UiButton b;
       if (!menu_button(&ev, &b)) continue;
       if (b == UI_BACK) { done = true; break; }
+      if (b == UI_UP || b == UI_DOWN) mods_ui.selected = 1 - mods_ui.selected;
       if (b == UI_ACCEPT || b == UI_LEFT || b == UI_RIGHT) {
-        settings.essence_tracker = !settings.essence_tracker;
+        if (mods_ui.selected == 0) settings.essence_tracker = !settings.essence_tracker;
+        else settings.d1_randomizer = !settings.d1_randomizer;
         settings_store();
       }
     }
@@ -1425,7 +1433,7 @@ static bool run_mods(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const
     mods_ui.tap = GUI_NONE;
     present(ren, tex, game_rgb ? game_rgb : black);
     if (mods_ui.tap == GUI_BACK) push_button(UI_BACK);
-    else if (mods_ui.tap == 0) push_button(UI_ACCEPT);
+    else if (mods_ui.tap >= 0 && mods_ui.tap < 2) { mods_ui.selected = mods_ui.tap; push_button(UI_ACCEPT); }
     oracles_frame_wait();
   }
   ui_leave(was);
@@ -2032,6 +2040,10 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     const char *error = mods_load_official_tracker();
     if (error) show_status(error);
   }
+  if (settings.d1_randomizer && !ages) {
+    const char *error = mods_load_official_randomizer();
+    if (error) show_status(error);
+  }
   features.treasure_swap = mods_treasure_swap;
   // Tracks only true->false transitions below, so the player sees a status line the moment a mod
   // fails -- whether that's immediately (a bad main.lua) or frames into play (a runaway handler)
@@ -2048,8 +2060,14 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   BootDriver boot = {gs->start_file >= 0 ? BOOT_TO_FILE_SELECT : BOOT_OFF, gs->start_file, gs->open_file, 0};
   if (gs->start_file == LAUNCH_RESUME || gs->start_file == LAUNCH_SLOTS) {
     int slot = gs->start_file == LAUNCH_RESUME ? SLOT_AUTO : gs->start_slot;
-    if (!slot_load(gb, dir, slot)) fprintf(stderr, "could not load the state in slot %d\n", slot + 1);
-    else if (slot != SLOT_AUTO) fprintf(stderr, "started from slot %d\n", slot + 1);
+    if (!slot_load(gb, dir, slot)) {
+      char path[1300];
+      slot_path(path, sizeof path, dir, slot, "");
+      fprintf(stderr, "could not load save state %s (missing, corrupt or incompatible)\n", path);
+      end = GAME_FAILED;
+    }
+    else if (slot == SLOT_AUTO) fprintf(stderr, "started from automatic state\n");
+    else fprintf(stderr, "started from slot %d\n", slot + 1);
   }
   framebuffer_to_rgb(gb->sample ? gb->sample->framebuffer : gb->framebuffer, rgb);
   session = (Session){gb, dir, sav, paused_rgb, &mode, &parked, false, &frames, gs->game};
@@ -2060,7 +2078,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   paused_game.rom_size = rom_size;
   playing = gs->game;
 
-  for (bool running = true; running && !gb->hung;) {
+  for (bool running = end != GAME_FAILED; running && !gb->hung;) {
     test_keys();
     SyncResult synced;
     if (sync_poll(&synced)) {
@@ -2279,8 +2297,8 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     write_crash_log(gb, dir, gs->game, ages, frames);
     end = GAME_STOPPED;
   }
-  else if (gs->max_frames) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
-  if (!gb->hung) save_sram(gb, sav);
+  else if (gs->max_frames && end != GAME_FAILED) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
+  if (!gb->hung && end != GAME_FAILED) save_sram(gb, sav);
   session.gb = NULL;
   playing = NULL;
   if (audio) SDL_DestroyAudioStream(audio);
@@ -2325,16 +2343,28 @@ static void stderr_to_logcat(void) {
 
 int main(int argc, char **argv) {
   const char *rom_arg = NULL, *game_arg = NULL, *cache_arg = NULL;
-  int file_arg = -1;
+  int file_arg = -1, state_arg = -1;
+  bool file_given = false;
   uint64_t max_frames = 0;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--game") && i + 1 < argc) game_arg = argv[++i];
     else if (!strcmp(argv[i], "--frames") && i + 1 < argc) max_frames = strtoull(argv[++i], NULL, 10);
     else if (!strcmp(argv[i], "--cache") && i + 1 < argc) cache_arg = argv[++i];
-    else if (!strcmp(argv[i], "--file") && i + 1 < argc) file_arg = atoi(argv[++i]) - 1;
+    else if (!strcmp(argv[i], "--file") && i + 1 < argc) { file_given = true; file_arg = atoi(argv[++i]) - 1; }
+    else if (!strcmp(argv[i], "--state") && i + 1 < argc) {
+      const char *value = argv[++i];
+      if (!strcmp(value, "auto")) state_arg = SLOT_AUTO;
+      else if (strlen(value) == 1 && value[0] >= '1' && value[0] < '1' + UI_SLOTS) state_arg = value[0] - '1';
+      else { fprintf(stderr, "--state must be auto or 1-%d\n", UI_SLOTS); return 2; }
+    }
     else if (argv[i][0] != '-') rom_arg = argv[i];
-    else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]\n"); return 2; }
+    else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons [--file 1-3 | --state auto|1-4]] [--cache DIR] [--frames N]\n"); return 2; }
   }
+  if (state_arg >= 0 && (file_given || (!rom_arg && !game_arg))) {
+    fprintf(stderr, "--state requires a ROM or --game and cannot be combined with --file\n");
+    return 2;
+  }
+
 #ifdef __ANDROID__
   stderr_to_logcat();
   SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
@@ -2384,6 +2414,10 @@ int main(int argc, char **argv) {
       gs.start_file = file_arg;
       gs.open_file = probe.games[is_ages(game) ? UI_GAME_AGES : UI_GAME_SEASONS].files[file_arg].valid;
     }
+  }
+  if (state_arg >= 0) {
+    gs.start_file = state_arg == SLOT_AUTO ? LAUNCH_RESUME : LAUNCH_SLOTS;
+    gs.start_slot = state_arg;
   }
   // The spec wants settings rows a mod asked for to exist "from the launcher", before any game
   // has been chosen, so a player can configure a mod before playing -- but mods_init takes a

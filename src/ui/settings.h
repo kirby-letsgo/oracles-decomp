@@ -24,6 +24,7 @@ typedef struct {
   bool fast_menus;              // quick fades into and out of the inventory and map
   int ff_speed;                 // fast-forward runs the game this many times as fast (FF_SPEED_MIN..FF_SPEED_MAX)
   bool four_slots;              // Item X / Item Y buttons, assigned in the inventory
+  bool d1_randomizer;           // bundled fixed-seed Seasons preview; off by default
   bool essence_tracker;         // bundled official mod; applied when a game starts
   bool haptics;                 // a tick when a finger presses a control or taps a menu (Android)
   PadStyle pad_style;           // the names on screen for a controller: Auto follows the pad's type

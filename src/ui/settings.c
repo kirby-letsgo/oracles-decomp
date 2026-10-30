@@ -20,6 +20,7 @@ void settings_default(Settings *s) {
   s->four_slots = false;
   s->haptics = true;
   s->essence_tracker = false;
+  s->d1_randomizer = false;
   s->pad_style = STYLE_AUTO;
   s->portable = false;
   s->error_log = false;
@@ -34,7 +35,7 @@ void settings_parse(Settings *s, const char *text) {
     size_t len = eol ? (size_t)(eol - p) : strlen(p);
     char line[300];
     snprintf(line, sizeof line, "%.*s", (int)(len < sizeof line ? len : sizeof line - 1), p);
-    if (sscanf(line, " %31[a-z_] = %255s", key, value) == 2) {
+    if (sscanf(line, " %31[a-z0-9_] = %255s", key, value) == 2) {
       if (!strcmp(key, "volume")) { int v = atoi(value); if (v >= 0 && v <= 10) s->volume = v; }
       else if (!strcmp(key, "fullscreen")) s->fullscreen = !strcmp(value, "on");
       else if (!strcmp(key, "scale")) s->fill = !strcmp(value, "fill");
@@ -46,6 +47,7 @@ void settings_parse(Settings *s, const char *text) {
       else if (!strcmp(key, "fast_menus")) s->fast_menus = !strcmp(value, "on");
       else if (!strcmp(key, "fast_forward")) { int v = atoi(value); if (v >= FF_SPEED_MIN && v <= FF_SPEED_MAX) s->ff_speed = v; }
       else if (!strcmp(key, "four_slots")) s->four_slots = !strcmp(value, "on");
+      else if (!strcmp(key, "d1_randomizer")) s->d1_randomizer = !strcmp(value, "on");
       else if (!strcmp(key, "essence_tracker")) s->essence_tracker = !strcmp(value, "on");
       else if (!strcmp(key, "haptics")) s->haptics = !strcmp(value, "on");
       else if (!strcmp(key, "filter")) {
@@ -65,6 +67,7 @@ int settings_format(const Settings *s, char *out, size_t size) {
                    s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->widescreen ? "on" : "off", s->dim_sides ? "on" : "off", s->gbc_colours ? "on" : "off",
                    s->fast_text ? "on" : "off", s->fast_menus ? "on" : "off", s->ff_speed, s->quick_swap ? "on" : "off", s->four_slots ? "on" : "off",
                    s->haptics ? "on" : "off", pad_style_keys[s->pad_style < STYLES ? s->pad_style : STYLE_AUTO]);
+  if (n < (int)size) n += snprintf(out + n, size - n, "d1_randomizer=%s\n", s->d1_randomizer ? "on" : "off");
   if (n < (int)size) n += snprintf(out + n, size - n, "essence_tracker=%s\n", s->essence_tracker ? "on" : "off");
   if (n < (int)size) n += bindings_format(&s->bindings, out + n, size - n);
   return n;
@@ -76,6 +79,7 @@ void settings_menu_open(SettingsMenu *m, bool phone) {
 }
 
 bool settings_row_shown(const SettingsMenu *m, SettingsRow r) {
+  if (r == SET_MODS) return false; // Deferred until the mods release.
   if (r == SET_HAPTICS) return m->phone;
   if (r == SET_FULLSCREEN || r == SET_PORTABLE) return !m->phone;
   return true;

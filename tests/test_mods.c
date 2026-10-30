@@ -563,6 +563,51 @@ static bool an_unreadable_mods_directory_is_a_failure(void) {
 #endif
 }
 
+static void installed_scan_is_metadata_only_and_includes_both_games(void) {
+  clear_mods();
+  const char *root = make_mod("z-seasons", "id=z-seasons\nname=Seed\napi=2\ngames=seasons\nchanges_game=yes\ndescription=D1 shuffle\n", "oracles.store('ran', true)");
+  ASSERT(mods_init(root, true));
+  make_mod("a-ages", "id=a-ages\nname=Ages mod\napi=1\ngames=ages\n", "oracles.store('ran', true)");
+  ModInstalled found[4];
+  ASSERT_EQ(mods_scan_installed(root, found, 4), 2);
+  ASSERT_EQ(strcmp(found[0].id, "a-ages"), 0);
+  ASSERT(found[0].info.ages && !found[0].info.seasons);
+  ASSERT_EQ(strcmp(found[1].info.description, "D1 shuffle"), 0);
+  ASSERT(found[1].info.changes_game);
+  ASSERT_EQ(mods_count(), 1); // The running session remains intact.
+  ASSERT_EQ(strcmp(mods_id(0), "z-seasons"), 0);
+  char store[1024];
+  snprintf(store, sizeof store, "%s/a-ages/store.ini", root);
+  ASSERT(access(store, F_OK) != 0); // Listing never runs the new mod.
+  ASSERT_EQ(mods_scan_installed(root, found, 1), 1);
+  ASSERT_EQ(strcmp(found[0].id, "a-ages"), 0);
+  ASSERT_EQ(mods_scan_installed(NULL, found, 4), -1);
+  mods_shutdown();
+}
+
+static void bundled_randomizer_loads_only_for_seasons(void) {
+  clear_mods();
+  const char *root = fixture_root();
+  ASSERT(mods_init(root, false));
+  ASSERT(mods_load_official_randomizer() == NULL);
+  ASSERT_EQ(mods_count(), 0);
+  ASSERT(mods_init(root, true));
+  ASSERT_EQ(mods_count(), 0); // Not enabled by discovery.
+  ModInfo info = mods_official_randomizer_info();
+  ASSERT(info.seasons && !info.ages && info.changes_game);
+  ASSERT(strstr(info.description, "Fixed seed"));
+  ASSERT(mods_load_official_randomizer() == NULL);
+  ASSERT_EQ(mods_count(), 1);
+  ASSERT(mods_enabled(0));
+  uint8_t id, subid;
+  ASSERT(mods_treasure_swap(4, 25, 51, 2, &id, &subid));
+  ASSERT_EQ(id, 52); ASSERT_EQ(subid, 1);
+  ASSERT(mods_treasure_swap(4, 13, 52, 1, &id, &subid));
+  ASSERT_EQ(id, 51); ASSERT_EQ(subid, 2);
+  ASSERT(mods_load_official_randomizer() != NULL); // No duplicate owners.
+  mods_shutdown();
+}
+
 static void a_mod_is_found_and_described(void) {
   clear_mods();
   const char *root = make_mod("hello",
@@ -5012,6 +5057,8 @@ int main(void) {
   RUN(mods_init_rejects_an_empty_directory_string);
   RUN_SKIPPABLE(an_unreadable_mods_directory_is_a_failure);
   RUN(a_mod_is_found_and_described);
+  RUN(bundled_randomizer_loads_only_for_seasons);
+  RUN(installed_scan_is_metadata_only_and_includes_both_games);
   RUN(a_broken_mod_is_disabled_not_removed);
   RUN(disabled_treatment_is_uniform_across_failure_kinds);
   RUN(a_disabled_mod_before_a_healthy_one_does_not_shift_indices);
