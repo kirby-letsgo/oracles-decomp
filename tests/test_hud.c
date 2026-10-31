@@ -189,8 +189,8 @@ static void slot_strip_draws_its_letter_on_a_tab(void) {
   ASSERT(wide_slot_strip(&s, &o, 0, true, box));
   for (int y = 1; y <= 7; y++)
     for (int x = 0; x < 6; x++) ASSERT_EQ(box[(y * WIDE_BOX_W + 1 + x) * 3], (g[y - 1] >> (7 - x)) & 1 ? 0 : 0xff);
-  for (int y = 1; y <= 14; y++) ASSERT_EQ(box[(y * WIDE_BOX_W + 7) * 3], 0);
-  ASSERT_EQ(box[(15 * WIDE_BOX_W + 7) * 3], 0xff);
+  for (int y = 1; y <= 14; y++) ASSERT_EQ(box[(y * WIDE_BOX_W + 9) * 3], 0);
+  ASSERT_EQ(box[(15 * WIDE_BOX_W + 9) * 3], 0xff);
   for (int i = 16 * WIDE_BOX_W * 3; i < WIDE_BOX_W * FB_H * 3; i++) ASSERT_EQ(box[i], 0);
   o.slots = false;
   ASSERT(!wide_slot_strip(&s, &o, 0, false, strip));

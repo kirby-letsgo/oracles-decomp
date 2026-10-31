@@ -174,10 +174,12 @@ hash permits retaining an unchanged slot's date across writes to another slot. M
 metadata falls back to SRAM's file time, and ambiguous normal-save ties open file selection.
 The sidecar is not synced; saves received from another device follow the same fallback.
 
-`ctest --test-dir build -R '^slot_hud$' checks issue #45 using the native HUD routines and local
+`ctest --test-dir build -R '^slot_hud$'` checks issue #45 using the native HUD routines and local
 USA/EU ROMs. It simulates seed/bomb consumption while either extra slot borrows A or B, comparing
 HUD tiles, icon graphics and sprite attributes before, during and after the press. It covers Ages'
 underwater A slot and the fallback without separate X/Y boxes; gameplay keeps the borrowed item.
+It also checks X/Y ammo counts (bombs, Bombchus and all five seed selections), BCD decoding,
+and rendered digits in widescreen, side boxes and compact tabs, including zero and live decrements.
 
 Two full-game movies are the main gate: the console-verified Ages TAS and the console-verified
 Seasons TAS (`tas/README.md`), plus a recorded Seasons playthrough.

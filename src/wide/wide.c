@@ -451,12 +451,26 @@ void wide_sprite_row(const GBSample *s, int y, int16_t c[WIDE_W], bool behind[WI
 // running from line 1 to line 14, so these are drawn the same way rather than copied, which would
 // tie us to wherever the bar happens to put its own.
 enum { HUD_SHIFT = 30, SLOT_LEFT = 2, SLOT_PITCH = 38,
-       SLOT_OPEN = 6, SLOT_ICON = 10, SLOT_CLOSE = 28, SLOT_BOX_W = 16,
+       SLOT_OPEN = 8, SLOT_ICON = 10, SLOT_CLOSE = 28, SLOT_BOX_W = 16,
        SLOT_TOP = 1, SLOT_BOTTOM = 14, SLOT_BOX = SLOT_CLOSE + 2 };
 
-enum { SLOT_LETTER_TOP = 1 };
+enum { SLOT_LETTER_TOP = 1, SLOT_COUNT_TOP = 9, COUNT_W = 7, COUNT_H = 5 };
 
-typedef struct { bool show; bool on[2]; WideItemIcon icon[2]; int x[2]; } SlotIcons;
+typedef struct { bool show; bool on[2]; WideItemIcon icon[2]; int x[2], count[2]; } SlotIcons;
+
+// Two 3x5 digits fit below the button label, clear of both the bracket and item art.
+static void count_row(uint8_t *row, int x, int y, int count, int ink) {
+  static const uint8_t digits[10][COUNT_H] = {
+    {7, 5, 5, 5, 7}, {2, 6, 2, 2, 7}, {7, 1, 7, 4, 7}, {7, 1, 7, 1, 7}, {5, 5, 7, 1, 1},
+    {7, 4, 7, 1, 7}, {7, 4, 7, 5, 7}, {7, 1, 1, 1, 1}, {7, 5, 7, 5, 7}, {7, 5, 7, 1, 7}
+  };
+  if (count < 0 || y < 0 || y >= COUNT_H) return;
+  for (int digit = 0; digit < 2; digit++) {
+    int bits = digits[digit ? count % 10 : count / 10][y];
+    for (int col = 0; col < 3; col++)
+      if (bits & (4 >> col)) put555(row + (x + digit * 4 + col) * 3, ink, false);
+  }
+}
 
 // Some scenes (taking an essence or the harp, and the end of a fade) keep the split on but turn the
 // whole bar one colour and take the game's B and A items away: X and Y go too, or they would hang
@@ -489,6 +503,7 @@ static void slot_icons(const GBSample *s, const WideOptions *o, SlotIcons *si) {
     si->on[i] = o->slots && o->rom && o->slot_item[i] &&
                 wide_item_icon(o->rom, o->rom_size, o->seasons, o->slot_item[i], &s->wram[0][0x600], &si->icon[i]);
     if (!si->on[i]) continue;
+    si->count[i] = wide_item_count(o->seasons, o->slot_item[i], &s->wram[0][0x600]);
     // Centre a narrow icon in its box, so the two boxes line up whatever is in them.
     si->x[i] = SLOT_LEFT + i * SLOT_PITCH + SLOT_ICON + (SLOT_BOX_W - si->icon[i].halves * 8) / 2;
   }
@@ -518,6 +533,7 @@ static void draw_slot_icons(const GBSample *s, const WideOptions *o, const SlotI
       }
     }
     if (!si->on[i]) continue;
+    count_row(row, base, y - SLOT_COUNT_TOP, si->count[i], ink);
     // The status bar draws item icons as sprites (spr_item_icons, wBItemSpriteAttribute1), so they
     // take an OBJ palette and colour 0 is clear, leaving the bar behind them.
     const WideItemIcon *ic = &si->icon[i];
@@ -533,7 +549,8 @@ static void draw_slot_icons(const GBSample *s, const WideOptions *o, const SlotI
 // One slot for the narrow picture's side bars, the rest of the strip black: with room, the box
 // widescreen draws (the same pixels, cut out of a bar row drawn the same way); without, its letter
 // above its icon on a tab of the bar's colour hanging from the top.
-enum { STRIP_LETTER_X = 5, STRIP_ICON_TOP = 9, STRIP_H = STRIP_ICON_TOP + 17 };
+enum { STRIP_LETTER_X = 5, STRIP_ICON_TOP = 9, STRIP_H = STRIP_ICON_TOP + 17,
+       STRIP_COUNT_TOP = STRIP_H, STRIP_COUNT_H = STRIP_COUNT_TOP + COUNT_H + 1 };
 
 bool wide_slot_strip(const GBSample *s, const WideOptions *o, int slot, bool box, uint8_t *out) {
   const GameRam *r = o->seasons ? &seasons_ram : &ages_ram;
@@ -562,10 +579,12 @@ bool wide_slot_strip(const GBSample *s, const WideOptions *o, int slot, bool box
   WideItemIcon ic;
   bool icon = o->rom && o->slot_item[slot] &&
               wide_item_icon(o->rom, o->rom_size, o->seasons, o->slot_item[slot], &s->wram[0][0x600], &ic);
+  int count = icon ? wide_item_count(o->seasons, o->slot_item[slot], &s->wram[0][0x600]) : -1;
   int icon_x = icon ? (w - ic.halves * 8) / 2 : 0;
-  for (int y = 0; y < STRIP_H; y++) {
+  for (int y = 0; y < (count >= 0 ? STRIP_COUNT_H : STRIP_H); y++) {
     uint8_t *row = out + (size_t)y * w * 3;
     for (int x = 0; x < w; x++) put555(row + x * 3, paper, false);
+    count_row(row, (w - COUNT_W) / 2, y - STRIP_COUNT_TOP, count, ink);
     if (y >= SLOT_LETTER_TOP && y < SLOT_LETTER_TOP + HUD_GLYPH_H)
       for (int x = 0; x < 6; x++)
         if (g[y - SLOT_LETTER_TOP] & (0x80 >> x)) put555(row + (STRIP_LETTER_X + x) * 3, ink, false);

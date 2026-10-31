@@ -382,7 +382,7 @@ foreach(t sha1 bus cpu blargg ppu acid2 tas smoke archive)
 endforeach()
 
 add_executable(test_slot_hud tests/test_slot_hud.c)
-target_link_libraries(test_slot_hud oraclesnative)
+target_link_libraries(test_slot_hud oraclesnative oracleswide)
 target_compile_definitions(test_slot_hud PRIVATE GAME_ROM_DIR="${GAME_ROM_DIR}")
 add_test(NAME slot_hud COMMAND test_slot_hud)
 set_tests_properties(slot_hud PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom")

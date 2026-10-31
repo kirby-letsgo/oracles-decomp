@@ -124,7 +124,9 @@ There are also quality-of-life toggles, **all off by default**:
 - **4 slots**: `A`/`S` become two more item buttons — highlight an item in the inventory and press
   one to assign it, then hold it in play to use that item. In widescreen they get their own X and Y
   boxes at the left of the status bar, so all four items are on screen at once; without widescreen
-  the boxes go in the black bars either side of the picture when the window is wide enough
+  the boxes go in the black bars either side of the picture when the window is wide enough.
+  Bombs, Bombchus and seed tools show their remaining count. Compact side tabs put the count
+  below the icon; seed counts follow the type selected for that tool.
 
 ### Save states
 

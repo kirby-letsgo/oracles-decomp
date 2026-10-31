@@ -22,6 +22,21 @@ static int le16(const uint8_t *rom, size_t size, size_t o) {
   return rb(rom, size, o) | (rb(rom, size, o + 1) << 8);
 }
 
+int wide_item_count(bool seasons, uint8_t item, const uint8_t *c600) {
+  // include/wram.s: USA and EU share RAM layouts, but Ages and Seasons differ.
+  int at;
+  if (item == 0x03) at = seasons ? 0xaa : 0xb0;       // bombs
+  else if (item == 0x0d) at = seasons ? 0xad : 0xb3;  // Bombchus
+  else if (item == 0x19 || item == (seasons ? 0x13 : 0x0f)) {
+    int selected = c600[(seasons ? 0xbe : 0xc4) + (item != 0x19)];
+    if (selected >= 5) return -1;
+    at = (seasons ? 0xb5 : 0xb9) + selected;
+  } else return -1;
+  // Quantities are packed BCD, including zero; do not show a counter for corrupt data.
+  int bcd = c600[at];
+  return (bcd >> 4) <= 9 && (bcd & 15) <= 9 ? (bcd >> 4) * 10 + (bcd & 15) : -1;
+}
+
 // One 8x16 half: two stacked 8x8 tiles, 16 bytes each, at spr_item_icons_1 + index * 32.
 static void half_pixels(const uint8_t *rom, size_t size, const ItemTables *t, bool seasons,
                         int index, int x0, uint8_t ci[16][16]) {
