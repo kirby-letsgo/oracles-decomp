@@ -3,7 +3,7 @@
 
 // code/fileManagement.s: each file is a copy of wFileStart ($c5b0), $550 bytes, at SRAM
 // $a010/$a560/$aab0 with backups at $b000/$b550/$baa0. Offsets below are from wFileStart.
-#define FILE_SIZE 0x550
+#define FILE_SIZE UI_FILE_SIZE
 #define OFS_STRING 0x02
 #define OFS_NAME 0x52
 #define OFS_LINKED 0x62
@@ -43,15 +43,20 @@ static bool verify(const uint8_t *file, bool ages) {
   return stored == ui_file_checksum(file) && memcmp(file + OFS_STRING, ages ? "Z21216-0" : "Z11216-0", 8) == 0;
 }
 
+const uint8_t *ui_file_data(const uint8_t *sram, size_t size, bool ages, int slot) {
+  if (!sram || slot < 0 || slot >= UI_FILES) return NULL;
+  if (size >= (size_t)copy1[slot] + FILE_SIZE && verify(sram + copy1[slot], ages)) return sram + copy1[slot];
+  if (size >= (size_t)copy2[slot] + FILE_SIZE && verify(sram + copy2[slot], ages)) return sram + copy2[slot];
+  return NULL;
+}
+
 int ui_read_files(const uint8_t *sram, size_t size, bool ages, UiFileInfo out[UI_FILES]) {
   int ofs_health = ages ? 0xfa : 0xf2, ofs_essences = ages ? 0x10f : 0x10b;
   int n = 0;
   for (int i = 0; i < UI_FILES; i++) {
     UiFileInfo *f = &out[i];
     memset(f, 0, sizeof *f);
-    const uint8_t *file = NULL;
-    if (sram && size >= (size_t)copy1[i] + FILE_SIZE && verify(sram + copy1[i], ages)) file = sram + copy1[i];
-    else if (sram && size >= (size_t)copy2[i] + FILE_SIZE && verify(sram + copy2[i], ages)) file = sram + copy2[i];
+    const uint8_t *file = ui_file_data(sram, size, ages, i);
     if (!file) continue;
     f->valid = true;
     for (int k = 0; k < 5 && file[OFS_NAME + k]; k++) f->name[k] = name_char(file[OFS_NAME + k]);

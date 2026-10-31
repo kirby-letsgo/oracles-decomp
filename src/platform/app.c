@@ -7,7 +7,7 @@
 // included, and the one added last is the one its game's tab starts (active.txt). Saves are the game's own SRAM image in that
 // cache; Cmd+S / Cmd+R save and load one state slot there.
 //
-// usage: oracles-native [ROM] [--game ages|seasons [--file 1-3 | --state auto|1-4]] [--cache DIR] [--frames N]
+// usage: oracles-native [ROM] [--game ages|seasons] [--file 1-3 | --state auto|1-4 | --latest] [--cache DIR] [--frames N]
 //   --file N boots straight into save file N, as choosing it in the launcher does.
 //   With neither a ROM nor --game it opens the launcher, which asks for a ROM through its ADD ROM
 //   row rather than putting a file dialog on screen before anything is drawn.
@@ -280,8 +280,57 @@ static void load_sram(GB *gb, const char *path) {
   fclose(f);
 }
 
+// The three normal files share one SRAM image. Keep dates per slot, tied to its contents so a
+// replaced/imported/synced SRAM cannot reuse a stale date. Older files fall back to SRAM's mtime;
+// if several are tied, --latest leaves the choice to the player. This metadata is local only.
+typedef struct { char hash[41]; SDL_Time time; } SaveDate;
+
+static void save_dates(const char *path, const uint8_t *sram, size_t size, bool ages, SaveDate out[UI_FILES]) {
+  SDL_PathInfo info;
+  SDL_Time fallback = SDL_GetPathInfo(path, &info) ? info.modify_time : 0;
+  memset(out, 0, sizeof(SaveDate) * UI_FILES);
+  for (int i = 0; i < UI_FILES; i++) {
+    const uint8_t *file = ui_file_data(sram, size, ages, i);
+    if (file) { sha1_hex(file, UI_FILE_SIZE, out[i].hash); out[i].time = fallback; }
+  }
+  char meta[1400];
+  snprintf(meta, sizeof meta, "%s.dates", path);
+  FILE *f = fopen(meta, "r");
+  if (!f) return;
+  char line[128], hash[41];
+  int slot;
+  long long time;
+  while (fgets(line, sizeof line, f))
+    if (sscanf(line, "%d %40s %lld", &slot, hash, &time) == 3 && slot >= 0 && slot < UI_FILES &&
+        time >= 0 && time <= fallback && !strcmp(hash, out[slot].hash)) out[slot].time = (SDL_Time)time;
+  fclose(f);
+}
+
 static void save_sram(GB *gb, const char *path) {
-  if (gb->eram_size) write_file(path, gb->eram, gb->eram_size);
+  if (!gb->eram_size) return;
+  size_t n = 0;
+  uint8_t *old = oracles_read_file(path, &n);
+  // Periodic flushes and quitting must not make an unchanged save newer than a save state.
+  if (old && n == gb->eram_size && !memcmp(old, gb->eram, n)) { free(old); return; }
+  bool ages = gb->rom_size > 0x150 && !memcmp(gb->rom + 0x134, "ZELDA NAYRU", 11);
+  SaveDate dates[UI_FILES];
+  save_dates(path, old, n, ages, dates);
+  free(old);
+  if (!write_file(path, gb->eram, gb->eram_size)) return;
+  SDL_PathInfo info;
+  if (!SDL_GetPathInfo(path, &info)) return;
+  char meta[1400], text[256];
+  int len = 0;
+  for (int i = 0; i < UI_FILES; i++) {
+    const uint8_t *file = ui_file_data(gb->eram, gb->eram_size, ages, i);
+    if (!file) continue;
+    char hash[41];
+    sha1_hex(file, UI_FILE_SIZE, hash);
+    SDL_Time time = !strcmp(hash, dates[i].hash) ? dates[i].time : info.modify_time;
+    len += snprintf(text + len, sizeof text - len, "%d %s %lld\n", i, hash, (long long)time);
+  }
+  snprintf(meta, sizeof meta, "%s.dates", path);
+  write_file(meta, text, (size_t)len);
 }
 
 static bool poll_event(SDL_Event *ev);
@@ -352,6 +401,9 @@ static bool slot_undo(const char *dir, int slot) {
 
 static bool slot_save(GB *gb, const char *dir, int slot, const uint8_t *rgb) {
   char path[1300];
+  // Flush normal saves first: this state is the newer, complete snapshot of the same progress.
+  snprintf(path, sizeof path, "%s/sram.sav", dir);
+  save_sram(gb, path);
   slot_path(path, sizeof path, dir, slot, "");
   if (slot != SLOT_AUTO) slot_keep_undo(dir, slot);
   if (!oracles_save_boot_state(gb, path)) return false;
@@ -1910,6 +1962,50 @@ typedef struct {
   uint64_t max_frames;
 } GameStart;
 
+// Restrict the search to the selected ROM's folder. On equal dates prefer a state (auto, then
+// the lowest manual slot), since it also captures unsaved progress. A bad newest state fails
+// through slot_load as an explicit --state would; never silently resume an older playthrough.
+static bool latest_start(GameStart *gs) {
+  char dir[1100], path[1300];
+  snprintf(dir, sizeof dir, "%s%s", gs->cache, gs->game);
+  migrate_state(dir);
+  bool found = false;
+  SDL_Time newest = 0;
+  SDL_PathInfo info;
+  for (int i = 0; i <= UI_SLOTS; i++) {
+    int slot = i == 0 ? SLOT_AUTO : i - 1;
+    slot_path(path, sizeof path, dir, slot, "");
+    if (!SDL_GetPathInfo(path, &info) || info.type != SDL_PATHTYPE_FILE) continue;
+    if (found && info.modify_time <= newest) continue;
+    found = true;
+    newest = info.modify_time;
+    gs->start_file = slot == SLOT_AUTO ? LAUNCH_RESUME : LAUNCH_SLOTS;
+    gs->start_slot = slot;
+    gs->open_file = false;
+  }
+  snprintf(path, sizeof path, "%s/sram.sav", dir);
+  size_t n = 0;
+  uint8_t *sram = oracles_read_file(path, &n);
+  SaveDate dates[UI_FILES];
+  save_dates(path, sram, n, is_ages(gs->game), dates);
+  free(sram);
+  for (int i = 0; i < UI_FILES; i++) {
+    if (!dates[i].hash[0]) continue;
+    if (!found || dates[i].time > newest) {
+      found = true;
+      newest = dates[i].time;
+      gs->start_file = i;
+      gs->open_file = true;
+    } else if (dates[i].time == newest && gs->start_file >= 0) gs->open_file = false;
+  }
+  if (!found) fprintf(stderr, "no save files or save states found for %s\n", gs->game);
+  else if (gs->start_file >= 0) {
+    if (gs->open_file) fprintf(stderr, "latest: starting save file %d\n", gs->start_file + 1);
+    else fprintf(stderr, "latest: normal save slots have tied or unknown dates; opening file selection\n");
+  }
+  return found;
+}
+
 // The running game, for the background event watch.
 typedef struct {
   GB *gb;
@@ -2344,13 +2440,14 @@ static void stderr_to_logcat(void) {
 int main(int argc, char **argv) {
   const char *rom_arg = NULL, *game_arg = NULL, *cache_arg = NULL;
   int file_arg = -1, state_arg = -1;
-  bool file_given = false;
+  bool file_given = false, latest = false;
   uint64_t max_frames = 0;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--game") && i + 1 < argc) game_arg = argv[++i];
     else if (!strcmp(argv[i], "--frames") && i + 1 < argc) max_frames = strtoull(argv[++i], NULL, 10);
     else if (!strcmp(argv[i], "--cache") && i + 1 < argc) cache_arg = argv[++i];
     else if (!strcmp(argv[i], "--file") && i + 1 < argc) { file_given = true; file_arg = atoi(argv[++i]) - 1; }
+    else if (!strcmp(argv[i], "--latest")) latest = true;
     else if (!strcmp(argv[i], "--state") && i + 1 < argc) {
       const char *value = argv[++i];
       if (!strcmp(value, "auto")) state_arg = SLOT_AUTO;
@@ -2358,7 +2455,11 @@ int main(int argc, char **argv) {
       else { fprintf(stderr, "--state must be auto or 1-%d\n", UI_SLOTS); return 2; }
     }
     else if (argv[i][0] != '-') rom_arg = argv[i];
-    else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons [--file 1-3 | --state auto|1-4]] [--cache DIR] [--frames N]\n"); return 2; }
+    else { fprintf(stderr, "usage: oracles-native [ROM] [--game ages|seasons] [--file 1-3 | --state auto|1-4 | --latest] [--cache DIR] [--frames N]\n"); return 2; }
+  }
+  if (latest && (file_given || state_arg >= 0 || (!rom_arg && !game_arg))) {
+    fprintf(stderr, "--latest requires a ROM or --game and cannot be combined with --file or --state\n");
+    return 2;
   }
   if (state_arg >= 0 && (file_given || (!rom_arg && !game_arg))) {
     fprintf(stderr, "--state requires a ROM or --game and cannot be combined with --file\n");
@@ -2419,6 +2520,7 @@ int main(int argc, char **argv) {
     gs.start_file = state_arg == SLOT_AUTO ? LAUNCH_RESUME : LAUNCH_SLOTS;
     gs.start_slot = state_arg;
   }
+  if (latest && !latest_start(&gs)) { oracles_close_window(win, window_size); SDL_Quit(); return 1; }
   // The spec wants settings rows a mod asked for to exist "from the launcher", before any game
   // has been chosen, so a player can configure a mod before playing -- but mods_init takes a
   // `seasons` bool, and the launcher does not commit to a game until LAUNCH_PLAY. Resolved by

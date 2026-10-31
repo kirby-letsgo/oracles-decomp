@@ -145,11 +145,12 @@ Same game, two frontends:
 Useful flags on `oracles-native`:
 
 ```
-oracles-native [ROM] [--game ages|seasons [--file 1-3]] [--cache DIR] [--frames N]
+oracles-native [ROM] [--game ages|seasons] [--file 1-3 | --state auto|1-4 | --latest] [--cache DIR] [--frames N]
 ```
 
-`--file N` boots straight into save file N, `--cache DIR` uses another cache folder (handy for
-testing a first launch), and `--frames N` exits after N frames. Tests drive the app under
+`--file N` boots straight into save file N, `--state auto|1-4` restores a state, and `--latest`
+selects the newest save/state in the chosen ROM's folder. `--cache DIR` uses another cache folder
+(handy for testing a first launch), and `--frames N` exits after N frames. Tests drive the app under
 `SDL_VIDEO_DRIVER=dummy` with `ORACLES_TEST_KEYS` for scripted input and `ORACLES_SHOT="tick:path.png"`
 for screenshots. `ORACLES_TOUCH=1 ./build/oracles-native` shows the phone's touch controls on the
 desktop, with the mouse as a finger, and `ORACLES_TEST_HAPTICS=1` prints `haptic` to stderr for
@@ -163,6 +164,15 @@ TAS_FRAMES=321712 ctest --test-dir build -R tas   # both whole movies with hooks
 ```
 
 Tests that need a ROM skip (exit 77) when `roms/` is empty, so a fresh checkout still runs the rest.
+
+`ctest --test-dir build -R '^(app_state|app_latest)$'` checks direct state/latest launches.
+The latest-save checks cover normal file dates, backup copies, unchanged SRAM flushes, deleted
+and imported saves, all four ROM folders, state-slot ordering and non-destructive failures.
+SRAM is written only when its contents change and is flushed before saving a state. The local
+`sram.sav.dates` records each valid slot's SHA1 and modification time in nanoseconds; a matching
+hash permits retaining an unchanged slot's date across writes to another slot. Missing or stale
+metadata falls back to SRAM's file time, and ambiguous normal-save ties open file selection.
+The sidecar is not synced; saves received from another device follow the same fallback.
 
 `ctest --test-dir build -R '^slot_hud$' checks issue #45 using the native HUD routines and local
 USA/EU ROMs. It simulates seed/bomb consumption while either extra slot borrows A or B, comparing

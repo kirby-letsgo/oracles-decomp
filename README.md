@@ -209,6 +209,15 @@ More options:
   save-state slot directly, skipping the launcher. Use with `--game` or a ROM path,
   without `--file`. For example: `oracles --game seasons --state auto`.
   Missing, corrupt or incompatible states report an error and exit without starting a new game.
+- `--latest` loads the newest normal save or save state for the selected ROM, including the
+  automatic state and manual slots 1–4. For example: `oracles --game seasons --latest`.
+  Use with `--game` or a ROM path, without `--file` or `--state`. Equal dates prefer the automatic
+  state, then the lowest manual state slot. If nothing is saved, or the newest state cannot be
+  loaded, the app reports an error and exits without overwriting progress or falling back to an
+  older state.
+  Normal save slots share `sram.sav`; the app now tracks their individual dates locally in
+  `sram.sav.dates`. Older or imported saves without matching dates use SRAM's modification time.
+  If several normal slots tie for newest, the game opens file selection so you can choose.
 - `--game ages-eu` (or `seasons-eu`) picks the European ROM when you have added both releases of a
   game; plain `ages`/`seasons` starts the one the game's tab starts.
 - `--cache DIR` keeps everything (ROMs, saves, settings) in that folder instead of the usual one, as

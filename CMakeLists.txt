@@ -332,6 +332,12 @@ if(ORACLES_SDL)
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
     "${CMAKE_SOURCE_DIR}/tas/seasons-boot.state")
   set_tests_properties(app_state PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom" TIMEOUT 180)
+  add_executable(test_app_latest tests/test_app_latest.c src/platform/window.c src/platform/sync_client.c src/platform/haptic.c)
+  target_link_libraries(test_app_latest oraclesnative oraclesgui oraclessync oracleswide oraclesmods ${ORACLES_SDL_TARGET})
+  target_compile_definitions(test_app_latest PRIVATE ${ORACLES_APP_DEFS})
+  add_test(NAME app_latest COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_latest.py $<TARGET_FILE:oracles-native>
+    $<TARGET_FILE:test_app_latest> "${GAME_ROM_DIR}" "${CMAKE_SOURCE_DIR}/tas")
+  set_tests_properties(app_latest PROPERTIES SKIP_RETURN_CODE 77 LABELS "rom" TIMEOUT 180)
   add_test(NAME app_eu COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/test_app_eu.py $<TARGET_FILE:oracles-native>
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (USA, Australia).gbc"
     "${GAME_ROM_DIR}/Legend of Zelda, The - Oracle of Seasons (Europe) (En,Fr,De,Es,It).gbc")
