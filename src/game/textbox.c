@@ -1,6 +1,7 @@
 #include "game/game.h"
 #include "game/features.h"
 #include "game/gen.h"
+#include "game/vwf.h"
 
 #undef CYC
 #undef CYCT
@@ -51,6 +52,7 @@ void inventoryTextCode__state04_hook(GB *gb);
 void inventoryTextCode__state05_hook(GB *gb);
 void inventoryTextCode__state06_hook(GB *gb);
 void inventoryTextCode__state07_hook(GB *gb);
+void inventoryTextCode__vwfDraw_hook(GB *gb);
 void initTextboxStuff_hook(GB *gb);
 static void add_double_index_to_hl(GB *gb, uint16_t return_address);
 static void add_a_to_hl(GB *gb);
@@ -624,7 +626,7 @@ void inventoryTextCode_hook(GB *gb) {
       CYC(b_+39, b_+41);
       CYC(b_+41, b_+42); A = alu_inc8(gb, A);
       CYC(b_+42, b_+44); A = alu_srl(gb, A);
-      CYC(b_+44, b_+45); mem_wr(gb, DE, A);
+      CYC(b_+44, b_+45); if (!features.vwf) mem_wr(gb, DE, A);
     }
   }
   CYC(b_+45, b_+47); E = 0xed;
@@ -655,6 +657,7 @@ void inventoryTextCode__state00__stopText_hook(GB *gb) {
 
 void inventoryTextCode__state00__end_hook(GB *gb) {
   BASE(inventoryTextCode);
+  if (features.vwf) vwf_inventory_reset();
   CYC(b_+60, b_+62); A = 0x17;
   CYC(b_+62, b_+65);
   TAIL(loadUncompressedGfxHeader);
@@ -674,6 +677,34 @@ void inventoryTextCode__state01_hook(GB *gb) {
   CYC(b_+77, b_+78); ret_effect(gb);
 }
 
+// _inventoryTextDrawHook: fills the line's last tile pixel by pixel. In: A nonzero to stop at a
+// newline (the item name ends there). Out: A 0 at the end of the text, 2 at that newline, else 1.
+// w7TextAddress follows hl.
+void inventoryTextCode__vwfDraw_hook(GB *gb) {
+  BASE(inventoryTextCode);
+  uint16_t sp0_ = gb->sp; (void)sp0_;
+  bool halt = A != 0;
+  uint8_t result;
+  vwf_inventory_begin_tile(gb);
+  for (;;) {
+    CALL_C(b_+85, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+88);
+    if (A == 0x01 && halt) { result = 2; break; }
+    if (A >= 0x10 || A == 0x01) {
+      if (vwf_inventory_add(gb, A == 0x01 ? 0x20 : A)) { result = 1; break; }
+      continue;
+    }
+    CALL_C(b_+96, handleTextControlCodeWithSpecialCase_hook, SYM(handleTextControlCodeWithSpecialCase), b_+99);
+    if (!W8(w7TextStatus)) { result = 0; break; }
+  }
+  W8(w7TextAddress) = L;
+  WP(w7TextAddress)[1] = H;
+  uint16_t hl = HL;
+  A = 0x17;
+  CALL_C(b_+181, loadUncompressedGfxHeader_hook, SYM(loadUncompressedGfxHeader), b_+184);
+  SET_HL(hl);
+  A = result;
+}
+
 void inventoryTextCode__state02_hook(GB *gb) {
   BASE(inventoryTextCode);
   uint16_t sp0_ = gb->sp; (void)sp0_;
@@ -681,7 +712,15 @@ void inventoryTextCode__state02_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+81, b_+82); ret_effect(gb); return; }
   CYC(b_+81, b_+82);
   CALL_C(b_+82, shiftTextGfxBufferLeft_hook, SYM(shiftTextGfxBufferLeft), b_+85);
-  for (;;) {
+  bool vwf_end = false;
+  if (features.vwf) {
+    A = 0;
+    inventoryTextCode__vwfDraw_hook(gb);
+    D = 0xd0;
+    if (A) { ret_effect(gb); return; }
+    vwf_end = true;
+  }
+  while (!vwf_end) {
     CALL_C(b_+85, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+88);
     CYC(b_+88, b_+90); alu_cp(gb, 0x10);
     if (!(F & FC)) {
@@ -718,6 +757,7 @@ void inventoryTextCode__state02_hook(GB *gb) {
   CYC(b_+121, b_+123); L = 0xd5;
   CYC(b_+123, b_+124); mem_wr(gb, HL, A); SET_HL(HL + 1);
   CYC(b_+124, b_+125); mem_wr(gb, HL, B);
+  if (vwf_end) { ret_effect(gb); return; }
   TAIL(inventoryTextCode__drawSpaceWithoutSavingTextAddress);
 }
 
@@ -746,6 +786,7 @@ void inventoryTextCode__state03_hook(GB *gb) {
   CYC(b_+141, b_+143);
   CYC(b_+143, b_+144); L = E;
   CYC(b_+144, b_+145); mem_wr(gb, HL, alu_inc8(gb, mem_rd(gb, HL)));
+  if (features.vwf) vwf_inventory_reset();
   CYC(b_+145, b_+147); L = 0xec;
   CYC(b_+147, b_+148); A = mem_rd(gb, HL);
   CYC(b_+148, b_+151); mem_wr(gb, wTextIndexL, A);
@@ -799,6 +840,16 @@ void inventoryTextCode__state04_hook(GB *gb) {
   if (!(F & FZ)) { CYCT(b_+187, b_+188); ret_effect(gb); return; }
   CYC(b_+187, b_+188);
   CALL_C(b_+188, shiftTextGfxBufferLeft_hook, SYM(shiftTextGfxBufferLeft), b_+191);
+  if (features.vwf) {
+    A = 1;
+    inventoryTextCode__vwfDraw_hook(gb);
+    if (A == 0 || A == 2) {
+      W8(w7InvTextSpaceCounter) = W8(w7InvTextSpacesAfterName);
+      W8(w7TextDisplayState)++;
+    }
+    ret_effect(gb);
+    return;
+  }
   for (;;) {
     CALL_C(b_+191, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+194);
     CYC(b_+194, b_+196); alu_cp(gb, 0x10);
@@ -1049,6 +1100,7 @@ set_textbox_width:
   CYC(b_+189, b_+191); alu_bit(gb, 0, A);
   if (!(F & FZ)) { CYCT(b_+191, b_+192); ret_effect(gb); return; }
   CYC(b_+191, b_+192);
+  if (features.vwf) { W8(w7TextAttribute) = 0x81; A = 0x0d; goto load_palette; }
   CYC(b_+192, b_+194); alu_and(gb, 0x14);
   CYC(b_+194, b_+196); A = 0x0e;
   if (F & FZ) { CYCT(b_+196, b_+198); goto load_palette; }
@@ -1131,6 +1183,7 @@ static void text_cc_6(GB *gb) {
     CYCT(b_+28, b_+30);
   }
   CYC(b_+36, b_+37); SET_BC(pop_effect(gb));
+  if (features.vwf) { vwf_add_symbol(gb, A); ret_effect(gb); return; }
   CYC(b_+37, b_+38); push_effect(gb, AF);
   A = 0x06;
   CYC(b_+38, b_+40);
@@ -1297,8 +1350,11 @@ static void text_cc_a(GB *gb) {
     CYC(b_+14, b_+15);
     if (F & FZ) { CYCT(b_+15, b_+17); break; }
     CYC(b_+15, b_+17);
-    CALL_C(b_+17, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+20);
-    CALL_C(b_+20, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+23);
+    if (features.vwf) vwf_add_char(gb, A);
+    else {
+      CALL_C(b_+17, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+20);
+      CALL_C(b_+20, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+23);
+    }
     CYCT(b_+23, b_+25);
   }
   CYC(b_+25, b_+26); SET_HL(pop_effect(gb));
@@ -1463,7 +1519,7 @@ void setLineTextBuffers_hook(GB *gb) {
   CYC(b_+28, b_+29); E = A;
   CYC(b_+29, b_+30); A = mem_rd(gb, HL);
   CYC(b_+30, b_+31); mem_wr(gb, DE, A);
-  CYC(b_+31, b_+33); mem_wr(gb, HL, 0x00);
+  CYC(b_+31, b_+33); if (!features.vwf) mem_wr(gb, HL, 0x00);
 
   CYC(b_+33, b_+34); SET_HL(pop_effect(gb));
   CYC(b_+34, b_+35); SET_DE(pop_effect(gb));
@@ -1488,13 +1544,17 @@ void drawLineOfText_hook(GB *gb) {
   CALL_C(b_+15, clearLineTextBuffer_hook, SYM(clearLineTextBuffer), b_+18);
   CYC(b_+18, b_+19); SET_HL(pop_effect(gb));
   CYC(b_+19, b_+22); SET_BC(w1ParentItem2);
+  if (features.vwf) vwf_begin_line(gb);
   for (;;) {
     CALL_C(b_+22, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+25);
     CYC(b_+25, b_+27); alu_cp(gb, 0x10);
     if (!(F & FC)) {
       CYCT(b_+27, b_+29);
-      CALL_C(b_+41, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+44);
-      CALL_C(b_+44, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+47);
+      if (features.vwf) vwf_add_char(gb, A);
+      else {
+        CALL_C(b_+41, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+44);
+        CALL_C(b_+44, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+47);
+      }
       CYC(b_+47, b_+49);
       continue;
     }
@@ -1744,6 +1804,7 @@ save_address:
   CYC(b_+84, b_+86); H &= (uint8_t)~0x80;
   CYC(b_+86, b_+88); H |= 0x40;
   CYC(b_+88, b_+89); SET_DE(pop_effect(gb));
+  SET_HL(vwf_redirect_text(gb, HL));
   CYC(b_+89, b_+90); ret_effect(gb);
 }
 
@@ -1942,6 +2003,7 @@ void doInventoryTextFirstPass_hook(GB *gb) {
   CYC(b_+11, b_+12); L = A;
   CYC(b_+12, b_+13); push_effect(gb, HL);
   CYC(b_+13, b_+15); E = 0;
+  int name_px = 0;
   for (;;) {
     CALL_C(b_+15, readByteFromW7ActiveBankAndIncHl_hook, SYM(readByteFromW7ActiveBankAndIncHl), b_+18);
     CYC(b_+18, b_+20); alu_cp(gb, 0);
@@ -1965,6 +2027,7 @@ null_terminator:
     CYC(b_+47, b_+49);
     goto line_end;
 not_control:
+    if (features.vwf) name_px += vwf_width(A);
     CYC(b_+35, b_+36); E = alu_inc8(gb, E);
     CYC(b_+36, b_+38); alu_bit(gb, 4, E);
     if (F & FZ) { CYCT(b_+38, b_+40); continue; }
@@ -1987,7 +2050,7 @@ line_end:
     CYC(b_+66, b_+68); alu_sub(gb, 0x11);
     CYC(b_+68, b_+69); alu_cpl(gb);
     CYC(b_+69, b_+71); L = 0xed;
-    CYC(b_+71, b_+72); mem_wr(gb, HL, A);
+    CYC(b_+71, b_+72); mem_wr(gb, HL, features.vwf ? vwf_inventory_centre(gb, name_px) : A);
     CYC(b_+72, b_+74); alu_and(gb, 0x0e);
     CYC(b_+74, b_+76); A = alu_swap(gb, A);
     CYC(b_+76, b_+78); alu_add(gb, 0);
@@ -2000,6 +2063,7 @@ line_end:
       CYC(b_+88, b_+90); alu_cp(gb, 0x10);
       if (F & FC) { CYCT(b_+90, b_+92); goto control; }
       CYC(b_+90, b_+92);
+      if (features.vwf) { vwf_add_char(gb, A); continue; }
       CALL_C(b_+92, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+95);
       CALL_C(b_+95, retrieveTextCharacter_hook, SYM(retrieveTextCharacter), b_+98);
       CYC(b_+98, b_+100); alu_bit(gb, 4, E);
@@ -3204,6 +3268,7 @@ void textControlCodeC_1_drawDigit_hook(GB *gb) {
   BASE(textControlCodeC_1);
   uint16_t sp0_ = gb->sp; (void)sp0_;
   CYC(b_+35, b_+37); alu_add(gb, 0x30);
+  if (features.vwf) { vwf_add_char(gb, A); ret_effect(gb); return; }
   CALL_C(b_+37, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+40);
   CYC(b_+40, b_+43); TAIL(retrieveTextCharacter);
 }
@@ -3232,7 +3297,7 @@ void textControlCodeC_2_hook(GB *gb) {
   CYC(b_+3, b_+6); A = mem_rd(gb, w7d0c1);
   CYC(b_+6, b_+8); alu_or(gb, 0x04);
   CYC(b_+8, b_+11); mem_wr(gb, w7d0c1, A);
-  CYC(b_+11, b_+12); A = E;
+  CYC(b_+11, b_+12); A = features.vwf ? vwf_option_position(gb) : E;
   CYC(b_+12, b_+13); alu_add(gb, A);
   CYC(b_+13, b_+15); alu_or(gb, 0x60);
   CYC(b_+15, b_+16); B = A;
@@ -3242,5 +3307,6 @@ void textControlCodeC_2_hook(GB *gb) {
   CYC(b_+19, b_+20); SET_BC(pop_effect(gb));
   CYC(b_+20, b_+22); A = 0x20;
   CALL_C(b_+22, setLineTextBuffers_hook, SYM(setLineTextBuffers), b_+25);
+  if (features.vwf) { ret_effect(gb); return; }
   CYC(b_+25, b_+28); TAIL(retrieveTextCharacter);
 }
