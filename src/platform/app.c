@@ -1962,6 +1962,24 @@ typedef struct {
   uint64_t max_frames;
 } GameStart;
 
+// An unclean exit can leave an automatic state older than the battery save. Never
+// restore that state's SRAM over the newer save, even if only unused bytes changed.
+// Manual state slots are explicit rollbacks; automatic resume opens file selection.
+static bool resume_start(GameStart *gs, const char *dir) {
+  if (gs->start_file != LAUNCH_RESUME) return false;
+  char path[1300];
+  SDL_PathInfo state, save;
+  slot_path(path, sizeof path, dir, SLOT_AUTO, "");
+  if (!SDL_GetPathInfo(path, &state) || state.type != SDL_PATHTYPE_FILE) return false;
+  snprintf(path, sizeof path, "%s/sram.sav", dir);
+  if (!SDL_GetPathInfo(path, &save) || save.type != SDL_PATHTYPE_FILE ||
+      save.modify_time <= state.modify_time) return false;
+  gs->start_file = 0;
+  gs->open_file = false;
+  fprintf(stderr, "resume: SRAM is newer than automatic state; opening file selection\n");
+  return true;
+}
+
 // Restrict the search to the selected ROM's folder. On equal dates prefer a state (auto, then
 // the lowest manual slot), since it also captures unsaved progress. A bad newest state fails
 // through slot_load as an explicit --state would; never silently resume an older playthrough.
@@ -2082,6 +2100,9 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   char dir[1100], path[1300];
   snprintf(dir, sizeof dir, "%s%s", gs->cache, gs->game);
   migrate_state(dir);
+  GameStart start = *gs;
+  bool newer_save = resume_start(&start, dir);
+  gs = &start;
   size_t rom_size, tab_size;
   snprintf(path, sizeof path, "%s/rom.bin", dir);
   uint8_t *rom = oracles_read_file(path, &rom_size);
@@ -2092,6 +2113,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   UiTheme theme;
   ui_theme_load(&theme, rom, rom_size, ages);
   overlay_style(&theme);
+  if (newer_save) show_status("Newer save found. Choose a game file.");
   ui_font_load(&mod_font, rom, rom_size);
   GB *gb = calloc(1, sizeof *gb);
   gb_init(gb);

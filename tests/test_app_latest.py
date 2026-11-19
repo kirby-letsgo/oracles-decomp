@@ -115,6 +115,48 @@ with tempfile.TemporaryDirectory() as cache:
             r = run("--game", game_id, "--latest", "--frames", "1")
             assert r.returncode == 0 and "opening file selection" in r.stderr, r.stderr
 
+            # Issue #47: automatic resume must not restore stale SRAM after an unclean exit.
+            # A marker outside the save slots must count even with older per-slot metadata.
+            reset()
+            # Let each ROM initialise its SRAM header (EU also stores language settings).
+            r = run("--game", game_id, "--file", "1", "--frames", "601")
+            assert r.returncode == 0, r.stderr
+            data = bytearray(sav.read_bytes())
+            data[0x10:0x10 + len(file)] = file
+            data[0x1000:0x1000 + len(file)] = file  # Avoid an unrelated in-game backup repair.
+            data[0x1ff0:0x1ff8] = b"MARQUEUR"
+            sav.write_bytes(data)
+            stamp(sav, 300)
+            meta.write_text(f"0 {digest} 100000000000\n")
+            if eu:
+                states[0].write_bytes(b"older invalid state")
+            else:
+                shutil.copyfile(boot, states[0])
+            stamp(states[0], 200)
+            before = {p: (p.read_bytes(), p.stat().st_mtime_ns)
+                      for p in (sav, meta, states[0])}
+            # Run past the 600-frame periodic flush, then also exercise the exit flush.
+            r = run("--game", game_id, "--state", "auto", "--frames", "601")
+            assert r.returncode == 0 and "SRAM is newer" in r.stderr, r.stderr
+            assert "started from automatic state" not in r.stderr, r.stderr
+            for p, snapshot in before.items():
+                after = (p.read_bytes(), p.stat().st_mtime_ns)
+                changed = [i for i, (a, b) in enumerate(zip(snapshot[0], after[0])) if a != b]
+                assert snapshot == after, (game_id, p.name, changed[:40], r.stderr)
+
+            if game_id == "seasons-eu":
+                # The reported launcher path, followed by a clean Quit to menu which
+                # writes a replacement automatic state and flushes SRAM again.
+                r = subprocess.run([app, "--cache", cache, "--frames", "601"],
+                                   env=dict(env, ORACLES_TEST_KEYS=
+                                            "10:^Home.0,150:Escape,170:Up,190:X"),
+                                   capture_output=True, text=True, timeout=30)
+                assert r.returncode == 0 and "SRAM is newer" in r.stderr, r.stderr
+                assert "test tap: no" not in r.stderr, r.stderr
+                for p in (sav, meta):
+                    assert before[p] == (p.read_bytes(), p.stat().st_mtime_ns), r.stderr
+                assert states[0].read_bytes() != before[states[0]][0], r.stderr
+
             # Ties favour auto, then the lowest manual state. Thumbnails/undo files are ignored.
             reset()
             for path in states:
@@ -134,4 +176,4 @@ with tempfile.TemporaryDirectory() as cache:
             r = run(str(rom), "--latest", "--frames", "1")
             assert r.returncode == 1 and f"could not load save state {states[2]}" in r.stderr, r.stderr
 
-print("app latest: arguments, four ROM variants, normal saves, states, ties and failure preservation passed")
+print("app latest: four ROM variants, saves, states, ties, stale resume and failure preservation passed")

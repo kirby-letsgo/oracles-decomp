@@ -82,6 +82,23 @@ int main(int argc, char **argv) {
     ASSERT(slot_save(gb, dir, SLOT_AUTO, rgb));
     save_sram(gb, sav);
     ASSERT(latest_start(&gs)); ASSERT_EQ(gs.start_file, LAUNCH_RESUME);
+    ASSERT(!resume_start(&gs, dir));  // A clean quit's state is safe to resume.
+
+    // A later battery flush can precede an unclean exit. Check the full SRAM image,
+    // not only valid file dates: unused bytes changed in the issue's reproduction.
+    SDL_Delay(10);
+    gb->eram[0x1ff0] ^= 1;
+    save_sram(gb, sav);
+    gs.open_file = true;
+    ASSERT(resume_start(&gs, dir));
+    ASSERT_EQ(gs.start_file, 0); ASSERT(!gs.open_file);
+    gs.start_file = LAUNCH_SLOTS;
+    ASSERT(!resume_start(&gs, dir));  // Explicit manual restores remain available.
+    gs.start_file = LAUNCH_RESUME;
+    char automatic[1300];
+    slot_path(automatic, sizeof automatic, dir, SLOT_AUTO, "");
+    ASSERT(SDL_RemovePath(automatic));
+    ASSERT(!resume_start(&gs, dir));  // Missing states still follow the load-error path.
     free(gb);
   }
   SDL_Quit();

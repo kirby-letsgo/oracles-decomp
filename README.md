@@ -81,6 +81,9 @@ each with when it was saved and the newest marked **Latest**; choosing one start
 straight into it — and **Title screen** starts the game from the beginning. Every menu works with a
 keyboard, a controller, the mouse, or by tapping its rows.
 
+If an in-game save is newer than the Resume state (for example, after a force quit), Resume opens
+the game's file-selection screen to protect that save. A message explains why it did so.
+
 ### Controls
 
 | | Keyboard | Gamepad (Xbox / PlayStation) |
@@ -210,6 +213,7 @@ More options:
 - `--state auto` resumes the automatic save state; `--state 1` (to `4`) loads a manual
   save-state slot directly, skipping the launcher. Use with `--game` or a ROM path,
   without `--file`. For example: `oracles --game seasons --state auto`.
+  If the battery save is newer than the automatic state, `--state auto` opens file selection instead.
   Missing, corrupt or incompatible states report an error and exit without starting a new game.
 - `--latest` loads the newest normal save or save state for the selected ROM, including the
   automatic state and manual slots 1–4. For example: `oracles --game seasons --latest`.
