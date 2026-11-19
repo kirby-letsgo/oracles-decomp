@@ -33,6 +33,7 @@ void ppu_write_lcdc(GB *gb, uint8_t v) {
     set_mode(gb, 0);
     for (int i = 0; i < FB_W * FB_H; i++) gb->framebuffer[i] = 0x7fff;
     render_lines_blank(gb);
+    gb_blank_display(gb);
   } else if (!was_on && (v & 0x80)) {
     gb->io[R_LY] = 0;
     gb->ppu_dot = 0;
@@ -114,6 +115,7 @@ void ppu_tick(GB *gb, int dots) {
         if (getenv("JOYLOG")) printf("%llu LATCH vblank joy %02x at %llu\n", (unsigned long long)GRID_FRAME(gb->cycles), gb->joy, (unsigned long long)gb->mcycles);
         if (!gb->vblank_if_raised) gb->io[R_IF] |= INT_VBLANK;
         gb->vblank_if_raised = false;
+        gb_publish_display(gb);
         gb->frame_ready = true;
         gb->frame_count++;
       }

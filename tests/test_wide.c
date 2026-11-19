@@ -7,6 +7,7 @@
 // checks, WIDE_PAIRS=1 lists each pair, WIDE_PAIR_PNG=room:season:path (WIDE_PAIR_AGES=1 for Ages)
 // saves a pair's strips beside the real columns; WIDE_TIME=1 prints the renderer's cost per frame.
 #include "unit.h"
+#include "hw/render.h"
 #include "core/gb.h"
 #include "platform/tas.h"
 #include "platform/setup.h"
@@ -316,6 +317,51 @@ static void impa_cb(GB *gb, const GBSample *s, void *ctx) {
   const OffscreenSprites *o = &s->drawn_offscreen[s->line_drawn[100]];
   for (int i = 0; i < o->n; i++)
     if (o->s[i].x >= FB_W && o->s[i].x < FB_W + 16 && o->s[i].y > 80 && o->s[i].y < 112) { c->seen++; break; }
+}
+
+static void ages_scroll_displays_a_complete_frame(void) {
+  size_t n;
+  uint8_t *rom = oracles_read_file(GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (USA, Australia).gbc", &n);
+  if (!rom) SKIP("ROM not present");
+  Tas t;
+  if (!tas_load(&t, TAS_DIR "/ages-consoleverified.inputs")) SKIP("inputs missing");
+  GB *gb = calloc(1, sizeof *gb);
+  gb_init(gb);
+  ASSERT(gb_load_rom(gb, rom, n));
+  gb->cyctab = cyctab_alloc(rom, n);
+  assets_zero_code(rom, n);
+  gb_reset(gb);
+  if (!oracles_load_boot_state(gb, TAS_DIR "/ages-boot.state")) SKIP("boot state missing");
+  static GBSample display;
+  gb_set_display(gb, &display);
+  gb->input_at = tas_cb; gb->input_ctx = &t;
+  uint16_t previous[FB_W * FB_H];
+  // Follow the movie until Link and Impa enter 59 from the east. Walk south
+  // through the exit beside the bush, as in the issue #52 recording.
+  for (int i = 0; i <= 2230; i++) {
+    if (i > 2100 && gb->wram[0][0xc30] == 0x59 && gb->wram[0][0xd00] == 1) {
+      gb->input_at = NULL;
+      gb->joy = gb->wram[1][0x0d] > 137 ? JOY_LEFT : JOY_DOWN;
+    }
+    gb_run_frame(gb);
+    ASSERT(!gb->hung);
+    if (i == 2229) memcpy(previous, display.framebuffer, sizeof previous);
+  }
+  const GBSample *grid = gb->sample;
+  ASSERT_EQ(grid->wram[0][0xc30], 0x69);
+  ASSERT_EQ(grid->wram[0][0xd02], 2);
+  ASSERT_EQ(grid->io[R_LY], 74);
+  ASSERT_EQ(display.io[R_LY], 144);
+  printf("grid frame %llu SCY above/below split %d/%d, VBlank %d/%d\n",
+         (unsigned long long)grid->frame, grid->line_scy[40], grid->line_scy[100],
+         display.line_scy[40], display.line_scy[100]);
+  ASSERT(grid->line_scy[40] != grid->line_scy[100]);
+  for (int y = 16; y < FB_H; y++) ASSERT_EQ(display.line_scy[y], grid->line_scy[40]);
+  size_t top = 74 * FB_W, bottom = 75 * FB_W;
+  ASSERT(!memcmp(grid->framebuffer, display.framebuffer, top * sizeof(uint16_t)));
+  ASSERT(!memcmp(grid->framebuffer + bottom, previous + bottom, sizeof previous - bottom * sizeof(uint16_t)));
+  ASSERT(memcmp(grid->framebuffer + bottom, display.framebuffer + bottom, sizeof previous - bottom * sizeof(uint16_t)));
+  gb_set_display(NULL, NULL);
 }
 
 static void ages_strips_show_impa_past_the_edge(void) {
@@ -674,6 +720,8 @@ static void ages_play_origin_follows_the_camera(void) {
 }
 
 int main(void) {
+  RUN(ages_scroll_displays_a_complete_frame);
+  if (getenv("WIDE_ONLY_SCROLL")) return 0;
   if (getenv("WIDE_ONLY_SPRITES")) {
     RUN(ages_strips_show_impa_past_the_edge);
     RUN(ages_strips_show_the_neighbours_characters);

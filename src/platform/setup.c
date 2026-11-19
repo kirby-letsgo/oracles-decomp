@@ -1,4 +1,5 @@
 #include "platform/setup.h"
+#include "hw/render.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -78,6 +79,7 @@ void oracles_copy_state(GB *gb, const GB *src) {
   gb->step = keep.step; gb->native = keep.native; gb->ring = keep.ring; gb->fib = keep.fib; gb->cyctab = keep.cyctab; gb->code_bits = keep.code_bits;
   gb->trace_lo = keep.trace_lo; gb->trace_hi = keep.trace_hi;
   gb->hooks_checked = false;
+  gb_blank_display(gb);
 }
 
 bool oracles_load_boot_state(GB *gb, const char *path) {

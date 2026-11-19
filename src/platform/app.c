@@ -983,6 +983,8 @@ static void show_game(SDL_Renderer *ren, const GBSample *sample, const uint8_t *
   features.slot_boxes = settings.four_slots && (settings.widescreen || strips_shown);
 }
 
+static GBSample display_frame;
+
 // The running game's paused picture: menus drawn over it show it as the game frame it was.
 static struct { const uint8_t *rgb; const GB *gb; bool seasons; const uint8_t *rom; size_t rom_size; } paused_game;
 
@@ -999,8 +1001,8 @@ static void present_game(SDL_Renderer *ren, const GBSample *sample, const uint8_
   // valid, live pointers -- never the NULL case the struct's own comment documents for "before
   // any game is running".
   int scroll_x, scroll_y, origin_x = 0, origin_y = 0;
-  mods_picture_scroll(sample, &scroll_x, &scroll_y);
-  bool origin = wide_play_origin(sample, seasons, &origin_x, &origin_y);
+  mods_picture_scroll(&display_frame, &scroll_x, &scroll_y);
+  bool origin = wide_play_origin(&display_frame, seasons, &origin_x, &origin_y);
   ModsFrame mf = {
     .wram = sample->wram[0],
     .wram3 = sample->wram[3],
@@ -1012,8 +1014,8 @@ static void present_game(SDL_Renderer *ren, const GBSample *sample, const uint8_
     .room_w = rd_room_w(sample),
     .room_h = rd_room_h(sample),
     .room_group = rd_room_group(sample, seasons),
-    .bg_pal = mods_picture_bg_pal(sample),
-    .oam = mods_picture_oam(sample),
+    .bg_pal = mods_picture_bg_pal(&display_frame),
+    .oam = mods_picture_oam(&display_frame),
     .scroll = true,
     .scroll_x = scroll_x,
     .scroll_y = scroll_y,
@@ -1025,7 +1027,7 @@ static void present_game(SDL_Renderer *ren, const GBSample *sample, const uint8_
     .font = &mod_font,
   };
   mods_frame(&mf);
-  show_game(ren, sample, rgb, seasons, rom, rom_size);
+  show_game(ren, &display_frame, rgb, seasons, rom, rom_size);
 }
 
 // What mods wrote with oracles.wr this frame, between frames as the headless POKE does.
@@ -1039,8 +1041,8 @@ static void apply_mod_writes(GB *gb) {
 // and in widescreen centred on the theme's border colour.
 static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
   (void)tex;
-  if (paused_game.gb && paused_game.gb->sample && rgb == paused_game.rgb) {
-    show_game(ren, paused_game.gb->sample, rgb, paused_game.seasons, paused_game.rom, paused_game.rom_size);
+  if (paused_game.gb && rgb == paused_game.rgb) {
+    show_game(ren, &display_frame, rgb, paused_game.seasons, paused_game.rom, paused_game.rom_size);
     return;
   }
   if (!settings.widescreen) { present_frame(ren, rgb, FB_W); return; }
@@ -2052,7 +2054,7 @@ static bool SDLCALL on_app_event(void *data, SDL_Event *ev) {
     if (gb->hung) return true;
     apu_read_samples(&gb->apu, samples, APU_RING);
     *session.parked = threads_parked(gb);
-    framebuffer_to_rgb(gb->sample->framebuffer, session.paused_rgb);
+    framebuffer_to_rgb(display_frame.framebuffer, session.paused_rgb);
     session.backgrounded = true;
   }
   if (*session.parked && (session.backgrounded || *session.mode == MODE_PAUSED)) slot_save(gb, session.dir, SLOT_AUTO, session.paused_rgb);
@@ -2124,6 +2126,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   gb->code_bits = assets_code_bits(rom, rom_size);
 #endif
   gb_reset(gb);
+  gb_set_display(gb, &display_frame);
   wide_npcs_reset();
   char sav[1300];
   snprintf(sav, sizeof sav, "%s/sram.sav", dir);
@@ -2187,7 +2190,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     else if (slot == SLOT_AUTO) fprintf(stderr, "started from automatic state\n");
     else fprintf(stderr, "started from slot %d\n", slot + 1);
   }
-  framebuffer_to_rgb(gb->sample ? gb->sample->framebuffer : gb->framebuffer, rgb);
+  framebuffer_to_rgb(display_frame.framebuffer, rgb);
   session = (Session){gb, dir, sav, paused_rgb, &mode, &parked, false, &frames, gs->game};
   paused_game.rgb = paused_rgb;
   paused_game.gb = gb;
@@ -2380,7 +2383,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     if (mode == MODE_PAUSING || mode == MODE_QUITTING) {
       parked = threads_parked(gb);
       if (parked || frames - park_from > PARK_TIMEOUT) {
-        framebuffer_to_rgb(gb->sample->framebuffer, paused_rgb);
+        framebuffer_to_rgb(display_frame.framebuffer, paused_rgb);
         if (mode == MODE_QUITTING) { if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); running = false; break; }
         mode = MODE_PAUSED;
         pause_open(&pause, parked, any_slot(dir));
@@ -2390,7 +2393,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     }
 
     if (save_from != NO_SAVE && threads_parked(gb)) {
-      framebuffer_to_rgb(gb->sample->framebuffer, rgb);
+      framebuffer_to_rgb(display_frame.framebuffer, rgb);
       bool ok = slot_save(gb, dir, 0, rgb);
       if (ok) { undo_slot = 0; show_undoable("Saved to slot 1"); } else show_status("Couldn't save the state");
       save_from = NO_SAVE;
@@ -2400,7 +2403,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     }
     uint32_t n = apu_read_samples(&gb->apu, samples, APU_RING);
     if (audio && mode == MODE_PLAY) SDL_PutAudioStreamData(audio, samples, n * 4);
-    framebuffer_to_rgb(gb->sample->framebuffer, rgb);
+    framebuffer_to_rgb(display_frame.framebuffer, rgb);
     present_game(ren, gb->sample, rgb, !ages, rom, rom_size);
     apply_mod_writes(gb);
     for (int i = 0; i < mod_count; i++) {
@@ -2427,6 +2430,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   // launcher is shown again, and the next run_game re-inits for whichever game is actually picked.
   features.treasure_swap = NULL;
   mods_shutdown();
+  gb_set_display(NULL, NULL);
   paused_game.gb = NULL;
   wide_npcs_stop();
   free(gb); free(rom); free(tab);

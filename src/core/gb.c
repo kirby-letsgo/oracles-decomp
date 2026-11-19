@@ -100,6 +100,54 @@ void gb_reset(GB *gb) {
   gb->joy_latched = false; gb->joy_read = false;
 }
 
+static void capture_sample(const GB *gb, GBSample *sm) {
+  memcpy(sm->wram, gb->wram, sizeof sm->wram);
+  memcpy(sm->hram, gb->hram, sizeof sm->hram);
+  memcpy(sm->vram, gb->vram, sizeof sm->vram);
+  memcpy(sm->oam, gb->oam, sizeof sm->oam);
+  memcpy(sm->io, gb->io, sizeof sm->io);
+  memcpy(sm->bg_pal, gb->bg_pal, sizeof sm->bg_pal);
+  memcpy(sm->ob_pal, gb->ob_pal, sizeof sm->ob_pal);
+  memcpy(sm->framebuffer, gb->framebuffer, sizeof sm->framebuffer);
+  const RenderLineRegs *lines = render_line_regs(gb);
+  memcpy(sm->line_scx, lines->scx, FB_H);
+  memcpy(sm->line_scy, lines->scy, FB_H);
+  memcpy(sm->line_lcdc, lines->lcdc, FB_H);
+  memcpy(sm->line_wx, lines->wx, FB_H);
+  memcpy(sm->line_wy, lines->wy, FB_H);
+  memcpy(sm->drawn_vram, lines->vram, sizeof sm->drawn_vram);
+  memcpy(sm->drawn_bg_pal, lines->bg_pal, sizeof sm->drawn_bg_pal);
+  memcpy(sm->line_drawn, lines->drawn, FB_H);
+  memcpy(sm->drawn_oam, lines->oam, sizeof sm->drawn_oam);
+  memcpy(sm->drawn_offscreen, lines->offscreen, sizeof sm->drawn_offscreen);
+  sm->ie = gb->ie; sm->rom_bank = gb->rom_bank; sm->ram_bank = gb->ram_bank;
+  sm->joy_latched = gb->joy_latched; sm->joy_read = gb->joy_read;
+}
+
+// Only a frontend's displayed machine publishes LCD frames. The movie/input clock
+// continues to sample independently, including when the LCD is switched off.
+static _Thread_local const GB *display_gb;
+static _Thread_local GBSample *display;
+
+void gb_blank_display(const GB *gb) {
+  if (!display || gb != display_gb) return;
+  memset(display, 0, sizeof *display);
+  for (int i = 0; i < FB_W * FB_H; i++) display->framebuffer[i] = 0x7fff;
+}
+
+void gb_set_display(const GB *gb, GBSample *out) {
+  display_gb = gb;
+  display = out;
+  gb_blank_display(gb);
+}
+
+void gb_publish_display(const GB *gb) {
+  if (display && gb == display_gb) {
+    capture_sample(gb, display);
+    display->frame = GRID_FRAME(gb->cycles);
+  }
+}
+
 void gb_tick(GB *gb) {
   timer_tick(gb);
   int dots = gb->double_speed ? 2 : 4;
@@ -120,27 +168,7 @@ void gb_tick(GB *gb) {
     if (gb->sample_count < 16) {
       GBSample *sm = &gb->samples[(gb->sample_head + gb->sample_count) % 16];
       sm->frame = GRID_FRAME(gb->next_sample_at) - 1;
-      memcpy(sm->wram, gb->wram, sizeof sm->wram);
-      memcpy(sm->hram, gb->hram, sizeof sm->hram);
-      memcpy(sm->vram, gb->vram, sizeof sm->vram);
-      memcpy(sm->oam, gb->oam, sizeof sm->oam);
-      memcpy(sm->io, gb->io, sizeof sm->io);
-      memcpy(sm->bg_pal, gb->bg_pal, sizeof sm->bg_pal);
-      memcpy(sm->ob_pal, gb->ob_pal, sizeof sm->ob_pal);
-      memcpy(sm->framebuffer, gb->framebuffer, sizeof sm->framebuffer);
-      const RenderLineRegs *lines = render_line_regs(gb);
-      memcpy(sm->line_scx, lines->scx, FB_H);
-      memcpy(sm->line_scy, lines->scy, FB_H);
-      memcpy(sm->line_lcdc, lines->lcdc, FB_H);
-      memcpy(sm->line_wx, lines->wx, FB_H);
-      memcpy(sm->line_wy, lines->wy, FB_H);
-      memcpy(sm->drawn_vram, lines->vram, sizeof sm->drawn_vram);
-      memcpy(sm->drawn_bg_pal, lines->bg_pal, sizeof sm->drawn_bg_pal);
-      memcpy(sm->line_drawn, lines->drawn, FB_H);
-      memcpy(sm->drawn_oam, lines->oam, sizeof sm->drawn_oam);
-      memcpy(sm->drawn_offscreen, lines->offscreen, sizeof sm->drawn_offscreen);
-      sm->ie = gb->ie; sm->rom_bank = gb->rom_bank; sm->ram_bank = gb->ram_bank;
-      sm->joy_latched = gb->joy_latched; sm->joy_read = gb->joy_read;
+      capture_sample(gb, sm);
       gb->sample_count++;
     }
     gb->joy_latched = false; gb->joy_read = false;

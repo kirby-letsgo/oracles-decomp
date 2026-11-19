@@ -217,6 +217,8 @@ int main(int argc, char **argv) {
   } else if (rec_path) { fprintf(stderr, "--record needs the boot ROM argument to match the headless runner\n"); return 2; }
   if (init_ram && !oracles_load_init_ram(gb, init_ram)) { fprintf(stderr, "cannot read %s\n", init_ram); return 2; }
   gb_reset(gb);
+  static GBSample display_frame;
+  gb_set_display(gb, &display_frame);
   char sav[1024];
   sav_path(argv[1], sav, sizeof sav);
   if (!rec_path) load_sram(gb, sav);
@@ -266,7 +268,7 @@ int main(int argc, char **argv) {
         else if (ev.key.scancode == SDL_SCANCODE_F12) {
           char path[256];
           snprintf(path, sizeof path, "out/screenshot_%llu.png", (unsigned long long)frames);
-          framebuffer_to_rgb(gb->sample->framebuffer, rgb);
+          framebuffer_to_rgb(display_frame.framebuffer, rgb);
           png_write_rgb(path, rgb, FB_W, FB_H);
         } else live_joy |= key_bit(ev.key.scancode);
         break;
@@ -288,7 +290,7 @@ int main(int argc, char **argv) {
       else if (frames % 600) continue;
     }
     if (audio && !fast_forward) SDL_PutAudioStreamData(audio, samples, n * 4);
-    framebuffer_to_rgb(gb->sample->framebuffer, rgb);
+    framebuffer_to_rgb(display_frame.framebuffer, rgb);
     SDL_UpdateTexture(tex, NULL, rgb, FB_W * 3);
     SDL_RenderClear(ren);
     SDL_RenderTexture(ren, tex, NULL, NULL);

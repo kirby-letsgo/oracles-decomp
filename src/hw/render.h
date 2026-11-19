@@ -2,6 +2,11 @@
 #define RENDER_H
 #include <stdint.h>
 #include "core/gb.h"
+// A frontend supplies storage for the last completed LCD picture on its emulation thread.
+// Pass NULL for both arguments when the game ends. Movie samples keep their own timing.
+void gb_set_display(const GB *gb, GBSample *out);
+void gb_blank_display(const GB *gb);
+void gb_publish_display(const GB *gb);
 void framebuffer_to_rgb(const uint16_t *fb, uint8_t *rgb);
 
 // The registers each line of the current frame was drawn with, kept beside the emulator (the GB
