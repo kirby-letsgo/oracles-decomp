@@ -238,30 +238,48 @@ static const char *pad_name(int button) {
   return buf;
 }
 
-static uint8_t live_joy, slot_joy[2], stick_joy, stick_pressed, triggers_held;
+static uint8_t live_joy, slot_joy[2], stick_joy, stick_pressed;
 static TapLatch taps;
-static int trigger_down = NO_BINDING, trigger_up = NO_BINDING;
+static int axis_down = NO_BINDING;
+static uint32_t axis_releases; // action bits; disconnect can release more than one axis
 static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy | slot_joy[0] | slot_joy[1] | stick_joy; }
 
-#define STICK_DEADZONE 16000
-
 static void stick_event(const SDL_Event *ev) {
-  uint8_t old = stick_joy;
-  if (ev->type == SDL_EVENT_GAMEPAD_REMOVED) stick_joy = triggers_held = 0;
-  else if (ev->type == SDL_EVENT_GAMEPAD_AXIS_MOTION && ev->gaxis.axis == SDL_GAMEPAD_AXIS_LEFTX)
-    stick_joy = (uint8_t)((stick_joy & ~(JOY_LEFT | JOY_RIGHT)) | (ev->gaxis.value < -STICK_DEADZONE ? JOY_LEFT : ev->gaxis.value > STICK_DEADZONE ? JOY_RIGHT : 0));
-  else if (ev->type == SDL_EVENT_GAMEPAD_AXIS_MOTION && ev->gaxis.axis == SDL_GAMEPAD_AXIS_LEFTY)
-    stick_joy = (uint8_t)((stick_joy & ~(JOY_UP | JOY_DOWN)) | (ev->gaxis.value < -STICK_DEADZONE ? JOY_UP : ev->gaxis.value > STICK_DEADZONE ? JOY_DOWN : 0));
-  stick_pressed = stick_joy & (uint8_t)~old;
-  trigger_down = trigger_up = NO_BINDING;
+  static const struct { int negative, positive; } buttons[SDL_GAMEPAD_AXIS_COUNT] = {
+    [SDL_GAMEPAD_AXIS_LEFTX] = {PAD_LS_LEFT, PAD_LS_RIGHT},
+    [SDL_GAMEPAD_AXIS_LEFTY] = {PAD_LS_UP, PAD_LS_DOWN},
+    [SDL_GAMEPAD_AXIS_RIGHTX] = {PAD_RS_LEFT, PAD_RS_RIGHT},
+    [SDL_GAMEPAD_AXIS_RIGHTY] = {PAD_RS_UP, PAD_RS_DOWN},
+    [SDL_GAMEPAD_AXIS_LEFT_TRIGGER] = {NO_BINDING, PAD_LEFT_TRIGGER},
+    [SDL_GAMEPAD_AXIS_RIGHT_TRIGGER] = {NO_BINDING, PAD_RIGHT_TRIGGER},
+  };
+  static int held[SDL_GAMEPAD_AXIS_COUNT];  // zero when centred
+  static const uint8_t move[] = {JOY_LEFT, JOY_RIGHT, JOY_UP, JOY_DOWN};
+  axis_down = NO_BINDING;
+  axis_releases = 0;
+  stick_pressed = 0;
+  if (ev->type == SDL_EVENT_GAMEPAD_REMOVED) {
+    for (int i = 0; i < SDL_GAMEPAD_AXIS_COUNT; i++) {
+      if (held[i]) axis_releases |= action_bit(bindings_pad_action(&settings.bindings, held[i]));
+      held[i] = 0;
+    }
+    stick_joy = 0;
+    return;
+  }
   if (ev->type != SDL_EVENT_GAMEPAD_AXIS_MOTION) return;
-  bool left = ev->gaxis.axis == SDL_GAMEPAD_AXIS_LEFT_TRIGGER;
-  if (!left && ev->gaxis.axis != SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) return;
-  uint8_t bit = left ? 2 : 1;
-  bool down = ev->gaxis.value > STICK_DEADZONE;
-  if (down == !!(triggers_held & bit)) return;
-  triggers_held ^= bit;
-  *(down ? &trigger_down : &trigger_up) = left ? PAD_LEFT_TRIGGER : PAD_RIGHT_TRIGGER;
+  unsigned axis = ev->gaxis.axis;
+  if (axis >= SDL_GAMEPAD_AXIS_COUNT) return;
+  int old = held[axis] ? held[axis] : NO_BINDING;
+  int next = pad_axis_button(ev->gaxis.value, buttons[axis].negative, buttons[axis].positive, old);
+  if (old == next) return;
+  held[axis] = next == NO_BINDING ? 0 : next;
+  axis_releases = action_bit(bindings_pad_action(&settings.bindings, old));
+  axis_down = next;
+  if (old >= PAD_LS_LEFT && old <= PAD_LS_DOWN) stick_joy &= ~move[old - PAD_LS_LEFT];
+  if (next >= PAD_LS_LEFT && next <= PAD_LS_DOWN) {
+    stick_pressed = move[next - PAD_LS_LEFT];  // menu navigation is always available
+    if (bindings_pad_action(&settings.bindings, next) == ACTIONS) stick_joy |= stick_pressed;
+  }
 }
 
 static char picked[1200];
@@ -1268,7 +1286,10 @@ static bool run_controls_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *t
       if (m.waiting) {
         if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) controls_capture_key(&m, &settings.bindings, (int)ev.key.scancode);
         else if (ev.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) controls_capture_pad(&m, &settings.bindings, ev.gbutton.button);
-        else if (trigger_down != NO_BINDING) controls_capture_pad(&m, &settings.bindings, trigger_down);
+        else if (axis_down != NO_BINDING) {
+          controls_capture_pad(&m, &settings.bindings, axis_down);
+          stick_joy &= ~stick_pressed;
+        }
         if (!m.waiting) settings_store();
         continue;
       }
@@ -2272,9 +2293,10 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
       case SDL_EVENT_KEY_UP:
         release |= action_bit(bindings_key_action(&settings.bindings, (int)ev.key.scancode));
         break;
+      case SDL_EVENT_GAMEPAD_REMOVED:
       case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-        press |= action_bit(bindings_pad_action(&settings.bindings, trigger_down));
-        release |= action_bit(bindings_pad_action(&settings.bindings, trigger_up));
+        press |= action_bit(bindings_pad_action(&settings.bindings, axis_down));
+        release |= axis_releases;
         if (stick_pressed && boot.phase != BOOT_OFF && boot.phase != BOOT_LANGUAGE) { boot.phase = BOOT_OFF; live_joy = 0; }
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN:

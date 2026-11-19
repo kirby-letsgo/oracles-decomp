@@ -410,6 +410,20 @@ static void bindings_remap_and_persist(void) {
   controls_capture_pad(&m, &s.bindings, 3);                      // a pad button binds from the keyboard page too
   ASSERT(!m.waiting && m.pad_page);
   ASSERT_EQ(bindings_pad_action(&s.bindings, 3), ACT_PAUSE);
+  m.sel = ACT_SAVE_STATE;
+  controls_press(&m, &s.bindings, UI_ACCEPT);
+  controls_capture_pad(&m, &s.bindings, PAD_RS_UP);
+  bindings_bind_pad(&s.bindings, ACT_LOAD_STATE, PAD_RS_DOWN);
+  settings_format(&s, buf, sizeof buf);
+  settings_default(&back);
+  settings_parse(&back, buf);
+  ASSERT_EQ(bindings_pad_action(&back.bindings, PAD_RS_UP), ACT_SAVE_STATE);
+  ASSERT_EQ(bindings_pad_action(&back.bindings, PAD_RS_DOWN), ACT_LOAD_STATE);
+  ASSERT_EQ(bindings_pad_action(&back.bindings, 7), ACTIONS);
+  ASSERT_EQ(pad_axis_button(-18000, PAD_RS_UP, PAD_RS_DOWN, NO_BINDING), PAD_RS_UP);
+  ASSERT_EQ(pad_axis_button(-15000, PAD_RS_UP, PAD_RS_DOWN, PAD_RS_UP), PAD_RS_UP);
+  ASSERT_EQ(pad_axis_button(20000, PAD_RS_UP, PAD_RS_DOWN, PAD_RS_UP), PAD_RS_DOWN);
+  ASSERT_EQ(pad_axis_button(11000, PAD_RS_UP, PAD_RS_DOWN, PAD_RS_DOWN), NO_BINDING);
   m.sel = CTRL_RESET;
   controls_press(&m, &s.bindings, UI_ACCEPT);
   ASSERT_EQ(bindings_key_action(&s.bindings, 27), ACT_A);

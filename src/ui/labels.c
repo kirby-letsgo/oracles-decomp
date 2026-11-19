@@ -22,6 +22,9 @@ void menu_hint_keys(InputDevice d, PadStyle resolved, const char **ok, const cha
 const char *pad_style_name(PadStyle resolved, int button) {
   static const char *const xbox[PAD_NAMED] = {"A", "B", "X", "Y", "VIEW", "GUIDE", "MENU", "LS", "RS", "LB", "RB"};
   static const char *const ps[PAD_NAMED] = {"CROSS", "CIRCLE", "SQUARE", "TRIANGLE", "SHARE", "PS", "OPTIONS", "L3", "R3", "L1", "R1"};
+  static const char *const stick_names[] = {"LS LEFT", "LS RIGHT", "LS UP", "LS DOWN",
+                                           "RS LEFT", "RS RIGHT", "RS UP", "RS DOWN"};
+  if (button >= PAD_LS_LEFT && button <= PAD_RS_DOWN) return stick_names[button - PAD_LS_LEFT];
   if (resolved == STYLE_NINTENDO) return NULL;
   bool p = resolved == STYLE_PLAYSTATION;
   if (button == PAD_RIGHT_TRIGGER) return p ? "R2" : "RT";

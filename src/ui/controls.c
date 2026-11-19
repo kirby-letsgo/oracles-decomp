@@ -14,6 +14,14 @@ static const int default_keys[ACTIONS][KEYS_PER_ACTION] = {
 };
 static const int default_pads[ACTIONS] = {11, 12, 13, 14, 0, 2, 6, 4, 5, PAD_RIGHT_TRIGGER, 9, 3, 1, 7, 8};
 
+int pad_axis_button(int value, int negative, int positive, int held) {
+  if (value < -16000) return negative;
+  if (value > 16000) return positive;
+  if (value < -12000 && held == negative) return negative;
+  if (value > 12000 && held == positive) return positive;
+  return NO_BINDING;
+}
+
 void bindings_default(Bindings *b) {
   memcpy(b->key, default_keys, sizeof b->key);
   memcpy(b->pad, default_pads, sizeof b->pad);
@@ -75,7 +83,7 @@ void bindings_parse_line(Bindings *b, const char *key, const char *value) {
       }
     } else if (!strcmp(key, "pads")) {
       long v = strtol(p, &end, 10);
-      if (end == p || v < NO_BINDING || v > PAD_LEFT_TRIGGER) return;
+      if (end == p || v < NO_BINDING || v > PAD_RS_DOWN) return;
       t.pad[a] = (int)v;
       p = end + (*end == ';');
     } else return;

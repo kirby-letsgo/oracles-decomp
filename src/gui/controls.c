@@ -38,7 +38,7 @@ int gui_controls(ControlsMenu *m, const Bindings *b, const char *(*key_name)(int
   int tapped = GUI_NONE;
   keep_visible(CLAY_ID("ControlList"), CLAY_IDI("Control", m->sel));
   PAGE(t, f) {
-    if (header(t, "Controls", f->hints ? (m->waiting ? (m->pad_page ? "Press the button" : "Press the key") : hint_of(f, "set", "back")) : NULL)) tapped = GUI_BACK;
+    if (header(t, "Controls", f->hints ? (m->waiting ? (m->pad_page ? "Press a button or move a stick" : "Press the key") : hint_of(f, "set", "back")) : NULL)) tapped = GUI_BACK;
     *page = tab_bar(t, "ControlTab", page_labels, 2, m->pad_page, false);
     LIST("ControlList") {
       for (int r = 0; r < CTRL_ROWS; r++) {
@@ -53,7 +53,7 @@ int gui_controls(ControlsMenu *m, const Bindings *b, const char *(*key_name)(int
           label(control_labels[r], TEXT, row_fg(t, sel, true));
           spacer();
           if (r == CTRL_RESET) continue;
-          if (sel && m->waiting) label(m->pad_page ? "Press a button..." : "Press a key...", TEXT, t->on_hi);
+          if (sel && m->waiting) label(m->pad_page ? "Button or stick..." : "Press a key...", TEXT, t->on_hi);
           else bindings_of(m, b, r, key_name, pad_name, t, sel);
         }
       }

@@ -102,8 +102,8 @@ the game's file-selection screen to protect that save. A message explains why it
 | Save / load state slot 1 | Cmd+S / Cmd+R, or Ctrl+S / Ctrl+R | L3 / R3 |
 
 Every button, including Pause, Fast-forward, Swap, the item buttons and save / load state, can be remapped in
-Settings > CONTROLS: pick a row, then press the key or controller button (triggers included) you
-want for it. Quick swap and the item buttons only do something once their gameplay toggles are on.
+Settings > CONTROLS: pick an action, then press a key, button or trigger, or move either stick in the
+direction you want to bind. Unassigned left-stick directions still move Link. Quick swap and the item buttons only do something once their gameplay toggles are on.
 The window resizes in whole-pixel steps.
 
 The status bar, the item boxes and the menu hints name the key or controller button each action is
