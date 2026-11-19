@@ -11,12 +11,14 @@
 typedef enum { FILTER_SHARP, FILTER_SCANLINES, FILTER_LCD, FILTER_CRT,
                FILTER_XBRZ, FILTER_HQX, FILTERS } ScreenFilter;
 
+typedef enum { WIDE_OFF, WIDE_16_10, WIDE_16_9, WIDE_MODES } WidescreenMode;
+
 typedef struct {
   int volume;                   // 0..10
   bool fullscreen;
   ScreenFilter filter;
   bool fill;                    // the game fills the width (or height) at a fractional scale
-  bool widescreen;              // 256 wide: the neighbouring rooms beside the 160 of the game
+  WidescreenMode widescreen;
   bool dim_sides;               // widescreen's side strips drawn darker than the live room
   bool gbc_colours;             // the Game Boy Color screen's paler, warmer colours
   bool fast_text;               // each line of a text box appears at once

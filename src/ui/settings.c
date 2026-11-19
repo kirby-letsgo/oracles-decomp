@@ -10,7 +10,7 @@ void settings_default(Settings *s) {
   s->fullscreen = false;
   s->filter = FILTER_SHARP;
   s->fill = false;
-  s->widescreen = false;
+  s->widescreen = WIDE_OFF;
   s->dim_sides = true;
   s->gbc_colours = false;
   s->fast_text = false;
@@ -39,7 +39,7 @@ void settings_parse(Settings *s, const char *text) {
       if (!strcmp(key, "volume")) { int v = atoi(value); if (v >= 0 && v <= 10) s->volume = v; }
       else if (!strcmp(key, "fullscreen")) s->fullscreen = !strcmp(value, "on");
       else if (!strcmp(key, "scale")) s->fill = !strcmp(value, "fill");
-      else if (!strcmp(key, "widescreen")) s->widescreen = !strcmp(value, "on");
+      else if (!strcmp(key, "widescreen")) s->widescreen = !strcmp(value, "16:10") ? WIDE_16_10 : !strcmp(value, "on") ? WIDE_16_9 : WIDE_OFF;
       else if (!strcmp(key, "dim_sides")) s->dim_sides = !strcmp(value, "on");
       else if (!strcmp(key, "gbc_colours")) s->gbc_colours = !strcmp(value, "on");
       else if (!strcmp(key, "fast_text")) s->fast_text = !strcmp(value, "on");
@@ -64,7 +64,7 @@ void settings_parse(Settings *s, const char *text) {
 
 int settings_format(const Settings *s, char *out, size_t size) {
   int n = snprintf(out, size, "volume=%d\nfullscreen=%s\nfilter=%s\nscale=%s\nwidescreen=%s\ndim_sides=%s\ngbc_colours=%s\nfast_text=%s\nfast_menus=%s\nfast_forward=%d\nquick_swap=%s\nfour_slots=%s\nhaptics=%s\ncontroller_style=%s\n",
-                   s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->widescreen ? "on" : "off", s->dim_sides ? "on" : "off", s->gbc_colours ? "on" : "off",
+                   s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->widescreen == WIDE_16_10 ? "16:10" : s->widescreen == WIDE_16_9 ? "on" : "off", s->dim_sides ? "on" : "off", s->gbc_colours ? "on" : "off",
                    s->fast_text ? "on" : "off", s->fast_menus ? "on" : "off", s->ff_speed, s->quick_swap ? "on" : "off", s->four_slots ? "on" : "off",
                    s->haptics ? "on" : "off", pad_style_keys[s->pad_style < STYLES ? s->pad_style : STYLE_AUTO]);
   if (n < (int)size) n += snprintf(out + n, size - n, "d1_randomizer=%s\n", s->d1_randomizer ? "on" : "off");
@@ -106,7 +106,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   case SET_VOLUME: s->volume = s->volume + dir < 0 ? 0 : s->volume + dir > 10 ? 10 : s->volume + dir; break;
   case SET_SCREEN: s->filter = (ScreenFilter)((s->filter + dir + FILTERS) % FILTERS); break;
   case SET_SCALE: if (dir) s->fill = !s->fill; break;
-  case SET_WIDESCREEN: if (dir) s->widescreen = !s->widescreen; break;
+  case SET_WIDESCREEN: s->widescreen = (s->widescreen + dir + WIDE_MODES) % WIDE_MODES; break;
   case SET_DIM_SIDES: if (dir) s->dim_sides = !s->dim_sides; break;
   case SET_COLOURS: if (dir) s->gbc_colours = !s->gbc_colours; break;
   case SET_FULLSCREEN: if (dir) s->fullscreen = !s->fullscreen; break;

@@ -147,7 +147,7 @@ session and the game carries on without it.
 - Each mod gets its own private Lua world. Two mods cannot see each other's variables, and one mod
   failing does not affect another.
 
-The surface is the size of the picture: **160x144**, or **256x144** with widescreen on, with `x` to
+The surface is the size of the picture: **160x144**, **230x144** (16:10), or **256x144** (16:9), with `x` to
 the right and `y` down from the top-left. Drawing outside it is clipped, not an error. Ask
 `oracles.screen()` for the width rather than assuming.
 
@@ -415,7 +415,7 @@ groups, so `room` alone is not enough to tell two rooms apart.
 
 ### `oracles.screen()`
 
-Returns the picture's width in pixels: 160, or 256 when the player has widescreen on. The height is
+Returns the picture's width in pixels: 160, 230 (16:10), or 256 (16:9). The height is
 always 144. Safe to call while `main.lua` is still loading.
 
 ```lua
@@ -748,7 +748,7 @@ Points worth taking from it:
 
 - **Pick addresses by game, once, at load.** `oracles.game()` works while `main.lua` is still
   running, so resolve the address there rather than branching on every frame.
-- **Ask for the width.** `oracles.screen()` is 160 or 256; using it lets the tracker fit in a widescreen side strip
+- **Ask for the width.** `oracles.screen()` is 160, 230, or 256; using it lets the tracker fit in a widescreen side strip
   or centre itself on the original picture.
 - **Draw every frame.** The surface is wiped each frame; there is nothing to erase and nothing that
   stays.

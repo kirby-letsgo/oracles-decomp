@@ -616,6 +616,10 @@ static void apply_window_settings(SDL_Window *win) {
   if (!!(SDL_GetWindowFlags(win) & SDL_WINDOW_FULLSCREEN) != settings.fullscreen) SDL_SetWindowFullscreen(win, settings.fullscreen);
 }
 
+static int picture_width(void) {
+  return settings.widescreen == WIDE_16_10 ? UI_W_16_10 : settings.widescreen == WIDE_16_9 ? WIDE_W : FB_W;
+}
+
 // Turning widescreen on or off reshapes a desktop window to the new picture at its current scale.
 static void fit_window_to_picture(SDL_Window *win) {
 #ifndef __ANDROID__
@@ -623,7 +627,7 @@ static void fit_window_to_picture(SDL_Window *win) {
   int w, h;
   if (!SDL_GetWindowSize(win, &w, &h)) return;
   int s = SDL_max(1, h / FB_H);
-  SDL_SetWindowSize(win, (settings.widescreen ? 256 : FB_W) * s, FB_H * s);
+  SDL_SetWindowSize(win, picture_width() * s, FB_H * s);
 #else
   (void)win;
 #endif
@@ -975,11 +979,11 @@ static void hud_glyphs(uint8_t g[4]) {
 // rgb itself is left as the game drew it.
 static void show_game(SDL_Renderer *ren, const GBSample *sample, const uint8_t *rgb, bool seasons, const uint8_t *rom, size_t rom_size) {
   static uint8_t pic[WIDE_W * FB_H * 3], boxes[2][WIDE_BOX_W * FB_H * 3], strips[2][WIDE_STRIP_W * FB_H * 3];
-  int w = settings.widescreen ? WIDE_W : FB_W;
+  int w = picture_width();
   // The X and Y items go in the space widescreen adds beside the status bar, or in the narrow
   // picture's side bars when they are wide enough; the game has nowhere to put them.
   WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}, rom, rom_size,
-                   settings.four_slots, {features.slot_item[0], features.slot_item[1]}, wide_npcs_room, {0}};
+                   settings.four_slots, {features.slot_item[0], features.slot_item[1]}, wide_npcs_room, {0}, settings.widescreen == WIDE_16_10};
   hud_glyphs(o.glyph);
   if (!settings.widescreen) {
     memcpy(pic, rgb, FB_W * FB_H * 3);
@@ -1027,7 +1031,7 @@ static void present_game(SDL_Renderer *ren, const GBSample *sample, const uint8_
     .wram1 = sample->wram[1],
     .hram = sample->hram,
     .seasons = seasons,
-    .width = settings.widescreen ? WIDE_W : FB_W,
+    .width = picture_width(),
     .room = rd_room(sample, seasons),
     .room_w = rd_room_w(sample),
     .room_h = rd_room_h(sample),
@@ -1065,14 +1069,14 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
   }
   if (!settings.widescreen) { present_frame(ren, rgb, FB_W); return; }
   static uint8_t wide[WIDE_W * FB_H * 3];
-  const int side = (WIDE_W - FB_W) / 2;
+  const int w = picture_width(), side = (w - FB_W) / 2;
   for (int y = 0; y < FB_H; y++) {
-    uint8_t *row = wide + (size_t)y * WIDE_W * 3;
-    for (int x = 0; x < WIDE_W; x++)
+    uint8_t *row = wide + (size_t)y * w * 3;
+    for (int x = 0; x < w; x++)
       if (x < side || x >= side + FB_W) { row[x * 3] = overlay_theme.bg.r; row[x * 3 + 1] = overlay_theme.bg.g; row[x * 3 + 2] = overlay_theme.bg.b; }
     memcpy(row + side * 3, rgb + (size_t)y * FB_W * 3, FB_W * 3);
   }
-  present_frame(ren, wide, WIDE_W);
+  present_frame(ren, wide, w);
 }
 
 // A modal settings screen; returns false when the window is closed. Changes apply as they are made.
@@ -1539,7 +1543,8 @@ static bool run_settings_page(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *t
       UiButton b;
       if (!menu_button(&ev, &b)) continue;
       SettingsRow row;
-      bool was_full = settings.fullscreen, was_wide = settings.widescreen, was_portable = settings.portable;
+      WidescreenMode was_wide = settings.widescreen;
+      bool was_full = settings.fullscreen, was_portable = settings.portable;
       MenuAction a = settings_press(&m, &settings, b, &row);
       if (settings.portable != was_portable) portable_switched();
       if (a == MENU_BACK) { settings_store(); return true; }
@@ -1864,7 +1869,8 @@ static bool run_home(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, const
       if (r.action == LAUNCH_QUIT) return false;
       if (r.action == LAUNCH_SETTINGS) {
         SettingsRow row;
-        bool was_full = settings.fullscreen, was_wide = settings.widescreen, was_portable = settings.portable;
+        WidescreenMode was_wide = settings.widescreen;
+        bool was_full = settings.fullscreen, was_portable = settings.portable;
         MenuAction sa = settings_press(&settings_menu, &settings, r.button, &row);
         if (settings.portable != was_portable) portable_switched();
         if (sa == MENU_PICK && row == SET_MODS && !run_mods(win, ren, tex, NULL)) return false;

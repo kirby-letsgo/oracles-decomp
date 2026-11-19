@@ -1,4 +1,5 @@
 #include "wide/wide.h"
+#include "ui/ui.h"
 #include "wide/item.h"
 #include "wide/room.h"
 #include "wide/hud.h"
@@ -450,7 +451,7 @@ void wide_sprite_row(const GBSample *s, int y, int16_t c[WIDE_W], bool behind[WI
 // between its B and A boxes. The game's brackets are a one-pixel stroke with two-pixel serifs
 // running from line 1 to line 14, so these are drawn the same way rather than copied, which would
 // tie us to wherever the bar happens to put its own.
-enum { HUD_SHIFT = 30, SLOT_LEFT = 2, SLOT_PITCH = 38,
+enum { HUD_SHIFT = 30, SLOT_LEFT = 2, SLOT_PITCH = 38, COMPACT_PITCH = 34,
        SLOT_OPEN = 8, SLOT_ICON = 10, SLOT_CLOSE = 28, SLOT_BOX_W = 16,
        SLOT_TOP = 1, SLOT_BOTTOM = 14, SLOT_BOX = SLOT_CLOSE + 2 };
 
@@ -505,7 +506,7 @@ static void slot_icons(const GBSample *s, const WideOptions *o, SlotIcons *si) {
     if (!si->on[i]) continue;
     si->count[i] = wide_item_count(o->seasons, o->slot_item[i], &s->wram[0][0x600]);
     // Centre a narrow icon in its box, so the two boxes line up whatever is in them.
-    si->x[i] = SLOT_LEFT + i * SLOT_PITCH + SLOT_ICON + (SLOT_BOX_W - si->icon[i].halves * 8) / 2;
+    si->x[i] = SLOT_LEFT + i * (o->compact ? COMPACT_PITCH : SLOT_PITCH) + SLOT_ICON + (SLOT_BOX_W - si->icon[i].halves * 8) / 2;
   }
 }
 
@@ -515,7 +516,7 @@ static void draw_slot_icons(const GBSample *s, const WideOptions *o, const SlotI
   const uint8_t *bg = s->drawn_bg_pal[s->line_drawn[y] & 1];
   int ink = bg[3 * 2] | (bg[3 * 2 + 1] << 8);           // BG palette 0, colour 3
   for (int i = 0; i < 2; i++) {
-    int base = SLOT_LEFT + i * SLOT_PITCH;
+    int base = SLOT_LEFT + i * (o->compact ? COMPACT_PITCH : SLOT_PITCH);
     if (y >= SLOT_LETTER_TOP && y < SLOT_LETTER_TOP + HUD_GLYPH_H) {
       const uint8_t *g = hud_glyph(o->glyph[i]);
       if (!g) g = hud_glyph(i ? 'Y' : 'X');
@@ -670,19 +671,21 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
   // colour and jump.
   if (menu && (settled >= 2 || !menu_rgb_set) && menu_colour(middle, menu_rgb)) menu_rgb_set = true;
   const uint8_t *fill = menu && menu_rgb_set ? menu_rgb : o->border;
+  int viewport = o->compact ? UI_W_16_10 : WIDE_W;
+  int side = (viewport - FB_W) / 2;
   int width = rd(s, W_ROOM_WIDTH) * 8, height = rd(s, W_ROOM_HEIGHT) * 8;
   bool rooms = a.v.shown && o->rom && width > 0 && height > 0 && width <= 256 && height <= 256;
   for (int y = 0; y < FB_H; y++) {
-    uint8_t *row = out + (size_t)y * WIDE_W * 3;
+    uint8_t *row = out + (size_t)y * viewport * 3;
     // The status bar is the game's own strip across the top 160 pixels, and there is no room to
     // show beside it. Its end colours carry on to the edges of the wider picture, so it reads as one
     // bar the whole way across instead of a box floating in the middle of a black band. Never
     // dimmed, unlike the room strips: half a dimmed bar would only put a seam down it.
     if (bar_shown && y < STATUS_BAR_LINES) {
       const uint8_t *mid = middle + (size_t)y * FB_W * 3;
-      int bar = WIDE_SIDE + (o->slots ? HUD_SHIFT : 0);
+      int bar = o->slots ? (o->compact ? 2 * COMPACT_PITCH : WIDE_SIDE + HUD_SHIFT) : side;
       for (int x = 0; x < bar; x++) memcpy(row + x * 3, mid, 3);
-      for (int x = bar + FB_W; x < WIDE_W; x++) memcpy(row + x * 3, mid + (FB_W - 1) * 3, 3);
+      for (int x = bar + FB_W; x < viewport; x++) memcpy(row + x * 3, mid + (FB_W - 1) * 3, 3);
       memcpy(row + (size_t)bar * 3, mid, FB_W * 3);
       draw_slot_icons(s, o, &icons, y, row);
       continue;
@@ -694,14 +697,14 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
     oy = a.v.moving && a.v.dy < 0 ? oy - 256 : wrap_offset(oy);
     static SpriteLine sprites;
     if (line) sprite_line(s, y, false, &sprites);
-    for (int x = 0; x < WIDE_W; x++) {
-      if (x == WIDE_SIDE) x += FB_W;
-      if (x >= WIDE_W) break;
+    for (int x = 0; x < viewport; x++) {
+      if (x == side) x += FB_W;
+      if (x >= viewport) break;
       int c = NOTHING;
       if (line) {
-        int rx = ox + x - WIDE_SIDE, ry = oy + y, gx = floor_div(rx, width), gy = floor_div(ry, height);
+        int rx = ox + x - side, ry = oy + y, gx = floor_div(rx, width), gy = floor_div(ry, height);
         uint8_t cover = 0;
-        if (!a.v.moving && !gx && !gy) c = bg_pixel(s, x - WIDE_SIDE, y, &cover);
+        if (!a.v.moving && !gx && !gy) c = bg_pixel(s, x - side, y, &cover);
         else {
           const Neighbour *n = around_cell(&a, gx, gy);
           int nx = rx - gx * width, ny = ry - gy * height;
@@ -711,7 +714,8 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
             if (sc >= 0 && !((cover & 0x80) || (n->sprites->behind[ny][nx] && (cover & 1)))) c = sc;
           }
         }
-        if (c >= 0 && sprites.c[x] >= 0 && !((cover & 0x80) || (sprites.behind[x] && (cover & 1)))) c = sprites.c[x];
+        int sx = x + WIDE_SIDE - side;
+        if (c >= 0 && sprites.c[sx] >= 0 && !((cover & 0x80) || (sprites.behind[sx] && (cover & 1)))) c = sprites.c[sx];
       }
       // LCD off: blank white, as in the middle -- and never dimmed, or the strips would turn grey
       // against a white middle every time the game blanks the screen between menus.
@@ -720,6 +724,6 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
       if (c < 0) memcpy(row + x * 3, fill, 3);
       else put555(row + x * 3, c, o->dim && !blank);
     }
-    memcpy(row + WIDE_SIDE * 3, middle + (size_t)y * FB_W * 3, FB_W * 3);
+    memcpy(row + side * 3, middle + (size_t)y * FB_W * 3, FB_W * 3);
   }
 }

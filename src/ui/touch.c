@@ -73,7 +73,14 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
     if (l->portrait) zoom = fminf((float)screen_w / pic_w, (float)(bottom - top - (need - UI_H)) * s / UI_H);
     zoom = fmaxf(zoom, (float)ps);
   }
+  // 16:10 is 230.4 pixels wide at 144 lines. Use that aspect for Fill,
+  // but keep the actual 230 squares per row for integer Pixel scaling.
+  if (fill && pic_w == UI_W_16_10) zoom = fminf(zoom, (float)fit_w / (UI_H * 1.6f));
   int pw = (int)(pic_w * zoom), ph = (int)(UI_H * zoom);
+  if (fill && pic_w == UI_W_16_10) {
+    pw = (int)lroundf(UI_H * 1.6f * zoom);
+    ph = (int)lroundf(UI_H * zoom);
+  }
   int gx = tall ? imax(screen_w - pw, 0) / 2 : safe.x + imax(safe.w - pw, 0) / 2;
   int gy = l->portrait ? top * s : tall ? safe.y + imax(safe.h - ph, 0) / 2 : imax(screen_h - ph, 0) / 2;
   if (!fill && ps == s) { gx -= gx % s; gy -= gy % s; }

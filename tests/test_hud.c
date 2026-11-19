@@ -171,7 +171,7 @@ static void slot_strip_draws_its_letter_on_a_tab(void) {
   s.hram[0x9b - 0x80] = 2;                             // Ages wDisplayedLcdBehaviour: the bar is split
   s.wram[0][0xd00] = 1;                                // wScrollMode: normal play
   for (int y = 0; y < 16; y++) s.framebuffer[y * FB_W] = 0x7fff;  // the bar's paper, white
-  WideOptions o = {false, false, {0, 0, 0}, NULL, 0, true, {0, 0}, NULL, {'Z', 0, 0, 0}};
+  WideOptions o = {false, false, {0, 0, 0}, NULL, 0, true, {0, 0}, NULL, {'Z', 0, 0, 0}, false};
   memset(strip, 0x55, sizeof strip);
   ASSERT(wide_slot_strip(&s, &o, 0, false, strip));
   const uint8_t *g = hud_glyph('Z');

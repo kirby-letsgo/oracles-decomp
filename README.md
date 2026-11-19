@@ -13,7 +13,7 @@ The app reads it once, keeps the graphics, sound and data, and never needs it ag
 
 What this port adds on top of the original games:
 
-- **Widescreen (16:9)** — see the rooms around you, not just the one you're in
+- **Widescreen (16:10 and 16:9)** — see the rooms around you, not just the one you're in
 - **Save states** — 4 slots with thumbnails, plus a Resume state from wherever you last quit
 - **Save sync** — your saves and states follow you between desktop and phone, no passwords
 - **Remappable controls** — every button, for keyboard and gamepad
@@ -145,8 +145,9 @@ desktop loads on your phone.
 
 ## Widescreen
 
-Settings > WIDESCREEN widens the picture to 256x144 (16:9 at the game's own 144 lines). The game's
-original 160 pixels stay in the middle, untouched, with 48 pixels either side showing the rooms
+Settings > Widescreen offers **Off**, **16:10** and **16:9**. Use **Scale > Fill** to fill a
+1280×800 screen in 16:10, or **Pixel** for integer scaling. The game's original 160 pixels stay
+in the middle, with 35 pixels on each side in 16:10 or 48 in 16:9 showing the rooms
 around you, decoded from your ROM: the overworld grid (with the right season in Seasons) and, in
 dungeons, the rooms through a doorway once you've visited them. Large dungeon rooms simply show more
 of themselves.

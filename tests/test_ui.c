@@ -167,7 +167,7 @@ static void settings_round_trip(void) {
   ASSERT(!s.essence_tracker);
   s.essence_tracker = true;
   s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true; s.fill = true;
-  s.widescreen = true; s.dim_sides = false;
+  s.widescreen = WIDE_16_10; s.dim_sides = false;
   ASSERT(s.haptics);                                    // on until the player turns it off
   s.haptics = false;
   ASSERT_EQ(s.ff_speed, 3);
@@ -176,6 +176,9 @@ static void settings_round_trip(void) {
   settings_format(&s, buf, sizeof buf);
   settings_default(&back);
   settings_parse(&back, buf);
+  ASSERT_EQ(back.widescreen, WIDE_16_10);
+  settings_parse(&back, "widescreen=on\n");
+  ASSERT_EQ(back.widescreen, WIDE_16_9);
   ASSERT(back.essence_tracker);
   ASSERT_EQ(back.volume, 3);
   ASSERT_EQ(back.filter, FILTER_CRT);
@@ -494,6 +497,11 @@ static void touch_fill_scales_past_whole_pixels(void) {
 
 static void touch_layout_takes_the_wide_picture(void) {
   TouchLayout l;
+  touch_layout(&l, 1280, 800, (UiRect){0, 0, 1280, 800}, false, true, true, UI_W_16_10);
+  ASSERT_EQ(l.game_px.x, 0); ASSERT_EQ(l.game_px.y, 0);
+  ASSERT_EQ(l.game_px.w, 1280); ASSERT_EQ(l.game_px.h, 800);
+  touch_layout(&l, 1280, 800, (UiRect){0, 0, 1280, 800}, false, true, false, UI_W_16_10);
+  ASSERT_EQ(l.game_px.w, 1150); ASSERT_EQ(l.game_px.h, 720);
   TouchLayout narrow;
   touch_layout(&narrow, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false, UI_W);
   touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, false, 256);

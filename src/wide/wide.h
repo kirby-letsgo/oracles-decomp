@@ -30,9 +30,10 @@ typedef struct {
   // the sprites of a neighbouring room, NULL where none are known (wide/npcs.h)
   const WideRoomSprites *(*room_sprites)(int group, int room);
   uint8_t glyph[4];             // the four slots' letters, X Y B A (ui/labels.h codes; 0: the game's own)
+  bool compact;                 // 16:10 viewport
 } WideOptions;
 
-// out: WIDE_W x FB_H RGB24.
+// out: (compact ? UI_W_16_10 : WIDE_W) x FB_H RGB24.
 void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out);
 enum { WIDE_STRIP_W = 16, WIDE_BOX_W = 38 };
 // Item X/Y beside the narrow picture: slot 0 (X) or 1 (Y) as an RGB24 strip FB_H tall, either the

@@ -22,7 +22,6 @@ static const char *section_before(int r) {
 static int toggle_of(const Settings *s, int r) {
   bool v;
   switch (r) {
-  case SET_WIDESCREEN: v = s->widescreen; break;
   case SET_DIM_SIDES: v = s->dim_sides; break;
   case SET_FULLSCREEN: v = s->fullscreen; break;
   case SET_FAST_TEXT: v = s->fast_text; break;
@@ -39,6 +38,7 @@ static int toggle_of(const Settings *s, int r) {
 static Clay_String value_of(const Settings *s, const char *sync_label, int r, int toggle) {
   switch (r) {
   case SET_SCREEN: return gui_str("< %s >", filter_labels[s->filter]);
+  case SET_WIDESCREEN: return gui_str("< %s >", s->widescreen == WIDE_16_10 ? "16:10" : s->widescreen == WIDE_16_9 ? "16:9" : "Off");
   case SET_SCALE: return gui_str("< %s >", s->fill ? "Fill" : "Pixel");
   case SET_COLOURS: return gui_str("< %s >", s->gbc_colours ? "GBC" : "Vivid");
   case SET_FF_SPEED: return gui_str("< %dx >", s->ff_speed);

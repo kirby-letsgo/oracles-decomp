@@ -8,6 +8,7 @@
 #include "assets/assets.h"
 #include "wide/item.h"
 #include "wide/wide.h"
+#include "ui/ui.h"
 
 static void check_counts(GB *gb, const uint8_t *rom, size_t size, bool seasons) {
   const uint8_t *page = &gb->wram[0][0x600];
@@ -52,10 +53,11 @@ static void check_counts(GB *gb, const uint8_t *rom, size_t size, bool seasons) 
   for (int n = 0; n < 4; n++) {
     s.wram[0][wNumBombs & 0xfff] = counts[n];
     s.wram[0][wNumEmberSeeds & 0xfff] = counts[n];
-    for (int slot = 0; slot < 2; slot++) for (int layout = 0; layout < 3; layout++) {
-      int w = layout == 0 ? WIDE_STRIP_W : layout == 1 ? WIDE_BOX_W : WIDE_W;
-      int x0 = layout == 0 ? 4 : layout == 1 ? (slot ? 8 : 1) : 2 + slot * 38;
+    for (int slot = 0; slot < 2; slot++) for (int layout = 0; layout < 4; layout++) {
+      int w = layout == 0 ? WIDE_STRIP_W : layout == 1 ? WIDE_BOX_W : layout == 2 ? WIDE_W : UI_W_16_10;
+      int x0 = layout == 0 ? 4 : layout == 1 ? (slot ? 8 : 1) : 2 + slot * (layout == 3 ? 34 : 38);
       int y0 = layout == 0 ? 26 : 9;
+      o.compact = layout == 3;
       if (layout < 2) ASSERT(wide_slot_strip(&s, &o, slot, layout == 1, picture));
       else wide_render(&s, &o, picture);
       for (int y = 0; y < 5; y++) for (int x = 0; x < 7; x++) {
@@ -64,6 +66,20 @@ static void check_counts(GB *gb, const uint8_t *rom, size_t size, bool seasons) 
       }
     }
   }
+  // X and Y keep their complete boxes. B, A, hearts and counters keep every
+  // pixel of the native bar, including its right edge.
+  static uint8_t full[WIDE_W * FB_H * 3];
+  o.compact = false;
+  wide_render(&s, &o, full);
+  o.compact = true;
+  wide_render(&s, &o, picture);
+  for (int y = 0; y < 16; y++) {
+    const uint8_t *a = full + y * WIDE_W * 3, *b = picture + y * UI_W_16_10 * 3;
+    ASSERT(!memcmp(a + 2*3, b + 2*3, 30*3));
+    ASSERT(!memcmp(a + 40*3, b + 36*3, 30*3));
+    ASSERT(!memcmp(a + 78*3, b + 68*3, FB_W*3));
+  }
+  o.compact = false;
   o.slot_item[0] = 5;
   ASSERT(wide_slot_strip(&s, &o, 0, false, picture));
   for (int i = 26 * WIDE_STRIP_W * 3; i < WIDE_STRIP_W * FB_H * 3; i++) ASSERT_EQ(picture[i], 0);
