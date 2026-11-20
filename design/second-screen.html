@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oracles · Second screen sketch</title>
+<style>
+* {box-sizing:border-box}
+body {margin:0;background:#172725;color:#fff0c9;font-family:"Trebuchet MS",system-ui,sans-serif}
+main {height:100dvh;max-width:900px;margin:auto;display:flex;flex-direction:column;background:#f1e6be;color:#283c34}
+nav,.slots {display:flex;gap:5px;padding:7px;background:#233831}
+button {font:inherit;font-weight:bold;color:inherit;cursor:pointer;touch-action:manipulation;min-height:44px}
+nav button {flex:1;border:0;color:#e4dcba;background:#364e42;letter-spacing:.09em;text-transform:uppercase}
+nav button[aria-pressed=true] {background:#efd58c;color:#25382d;box-shadow:inset 0 -4px #c89449}
+header {padding:9px 12px 5px;display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+h1 {margin:0;font:700 clamp(18px,4vmin,28px) Georgia,serif}
+small {font-size:clamp(12px,2.8vmin,18px)}
+.grid {flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(max(64px,21%),1fr));grid-auto-rows:minmax(54px,1fr);gap:6px;padding:6px 10px 10px}
+.item {position:relative;display:grid;place-items:center;border:1px solid #b7a97e;background:#fff5d6;min-height:clamp(54px,16vmin,104px)}
+.item[aria-pressed=true] {background:#f9d88a;outline:3px solid #846026;outline-offset:-3px}
+canvas {image-rendering:pixelated}
+.item canvas {width:clamp(44px,16vmin,90px);height:auto}
+.count,.tag {position:absolute;bottom:2px;right:4px;font:bold 13px monospace}
+.tag {left:3px;right:auto;top:3px;bottom:auto;background:#395547;color:#fff4cd;padding:1px 4px}
+.slots button {flex:1;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid #778369;background:#355045;color:#fff1c9}
+.slots canvas {width:clamp(26px,8vmin,50px)}
+#map {flex:1;min-height:0;display:flex;flex-direction:column}
+#map canvas {width:100%;height:100%;object-fit:contain;min-height:0}
+.floors {display:flex;gap:6px;justify-content:center;background:#233831;padding:7px}
+.floors button {background:#395547;color:#fff1cc;border:0;min-width:64px}
+.floors button[aria-pressed=true] {background:#efd58c;color:#24382c}
+[hidden] {display:none!important}
+</style>
+<main>
+<nav aria-label="View"><button id="inventoryTab" aria-pressed="true">Inventory</button><button id="mapTab" aria-pressed="false">Map</button></nav>
+<header><h1 id="heading">Bombs</h1><small id="hint" role="status">Choose a slot</small></header>
+<div class="grid" id="grid" aria-label="Inventory"></div><div class="slots" id="slots" aria-label="Equip to slot"></div>
+<section id="map" hidden><canvas id="plan" width="152" height="100" aria-label="Example dungeon floor plan"></canvas><div class="floors" aria-label="Choose floor"></div></section>
+</main>
+<script>
+// Original pixel sketches for the touch study. Each character paints one pixel.
+const items = [
+ ['Sword','#83a7ae',['       aa','      aba','     aba','    aba',' a aba',' abba','  bb',' abb',' aa']],
+ ['Shield','#569899',['  aaaaa',' abbbbba',' abaccba',' abcccba',' abaccba','  abbba','   aba','    a']],
+ ['Bombs','#648895',['     cc','    ca c','   aa','  abba',' abbbbba',' abbabbba',' abbbbbba','  abbbba','   aaaa']],
+ ['Feather','#ce775f',['      aaa','    abbba','   abbbba','  abbaba',' abbaba',' ababa','  aba',' aca',' ac']],
+ ['Shovel','#79979b',['     aaa','     aca','     aa','    ac','   ac',' aabaaa',' abbbba',' abbbba','  aaa']],
+ ['Seed Satchel','#b77540',['  acaca','   aca','  abbaa',' abbbbba',' abbccbba',' abbccbba',' abbbbba','  aaaaa']],
+ ['Boomerang','#c48640',['  aaa',' abba',' abba','  abba','   abba','    abbba','     abbbba','       aaa']],
+ ['Harp','#c69a3e',[' aa    aa',' abaaaaba',' abcccaba',' abcccaba',' abcccaba','  abccba','   abba','    aa']]
+];
+const keys=['A','B','X','Y'];
+let selected=2, equipped=[0,1,null,3], floor=1;
+const el=id=>document.getElementById(id);
+function icon(index) {
+ const c=document.createElement('canvas'); c.width=c.height=14;
+ const ctx=c.getContext('2d'), [,color,rows]=items[index];
+ const colors={a:'#243831',b:color,c:'#edbc5f'};
+ rows.forEach((row,y)=>[...row].forEach((p,x)=>{if(colors[p]){ctx.fillStyle=colors[p];ctx.fillRect(x+2,y+2,1,1)}}));
+ return c;
+}
+function equip(slot) {
+ const old=equipped.indexOf(selected);
+ if(old>=0) equipped[old]=equipped[slot];
+ equipped[slot]=selected;
+ drawInventory(items[selected][0]+' equipped to '+keys[slot]);
+}
+function drawInventory(message='Choose a slot') {
+ el('heading').textContent=items[selected][0];el('hint').textContent=message;
+ el('grid').replaceChildren();el('slots').replaceChildren();
+ items.forEach(([name],i)=>{
+  const b=document.createElement('button');b.className='item';b.ariaLabel=name;b.ariaPressed=String(i===selected);b.append(icon(i));
+  const slot=equipped.indexOf(i);
+  if(slot>=0){const t=document.createElement('span');t.className='tag';t.textContent=keys[slot];b.append(t)}
+  if(i===2){const n=document.createElement('span');n.className='count';n.textContent='12';b.append(n)}
+  b.onclick=()=>{selected=i;drawInventory()};el('grid').append(b);
+ });
+ keys.forEach((k,i)=>{const b=document.createElement('button');b.textContent=k;b.ariaLabel='Equip to '+k;
+ if(equipped[i]!=null)b.append(icon(equipped[i]));else b.append(' —');
+ b.onclick=()=>equip(i);el('slots').append(b)});
+}
+function drawMap() {
+ el('heading').textContent='Dungeon map';el('hint').textContent=floor===1?'◆ Link · 1F':'Viewing 2F';
+ const ctx=el('plan').getContext('2d');
+ const rooms=floor===1?[[0,1],[1,1],[1,0],[2,1],[2,2],[3,1],[3,0]]:[[1,0],[1,1],[2,0],[3,0]];
+ ctx.fillStyle='#f1e6be';ctx.fillRect(0,0,152,100);
+ for(const [x,y] of rooms){
+  const l=10+x*34,t=12+y*27;ctx.fillStyle='#718472';
+  if(rooms.some(([a,b])=>a===x+1&&b===y))ctx.fillRect(l+24,t+7,12,5);
+  if(rooms.some(([a,b])=>a===x&&b===y+1))ctx.fillRect(l+10,t+16,5,13);
+ }
+ for(const [x,y] of rooms){
+  const l=10+x*34,t=12+y*27;ctx.fillStyle='#355045';ctx.fillRect(l,t,25,19);
+  ctx.fillStyle='#92a78a';ctx.fillRect(l+2,t+2,21,15);
+  if(x===1&&y===1&&floor===1){ctx.fillStyle='#674a26';ctx.fillRect(l+8,t+6,9,7);ctx.fillStyle='#ffda73';ctx.fillRect(l+10,t+5,5,8)}
+ }
+ const bar=document.querySelector('.floors');bar.replaceChildren();
+ [1,2].forEach(f=>{const b=document.createElement('button');b.textContent=f+'F';b.ariaPressed=String(f===floor);b.onclick=()=>{floor=f;drawMap()};bar.append(b)});
+}
+function showMap(on){
+ el('inventoryTab').ariaPressed=String(!on);el('mapTab').ariaPressed=String(on);
+ el('grid').hidden=el('slots').hidden=on;el('map').hidden=!on;
+ if(on)drawMap();else drawInventory();
+}
+el('inventoryTab').onclick=()=>showMap(false);el('mapTab').onclick=()=>showMap(true);
+document.addEventListener('keydown',e=>{const i=keys.indexOf(e.key.toUpperCase());if(i>=0&&!e.repeat&&!el('grid').hidden)equip(i)});
+showMap(location.hash==='#map');
+</script>
+</html>
