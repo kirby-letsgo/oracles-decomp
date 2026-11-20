@@ -26,6 +26,9 @@ bool features_quick_swap(struct GB *gb);
 void features_frame(struct GB *gb);
 // With the inventory's item page open: puts the highlighted item on X (slot 0) or Y (slot 1).
 bool features_assign_slot(struct GB *gb, int slot);
+// Equip an owned item from the companion touch screen (0..3 = A/B/X/Y).
+bool features_touch_available(struct GB *gb);
+bool features_touch_equip(struct GB *gb, int slot, uint8_t item);
 // In play, pressing X/Y: returns the game buttons to hold. For an item on neither A nor B this puts
 // it on B for as long as the button is held; features_slot_release puts B's own item back.
 uint8_t features_slot_press(struct GB *gb, int slot);

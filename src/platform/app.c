@@ -40,6 +40,7 @@
 #include "sync/update.h"
 
 #ifdef __ANDROID__
+#include "platform/companion.h"
 #define ON_PHONE true           // the settings show Vibration and leave out Fullscreen
 #else
 #define ON_PHONE false
@@ -2227,6 +2228,10 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   playing = gs->game;
 
   for (bool running = end != GAME_FAILED; running && !gb->hung;) {
+#ifdef __ANDROID__
+    if (companion_update(gb, !ages, mode == MODE_PLAY && boot.phase == BOOT_OFF))
+      item_buttons_store(dir);
+#endif
     test_keys();
     SyncResult synced;
     if (sync_poll(&synced)) {
@@ -2442,6 +2447,9 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     if (frames % 600 == 0) save_sram(gb, sav);
     if (gs->max_frames && frames >= gs->max_frames) running = false;
   }
+#ifdef __ANDROID__
+  companion_clear();
+#endif
   if (gb->hung) {
     write_crash_log(gb, dir, gs->game, ages, frames);
     end = GAME_STOPPED;

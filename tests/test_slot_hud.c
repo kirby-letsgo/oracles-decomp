@@ -127,7 +127,13 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   W8(wTilesetFlags) = underwater ? 0x40 : 0;
   mem_wr(gb, wInventoryStorage, item);
   features = (Features){.four_slots = true, .slot_boxes = true, .slot_item = {0, 0}};
-  features.slot_item[slot] = item;
+  ASSERT(features_touch_equip(gb, slot + 2, item));
+  ASSERT_EQ(features.slot_item[slot], item);
+  ASSERT(features_touch_equip(gb, 0, item));
+  ASSERT_EQ(W8(wInventoryA), item);
+  ASSERT_EQ(W8(wInventoryStorage), 1);
+  ASSERT(features_touch_equip(gb, 0, 1));
+  ASSERT_EQ(W8(wInventoryStorage), item);
   draw(gb, true);
   uint8_t expected[0x1000];
   memcpy(expected, gb->wram[4], sizeof expected);

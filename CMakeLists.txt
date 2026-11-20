@@ -216,7 +216,7 @@ endif()
 if(ANDROID)
   enable_language(CXX)   # SDL's Android HIDAPI is C++, so libmain links the C++ runtime
   oracles_fetch_sdl()
-  add_library(main SHARED src/platform/app.c src/platform/window.c src/platform/sync_client.c src/platform/haptic.c)
+  add_library(main SHARED src/platform/companion.c src/platform/app.c src/platform/window.c src/platform/sync_client.c src/platform/haptic.c)
   target_link_libraries(oraclessync PUBLIC ${ORACLES_SDL_TARGET})
   target_link_libraries(oraclesgui PUBLIC ${ORACLES_SDL_TARGET})
   target_link_libraries(main oraclesnative oraclesgui oraclessync oracleswide oraclesmods ${ORACLES_SDL_TARGET} log)
