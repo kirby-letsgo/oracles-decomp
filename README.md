@@ -37,7 +37,7 @@ Play **Oracle of Ages** and **Oracle of Seasons** natively on macOS, Windows, Li
 
 For build instructions, see [Development](DEVELOPMENT.md). For Lua mods, see [Modding](MODDING.md). To report a problem, [open an issue](https://github.com/kirby-letsgo/oracles-decomp/issues).
 
-**AI DISCLOSURE**
+## AI DISCLOSURE
 
 [![REAL Level 4 — Major AI (2026)](design/real-rating-4.png)](https://www.realgoodai.org/real-rating)
 
