@@ -1,32 +1,25 @@
 # The Legend of Zelda: Oracle of Ages & Oracle of Seasons
 
-Native macOS, Windows, Linux and Android versions of **Oracle of Ages** and **Oracle of Seasons**
-(Capcom, 2001), rebuilt from the games' own code in C. There is no emulator underneath: the games
-run as native programs, which is what makes widescreen, save states and save sync across your
-devices possible.
+Play **Oracle of Ages** and **Oracle of Seasons** natively on macOS, Windows, Linux and Android. Both games run from C code rebuilt from the originals. You supply your own USA or European ROM for each game you want to play.
 
-**No game data is included.** You need your own Oracle of Ages and/or Oracle of Seasons ROM (USA or
-Europe).
-The app reads it once, keeps the graphics, sound and data, and never needs it again.
+## Start playing
 
-## Quality-of-life improvements
+1. [Download the latest release](https://github.com/kirby-letsgo/oracles-decomp/releases/latest) for your system and install it.
+2. Open Oracles and select the **Ages** or **Seasons** tab.
+3. Choose **Add ROM…** and select your ROM. Once imported, choose **Title screen** to start playing.
 
-What this port adds on top of the original games:
+The port adds 16:10 and 16:9 widescreen, remappable controls, up to six item slots, and save states you can sync across devices. Android builds made after v1.0.10 also support a second screen for touch inventory, maps and walkthroughs.
 
-- **Widescreen (16:10 and 16:9)** — see the rooms around you, not just the one you're in
-- **Save states** — 4 slots with thumbnails, plus a Resume state from wherever you last quit
-- **Save sync** — your saves and states follow you between desktop and phone, no passwords
-- **Remappable controls** — every button, for keyboard and gamepad
-- **Fast-forward** — hold Tab, or the right trigger; 3x by default, 2x to 8x in Settings
-- **Screen filters** — sharp, scanlines, LCD grid, CRT, or the xBRZ and hqx pixel-art scalers, and true Game Boy Color colours
-- **Fast text and faster menus** — optional, off by default
-- **Quick swap and up to 6 item slots** — optional, off by default
-- **Mods** — Lua folder mods; see [MODDING.md](MODDING.md). The in-app Mods screen is
-  hidden until the upcoming mods release.
+## Player guides
 
-The gameplay toggles are all off until you turn them on, so the default is the game as it shipped.
+- [Getting started](https://github.com/kirby-letsgo/oracles-decomp/wiki/Getting-started)
+- [Controls and settings](https://github.com/kirby-letsgo/oracles-decomp/wiki/Controls-and-settings)
+- [Saves and sync](https://github.com/kirby-letsgo/oracles-decomp/wiki/Saves-and-sync)
+- [Android and dual-screen handhelds](https://github.com/kirby-letsgo/oracles-decomp/wiki/Android-and-dual-screen-handhelds)
+- [Frontend setup](https://github.com/kirby-letsgo/oracles-decomp/wiki/Frontend-setup)
+- [Troubleshooting](https://github.com/kirby-letsgo/oracles-decomp/wiki/Troubleshooting)
 
----
+For build instructions, see [Development](DEVELOPMENT.md). For Lua mods, see [Modding](MODDING.md). To report a problem, [open an issue](https://github.com/kirby-letsgo/oracles-decomp/issues).
 
 **AI DISCLOSURE**
 
@@ -34,272 +27,6 @@ This native implementation has used help from generative AI, specifically Claude
 
 If you don't want to use it for that I completely understand.
 
----
+## Not affiliated with Nintendo
 
-## Download
-
-Get the build for your system from the
-[**latest release**](https://github.com/kirby-letsgo/oracles-decomp/releases/latest):
-
-| System | File | First launch |
-|---|---|---|
-| macOS 11+ (Apple Silicon and Intel) | `Oracles-macOS.dmg` | Open the DMG and drag Oracles out. It isn't notarized, so the first time right-click it and choose **Open**. |
-| Windows 10/11 (64-bit) | `Oracles-windows-x64.zip` | Unzip and run `Oracles.exe`. If SmartScreen warns about an unknown publisher, choose **More info → Run anyway**. |
-| Linux (x86_64) | `Oracles-linux-x86_64.AppImage` | `chmod +x` the file, then run it. |
-| Android 8+ (arm64) | `Oracles-android.apk` | Install the APK (allow installs from your browser or file manager). |
-
-Each desktop download is a single self-contained file; nothing else needs installing.
-
-When a newer version is out, the main menu shows it with a **Download** link to your system's file,
-and **Settings → Version** has the same link. The version you have is on that row too. On Linux the
-AppImage updates itself: Download fetches the new one, checks it against the release's SHA-256,
-puts it in place of the old file and restarts (if it can't, the link opens instead).
-
-## Adding your ROM
-
-The app opens on its main menu, with a tab each for Ages and Seasons. A game you have no ROM for yet
-shows **Not installed** and an **Add ROM...** row — choose it and the file picker opens. Do the same
-on the other tab to add the second game. Nothing is asked for before the menu appears.
-
-The ROM can be a plain `.gbc`/`.gb` file **or a `.zip` or `.gz`** holding one, so a freshly
-downloaded archive works as it came. From a zip the `.gbc`/`.gb` file inside is taken, otherwise the
-largest one. `.7z` isn't read — extract it first.
-
-Your ROM has to be the USA or the European release of either game; the app checks it and says so if
-it isn't. The European ROMs play in English, French, German, Italian or Spanish: the game asks the
-first time it starts, and B on the file menu brings the language screen back. Each ROM keeps its own
-saves and save states, so a game's USA and European files never mix; adding the other release of a
-game makes it the one that tab starts, and adding the first one again switches back, its saves
-where you left them. On Android, copy the ROM to the phone's Downloads first so the picker can reach
-it.
-
-### Android dual-screen handhelds
-
-On a handheld that exposes its second screen to Android as a presentation display, turn on **Settings → Picture → Dual screen** to show the touch tabs. The setting is off by default. The controller stays with the game on the main screen.
-
-- **Inventory** — tap an item to highlight its available slots in gold. Tap a slot to equip it. The slot flashes green when equipped.
-- **Map** — shows the game's overworld or dungeon map. Tap to zoom, drag to pan, and tap again to fit the map. In a dungeon, tap a floor to browse it. Link's marker follows his current floor. Finding the dungeon map and compass reveals rooms and markers as in the game.
-- **Guide** — opens the Zelda Dungeon walkthrough for the current game and remembers your chapter and reading position. Use **Save walkthrough** to download all chapters and illustrations for offline reading, or **Save chapter** for the open chapter. Downloads require the site to allow access. If a download stops, **Contents** lists chapters already saved, and **Save walkthrough** resumes from those chapters.
-
-## Playing
-
-A game's tab leads with **Resume** (the state from when you last quit) and its four save-state slots,
-each with when it was saved and the newest marked **Latest**; choosing one starts from it. Below them,
-**Save files** opens the game's own three files (name, hearts, essences) — choosing one boots
-straight into it — and **Title screen** starts the game from the beginning. Every menu works with a
-keyboard, a controller, the mouse, or by tapping its rows.
-
-If an in-game save is newer than the Resume state (for example, after a force quit), Resume opens
-the game's file-selection screen to protect that save. A message explains why it did so.
-
-### Controls
-
-| | Keyboard | Gamepad (Xbox / PlayStation) |
-|---|---|---|
-| Move | Arrow keys | D-pad or left stick |
-| A | `X` | A / Cross |
-| B | `Z` | X / Square |
-| Start | Return | Start / Options |
-| Select | Backspace or Right Shift | Back / Share |
-| Pause | Esc | Guide / PS button |
-| Fast-forward | Hold Tab | Hold RT / R2 |
-| Quick swap | `C` | LB / L1 |
-| Item L / Item R (6 items) | `Q` / `W` | LT / L2, RB / R1 |
-| Item X / Item Y | `A` / `S` | Y / Triangle, B / Circle |
-| Mute | `M` | |
-| Fullscreen | F11 or Cmd+F | |
-| Save / load state slot 1 | Cmd+S / Cmd+R, or Ctrl+S / Ctrl+R | L3 / R3 |
-
-Every button, including Pause, Fast-forward, Swap, the item buttons and save / load state, can be remapped in
-Settings > CONTROLS: pick an action, then press a key, button or trigger, or move either stick in the
-direction you want to bind. Unassigned left-stick directions still move Link. Quick swap and the item buttons only do something once their gameplay toggles are on.
-The window resizes in whole-pixel steps.
-
-The status bar, the item boxes and the menu hints name the key or controller button each action is
-bound to, and switch between keyboard and controller as you use them. Settings > Pad button names
-picks how a controller's buttons are named: Auto follows the connected pad (Xbox for anything it
-doesn't recognise), or choose Nintendo (the Game Boy's own B and A), Xbox or PlayStation.
-
-### Settings
-
-From the launcher or the pause menu: volume, screen filter (sharp, scanlines, LCD grid, CRT, and the
-two pixel-art scalers XBRZ and HQX, which round off jagged diagonals instead of turning each pixel
-into a square — they are two different algorithms, so it is worth trying both), scale
-(**pixel** for whole-pixel steps, **fill** for the largest size that fits), Game Boy Color colours,
-fullscreen, fast-forward speed (2x to 8x, 3x by default, the same on any display), controls and
-[portable mode](#portable-mode).
-
-There are also quality-of-life toggles, **all off by default**:
-
-- **Fast text** and **faster menus**
-- **Quick swap**: `C` swaps the A and B items
-- **Holdable items** defaults to **2**. Choose **4** to add X/Y or **6** to add X/Y and L/R.
-  Highlight an item in the inventory and press an extra button to assign it. Press or hold that button during play to use it.
-  Six-item widescreen mode groups the items at the lower left. With widescreen off, X/L stack in the left margin and Y/R in the right. Narrow margins use compact tabs. On a phone, portrait uses a strip as wide as the native HUD, with item labels inside the screen insets. Landscape fits the side panels around the touch controls, with the top strip as a fallback. When the game and its controls fill the available space, the items use a compact row just below the status bar.
-  Four-item mode uses the existing status-bar boxes or side tabs. Bombs, Bombchus and seed tools show their remaining count.
-
-### Save states
-
-Esc pauses the game: Resume, Save state, Load state (4 slots, each with a thumbnail and the time
-it was saved, to the second) and Quit to menu, which saves a Resume state and returns to the main
-menu. Cmd+S and Cmd+R (Ctrl+S and Ctrl+R on Windows and Linux), or L3 and R3 on a controller,
-are shortcuts for slot 1. Messages like *Saved to slot 2* or *Sound off*
-appear at the bottom of the picture; after a save the message offers **Undo**, which puts back what
-the slot held before.
-
-Save states work across every platform — all 64-bit builds share one layout, so a state made on your
-desktop loads on your phone.
-
-## Widescreen
-
-Settings > Widescreen offers **Off**, **16:10** and **16:9**. Use **Scale > Fill** to fill a
-1280×800 screen in 16:10, or **Pixel** for integer scaling. The game's original 160 pixels stay
-in the middle, with 35 pixels on each side in 16:10 or 48 in 16:9 showing the rooms
-around you, decoded from your ROM: the overworld grid (with the right season in Seasons) and, in
-dungeons, the rooms through a doorway once you've visited them. Large dungeon rooms simply show more
-of themselves.
-
-The status bar runs the whole way across rather than sitting in a box in the middle. With **Holdable items**
-set to **4**, the X and Y items get their own boxes at its left end and the game's own bar slides right to make
-room, so the four item slots read across as X, Y, B, A. Holding X or Y then leaves the B box showing
-its own item, instead of borrowing it to display the one you pressed.
-
-The sides scroll along with every room change. Nothing moves in them — the game only runs the room
-you're in — and they show each room as the ROM describes it, so a chest you opened or grass you cut
-won't update until you walk back there. Houses, caves and cutscenes use the game's border colour
-instead, while a menu fills them with its own colour and keeps the status bar across the top.
-**DIM SIDES** (on by default) draws the sides slightly darker than the live room.
-
-## Save sync
-
-Settings > SYNC keeps your saves in step across devices, with no passwords: **CREATE ACCOUNT** gives
-you a 16-digit code, and **ENTER CODE** on another device joins the same account.
-
-Synced: each game's save, the save-state slots with their pictures and item buttons, and your
-settings. Never your ROM or anything derived from it.
-
-It syncs when the launcher opens, before a game starts, and when you leave a game or the app;
-**SYNC NOW** does it by hand. A sync that fails because you're offline is retried automatically, and
-again the moment the app comes back to the foreground. If the same save changed on two devices, a
-**KEEP WHICH?** screen shows you both — the files and hearts, or the state's picture — and you pick.
-The copy you turn down isn't thrown away: it stays in the game's folder as `<name>.bak` (a save
-state's picture too), until the next KEEP WHICH? about the same file replaces it.
-
-## Android
-
-Touch controls sit under the game in portrait and at its sides in landscape: D-pad (diagonals by
-touching between the arms), A, B, Start, Select, Pause and fast-forward (`>>`, hold), plus X and Y
-for four or six holdable items. Six-item mode adds L and R. They hide when you use a controller or keyboard and come back on the next touch.
-The back button pauses, and goes back in menus. In the menus, tap a row to choose it and drag a long
-list to scroll it; while a menu fills the screen the on-screen controls step aside.
-
-Pressing a control or tapping a menu gives a short tick, the same one as the keyboard, and follows
-your phone's touch feedback setting. **Settings → Vibration** (Android only) turns it off for the game.
-Volume has **−** and **+** either side of its bars, and tapping a bar jumps to that level.
-
-Leaving the app saves the game and a Resume state; coming back opens the pause menu.
-
-## Starting a game directly (frontends)
-
-To skip the main menu, for example to give each game its own entry in a frontend (ES-DE,
-LaunchBox, Playnite, RetroBat, Steam's non-Steam games...), start the app with `--game`:
-
-| System | Oracle of Ages | Oracle of Seasons |
-|---|---|---|
-| Windows | `Oracles.exe --game ages` | `Oracles.exe --game seasons` |
-| Linux | `Oracles-linux-x86_64.AppImage --game ages` | `Oracles-linux-x86_64.AppImage --game seasons` |
-| macOS | `Oracles.app/Contents/MacOS/Oracles --game ages` | `Oracles.app/Contents/MacOS/Oracles --game seasons` |
-
-Add the ROMs once from the main menu first; `--game` exits with a message when the game's ROM hasn't
-been added. The game starts at its title screen, with your settings, saves and save states as usual,
-and **Settings** is in the pause menu (Esc). Closing the window quits; **Quit to menu** opens the
-main menu.
-
-More options:
-
-- `--file 1` (to `3`) boots straight into that save file.
-- `--state auto` resumes the automatic save state; `--state 1` (to `4`) loads a manual
-  save-state slot directly, skipping the launcher. Use with `--game` or a ROM path,
-  without `--file`. For example: `oracles --game seasons --state auto`.
-  If the battery save is newer than the automatic state, `--state auto` opens file selection instead.
-  Missing, corrupt or incompatible states report an error and exit without starting a new game.
-- `--latest` loads the newest normal save or save state for the selected ROM, including the
-  automatic state and manual slots 1–4. For example: `oracles --game seasons --latest`.
-  Use with `--game` or a ROM path, without `--file` or `--state`. Equal dates prefer the automatic
-  state, then the lowest manual state slot. If nothing is saved, or the newest state cannot be
-  loaded, the app reports an error and exits without overwriting progress or falling back to an
-  older state.
-  Normal save slots share `sram.sav`; the app now tracks their individual dates locally in
-  `sram.sav.dates`. Older or imported saves without matching dates use SRAM's modification time.
-  If several normal slots tie for newest, the game opens file selection so you can choose.
-- `--game ages-eu` (or `seasons-eu`) picks the European ROM when you have added both releases of a
-  game; plain `ages`/`seasons` starts the one the game's tab starts.
-- `--cache DIR` keeps everything (ROMs, saves, settings) in that folder instead of the usual one, as
-  [Portable](#portable-mode) mode does.
-
-On macOS, `open -a Oracles --args --game ages` works too, but only when Oracles isn't already open.
-Android has no command line, so the app always opens on its main menu there.
-
-## Where your files are
-
-Everything — the data read from your ROM, your saves, save states and settings — lives in one
-per-user folder:
-
-| System | Folder |
-|---|---|
-| macOS | `~/Library/Application Support/oracles-decomp/oracles/` |
-| Windows | `%APPDATA%\oracles-decomp\oracles\` |
-| Linux | `~/.local/share/oracles-decomp/oracles/` |
-| Android | the app's own storage (removed when you uninstall) |
-
-Deleting that folder resets the app; you'll be asked for your ROM again.
-
-### Portable mode
-
-To keep everything next to the app instead (on a USB stick or external drive, or shared between
-computers), turn on **Settings → Portable** and choose **Restart** on the message that appears. The
-app writes an empty `portable.txt` beside itself and, from then on, keeps its data in an
-`oracles-data` folder there:
-
-| System | Beside |
-|---|---|
-| macOS | `Oracles.app` (never inside it) |
-| Windows | `Oracles.exe` |
-| Linux | the `.AppImage` file |
-
-Creating `portable.txt` by hand does the same, so a folder holding the app, `portable.txt` and
-`oracles-data` can be copied anywhere as it is.
-
-On the first start in the new place, the app copies your current data across, so your saves come
-with you. It never overwrites: if the folder it switches to already holds data, that data is used as
-it is, and the folder it left stays untouched as a backup. Turning Portable off again goes back to
-the per-user folder, as it was when you left it.
-
-The app needs to be able to write where it sits. On macOS, a freshly downloaded app runs from a
-read-only copy until it has been moved once, so drag it to its final place first. Portable mode
-isn't offered on Android.
-
-## Reporting problems
-
-Please open an [issue](https://github.com/kirby-letsgo/oracles-decomp/issues) with your system, which
-game, and what you were doing. Never attach a ROM or a save made from one.
-
-**Settings → Copy error log** copies saved engine error reports so you can paste them into an
-issue, including on Android. The row is disabled when no report exists. If the game engine stops,
-the app shows a message with **Create issue**, **Copy error log**, and **Back to menu** buttons,
-and keeps the report available after restarting. Reports include
-the game/region, app version, platform, stop reason and room; long logs copy only their recent text.
-`adb logcat -s oracles` also shows the Android app's messages.
-
-## How it works
-
-Every routine the games run is readable C: all of Ages, and 99% of Seasons (shared with Ages where
-the two games agree, hand-written where Seasons differs; the rest generated from the disassembly).
-The native build runs both games with no CPU emulator and no ROM code at all — on first launch the
-app takes the graphics, sound and data out of your ROM and zeroes the code bytes, because it no
-longer needs them.
-
-Behaviour is checked against the original ROM by replaying full playthroughs and comparing every C
-routine with the original code it replaces.
-
-To build it yourself, or work on it, see [DEVELOPMENT.md](DEVELOPMENT.md).
+Oracles is an independent fan project. Nintendo and Capcom have no affiliation with the project and do not sponsor or endorse it. The Legend of Zelda and its game titles belong to their respective owners. The downloads include no ROMs or original game data.
