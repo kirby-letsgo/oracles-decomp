@@ -39,7 +39,11 @@ For build instructions, see [Development](DEVELOPMENT.md). For Lua mods, see [Mo
 
 **AI DISCLOSURE**
 
-This native implementation has used help from generative AI, specifically Claude Opus.
+[![REAL Level 4 — Major AI (2026)](design/real-rating-4.png)](https://www.realgoodai.org/real-rating)
+
+I use Astra or Claude Code to write the native game port. The Node.js save sync is the only part that is mostly written by me. I decide what to build, how it should feel to play, and when it’s ready to ship.
+
+I test the port by hand on Android, macOS, and Linux. I don’t have a Windows computer, so I usually don’t test the Windows build myself.
 
 If you don't want to use it for that I completely understand.
 
