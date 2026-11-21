@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/gen.h"
+#include "game/features.h"
 
 #undef CYC
 #undef CYCT
@@ -89,7 +90,12 @@ void parentItemCode_shield_hook(GB *gb) {
   if (!(F & FC)) { CYCT(b_+3, b_+5); goto delete_self; }
   CYC(b_+3, b_+5);
   CALL_C(b_+5, checkNoOtherParentItemsInUse_hook, SYM(checkNoOtherParentItemsInUse), b_+8);
-  if (!(F & FZ)) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
+  // With extra hands enabled the shield can guard while a regular sword charges
+  // (state 2) or waits for release (state 3). Swings and other items retain priority.
+  bool charging = features.extra_slots && W8(w1ParentItem2_id) == ITEM_SWORD &&
+                  (W8(w1ParentItem2_state) == 2 || W8(w1ParentItem2_state) == 3) &&
+                  !W8(w1ParentItem3_enabled) && !W8(w1ParentItem4_enabled);
+  if (!(F & FZ) && !charging) { CYCT(b_+8, b_+9); ret_effect(gb); return; }
   CYC(b_+8, b_+9);
   CYC(b_+9, b_+11); E = 0x04;
   CYC(b_+11, b_+12); A = mem_rd(gb, DE);

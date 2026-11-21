@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/gen.h"
+#include "game/features.h"
 
 #undef CYC
 #undef CYCT
@@ -604,6 +605,7 @@ standingAnimation:
   else {
     CYC(b_+104, b_+106);
     CYC(b_+106, b_+109); A = mem_rd(gb, wInventoryB);
+    if (features.extra_slots && features_extra_shield_equipped(gb)) A = ITEM_SHIELD;
     alu_cp(gb, 0x01);
     CYC(b_+109, b_+111);
     if (!(F & FZ)) { CYCT(b_+111, b_+113); goto animationFound; }
