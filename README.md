@@ -4,6 +4,10 @@ Play **Oracle of Ages** and **Oracle of Seasons** natively on macOS, Windows, Li
 
 ## Start playing
 
+[![Install with Decomp Buddy](https://decompbuddy.com/install-button.svg)](https://decompbuddy.com/games/the-legend-of-zelda-oracle-of-ages-game-boy-color-kirby-letsgo?install)
+[![Open in Quiver Launcher](https://img.shields.io/badge/Open_in-Quiver_Launcher-5B45AB?style=for-the-badge)](https://quiverlauncher.com/apps/the-legend-of-zelda-oracle-of-ages-oracle-of-seasons-oracles-decomp)
+[![Install with Obtainium for Android](https://img.shields.io/badge/Android-Obtainium-17644B?style=for-the-badge)](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522org.oracles%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252Fkirby-letsgo%252Foracles-decomp%2522%252C%2522author%2522%253A%2522kirby-letsgo%2522%252C%2522name%2522%253A%2522Oracles%2522%257D)
+
 1. [Download the latest release](https://github.com/kirby-letsgo/oracles-decomp/releases/latest) for your system and install it.
 2. Open Oracles and select the **Ages** or **Seasons** tab.
 3. Choose **Add ROM…** and select your ROM. Once imported, choose **Title screen** to start playing.
