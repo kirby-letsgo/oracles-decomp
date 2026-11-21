@@ -103,6 +103,83 @@ static void draw(GB *gb, bool full) {
   ASSERT(!gb->hung);
 }
 
+static void check_sword_and_shield(GB *gb) {
+  const int sword_slot = 1, shield_slot = 3;
+  features = (Features){.extra_slots = 4, .slot_boxes = true};
+  features.slot_item[sword_slot] = ITEM_SWORD;
+  features.slot_item[shield_slot] = ITEM_SHIELD;
+  W8(wInventoryA) = 3;
+  W8(wInventoryB) = 0x19;
+  W8(wInventoryStorage) = ITEM_SWORD;
+  mem_wr(gb, wInventoryStorage + 1, ITEM_SHIELD);
+
+  mem_wr(gb, 0xff70, 1);
+  mem_wr(gb, 0x2000, SYMBANK(func_4553));
+  W8(w1Link_animMode) = 0x10;
+  W8(wForceLinkPushAnimation) = 0x80;
+  // Only an owned shield assigned to an enabled slot selects the shield sprite.
+  for (int enabled = 2; enabled <= 4; enabled += 2) {
+    features.extra_slots = enabled;
+    for (int level = 1; level <= 2; level++) {
+      W8(wShieldLevel) = level;
+      gb->sp = 0xcff0;
+      func_4553_hook(gb);
+      ASSERT_EQ(W8(w1Link_var34), enabled == 4 ? 4 * (4 + level) : 0);
+    }
+  }
+  mem_wr(gb, wInventoryStorage + 1, 0);
+  ASSERT(!features_extra_shield_equipped(gb));
+  mem_wr(gb, wInventoryStorage + 1, ITEM_SHIELD);
+
+  // Whichever button is pressed first, keep a native sword on B available
+  // for a shield on R. Repeat with the sword and shield assignments reversed.
+  for (int native_sword = 0; native_sword <= 1; native_sword++) {
+    W8(wInventoryB) = native_sword ? ITEM_SWORD : ITEM_SHIELD;
+    int extra = native_sword ? shield_slot : sword_slot;
+    ASSERT_EQ(features_slot_press(gb, extra, 0), JOY_A);
+    features_slot_release(gb, extra);
+    ASSERT_EQ(features_slot_press(gb, extra, JOY_B), JOY_A);
+    features_slot_release(gb, extra);
+    ASSERT_EQ(W8(wInventoryA), 3);
+  }
+  W8(wInventoryB) = 0x19;
+
+  for (int first_shield = 0; first_shield <= 1; first_shield++) {
+    int first = first_shield ? shield_slot : sword_slot;
+    int second = first_shield ? sword_slot : shield_slot;
+    ASSERT_EQ(features_slot_press(gb, first, 0), JOY_B);
+    ASSERT_EQ(features_slot_press(gb, second, 0), JOY_A);
+    ASSERT_EQ(features_hud_item(gb, wInventoryA), 3);
+    ASSERT_EQ(features_hud_item(gb, wInventoryB), 0x19);
+
+    // Start with the sword charged. Release only its button and run the game's
+    // real item dispatcher, including the sword and shield parent objects.
+    uint8_t shield = first_shield ? JOY_B : JOY_A;
+    W8(w1ParentItem2_enabled) = 0xe1;
+    W8(w1ParentItem2_id) = ITEM_SWORD;
+    W8(w1ParentItem2_var03) = first_shield ? JOY_A : JOY_B;
+    W8(w1ParentItem2_state) = 3;
+    W8(wGameKeysPressed) = JOY_A | JOY_B;
+    gb->sp = 0xcff0;
+    checkUseItems_b06_hook(gb);
+    ASSERT_EQ(W8(w1ParentItem2_state), 3);
+    ASSERT_EQ(W8(wUsingShield), 2);
+
+    features_slot_release(gb, sword_slot);
+    W8(wGameKeysPressed) = shield;
+    gb->sp = 0xcff0;
+    checkUseItems_b06_hook(gb);
+    ASSERT_EQ(W8(w1ParentItem2_state), 4);
+    ASSERT_EQ(W8(wUsingShield), 0); // the spin itself takes priority
+    features_slot_release(gb, shield_slot);
+    ASSERT_EQ(W8(wInventoryA), 3);
+    ASSERT_EQ(W8(wInventoryB), 0x19);
+    gb->sp = 0xcff0;
+    clearAllParentItems_body_hook(gb);
+    ASSERT(!gb->hung);
+  }
+}
+
 static void check(const char *path, bool seasons, bool eu, int item, bool underwater, int slot) {
   size_t size;
   uint8_t *rom = oracles_read_file(path, &size);
@@ -127,7 +204,7 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   W8(wTilesetFlags) = underwater ? 0x40 : 0;
   mem_wr(gb, wInventoryStorage, item);
   features = (Features){.extra_slots = 2, .slot_boxes = true};
-  ASSERT_EQ(features_slot_press(gb, 3), 0);
+  ASSERT_EQ(features_slot_press(gb, 3, 0), 0);
   features.extra_slots = 4;
   W8(wOpenedMenuType) = 1;
   W8(wInventorySubmenu) = W8(wInventorySubmenu0CursorPos) = 0;
@@ -140,7 +217,7 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   uint8_t expected[0x1000];
   memcpy(expected, gb->wram[4], sizeof expected);
   uint8_t battr = W8(wBItemSpriteAttribute1), aattr = W8(wAItemSpriteAttribute1);
-  ASSERT_EQ(features_slot_press(gb, slot), underwater ? JOY_A : JOY_B);
+  ASSERT_EQ(features_slot_press(gb, slot, 0), underwater ? JOY_A : JOY_B);
   ASSERT_EQ(underwater ? W8(wInventoryA) : W8(wInventoryB), item);
   // Consumption requests this exact count/palette redraw, without loading new icon graphics.
   W8(wNumBombs) = 0x18;
@@ -160,14 +237,17 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   ASSERT_EQ(memcmp(expected, gb->wram[4], sizeof expected), 0);
   // Without separate X/Y boxes, the existing behavior intentionally shows the borrowed item.
   features.slot_boxes = false;
-  ASSERT_EQ(features_slot_press(gb, slot), underwater ? JOY_A : JOY_B);
+  ASSERT_EQ(features_slot_press(gb, slot, 0), underwater ? JOY_A : JOY_B);
   ASSERT_EQ(features_hud_item(gb, underwater ? wInventoryA : wInventoryB), item);
   draw(gb, true);
   ASSERT(memcmp(expected, gb->wram[4], sizeof expected) != 0);
   features_slot_release(gb, slot);
   draw(gb, true);
   ASSERT_EQ(memcmp(expected, gb->wram[4], sizeof expected), 0);
-  if (slot == 0 && item == 3 && !underwater) check_counts(gb, rom, size, seasons);
+  if (slot == 0 && item == 3 && !underwater) {
+    check_counts(gb, rom, size, seasons);
+    check_sword_and_shield(gb);
+  }
   free((void *)gb->cyctab); free(gb); free(rom);
 }
 int main(void) {
@@ -182,5 +262,5 @@ int main(void) {
         check(paths[variant], variant % 2, variant >= 2, item, false, slot);
         if (!(variant % 2)) check(paths[variant], false, variant >= 2, item, true, slot);
       }
-  puts("slot HUD: all four extra slots, bombs and satchel, USA/EU Ages/Seasons, underwater A, with/without boxes passed");
+  puts("slot HUD: all four extra slots, bombs and satchel, USA/EU Ages/Seasons, underwater A, with/without boxes and sword/shield input passed");
 }

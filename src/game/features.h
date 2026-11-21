@@ -26,9 +26,11 @@ bool features_quick_swap(struct GB *gb);
 void features_frame(struct GB *gb);
 // With the inventory's item page open: puts the highlighted item on X, Y, L or R (slots 0..3).
 bool features_assign_slot(struct GB *gb, int slot);
-// In play, pressing an extra button returns the game buttons to hold. For an item on neither A nor B this puts
-// it on B for as long as the button is held; features_slot_release puts B's own item back.
-uint8_t features_slot_press(struct GB *gb, int slot);
+enum { ITEM_SHIELD = 0x01, ITEM_SWORD = 0x05 };
+bool features_extra_shield_equipped(struct GB *gb);
+// Returns the joypad bit for this extra slot. Borrow an available native hand
+// until release, accounting for physical A/B buttons already down.
+uint8_t features_slot_press(struct GB *gb, int slot, uint8_t native_buttons);
 void features_slot_release(struct GB *gb, int slot);
 // The item shown on A/B, hiding an extra slot's temporary assignment when it has its own box.
 uint8_t features_hud_item(struct GB *gb, uint16_t addr);

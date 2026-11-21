@@ -92,7 +92,7 @@ static void on_frame(GB *gb, const GBSample *sm, void *ctx) {
     unsigned item = 0; unsigned long long from = 0, to = 0;
     sscanf(getenv("SLOT_TEST"), "%x:%llu-%llu", &item, &from, &to);
     features.slot_item[0] = (uint8_t)item;
-    if (frame == from) { extra_joy = features_slot_press(gb, 0); fprintf(stderr, "slot press at %llu: joy %02x, B %02x A %02x\n", (unsigned long long)frame, extra_joy, sm->wram[0][wInventoryB & 0xfff], sm->wram[0][wInventoryA & 0xfff]); }
+    if (frame == from) { extra_joy = features_slot_press(gb, 0, gb->input_at(gb->input_ctx, frame)); fprintf(stderr, "slot press at %llu: joy %02x, B %02x A %02x\n", (unsigned long long)frame, extra_joy, sm->wram[0][wInventoryB & 0xfff], sm->wram[0][wInventoryA & 0xfff]); }
     if (frame == to) { features_slot_release(gb, 0); extra_joy = 0; fprintf(stderr, "slot release at %llu\n", (unsigned long long)frame); }
   }
   if (getenv("SWAP_AT") && frame == strtoull(getenv("SWAP_AT"), NULL, 10))

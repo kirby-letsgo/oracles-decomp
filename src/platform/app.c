@@ -718,7 +718,7 @@ static void item_button(GB *gb, const char *dir, int slot, bool down) {
     show_status(message);
     return;
   }
-  slot_joy[slot] = features_slot_press(gb, slot);
+  slot_joy[slot] = features_slot_press(gb, slot, live_joy | stick_joy);
   if (slot_joy[slot]) item_frames[slot] = 2;
 }
 

@@ -3,13 +3,28 @@
 
 Features features;
 
+// A held extra button owns its native input until release. addr is nonzero only
+// when the item temporarily replaces the item in that hand.
+typedef struct {
+  uint8_t button, item, previous;
+  uint16_t addr;
+  bool refresh;
+} HeldItem;
+static HeldItem held_items[4];
+
+static uint8_t held_buttons(void) {
+  uint8_t buttons = 0;
+  for (int i = 0; i < 4; i++) buttons |= held_items[i].button;
+  return buttons;
+}
+
 // the moments the player could open the inventory and change the buttons there
 static bool can_change_items(GB *gb) {
   return !W8(wMenuDisabled) && !W8(wOpenedMenuType) && !W8(wTextIsActive) && !W8(wDisableLinkCollisionsAndMenu);
 }
 
 bool features_quick_swap(GB *gb) {
-  if (!features.quick_swap || !can_change_items(gb)) return false;
+  if (!features.quick_swap || held_buttons() || !can_change_items(gb)) return false;
   uint8_t b = W8(wInventoryB), a = W8(wInventoryA);
   if (a == b) return false;     // both empty, or Biggoron's Sword filling both
   W8(wInventoryB) = a;
@@ -43,53 +58,73 @@ bool features_assign_slot(GB *gb, int slot) {
   return true;
 }
 
-static int held_slot = -1;
-static uint16_t held_addr;
-static uint8_t held_prev;
-static bool held_refresh;                // the press redrew the bar, so the release must too
-
 static bool in_storage(GB *gb, uint8_t item) {
   for (int i = 0; i < INVENTORY_CAPACITY; i++)
     if (mem_rd(gb, (uint16_t)(wInventoryStorage + i)) == item) return true;
   return false;
 }
 
-uint8_t features_slot_press(GB *gb, int slot) {
-  if (slot < 0 || slot >= features.extra_slots) return 0;
-  uint8_t item = features.slot_item[slot];
-  if (!item || held_slot >= 0) return 0;
-  if (item == W8(wInventoryB)) return JOY_B;
-  if (item == W8(wInventoryA)) return JOY_A;
-  if (!can_change_items(gb) || !in_storage(gb, item)) return 0;
-  // Ages' underwater rooms only read A (B is the swim kick), so the item borrows A there
-  uint8_t flags = W8(wTilesetFlags);
-  bool underwater = !game_seasons && (flags & 0x40) && !(flags & 0x20);
-  held_slot = slot;
-  held_addr = underwater ? wInventoryA : wInventoryB;
-  held_prev = mem_rd(gb, held_addr);
-  mem_wr(gb, held_addr, item);
-  // Only redraw the bar when the item has nowhere else to be seen: with the X and Y boxes on screen
-  // the player can already see what they pressed, and the B box should keep its own item.
-  held_refresh = !features.slot_boxes;
-  if (held_refresh) W8(wStatusBarNeedsRefresh) |= 0x01;
-  return underwater ? JOY_A : JOY_B;
+bool features_extra_shield_equipped(GB *gb) {
+  for (int slot = 0; slot < features.extra_slots; slot++) {
+    if (features.slot_item[slot] == ITEM_SHIELD && in_storage(gb, ITEM_SHIELD)) return true;
+  }
+  // A native shield may itself be temporarily covered by a borrowed item.
+  for (int slot = 0; slot < 4; slot++) {
+    const HeldItem *held = &held_items[slot];
+    if (held->addr && held->previous == ITEM_SHIELD && mem_rd(gb, held->addr) == held->item) return true;
+  }
+  return false;
 }
 
-// HUD reads must not expose the temporary A/B assignment when X/Y have their own boxes.
-// Read through rather than swapping RAM around a draw: rendering can yield to other threads.
+uint8_t features_slot_press(GB *gb, int slot, uint8_t native_buttons) {
+  if (slot < 0 || slot >= features.extra_slots) return 0;
+  uint8_t item = features.slot_item[slot];
+  if (!item || held_items[slot].button) return held_items[slot].button;
+  uint8_t a = W8(wInventoryA), b = W8(wInventoryB);
+  if (item == b || item == a) {
+    held_items[slot].button = item == b ? JOY_B : JOY_A;
+    return held_items[slot].button;
+  }
+  if (!can_change_items(gb) || !in_storage(gb, item)) return 0;
+
+  uint8_t flags = W8(wTilesetFlags);
+  bool only_a = !game_seasons && (flags & 0x40) && !(flags & 0x20);
+  bool only_b = (flags & 0x20) && W8(wLinkSwimmingState) &&
+                (game_seasons || !(W8(w1Link_var2f) & 0x80));
+  uint8_t available = JOY_A | JOY_B;
+  if (only_a) available = JOY_A;
+  if (only_b) available = JOY_B;
+  available &= ~(native_buttons | held_buttons());
+  if (!available) return 0;
+
+  // Leave the other half of a sword/shield pair usable even if it is pressed second.
+  bool keep_b = (item == ITEM_SHIELD && b == ITEM_SWORD) || (item == ITEM_SWORD && b == ITEM_SHIELD);
+  uint8_t button = JOY_B;
+  if (!(available & JOY_B) || (keep_b && (available & JOY_A))) button = JOY_A;
+  uint16_t addr = button == JOY_A ? wInventoryA : wInventoryB;
+  held_items[slot] = (HeldItem){.button = button, .item = item, .addr = addr,
+                                .previous = mem_rd(gb, addr), .refresh = !features.slot_boxes};
+  mem_wr(gb, addr, item);
+  if (held_items[slot].refresh) W8(wStatusBarNeedsRefresh) |= 1;
+  return button;
+}
+
 uint8_t features_hud_item(GB *gb, uint16_t addr) {
   uint8_t item = mem_rd(gb, addr);
-  if (held_slot >= 0 && !held_refresh && addr == held_addr && item == features.slot_item[held_slot])
-    return held_prev;
+  for (int slot = 0; slot < 4; slot++) {
+    const HeldItem *held = &held_items[slot];
+    if (held->addr == addr && !held->refresh && held->item == item) return held->previous;
+  }
   return item;
 }
 
 void features_slot_release(GB *gb, int slot) {
-  if (held_slot != slot) return;
-  held_slot = -1;
-  if (mem_rd(gb, held_addr) != features.slot_item[slot]) return;
-  mem_wr(gb, held_addr, held_prev);
-  if (held_refresh) W8(wStatusBarNeedsRefresh) |= 0x01;
+  if (slot < 0 || slot >= 4) return;
+  HeldItem held = held_items[slot];
+  held_items[slot] = (HeldItem){0};
+  if (!held.addr || mem_rd(gb, held.addr) != held.item) return;
+  mem_wr(gb, held.addr, held.previous);
+  if (held.refresh) W8(wStatusBarNeedsRefresh) |= 1;
 }
 
 static uint8_t rom_at(GB *gb, uint8_t bank, uint16_t addr) {
