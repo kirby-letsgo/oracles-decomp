@@ -425,6 +425,16 @@ int overworld_map_height(const OverworldMap *map) {
   return map->seasons && map->plane == 1 ? 64 : overworld_map_width(map);
 }
 
+static uint32_t map_pixel(const WideRoom *art, int tile, int attr, int x, int y) {
+  int row = (attr & 0x40) ? 7 - y%8 : y%8, bit = (attr & 0x20) ? x%8 : 7 - x%8;
+  const uint8_t *data = art->vram[(attr>>3)&1] + 0x1000 + (int8_t)tile*16 + row*2;
+  int ci = ((data[0]>>bit)&1) | (((data[1]>>bit)&1)<<1);
+  int p = (attr&7)*8 + ci*2;
+  int rgb = art->bg_pal[p] | art->bg_pal[p+1]<<8;
+  return 0xff000000u | ((rgb&31)*255/31)<<16 |
+                         (((rgb>>5)&31)*255/31)<<8 | ((rgb>>10)&31)*255/31;
+}
+
 void overworld_map_pixels(const uint8_t *rom, size_t size, const OverworldMap *map, uint32_t *pixels) {
   if (size <= 0x142 || map->plane > 1) return;
   bool eu = rom[0x142] == 'P';
@@ -457,12 +467,73 @@ void overworld_map_pixels(const uint8_t *rom, size_t size, const OverworldMap *m
     int pos = start + (y/8)*32 + x/8;
     bool visited = map->visited[(y/8)*16 + x/8] != 0;
     int tile = visited ? art.tiles[pos] : 4, attr = visited ? art.attrs[pos] : 0x0a;
-    int row = (attr & 0x40) ? 7 - y%8 : y%8, bit = (attr & 0x20) ? x%8 : 7 - x%8;
-    const uint8_t *data = art.vram[(attr>>3)&1] + 0x1000 + (int8_t)tile*16 + row*2;
-    int ci = ((data[0]>>bit)&1) | (((data[1]>>bit)&1)<<1);
-    int p = (attr&7)*8 + ci*2;
-    int rgb = art.bg_pal[p] | art.bg_pal[p+1]<<8;
-    pixels[y*width*8+x] = 0xff000000u | ((rgb&31)*255/31)<<16 |
-                           (((rgb>>5)&31)*255/31)<<8 | ((rgb>>10)&31)*255/31;
+    pixels[y*width*8+x] = map_pixel(&art, tile, attr, x, y);
+  }
+}
+
+// Matches dungeonMap_getTileForRoom. Compass markers supersede ordinary room tiles.
+static uint8_t dungeon_tile(int room, int flags, int properties, bool compass, bool has_map) {
+  if (!room || properties == 0x60 || properties == 0x70) return 0xac;
+  if (compass) {
+    int feature = properties & 0x70;
+    if (feature == 0x40) return 0x83;
+    if ((feature == 0x20 || feature == 0x30) && !(flags & 0x20)) return 0xae;
+  }
+  if (flags & 0x10) return 0xb0 + ((flags | properties) & 15);
+  return has_map ? 0xaf : 0xac;
+}
+
+void dungeon_map_state(bool seasons, const uint8_t *rom, size_t size,
+                       const uint8_t wram[4096], const uint8_t bank2[4096], DungeonMap *map) {
+  *map = (DungeonMap){0};
+  int offset = seasons ? 0x1c : 0;
+  int index = wram[0xc39 + offset], floors = wram[0xc40 + offset];
+  int flags_page = wram[0xc3d + offset];
+  if (index >= (seasons ? 12 : 16) || !floors || floors > DUNGEON_MAX_FLOORS ||
+      (flags_page != 0xc9 && flags_page != 0xca)) return;
+
+  int group = wram[0xc2d + offset];
+  // Bank 1 room-property tables have the same addresses in the US and European releases.
+  size_t props = (seasons ? 0x4d41 : 0x4dce) + (group & 1) * 256;
+  if (props + 256 > size) return;
+  int item_byte = (seasons ? 0x67c : 0x684) + index / 8;
+  int bit = 1 << (index % 8);
+  bool compass = wram[item_byte] & bit;
+  bool has_map = wram[item_byte + 2] & bit;
+  map->index = index;
+  map->floors = floors;
+  map->base_floor = wram[0xc41 + offset];
+  map->link_floor = wram[0x63d];
+  map->link_cell = wram[0x63c];
+  if (group == 5 && wram[0xc30 + offset] == (seasons ? 0x9e : 0xf5)) map->link_cell = 0x13;
+  int visible = wram[0x662 + index];
+  if (compass) visible |= wram[0xc42 + offset];
+  map->visible = (has_map ? 0xff : visible) & ((1 << floors) - 1);
+  for (int floor = 0; floor < floors; floor++) {
+    if (!(map->visible & (1 << floor))) continue;
+    for (int cell = 0; cell < DUNGEON_CELLS; cell++) {
+      int room = bank2[0xc00 + floor * DUNGEON_CELLS + cell];
+      int flags = wram[(flags_page - 0xc0) * 256 + room];
+      map->tiles[floor][cell] = dungeon_tile(room, flags, rom[props + room], compass, has_map);
+    }
+  }
+}
+
+void dungeon_map_pixels(bool seasons, const uint8_t *rom, size_t size,
+                        const DungeonMap *map, uint32_t *pixels) {
+  if (!map->floors || size <= 0x142) return;
+  bool eu = rom[0x142] == 'P';
+  const Tables *tables = seasons ? (eu ? &seasons_eu_tables : &seasons_tables)
+                                 : (eu ? &ages_eu_tables : &ages_tables);
+  Rom r = {rom, size, tables, 0};
+  WideRoom art = {0};
+  load_gfx(&r, tables->gfx_bank, tables->gfx_headers, 0x0f, GFX_MINIMAP, &art);
+  load_palette_header(&r, 9, &art);
+  for (int floor = 0; floor < map->floors; floor++) {
+    for (int y = 0; y < 64; y++) for (int x = 0; x < 64; x++) {
+      int tile = map->tiles[floor][(y/8)*8 + x/8];
+      int palette = tile == 0x83 ? 0 : tile == 0xae ? 2 : tile == 0xaf ? 4 : 5;
+      pixels[floor * DUNGEON_FLOOR_PIXELS + y*64+x] = map_pixel(&art, tile ? tile : 0xac, palette, x, y);
+    }
   }
 }

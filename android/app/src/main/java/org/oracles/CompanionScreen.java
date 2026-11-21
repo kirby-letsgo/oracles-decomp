@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.widget.ScrollView;
-import android.widget.ImageView;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Gravity;
@@ -30,7 +29,14 @@ final class CompanionScreen extends Presentation {
     private ScrollView scroll;
     private int[] snapshot;
     private int selected;
-    private ImageView mapImage;
+    private CompanionMapView mapImage;
+    private LinearLayout floorButtons;
+    private int selectedFloor, previousDungeon = -1, previousLinkFloor = -1;
+    private int currentGuideGame = -1;
+    private static native int guideGame();
+    private static final int MAP_REVISION = 0, MAP_PLANE = 1, MAP_ROOM = 2, MAP_GAME = 3,
+            MAP_WIDTH = 4, MAP_HEIGHT = 5, MAP_DUNGEON = 6, MAP_LINK_FLOOR = 7,
+            MAP_BASE_FLOOR = 8, MAP_VISIBLE = 9, MAP_FLOORS = 10, MAP_PIXELS = 11;
     private int[] mapSnapshot;
     private static native int[] worldMap(int revision);
     private static final int RECORD = 258;
@@ -44,11 +50,17 @@ final class CompanionScreen extends Presentation {
     private final Handler handler = new Handler(android.os.Looper.getMainLooper());
     private final Runnable poll = new Runnable() {
         @Override public void run() {
-            if (tab != INVENTORY) {
-                int[] changed = worldMap(mapSnapshot == null ? -1 : mapSnapshot[0]);
+            if (tab == GUIDE) {
+                int game = guideGame();
+                if (game != currentGuideGame) {
+                    currentGuideGame = game;
+                    renderGuide();
+                }
+            } else if (tab == MAP) {
+                int[] changed = worldMap(mapSnapshot == null ? -1 : mapSnapshot[MAP_REVISION]);
                 if (changed != null) {
                     mapSnapshot = changed;
-                    if (tab == MAP) renderMap(); else renderGuide();
+                    renderMap();
                 }
             } else {
                 int[] changed = inventory(snapshot == null ? -1 : snapshot[0]);
@@ -107,9 +119,10 @@ final class CompanionScreen extends Presentation {
         page.setTextSize(28);
         page.setTypeface(Typeface.SERIF, Typeface.BOLD);
         root.addView(page);
-        mapImage = new ImageView(context);
-        mapImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        mapImage = new CompanionMapView(context);
         root.addView(mapImage, new LinearLayout.LayoutParams(-1, 0, 1));
+        floorButtons = new LinearLayout(context);
+        root.addView(floorButtons);
         scroll = new ScrollView(context);
         items = new LinearLayout(context);
         items.setOrientation(LinearLayout.VERTICAL);
@@ -137,12 +150,14 @@ final class CompanionScreen extends Presentation {
 
     private void render() {
         boolean map = tab == MAP;
+        page.setTextSize(map ? 20 : 28);
         styleTab(guideTab, tab == GUIDE);
         styleTab(inventoryTab, tab == INVENTORY);
         styleTab(mapTab, map);
         scroll.setVisibility(tab == INVENTORY ? View.VISIBLE : View.GONE);
         slots.setVisibility(tab == INVENTORY ? View.VISIBLE : View.GONE);
         mapImage.setVisibility(map ? View.VISIBLE : View.GONE);
+        floorButtons.setVisibility(View.GONE);
         if (guide != null) guide.setVisibility(tab == GUIDE ? View.VISIBLE : View.GONE);
         page.setVisibility(View.VISIBLE);
         if (tab == GUIDE) {
@@ -206,7 +221,8 @@ final class CompanionScreen extends Presentation {
     private LinearLayout container;
 
     private void renderGuide() {
-        if (mapSnapshot == null || mapSnapshot[1] == -2) {
+        currentGuideGame = guideGame();
+        if (currentGuideGame == 0) {
             page.setVisibility(View.VISIBLE);
             page.setText("Open Ages or Seasons to read its walkthrough");
             if (guide != null) guide.setVisibility(View.GONE);
@@ -218,7 +234,7 @@ final class CompanionScreen extends Presentation {
         }
         page.setVisibility(View.GONE);
         guide.setVisibility(View.VISIBLE);
-        guide.setGame(mapSnapshot[3] == 0 ? "ages" : "seasons");
+        guide.setGame(currentGuideGame == 1 ? "ages" : "seasons");
     }
 
     @Override public void dismiss() {
@@ -230,21 +246,59 @@ final class CompanionScreen extends Presentation {
     }
 
     private void renderMap() {
-        int plane = mapSnapshot == null ? -2 : mapSnapshot[1];
-        if (plane != 0 && plane != 1) {
+        int plane = mapSnapshot == null ? -2 : mapSnapshot[MAP_PLANE];
+        boolean dungeon = plane == 2;
+        floorButtons.removeAllViews();
+        floorButtons.setVisibility(View.GONE);
+        if (!dungeon) previousDungeon = -1;
+        if (plane < 0 || (dungeon && mapSnapshot[MAP_VISIBLE] == 0)) {
             mapImage.setImageDrawable(null);
-            page.setText(plane == -2 ? "Open a game file to see the map" :
-                    "Dungeon map unavailable");
+            mapImage.setContentDescription(null);
+            mapImage.resetViewport();
+            page.setText(plane < 0 ? "Open a game file to see the map" : "No mapped floors yet");
             return;
         }
-        boolean seasons = mapSnapshot[3] != 0;
-        page.setText(seasons ? (plane == 0 ? "Holodrum" : "Subrosia")
-                : (plane == 0 ? "Labrynna · Present" : "Labrynna · Past"));
-        int width = mapSnapshot[4], height = mapSnapshot[5];
+
+        boolean seasons = mapSnapshot[MAP_GAME] != 0;
+        int width = mapSnapshot[MAP_WIDTH], height = mapSnapshot[MAP_HEIGHT];
+        int room = mapSnapshot[MAP_ROOM], columns = dungeon ? 8 : 16;
+        int offset = MAP_PIXELS;
+        boolean showLink = true;
+        int area = (seasons ? 256 : 0) + (dungeon ? 2 + mapSnapshot[MAP_DUNGEON] : plane);
+        if (dungeon) {
+            int linkFloor = mapSnapshot[MAP_LINK_FLOOR], visible = mapSnapshot[MAP_VISIBLE];
+            if (area != previousDungeon || linkFloor != previousLinkFloor || (visible & (1 << selectedFloor)) == 0) {
+                selectedFloor = linkFloor < 8 && (visible & (1 << linkFloor)) != 0
+                        ? linkFloor : Integer.numberOfTrailingZeros(visible);
+            }
+            previousDungeon = area;
+            previousLinkFloor = linkFloor;
+            int base = mapSnapshot[MAP_BASE_FLOOR];
+            for (int i = 0; i < mapSnapshot[MAP_FLOORS]; i++) {
+                if ((visible & (1 << i)) == 0) continue;
+                final int floor = i;
+                Button button = new Button(getContext());
+                String label = floorName(base + i);
+                button.setText(i == linkFloor ? "◆ " + label : label);
+                button.setPadding(0, 0, 0, 0);
+                button.setContentDescription(label + (i == linkFloor ? ", Link’s floor" : ""));
+                styleTab(button, i == selectedFloor);
+                button.setOnClickListener(v -> { selectedFloor = floor; renderMap(); });
+                floorButtons.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
+            }
+            if (floorButtons.getChildCount() > 1) floorButtons.setVisibility(View.VISIBLE);
+            offset += width * height * selectedFloor;
+            showLink = selectedFloor == linkFloor;
+            page.setText(dungeonName(seasons, mapSnapshot[MAP_DUNGEON]) + " · " + floorName(base + selectedFloor));
+        } else {
+            page.setText(seasons ? (plane == 0 ? "Holodrum" : "Subrosia")
+                    : (plane == 0 ? "Labrynna · Present" : "Labrynna · Past"));
+        }
+        mapImage.setArea(area * 8 + (dungeon ? selectedFloor : 0));
         Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        image.setPixels(mapSnapshot, 6, width, 0, 0, width, height);
-        int room = mapSnapshot[2], cx = (room % 16) * 8 + 3, cy = (room / 16) * 8 + 3;
-        if (cx < width && cy < height) {
+        image.setPixels(mapSnapshot, offset, width, 0, 0, width, height);
+        int cx = (room % columns) * 8 + 3, cy = (room / columns) * 8 + 3;
+        if (showLink && cx < width && cy < height) {
             for (int y = -3; y <= 3; y++) for (int x = -3; x <= 3; x++) {
                 int distance = Math.abs(x) + Math.abs(y);
                 if (distance <= 3) image.setPixel(cx+x, cy+y, distance == 3 ? 0xff26332c : 0xffffdf55);
@@ -253,7 +307,26 @@ final class CompanionScreen extends Presentation {
         BitmapDrawable art = new BitmapDrawable(getContext().getResources(), image);
         art.setFilterBitmap(false);
         mapImage.setImageDrawable(art);
-        mapImage.setContentDescription(page.getText() + ", Link at column " + (room%16+1) + ", row " + (room/16+1));
+        mapImage.setContentDescription(page.getText() + (showLink && cx < width && cy < height
+                ? ", Link at column " + (room % columns + 1) + ", row " + (room / columns + 1) : ""));
+    }
+
+    private static String floorName(int index) {
+        return index < 3 ? "B" + (3 - index) : (index - 2) + "F";
+    }
+
+    private static final String[] AGES_DUNGEONS = {"", "Spirit’s Grave", "Wing Dungeon",
+            "Moonlit Grotto", "Skull Dungeon", "Crown Dungeon", "Mermaid’s Cave",
+            "Jabu-Jabu’s Belly", "Ancient Tomb"};
+    private static final String[] SEASONS_DUNGEONS = {"", "Gnarled Root Dungeon", "Snake’s Remains",
+            "Poison Moth’s Lair", "Dancing Dragon Dungeon", "Unicorn’s Cave", "Ancient Ruins",
+            "Explorer’s Crypt", "Sword & Shield Maze"};
+
+    private static String dungeonName(boolean seasons, int index) {
+        if (!seasons && index == 12) return "Mermaid’s Cave · Past";
+        if (!seasons && index == 6) return "Mermaid’s Cave · Present";
+        if (index < 1 || index > 8) return "Dungeon";
+        return (seasons ? SEASONS_DUNGEONS : AGES_DUNGEONS)[index];
     }
 
     private static String name(int id) {

@@ -47,3 +47,14 @@ int overworld_map_width(const OverworldMap *map);
 int overworld_map_height(const OverworldMap *map);
 // Draws the map grid into a tightly packed ARGB buffer, at most 128x128.
 void overworld_map_pixels(const uint8_t *rom, size_t size, const OverworldMap *map, uint32_t *pixels);
+
+enum { DUNGEON_MAX_FLOORS = 8, DUNGEON_CELLS = 64, DUNGEON_FLOOR_PIXELS = 64 * 64 };
+typedef struct {
+  uint8_t index, floors, base_floor, visible, link_floor, link_cell;
+  uint8_t tiles[DUNGEON_MAX_FLOORS][DUNGEON_CELLS];
+} DungeonMap;
+
+void dungeon_map_state(bool seasons, const uint8_t *rom, size_t size,
+                       const uint8_t wram[4096], const uint8_t bank2[4096], DungeonMap *map);
+void dungeon_map_pixels(bool seasons, const uint8_t *rom, size_t size,
+                        const DungeonMap *map, uint32_t *pixels);

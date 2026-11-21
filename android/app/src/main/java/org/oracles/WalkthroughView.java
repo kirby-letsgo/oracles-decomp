@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -25,7 +27,8 @@ final class WalkthroughView extends LinearLayout {
     private String resumeChapter;
     private int resumeOffset;
     private boolean ready;
-    private boolean busy;
+    private boolean busy, closed;
+    private String failedPage;
 
     WalkthroughView(Context context) {
         super(context);
@@ -69,11 +72,21 @@ final class WalkthroughView extends LinearLayout {
                 return true;
             }
             @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
+                if (closed) return;
+                if (failedPage != null && !busy) status.setText("Zelda Dungeon");
+                failedPage = null;
                 current = null;
                 ready = false;
+                updateButtons();
+            }
+            @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) pageFailed(request);
+            }
+            @Override public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse response) {
+                if (request.isForMainFrame() && response.getStatusCode() >= 400) pageFailed(request);
             }
             @Override public void onPageFinished(WebView view, String url) {
-                if (!url.equals(view.getUrl()) || game == null) return;
+                if (closed || !url.equals(view.getUrl()) || url.equals(failedPage) || game == null) return;
                 current = url;
                 String chapterUrl = canonicalPage(url);
                 if (!chapterUrl.isEmpty()) {
@@ -96,6 +109,20 @@ final class WalkthroughView extends LinearLayout {
             reader.postDelayed(storePosition, 350);
         });
         addView(reader, new LayoutParams(-1, 0, 1));
+    }
+
+    private void pageFailed(WebResourceRequest request) {
+        if (closed || game == null) return;
+        String url = request.getUrl().toString();
+        if (GuideBook.chapter(url, root()).isEmpty()) return;
+        failedPage = url;
+        current = null;
+        ready = false;
+        File[] pages = savedChapters();
+        status.setText(pages != null && pages.length > 0
+                ? "Page unavailable · Open Contents for saved chapters"
+                : "Page unavailable · Tap Contents to retry");
+        updateButtons();
     }
 
     private Button button(LinearLayout row, String label, Runnable action) {
@@ -154,12 +181,17 @@ final class WalkthroughView extends LinearLayout {
         updateButtons();
     }
 
+    private File[] savedChapters() {
+        return partial().listFiles((dir,name) -> name.endsWith(".html") && !name.equals("index.html"));
+    }
+
     private void openContents() {
-        File[] pages = partial().listFiles((dir,name) -> name.endsWith(".html") && !name.equals("index.html"));
+        File[] pages = savedChapters();
         if (new File(folder(),"index.html").exists() || pages == null || pages.length == 0) {
             openUrl(root());
             return;
         }
+        java.util.Arrays.sort(pages);
         android.widget.PopupMenu menu = new android.widget.PopupMenu(getContext(), contents);
         menu.getMenu().add("Online contents").setOnMenuItemClickListener(item -> { openUrl(root()); return true; });
         for (File page : pages) {
@@ -188,12 +220,13 @@ final class WalkthroughView extends LinearLayout {
             String message;
             try {
                 if (whole) GuideBook.download(library,target,GuideBook::fetch,
-                        text -> post(() -> { if (target.equals(game)) status.setText(text); }));
+                        text -> post(() -> { if (!closed && target.equals(game)) status.setText(text); }));
                 else GuideBook.downloadChapter(library,target,url,GuideBook::fetch);
                 message = whole ? "Walkthrough saved for offline reading" : "Chapter saved for offline reading";
             } catch (Exception e) { message = "Download stopped · " + e.getMessage(); }
             String result = message;
             post(() -> {
+                if (closed) return;
                 busy = false;
                 if (target.equals(game)) {
                     status.setText(result);
@@ -211,6 +244,7 @@ final class WalkthroughView extends LinearLayout {
 
     void close() {
         rememberPlace();
+        closed = true;
         ready = false;
         current = null;
         reader.removeCallbacks(storePosition);

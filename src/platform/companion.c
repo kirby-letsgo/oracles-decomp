@@ -17,11 +17,18 @@ static int requested_item, requested_slot;
 static atomic_bool refresh;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
-// Packet header: revision, plane (-2 before file load), room, game, width and height.
+// Header fields match the MAP_* indices in CompanionScreen. Dungeon floors follow consecutively.
 static atomic_bool refreshMap;
+static atomic_int guideGame; // 0 before file load, 1 for Ages, 2 for Seasons.
 static int mapRevision = 1, mapStatus = -2;
 static OverworldMap lastMap;
-static uint32_t mapPixels[128*128];
+static DungeonMap lastDungeon;
+static uint32_t mapPixels[DUNGEON_MAX_FLOORS * DUNGEON_FLOOR_PIXELS];
+
+JNIEXPORT jint JNICALL Java_org_oracles_CompanionScreen_guideGame(JNIEnv *env, jclass cls) {
+  (void)env; (void)cls;
+  return atomic_load(&guideGame);
+}
 
 JNIEXPORT jintArray JNICALL Java_org_oracles_CompanionScreen_worldMap(JNIEnv *env, jclass cls, jint seen) {
   (void)cls;
@@ -31,12 +38,17 @@ JNIEXPORT jintArray JNICALL Java_org_oracles_CompanionScreen_worldMap(JNIEnv *en
   if (seen != mapRevision) {
     int width = mapStatus < 0 ? 0 : overworld_map_width(&lastMap);
     int height = mapStatus < 0 ? 0 : overworld_map_height(&lastMap);
-    int count = width * height;
-    jint header[] = {mapRevision, mapStatus, lastMap.room, lastMap.seasons, width, height};
-    result = (*env)->NewIntArray(env, count + 6);
+    bool dungeon = mapStatus == 2;
+    if (dungeon) width = height = 64;
+    int count = width * height * (dungeon ? lastDungeon.floors : 1);
+    jint header[] = {mapRevision, mapStatus, dungeon ? lastDungeon.link_cell : lastMap.room,
+                     lastMap.seasons, width, height, lastDungeon.index, lastDungeon.link_floor,
+                     lastDungeon.base_floor, lastDungeon.visible, lastDungeon.floors};
+    int fields = sizeof header / sizeof header[0];
+    result = (*env)->NewIntArray(env, count + fields);
     if (result) {
-      (*env)->SetIntArrayRegion(env, result, 0, 6, header);
-      if (count) (*env)->SetIntArrayRegion(env, result, 6, count, (const jint *)mapPixels);
+      (*env)->SetIntArrayRegion(env, result, 0, fields, header);
+      if (count) (*env)->SetIntArrayRegion(env, result, fields, count, (const jint *)mapPixels);
     }
   }
   pthread_mutex_unlock(&lock);
@@ -47,10 +59,15 @@ static void update_map(GB *gb, bool seasons, bool loaded) {
   OverworldMap next = {0};
   if (loaded) overworld_map_state(seasons, gb->wram[0], &next);
   int status = !loaded ? -2 : next.plane;
+  DungeonMap dungeon = {0};
+  if (status == 2) dungeon_map_state(seasons, gb->rom, gb->rom_size, gb->wram[0], gb->wram[2], &dungeon);
   pthread_mutex_lock(&lock);
-  if (status != mapStatus || memcmp(&next, &lastMap, sizeof next)) {
+  if (memcmp(&dungeon, &lastDungeon, sizeof dungeon) || status != mapStatus || memcmp(&next, &lastMap, sizeof next)) {
     if (status == 0 || status == 1)
       overworld_map_pixels(gb->rom, gb->rom_size, &next, mapPixels);
+    else if (status == 2)
+      dungeon_map_pixels(seasons, gb->rom, gb->rom_size, &dungeon, mapPixels);
+    lastDungeon = dungeon;
     mapStatus = status;
     lastMap = next;
     mapRevision++;
@@ -89,6 +106,7 @@ void companion_clear(void) {
   pthread_mutex_lock(&lock);
   memset(packet, 0, HEADER * sizeof(jint));
   length = HEADER;
+  atomic_store(&guideGame, 0);
   mapStatus = -2;
   mapRevision++;
   revision++;
@@ -99,8 +117,8 @@ void companion_clear(void) {
 bool companion_update(GB *gb, bool seasons, bool playing) {
   bool inventory_requested = atomic_exchange(&refresh, false);
   bool map_requested = atomic_exchange(&refreshMap, false);
-  if (!inventory_requested && !map_requested) return false;
   bool loaded = !memcmp(&gb->wram[0][0x5b2], seasons ? "Z11216-0" : "Z21216-0", 8);
+  atomic_store(&guideGame, loaded ? (seasons ? 2 : 1) : 0);
   if (map_requested) update_map(gb, seasons, loaded);
   if (!inventory_requested) return false;
   pthread_mutex_lock(&lock);
