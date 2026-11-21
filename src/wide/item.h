@@ -21,3 +21,8 @@ bool wide_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
 // Remaining ammo, 0..99; -1 for an item without a counter or invalid seed/count data.
 // Reads the same $c600 page as the icon, including each seed tool's own selection.
 int wide_item_count(bool seasons, uint8_t item, const uint8_t *c600);
+
+#include "wide/room.h"
+
+bool inventory_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
+                         const uint8_t *c600, const InventoryArt *art, uint32_t pixels[256]);

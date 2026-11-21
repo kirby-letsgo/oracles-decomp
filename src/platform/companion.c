@@ -9,9 +9,11 @@
 #include <pthread.h>
 
 // Packet for CompanionScreen: slot count, six assigned IDs, then a record per
-// owned item (ID, remaining count, 16x16 ARGB icon). A/B plus 16 storage cells.
-enum { HEADER = 7, RECORD = 258, CAPACITY = HEADER + 18 * RECORD };
+// owned item (ID, remaining count, 16x16 ARGB icon, equipment level). A/B plus 16 storage cells.
+enum { HEADER = 7, RECORD = 259, CAPACITY = HEADER + 18 * RECORD };
 static jint packet[CAPACITY];
+static InventoryArt inventoryArt;
+static bool hasInventoryArt;
 static int length = HEADER, revision = 1;
 static int requested_item, requested_slot;
 static atomic_bool refresh;
@@ -104,6 +106,7 @@ JNIEXPORT void JNICALL Java_org_oracles_CompanionScreen_assign(JNIEnv *env, jcla
 
 void companion_clear(void) {
   pthread_mutex_lock(&lock);
+  hasInventoryArt = false;
   memset(packet, 0, HEADER * sizeof(jint));
   length = HEADER;
   atomic_store(&guideGame, 0);
@@ -112,6 +115,21 @@ void companion_clear(void) {
   revision++;
   requested_item = 0;
   pthread_mutex_unlock(&lock);
+}
+
+// Item levels distinguish upgrades that share an inventory ID and slot.
+static int companion_item_level(const uint8_t *page, bool seasons, int id) {
+  switch (id) {
+    case 1: return page[seasons ? 0xa9 : 0xaf]; // shield
+    case 5: return page[seasons ? 0xac : 0xb2]; // sword
+    case 6: return seasons ? page[0xb1] : 1;    // boomerang
+    case 10: return seasons ? 1 : page[0xb6];   // switch hook
+    case 14: return page[seasons ? 0xaf : 0xb5]; // flute
+    case 19: return seasons ? page[0xb3] : 1;   // slingshot
+    case 22: return seasons ? 1 : page[0xb8];   // bracelet
+    case 23: return seasons ? page[0xb4] : 1;   // feather
+    default: return 0;
+  }
 }
 
 bool companion_update(GB *gb, bool seasons, bool playing) {
@@ -135,6 +153,10 @@ bool companion_update(GB *gb, bool seasons, bool playing) {
     next[1] = features_hud_item(gb, wInventoryA);
     next[2] = features_hud_item(gb, wInventoryB);
     for (int i = 0; i < 4; i++) next[3+i] = features.slot_item[i];
+    if (!hasInventoryArt) {
+      inventory_load_art(gb->rom, gb->rom_size, seasons, &inventoryArt);
+      hasInventoryArt = true;
+    }
     bool present[32] = {false};
     for (int i = 0; i < 18; i++) {
       int id = i < 2 ? next[i+1] : mem_rd(gb, wInventoryStorage+i-2);
@@ -142,17 +164,10 @@ bool companion_update(GB *gb, bool seasons, bool playing) {
       present[id] = true;
       next[n] = id;
       next[n+1] = wide_item_count(seasons, id, &gb->wram[0][0x600]);
-      WideItemIcon icon;
-      if (wide_item_icon(gb->rom, gb->rom_size, seasons, id, &gb->wram[0][0x600], &icon)) {
-        for (int y = 0; y < 16; y++) for (int x = 0; x < icon.halves*8; x++) {
-          int c = icon.ci[y][x];
-          if (!c) continue;
-          int p = icon.pal[x/8]*8 + c*2;
-          int rgb = gb->ob_pal[p] | gb->ob_pal[p+1]<<8;
-          next[n+2+y*16+x+(icon.halves==1 ? 4 : 0)] = 0xff000000u |
-              ((rgb & 31)*255/31)<<16 | (((rgb>>5)&31)*255/31)<<8 | ((rgb>>10)&31)*255/31;
-        }
-      }
+      uint32_t pixels[256] = {0};
+      inventory_item_icon(gb->rom, gb->rom_size, seasons, id, &gb->wram[0][0x600], &inventoryArt, pixels);
+      memcpy(next + n + 2, pixels, sizeof pixels);
+      next[n + 258] = companion_item_level(&gb->wram[0][0x600], seasons, id);
       n += RECORD;
     }
   }

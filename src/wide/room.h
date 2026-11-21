@@ -58,3 +58,9 @@ void dungeon_map_state(bool seasons, const uint8_t *rom, size_t size,
                        const uint8_t wram[4096], const uint8_t bank2[4096], DungeonMap *map);
 void dungeon_map_pixels(bool seasons, const uint8_t *rom, size_t size,
                         const DungeonMap *map, uint32_t *pixels);
+
+// The inventory menu loads its own icon tiles and fixed palettes, independent of the room.
+typedef struct {
+  uint8_t tiles[0x800], palettes[64];
+} InventoryArt;
+void inventory_load_art(const uint8_t *rom, size_t size, bool seasons, InventoryArt *art);

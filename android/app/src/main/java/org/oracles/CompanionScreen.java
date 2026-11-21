@@ -23,6 +23,10 @@ final class CompanionScreen extends Presentation {
     private static final int INVENTORY = 0, MAP = 1, GUIDE = 2;
     private int tab;
     private WalkthroughView guide;
+    private ScrollView library;
+    private TextView libraryHint;
+    private Button libraryBack;
+    private int manualGuide;
     private Button inventoryTab, mapTab, guideTab;
     private TextView page;
     private LinearLayout items, slots;
@@ -40,7 +44,7 @@ final class CompanionScreen extends Presentation {
     private int[] mapSnapshot;
     private static native int[] worldMap(int revision);
     private static final int HEADER = 8; // revision, slot count, six equipped IDs
-    private static final int RECORD = 258;
+    private static final int RECORD = 259;
     private static final String[] KEYS = {"A", "B", "X", "Y", "L", "R"};
     private static final String[] NAMES = {"", "Shield", "Punch", "Bombs", "Cane of Somaria",
         "Sword", "Boomerang", "Rod of Seasons", "Magnet Gloves", "", "Switch Hook", "",
@@ -131,9 +135,88 @@ final class CompanionScreen extends Presentation {
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         slots = new LinearLayout(context);
         root.addView(slots);
+        library = buildLibrary(context);
+        root.addView(library, new LinearLayout.LayoutParams(-1, 0, 1));
+        libraryBack = new Button(context);
+        libraryBack.setAllCaps(false);
+        libraryBack.setText("‹  Walkthrough library");
+        libraryBack.setOnClickListener(v -> { manualGuide = 0; render(); });
+        root.addView(libraryBack);
         container = root;
         setContentView(root);
         render();
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getContext().getResources().getDisplayMetrics().density);
+    }
+
+    private ScrollView buildLibrary(Context context) {
+        ScrollView panel = new ScrollView(context);
+        panel.setFillViewport(true);
+        panel.setBackgroundColor(0xff233831);
+        LinearLayout outer = new LinearLayout(context);
+        outer.setGravity(Gravity.CENTER);
+        outer.setPadding(dp(16), dp(14), dp(16), dp(14));
+        panel.addView(outer);
+        LinearLayout content = new LinearLayout(context);
+        content.setOrientation(LinearLayout.VERTICAL);
+        int available = context.getResources().getDisplayMetrics().widthPixels - dp(32);
+        outer.addView(content, new LinearLayout.LayoutParams(Math.min(dp(432), available), -2));
+        TextView title = new TextView(context);
+        title.setText("Walkthrough library");
+        title.setTypeface(Typeface.SERIF, Typeface.BOLD);
+        title.setTextColor(0xffffedc4);
+        title.setTextSize(26);
+        content.addView(title);
+        libraryHint = new TextView(context);
+        libraryHint.setTextColor(0xffd0ddd1);
+        libraryHint.setTextSize(15);
+        libraryHint.setPadding(0, dp(3), 0, dp(12));
+        content.addView(libraryHint);
+        addGameChoice(content, "Oracle of Ages", 1, 0xffcbdaf1);
+        addGameChoice(content, "Oracle of Seasons", 2, 0xfff3d596);
+        return panel;
+    }
+
+    private void addGameChoice(LinearLayout content, String label, int game, int color) {
+        Button choice = new Button(getContext());
+        choice.setAllCaps(false);
+        choice.setText(label + "   ›");
+        choice.setContentDescription("Read the " + label + " walkthrough");
+        choice.setTextSize(18);
+        choice.setTextColor(0xff22362e);
+        choice.setTypeface(Typeface.SERIF, Typeface.BOLD);
+        choice.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+        choice.setPadding(dp(18), 0, dp(12), 0);
+        android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable();
+        shape.setColor(color);
+        shape.setCornerRadius(dp(6));
+        choice.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(0x30233831), shape, null));
+        choice.setOnClickListener(v -> {
+            manualGuide = game;
+            tab = GUIDE;
+            listener.selected(tab);
+            render();
+        });
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(52));
+        size.topMargin = dp(6);
+        content.addView(choice, size);
+    }
+
+    private void showLibrary() {
+        libraryHint.setText(tab == GUIDE ? "Choose a game to read its guide."
+                : tab == MAP ? "Open a save on the top screen to see your map, or read a guide here."
+                : "Open a save on the top screen to see your items, or read a guide here.");
+        page.setVisibility(View.GONE);
+        scroll.setVisibility(View.GONE);
+        slots.setVisibility(View.GONE);
+        mapImage.setVisibility(View.GONE);
+        floorButtons.setVisibility(View.GONE);
+        libraryBack.setVisibility(View.GONE);
+        if (guide != null) guide.setVisibility(View.GONE);
+        library.setVisibility(View.VISIBLE);
     }
 
     private Button addTab(LinearLayout tabs, String label, int next) {
@@ -150,8 +233,10 @@ final class CompanionScreen extends Presentation {
     }
 
     private void render() {
+        library.setVisibility(View.GONE);
+        libraryBack.setVisibility(View.GONE);
         boolean map = tab == MAP;
-        page.setTextSize(map ? 20 : 28);
+        page.setTextSize(map ? 20 : 18);
         styleTab(guideTab, tab == GUIDE);
         styleTab(inventoryTab, tab == INVENTORY);
         styleTab(mapTab, map);
@@ -173,7 +258,7 @@ final class CompanionScreen extends Presentation {
         slots.removeAllViews();
         if (snapshot == null || snapshot[1] == 0) {
             selected = 0;
-            page.setText("Open a game file to see your items");
+            showLibrary();
             return;
         }
         if (snapshot.length == HEADER) {
@@ -187,31 +272,46 @@ final class CompanionScreen extends Presentation {
         boolean canEquip = snapshot[1] > 0;
         page.setText(!canEquip ? "Inventory · Equipping paused"
                 : selected == 0 ? "Choose an item" : name(selected) + " · Choose a slot");
+        int available = getContext().getResources().getDisplayMetrics().widthPixels;
+        int columns = Math.max(3, Math.min(4, available / dp(118)));
+        items.setPadding(dp(4), dp(4), dp(4), dp(4));
         LinearLayout row = null;
         for (int pos = HEADER, i = 0; pos < snapshot.length; pos += RECORD, i++) {
             int id = snapshot[pos], count = snapshot[pos + 1];
-            if (i % 3 == 0) {
+            if (i % columns == 0) {
                 row = new LinearLayout(getContext());
                 items.addView(row);
             }
             Button button = new Button(getContext());
             button.setAllCaps(false);
+            button.setTextSize(14);
+            button.setPadding(dp(2), dp(5), dp(2), dp(4));
             button.setText(name(id) + (count < 0 ? "" : " ×" + count));
             Bitmap image = Bitmap.createBitmap(snapshot, pos + 2, 16, 16, 16, Bitmap.Config.ARGB_8888);
             BitmapDrawable sprite = new BitmapDrawable(getContext().getResources(), image);
             sprite.setFilterBitmap(false);
-            int size = Math.round(40 * getContext().getResources().getDisplayMetrics().density);
+            int size = dp(44);
             sprite.setBounds(0, 0, size, size);
             button.setCompoundDrawables(null, sprite, null, null);
-            styleTab(button, id == selected);
+            button.setSelected(id == selected);
+            button.setBackgroundColor(id == selected ? 0xffefd58c : 0xfff8efd4);
+            button.setTextColor(0xff25382d);
             button.setOnClickListener(v -> { selected = id; render(); });
-            row.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
+            LinearLayout.LayoutParams cell = new LinearLayout.LayoutParams(0, -2, 1);
+            cell.setMargins(dp(2), dp(2), dp(2), dp(2));
+            row.addView(button, cell);
+            if (pos + RECORD >= snapshot.length) {
+                for (int k = i % columns + 1; k < columns; k++)
+                    row.addView(new View(getContext()), new LinearLayout.LayoutParams(0, 0, 1));
+            }
         }
         int slotCount = Math.abs(snapshot[1]);
+        boolean splitSlots = slotCount == 6 && available < dp(528);
+        slots.setBackgroundColor(0xff233831);
         slots.setOrientation(LinearLayout.VERTICAL);
         LinearLayout slotRow = null;
         for (int i = 0; i < slotCount; i++) {
-            if (i == 0 || (slotCount == 6 && i == 3)) {
+            if (i == 0 || (splitSlots && i == 3)) {
                 slotRow = new LinearLayout(getContext());
                 slots.addView(slotRow);
             }
@@ -219,10 +319,17 @@ final class CompanionScreen extends Presentation {
             Button button = new Button(getContext());
             int id = snapshot[2+i];
             button.setAllCaps(false);
+            button.setTextSize(13);
+            button.setPadding(dp(2), dp(4), dp(2), dp(4));
+            button.setMinHeight(dp(52));
+            button.setTextColor(0xfff8efd4);
+            button.setBackgroundColor(0xff364e42);
             button.setText(KEYS[i] + "\n" + (id == 0 ? "—" : name(id)));
             button.setEnabled(canEquip && selected != 0);
             button.setOnClickListener(v -> assign(snapshot[0], slot, selected));
-            slotRow.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
+            LinearLayout.LayoutParams slotSize = new LinearLayout.LayoutParams(0, -2, 1);
+            slotSize.setMargins(dp(1), dp(1), dp(1), dp(1));
+            slotRow.addView(button, slotSize);
         }
     }
 
@@ -230,10 +337,10 @@ final class CompanionScreen extends Presentation {
 
     private void renderGuide() {
         currentGuideGame = guideGame();
-        if (currentGuideGame == 0) {
-            page.setVisibility(View.VISIBLE);
-            page.setText("Open Ages or Seasons to read its walkthrough");
-            if (guide != null) guide.setVisibility(View.GONE);
+        if (currentGuideGame != 0) manualGuide = 0;
+        int edition = currentGuideGame == 0 ? manualGuide : currentGuideGame;
+        if (edition == 0) {
+            showLibrary();
             return;
         }
         if (guide == null) {
@@ -242,7 +349,9 @@ final class CompanionScreen extends Presentation {
         }
         page.setVisibility(View.GONE);
         guide.setVisibility(View.VISIBLE);
-        guide.setGame(currentGuideGame == 1 ? "ages" : "seasons");
+        library.setVisibility(View.GONE);
+        libraryBack.setVisibility(currentGuideGame == 0 ? View.VISIBLE : View.GONE);
+        guide.setGame(edition == 1 ? "ages" : "seasons");
     }
 
     @Override public void dismiss() {
@@ -255,15 +364,24 @@ final class CompanionScreen extends Presentation {
 
     private void renderMap() {
         int plane = mapSnapshot == null ? -2 : mapSnapshot[MAP_PLANE];
+        if (plane < 0) {
+            previousDungeon = -1;
+            mapImage.resetViewport();
+            showLibrary();
+            return;
+        }
+        library.setVisibility(View.GONE);
+        page.setVisibility(View.VISIBLE);
+        mapImage.setVisibility(View.VISIBLE);
         boolean dungeon = plane == 2;
         floorButtons.removeAllViews();
         floorButtons.setVisibility(View.GONE);
         if (!dungeon) previousDungeon = -1;
-        if (plane < 0 || (dungeon && mapSnapshot[MAP_VISIBLE] == 0)) {
+        if (dungeon && mapSnapshot[MAP_VISIBLE] == 0) {
             mapImage.setImageDrawable(null);
             mapImage.setContentDescription(null);
             mapImage.resetViewport();
-            page.setText(plane < 0 ? "Open a game file to see the map" : "No mapped floors yet");
+            page.setText("No mapped floors yet");
             return;
         }
 
@@ -337,7 +455,22 @@ final class CompanionScreen extends Presentation {
         return (seasons ? SEASONS_DUNGEONS : AGES_DUNGEONS)[index];
     }
 
-    private static String name(int id) {
+    private String name(int id) {
+        int level = 0;
+        for (int pos = HEADER; pos < snapshot.length; pos += RECORD) {
+            if (snapshot[pos] == id) { level = snapshot[pos + 258]; break; }
+        }
+        if (id == 1 && level == 3) return "Mirror Shield";
+        if (id == 1 && level == 2) return "Iron Shield";
+        if (id == 5 && level == 3) return "Master Sword";
+        if (id == 5 && level == 2) return "Noble Sword";
+        if (id == 6 && level == 2) return "Magical Boomerang";
+        if (id == 10 && level == 2) return "Long Hook";
+        if (id == 14 && level >= 1 && level <= 3)
+            return new String[]{"", "Ricky’s Flute", "Dimitri’s Flute", "Moosh’s Flute"}[level];
+        if (id == 19 && level == 2) return "Hyper Slingshot";
+        if (id == 22 && level == 2) return "Power Glove";
+        if (id == 23 && level == 2) return "Roc’s Cape";
         if (id == 30) return "Fool’s Ore";
         if (id < NAMES.length && !NAMES[id].isEmpty()) return NAMES[id];
         return "Item " + id;

@@ -13,11 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 final class WalkthroughView extends LinearLayout {
-    private static final ExecutorService downloads = Executors.newSingleThreadExecutor();
+    private GuideBook download;
     private final File library;
     private final WebView reader;
     private final TextView status;
@@ -44,7 +43,8 @@ final class WalkthroughView extends LinearLayout {
         addView(status);
         reader = new WebView(context);
         reader.getSettings().setAllowContentAccess(false);
-        reader.getSettings().setAllowFileAccess(true);
+        reader.getSettings().setAllowFileAccess(false);
+        reader.getSettings().setDomStorageEnabled(true);
         reader.getSettings().setBuiltInZoomControls(true);
         reader.getSettings().setDisplayZoomControls(false);
         reader.setWebViewClient(new WebViewClient() {
@@ -58,17 +58,20 @@ final class WalkthroughView extends LinearLayout {
                     File page = new File(path);
                     if (!folder().equals(page.getParentFile()) && !partial().equals(page.getParentFile())) return true;
                     String filename = page.getName();
-                    if (!filename.matches("[a-z0-9-]+\\.html")) return true;
-                    if (page.exists()) return false;
-                    openUrl(root() + (filename.equals("index.html") ? "" : filename.replace(".html","")+"/"));
+                    if (!filename.matches("[a-z0-9-]+\\.(html|mht)")) return true;
+                    if (page.exists()) { loadPage(uri.toString()); return true; }
+                    openUrl(root() + (filename.equals("index.html") ? "" : filename.substring(0, filename.lastIndexOf('.'))+"/"));
                     return true;
                 }
                 String target = GuideBook.chapter(uri.toString(), root());
                 if (target.isEmpty()) return true;
                 File cached = saved(target);
-                if (!cached.exists()) return false;
+                if (!cached.exists()) {
+                    if (reader.getSettings().getAllowFileAccess()) { loadPage(uri.toString()); return true; }
+                    return false;
+                }
                 Uri local = Uri.fromFile(cached).buildUpon().fragment(uri.getFragment()).build();
-                reader.loadUrl(local.toString());
+                loadPage(local.toString());
                 return true;
             }
             @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
@@ -155,8 +158,8 @@ final class WalkthroughView extends LinearLayout {
         File file = new File(uri.getPath());
         if (!folder().equals(file.getParentFile()) && !partial().equals(file.getParentFile())) return "";
         String name = file.getName();
-        if (!name.matches("[a-z0-9-]+\\.html")) return "";
-        return name.equals("index.html") ? root() : root() + name.substring(0, name.length()-5) + "/";
+        if (!name.matches("[a-z0-9-]+\\.(html|mht)")) return "";
+        return name.equals("index.html") ? root() : root() + name.substring(0, name.lastIndexOf('.')) + "/";
     }
 
     private void rememberPlace() {
@@ -171,18 +174,26 @@ final class WalkthroughView extends LinearLayout {
     private File partial() { return new File(library, game+"-partial"); }
     private File saved(String url) {
         String name = GuideBook.fileName(url,root());
-        File complete = new File(folder(),name);
-        return complete.exists() ? complete : new File(partial(),name);
+        File complete = GuideBook.existing(folder(), name);
+        return complete.exists() ? complete : GuideBook.existing(partial(), name);
+    }
+
+    private void loadPage(String url) {
+        boolean local = "file".equals(Uri.parse(url).getScheme());
+        reader.getSettings().setBlockNetworkLoads(local);
+        reader.getSettings().setJavaScriptEnabled(!local);
+        reader.getSettings().setAllowFileAccess(local);
+        reader.loadUrl(url);
     }
 
     private void openUrl(String url) {
         File file = saved(url);
-        reader.loadUrl(file.isFile() ? Uri.fromFile(file).toString() : url);
+        loadPage(file.isFile() ? Uri.fromFile(file).toString() : url);
         updateButtons();
     }
 
     private File[] savedChapters() {
-        return partial().listFiles((dir,name) -> name.endsWith(".html") && !name.equals("index.html"));
+        return partial().listFiles((dir,name) -> (name.endsWith(".html") || name.endsWith(".mht")) && !name.equals("index.html"));
     }
 
     private void openContents() {
@@ -195,8 +206,8 @@ final class WalkthroughView extends LinearLayout {
         android.widget.PopupMenu menu = new android.widget.PopupMenu(getContext(), contents);
         menu.getMenu().add("Online contents").setOnMenuItemClickListener(item -> { openUrl(root()); return true; });
         for (File page : pages) {
-            menu.getMenu().add(page.getName().replace(".html","").replace('-',' '))
-                    .setOnMenuItemClickListener(item -> { reader.loadUrl(Uri.fromFile(page).toString()); return true; });
+            menu.getMenu().add(page.getName().replace(".html","").replace(".mht","").replace('-',' '))
+                    .setOnMenuItemClickListener(item -> { loadPage(Uri.fromFile(page).toString()); return true; });
         }
         menu.show();
     }
@@ -216,35 +227,32 @@ final class WalkthroughView extends LinearLayout {
         busy = true;
         updateButtons();
         status.setText(whole ? "Finding chapters…" : "Saving chapter…");
-        downloads.execute(() -> {
-            String message;
-            try {
-                if (whole) GuideBook.download(library,target,GuideBook::fetch,
-                        text -> post(() -> { if (!closed && target.equals(game)) status.setText(text); }));
-                else GuideBook.downloadChapter(library,target,url,GuideBook::fetch);
-                message = whole ? "Walkthrough saved for offline reading" : "Chapter saved for offline reading";
-            } catch (Exception e) { message = "Download stopped · " + e.getMessage(); }
-            String result = message;
-            post(() -> {
-                if (closed) return;
+        download = new GuideBook(getContext(), library, target, whole, new GuideBook.Listener() {
+            @Override public void progress(String message) {
+                if (target.equals(game)) status.setText(message);
+            }
+            @Override public void finished(String message) {
+                download = null;
                 busy = false;
                 if (target.equals(game)) {
-                    status.setText(result);
-                    if (new File(folder(),"index.html").isFile()) {
-                        String place = current == null ? "" : canonicalPage(current);
-                        resumeChapter = place.isEmpty() ? root() : place;
+                    status.setText(message);
+                    String place = current == null ? "" : canonicalPage(current);
+                    if (!place.isEmpty() && saved(place).isFile()) {
+                        resumeChapter = place;
                         resumeOffset = reader.getScrollY();
-                        openUrl(resumeChapter);
+                        openUrl(place);
                     }
                 }
                 updateButtons();
-            });
+            }
         });
+        download.start(whole ? root() : GuideBook.chapter(url, root()));
     }
 
     void close() {
         rememberPlace();
         closed = true;
+        if (download != null) download.close();
         ready = false;
         current = null;
         reader.removeCallbacks(storePosition);

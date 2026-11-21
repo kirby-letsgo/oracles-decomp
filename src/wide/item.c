@@ -57,12 +57,8 @@ static void half_pixels(const uint8_t *rom, size_t size, const ItemTables *t, bo
   }
 }
 
-bool wide_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
-                    const uint8_t *c600, WideItemIcon *out) {
-  if (!rom || !item) return false;
-  bool eu = size > 0x142 && rom[0x142] == 'P';
-  const ItemTables *t = eu ? (seasons ? &seasons_eu_items : &ages_eu_items) : (seasons ? &seasons_items : &ages_items);
-
+static size_t display_record(const uint8_t *rom, size_t size, const ItemTables *t, bool seasons,
+                             uint8_t item, const uint8_t *c600) {
   // getTableIndices: walk the three-byte entries looking for this item. The list ends with a zero
   // entry whose own two remaining bytes are the default, so the walk lands on the right pair either
   // way: `d` picks the record within a sub-table, `e` picks the sub-table.
@@ -77,8 +73,16 @@ bool wide_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
   if (level_byte) d = c600[level_byte];
 
   size_t rec = (size_t)le16(rom, size, at(TD_BANK, t->td2) + (size_t)e * 2);
-  rec = at(TD_BANK, (int)((rec + (size_t)d * 7) & 0xffff));
+  return at(TD_BANK, (int)((rec + (size_t)d * 7) & 0xffff));
+}
 
+bool wide_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
+                    const uint8_t *c600, WideItemIcon *out) {
+  if (!rom || !item) return false;
+  bool eu = size > 0x142 && rom[0x142] == 'P';
+  const ItemTables *t = eu ? (seasons ? &seasons_eu_items : &ages_eu_items) : (seasons ? &seasons_items : &ages_items);
+
+  size_t rec = display_record(rom, size, t, seasons, item, c600);
   int left = rb(rom, size, rec + 1), left_attr = rb(rom, size, rec + 2);
   int right = rb(rom, size, rec + 3), right_attr = rb(rom, size, rec + 4);
   if (!left) return false;                              // no icon for this item
@@ -93,5 +97,31 @@ bool wide_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
   out->pal[1] = (uint8_t)(right_attr & 7);
   half_pixels(rom, size, t, seasons, left, 0, out->ci);
   if (right) half_pixels(rom, size, t, seasons, right, 8, out->ci);
+  return true;
+}
+
+bool inventory_item_icon(const uint8_t *rom, size_t size, bool seasons, uint8_t item,
+                         const uint8_t *c600, const InventoryArt *art, uint32_t pixels[256]) {
+  if (!rom || size <= 0x142 || !item) return false;
+  bool eu = rom[0x142] == 'P';
+  const ItemTables *t = eu ? (seasons ? &seasons_eu_items : &ages_eu_items) : (seasons ? &seasons_items : &ages_items);
+  size_t rec = display_record(rom, size, t, seasons, item, c600);
+  memset(pixels, 0, 256 * sizeof *pixels);
+  int halves = rb(rom, size, rec + 3) ? 2 : 1;
+  for (int half = 0; half < halves; half++) {
+    int index = rb(rom, size, rec + 1 + 2*half);
+    if (index < 0x80 || index >= 0xc0) return false;
+    int palette = (rb(rom, size, rec + 2 + 2*half) + 2) & 7;
+    const uint8_t *tile = art->tiles + (index - 0x80) * 32;
+    for (int y = 0; y < 16; y++) for (int x = 0; x < 8; x++) {
+      int bit = 7 - x;
+      int color = ((tile[2*y] >> bit) & 1) | (((tile[2*y+1] >> bit) & 1) << 1);
+      if (color == 0) continue;
+      const uint8_t *p = art->palettes + palette*8 + color*2;
+      int rgb = p[0] | (p[1] << 8);
+      pixels[y*16 + half*8 + x + (halves == 1 ? 4 : 0)] = 0xff000000u |
+          ((rgb & 31)*255/31)<<16 | (((rgb>>5)&31)*255/31)<<8 | ((rgb>>10)&31)*255/31;
+    }
+  }
   return true;
 }

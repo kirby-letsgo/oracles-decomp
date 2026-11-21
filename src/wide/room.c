@@ -537,3 +537,15 @@ void dungeon_map_pixels(bool seasons, const uint8_t *rom, size_t size,
     }
   }
 }
+
+void inventory_load_art(const uint8_t *rom, size_t size, bool seasons, InventoryArt *art) {
+  bool eu = size > 0x142 && rom[0x142] == 'P';
+  const Tables *tables = seasons ? (eu ? &seasons_eu_tables : &seasons_tables)
+                                 : (eu ? &ages_eu_tables : &ages_tables);
+  Rom r = {rom, size, tables, 0};
+  WideRoom menu = {0};
+  load_gfx(&r, tables->gfx_bank, tables->gfx_headers, 8, GFX_MINIMAP, &menu);
+  load_palette_header(&r, 0x0a, &menu);
+  memcpy(art->tiles, menu.vram[1], sizeof art->tiles);
+  memcpy(art->palettes, menu.bg_pal, sizeof art->palettes);
+}
