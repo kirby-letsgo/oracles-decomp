@@ -34,3 +34,13 @@ typedef struct {
 
 // The ROM's region comes from its header (European ROMs: game code AZ8P, AZ7P).
 bool wide_decode_room(const uint8_t *rom, size_t size, bool seasons, const WideRoomKey *key, WideRoom *out);
+
+// The Seasons map menu uses wMinimapGroup/Room even when Link is inside a building.
+// plane is 0 for Holodrum, 1 for Subrosia, 2 for a dungeon.
+typedef struct {
+  uint8_t plane, room, companion, floodgates, ship_docked;
+  uint8_t visited[256];
+} SeasonsMap;
+void seasons_map_state(const uint8_t wram[4096], SeasonsMap *map);
+// Draws the map grid, 128x128 (Holodrum) or 88x64 (Subrosia), tightly packed ARGB.
+void seasons_map_pixels(const uint8_t *rom, size_t size, const SeasonsMap *map, uint32_t *pixels);

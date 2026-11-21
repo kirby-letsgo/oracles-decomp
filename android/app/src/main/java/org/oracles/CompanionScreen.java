@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.widget.ScrollView;
+import android.widget.ImageView;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Gravity;
@@ -17,16 +18,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 final class CompanionScreen extends Presentation {
-    interface SelectionListener { void selected(boolean map); }
+    interface SelectionListener { void selected(int tab); }
 
     private final SelectionListener listener;
-    private boolean map;
-    private Button inventoryTab, mapTab;
+    private static final int INVENTORY = 0, MAP = 1, GUIDE = 2;
+    private int tab;
+    private WalkthroughView guide;
+    private Button inventoryTab, mapTab, guideTab;
     private TextView page;
     private LinearLayout items, slots;
     private ScrollView scroll;
     private int[] snapshot;
     private int selected;
+    private ImageView mapImage;
+    private int[] mapSnapshot;
+    private static native int[] worldMap(int revision);
     private static final int RECORD = 258;
     private static final String[] KEYS = {"A", "B", "X", "Y"};
     private static final String[] NAMES = {"", "Shield", "Punch", "Bombs", "Cane of Somaria",
@@ -38,7 +44,13 @@ final class CompanionScreen extends Presentation {
     private final Handler handler = new Handler(android.os.Looper.getMainLooper());
     private final Runnable poll = new Runnable() {
         @Override public void run() {
-            if (!map) {
+            if (tab != INVENTORY) {
+                int[] changed = worldMap(mapSnapshot == null ? -1 : mapSnapshot[0]);
+                if (changed != null) {
+                    mapSnapshot = changed;
+                    if (tab == MAP) renderMap(); else renderGuide();
+                }
+            } else {
                 int[] changed = inventory(snapshot == null ? -1 : snapshot[0]);
                 if (changed != null) {
                     snapshot = changed;
@@ -59,9 +71,9 @@ final class CompanionScreen extends Presentation {
         super.onStop();
     }
 
-    CompanionScreen(Context game, Display display, boolean map, SelectionListener listener) {
+    CompanionScreen(Context game, Display display, int tab, SelectionListener listener) {
         super(game, display);
-        this.map = map;
+        this.tab = tab;
         this.listener = listener;
     }
 
@@ -86,14 +98,18 @@ final class CompanionScreen extends Presentation {
         LinearLayout tabs = new LinearLayout(context);
         tabs.setBackgroundColor(0xff233831);
         root.addView(tabs);
-        inventoryTab = addTab(tabs, "Inventory", false);
-        mapTab = addTab(tabs, "Map", true);
+        inventoryTab = addTab(tabs, "Inventory", INVENTORY);
+        mapTab = addTab(tabs, "Map", MAP);
+        guideTab = addTab(tabs, "Guide", GUIDE);
         page = new TextView(context);
         page.setGravity(Gravity.CENTER);
         page.setTextColor(0xff283c34);
         page.setTextSize(28);
         page.setTypeface(Typeface.SERIF, Typeface.BOLD);
         root.addView(page);
+        mapImage = new ImageView(context);
+        mapImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        root.addView(mapImage, new LinearLayout.LayoutParams(-1, 0, 1));
         scroll = new ScrollView(context);
         items = new LinearLayout(context);
         items.setOrientation(LinearLayout.VERTICAL);
@@ -101,17 +117,18 @@ final class CompanionScreen extends Presentation {
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         slots = new LinearLayout(context);
         root.addView(slots);
+        container = root;
         setContentView(root);
         render();
     }
 
-    private Button addTab(LinearLayout tabs, String label, boolean showMap) {
+    private Button addTab(LinearLayout tabs, String label, int next) {
         Button button = new Button(getContext());
         button.setText(label);
         button.setMinHeight(Math.round(52 * getContext().getResources().getDisplayMetrics().density));
         button.setOnClickListener(v -> {
-            map = showMap;
-            listener.selected(map);
+            tab = next;
+            listener.selected(tab);
             render();
         });
         tabs.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
@@ -119,12 +136,21 @@ final class CompanionScreen extends Presentation {
     }
 
     private void render() {
-        styleTab(inventoryTab, !map);
+        boolean map = tab == MAP;
+        styleTab(guideTab, tab == GUIDE);
+        styleTab(inventoryTab, tab == INVENTORY);
         styleTab(mapTab, map);
-        scroll.setVisibility(map ? View.GONE : View.VISIBLE);
-        slots.setVisibility(map ? View.GONE : View.VISIBLE);
+        scroll.setVisibility(tab == INVENTORY ? View.VISIBLE : View.GONE);
+        slots.setVisibility(tab == INVENTORY ? View.VISIBLE : View.GONE);
+        mapImage.setVisibility(map ? View.VISIBLE : View.GONE);
+        if (guide != null) guide.setVisibility(tab == GUIDE ? View.VISIBLE : View.GONE);
+        page.setVisibility(View.VISIBLE);
+        if (tab == GUIDE) {
+            renderGuide();
+            return;
+        }
         if (map) {
-            page.setText("Map");
+            renderMap();
             return;
         }
         items.removeAllViews();
@@ -175,6 +201,57 @@ final class CompanionScreen extends Presentation {
             button.setOnClickListener(v -> assign(snapshot[0], slot, selected));
             slots.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
         }
+    }
+
+    private LinearLayout container;
+
+    private void renderGuide() {
+        if (mapSnapshot == null || mapSnapshot[1] == -2) {
+            page.setVisibility(View.VISIBLE);
+            page.setText("Open Ages or Seasons to read its walkthrough");
+            if (guide != null) guide.setVisibility(View.GONE);
+            return;
+        }
+        if (guide == null) {
+            guide = new WalkthroughView(getContext());
+            container.addView(guide, new LinearLayout.LayoutParams(-1, 0, 1));
+        }
+        page.setVisibility(View.GONE);
+        guide.setVisibility(View.VISIBLE);
+        guide.setGame(mapSnapshot[1] == -1 ? "ages" : "seasons");
+    }
+
+    @Override public void dismiss() {
+        super.dismiss();
+        if (guide != null) {
+            guide.close();
+            guide = null;
+        }
+    }
+
+    private void renderMap() {
+        int plane = mapSnapshot == null ? -2 : mapSnapshot[1];
+        if (plane != 0 && plane != 1) {
+            mapImage.setImageDrawable(null);
+            page.setText(plane == -2 ? "Open a game file to see the map" :
+                    plane == 2 ? "Dungeon map unavailable" : "Map available in Seasons");
+            return;
+        }
+        page.setText(plane == 0 ? "Holodrum" : "Subrosia");
+        int width = plane == 0 ? 128 : 88, height = plane == 0 ? 128 : 64;
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        image.setPixels(mapSnapshot, 3, width, 0, 0, width, height);
+        int room = mapSnapshot[2], cx = (room % 16) * 8 + 3, cy = (room / 16) * 8 + 3;
+        if (cx < width && cy < height) {
+            for (int y = -3; y <= 3; y++) for (int x = -3; x <= 3; x++) {
+                int distance = Math.abs(x) + Math.abs(y);
+                if (distance <= 3) image.setPixel(cx+x, cy+y, distance == 3 ? 0xff26332c : 0xffffdf55);
+            }
+        }
+        BitmapDrawable art = new BitmapDrawable(getContext().getResources(), image);
+        art.setFilterBitmap(false);
+        mapImage.setImageDrawable(art);
+        mapImage.setContentDescription(page.getText() + ", Link at column " + (room%16+1) + ", row " + (room/16+1));
     }
 
     private static String name(int id) {

@@ -10,7 +10,7 @@ import org.libsdl.app.SDLActivity;
 public class OraclesActivity extends SDLActivity implements DisplayManager.DisplayListener {
     private DisplayManager displays;
     private CompanionScreen companion;
-    private boolean mapSelected;
+    private int selectedTab;
 
     @Override
     protected void onStart() {
@@ -48,8 +48,8 @@ public class OraclesActivity extends SDLActivity implements DisplayManager.Displ
             if (companion != null && companion.isShowing()
                     && companion.getDisplay().getDisplayId() == display.getDisplayId()) return;
             dismissCompanion();
-            CompanionScreen screen = new CompanionScreen(this, display, mapSelected,
-                    selected -> mapSelected = selected);
+            CompanionScreen screen = new CompanionScreen(this, display, selectedTab,
+                    selected -> selectedTab = selected);
             try {
                 screen.show();
                 companion = screen;
