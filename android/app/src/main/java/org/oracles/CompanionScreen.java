@@ -294,10 +294,10 @@ final class CompanionScreen extends Presentation {
         for (int pos = HEADER; pos < snapshot.length; pos += RECORD) found |= snapshot[pos] == selected;
         if (!found) selected = 0;
         boolean canEquip = snapshot[1] > 0;
-        if (canEquip && selected == 0) {
+        if (canEquip) {
             page.setVisibility(View.GONE);
         } else {
-            page.setText(canEquip ? name(selected) + " · Choose a slot" : "Inventory · Equipping paused");
+            page.setText("Inventory · Equipping paused");
         }
         int available = getContext().getResources().getDisplayMetrics().widthPixels;
         int columns = Math.max(3, Math.min(4, available / dp(118)));
