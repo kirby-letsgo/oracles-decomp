@@ -489,9 +489,9 @@ static void map_cb(GB *gb, const GBSample *s, void *ctx) {
   MapCheck *c = ctx;
   if (s->wram[0][0xbcb] != 0x02 || s->line_lcdc[0] != s->line_lcdc[16]) return;
   static uint8_t with[WIDE_W * FB_H * 3], without[WIDE_W * FB_H * 3];
-  WideOptions on = {true, true, {40, 32, 16}, c->rom, c->rom_size, true, {0x05, 0x06}, NULL, {0}, false};
+  WideOptions on = {true, true, {40, 32, 16}, c->rom, c->rom_size, 2, {0x05, 0x06}, NULL, {0}, false};
   WideOptions off = on;
-  off.slots = false;
+  off.extra_slots = 0;
   wide_render(s, &on, with);
   wide_render(s, &off, without);
   c->maps++;
@@ -541,7 +541,7 @@ static void blanked_bar_has_no_x_and_y(void) {
   for (int y = 0; y < FB_H; y++) s.line_lcdc[y] = y < 16 ? 0xc7 : 0xe7;
   s.drawn_bg_pal[0][6] = 0xff;                          // BG palette 0 colour 3, the bar's text: white
   s.drawn_bg_pal[0][7] = 0x7f;
-  WideOptions o = {false, false, {0, 0, 0}, NULL, 0, true, {0, 0}, NULL, {0}, false};
+  WideOptions o = {false, false, {0, 0, 0}, NULL, 0, 2, {0, 0}, NULL, {0}, false};
   wide_render(&s, &o, out);
   ASSERT(!slots_drawn(out));
   ASSERT(!wide_slot_strip(&s, &o, 0, false, strip));
@@ -572,14 +572,14 @@ static void scene_cb(GB *gb, const GBSample *s, void *ctx) {
   (void)gb;
   SceneCheck *c = ctx;
   static uint8_t with[WIDE_W * FB_H * 3], without[WIDE_W * FB_H * 3], strip[WIDE_STRIP_W * FB_H * 3];
-  WideOptions on = {true, true, {40, 32, 16}, c->rom, c->rom_size, true, {0x05, 0x06}, NULL, {0}, false};
+  WideOptions on = {true, true, {40, 32, 16}, c->rom, c->rom_size, 2, {0x05, 0x06}, NULL, {0}, false};
   bool lit = s->line_lcdc[0] & 0x80;
   if (s->wram[0][0x49c] < FB_H || (lit && s->line_lcdc[0] != s->line_lcdc[16])) {
     if (wide_slot_strip(s, &on, 0, false, strip)) c->bar++;
     return;
   }
   WideOptions off = on;
-  off.slots = false;
+  off.extra_slots = 0;
   wide_render(s, &on, with);
   wide_render(s, &off, without);
   c->scenes++;

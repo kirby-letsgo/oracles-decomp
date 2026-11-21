@@ -38,7 +38,7 @@ static int cluster_y(int above, int below, bool item_buttons) {
   return (above + below + reach - DPAD / 2) / 2;
 }
 
-void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, bool item_buttons, bool fill, int pic_w) {
+void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool overlay, int item_buttons, bool fill, int pic_w) {
   memset(l, 0, sizeof *l);
   l->screen_w = screen_w;
   l->screen_h = screen_h;
@@ -84,9 +84,22 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
   int gx = tall ? imax(screen_w - pw, 0) / 2 : safe.x + imax(safe.w - pw, 0) / 2;
   int gy = l->portrait ? top * s : tall ? safe.y + imax(safe.h - ph, 0) / 2 : imax(screen_h - ph, 0) / 2;
   if (!fill && ps == s) { gx -= gx % s; gy -= gy % s; }
+  // In portrait the controls follow the game. Reserve a row above it only if
+  // the controls below still have their full space at the selected scale.
+  if (l->portrait && item_buttons == 4 && pic_w == UI_W) {
+    int bar = ceil_div(ph * UI_ITEM_BAR_H, UI_H);
+    int next_y = gy + ceil_div(bar, s) * s;
+    if (ceil_div(next_y + ph, s) + need - UI_H <= bottom) gy = next_y;
+  }
   l->game_px = (UiRect){gx, gy, pw, ph};
   l->game = (UiRect){gx / s, gy / s, ceil_div(gx + pw, s) - gx / s, ceil_div(gy + ph, s) - gy / s};
   if (!overlay) return;
+  if (item_buttons == 4) {
+    int y = l->portrait ? l->game.y + l->game.h + 6 : top;
+    int width = 22;
+    l->button[ACT_ITEM_L] = (UiRect){left + pill_w(ACT_FAST) + 6, y, width, PILL_H};
+    l->button[ACT_ITEM_R] = (UiRect){right - pill_w(ACT_PAUSE) - 6 - width, y, width, PILL_H};
+  }
   if (l->portrait) {
     int row = l->game.y + l->game.h + 6, pills = bottom - PILL_H;
     l->button[ACT_FAST] = (UiRect){left, row, pill_w(ACT_FAST), PILL_H};
@@ -106,6 +119,56 @@ void touch_layout(TouchLayout *l, int screen_w, int screen_h, UiRect safe, bool 
   l->button[ACT_PAUSE] = (UiRect){right - pill_w(ACT_PAUSE), top, pill_w(ACT_PAUSE), PILL_H};
   l->button[ACT_SELECT] = (UiRect){dpad_x - pill_w(ACT_SELECT) / 2, bottom - PILL_H, pill_w(ACT_SELECT), PILL_H};
   l->button[ACT_START] = (UiRect){face_x - pill_w(ACT_START) / 2, bottom - PILL_H, pill_w(ACT_START), PILL_H};
+}
+
+// Return the first row below any controls that this HUD rectangle would cover.
+// Touch controls are measured on the unscaled input grid, the HUD in screen pixels.
+static int clear_hud_y(const TouchLayout *l, UiRect rect) {
+  int next = rect.y;
+  if (!l->overlay) return next;
+  for (int i = 0; i <= ACTIONS; i++) {
+    UiRect b = i == ACTIONS ? l->dpad : l->button[i];
+    if (!b.w) continue;
+    int gap = 2 * l->scale;
+    int left = b.x * l->scale - gap, right = (b.x + b.w) * l->scale + gap;
+    int top = b.y * l->scale - gap, bottom = (b.y + b.h) * l->scale + gap;
+    if (rect.x < right && left < rect.x + rect.w && rect.y < bottom && top < rect.y + rect.h)
+      next = imax(next, bottom);
+  }
+  return next;
+}
+
+bool touch_item_margins(const TouchLayout *l, UiRect safe, int w, int h, UiRect slots[2]) {
+  UiRect g = l->game_px;
+  int left = g.x - w, right = g.x + g.w;
+  if (left < safe.x || right + w > safe.x + safe.w) return false;
+  int end = imin(g.y + g.h, safe.y + safe.h);
+  for (int y = imax(safe.y, g.y); y + h <= end;) {
+    slots[0] = (UiRect){left, y, w, h};
+    slots[1] = (UiRect){right, y, w, h};
+    int next = imax(clear_hud_y(l, slots[0]), clear_hud_y(l, slots[1]));
+    if (next == y) return true;
+    y = next;
+  }
+  return false;
+}
+
+bool touch_top_item_bar(TouchLayout *l, UiRect safe, UiRect *bar) {
+  UiRect *g = &l->game_px;
+  int x = imax(g->x, safe.x), w = imin(g->x + g->w, safe.x + safe.w) - x;
+  if (w <= 0) return false;
+  int h = ceil_div(w * UI_ITEM_BAR_H, UI_W);
+  int y = imax(g->y, safe.y + h);
+  // Portrait controls already follow the reserved row. A desktop or landscape
+  // picture can use lower letterboxing if the entire room still fits.
+  if ((l->portrait && y != g->y) || y + g->h > l->screen_h) return false;
+  if (y > g->y && y + g->h > safe.y + safe.h) return false;
+  *bar = (UiRect){x, y - h, w, h};
+  if (clear_hud_y(l, *bar) != bar->y) return false;
+  g->y = y;
+  l->game.y = y / l->scale;
+  l->game.h = ceil_div(y + g->h, l->scale) - l->game.y;
+  return true;
 }
 
 uint32_t touch_hit(const TouchLayout *l, float x, float y) {

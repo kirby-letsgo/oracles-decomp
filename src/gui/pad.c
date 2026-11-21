@@ -7,7 +7,7 @@
 
 static const char *const labels[ACTIONS] = {
   [ACT_A] = "A", [ACT_B] = "B", [ACT_START] = "Start", [ACT_SELECT] = "Select",
-  [ACT_PAUSE] = "Pause", [ACT_FAST] = ">>", [ACT_ITEM_X] = "X", [ACT_ITEM_Y] = "Y",
+  [ACT_PAUSE] = "Pause", [ACT_FAST] = ">>", [ACT_ITEM_X] = "X", [ACT_ITEM_Y] = "Y", [ACT_ITEM_L] = "L", [ACT_ITEM_R] = "R",
 };
 
 typedef struct { SDL_Renderer *ren; float s, line; } Pen;

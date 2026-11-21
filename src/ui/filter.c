@@ -28,9 +28,9 @@ static uint8_t shade(uint8_t v, int num, int den) { return (uint8_t)(v * num / d
 
 // The source with the Game Boy Color screen's colours already applied, so a filter that reads a
 // pixel more than once does not convert it again on every read.
-static const uint8_t *corrected_source(const uint8_t *src, int src_w) {
+static const uint8_t *corrected_source(const uint8_t *src, int src_w, int src_h) {
   static uint8_t buf[FILTER_MAX_SRC_W * UI_H * 3];
-  for (int i = 0; i < src_w * UI_H; i++) ui_gbc_colour(src + i * 3, buf + i * 3);
+  for (int i = 0; i < src_w * src_h; i++) ui_gbc_colour(src + i * 3, buf + i * 3);
   return buf;
 }
 
@@ -53,18 +53,18 @@ static void crt_line_init(void) {
 
 static bool is_upscaler(ScreenFilter f) { return f == FILTER_XBRZ || f == FILTER_HQX; }
 
-void ui_filter(const uint8_t *src, int src_w, bool gbc, ScreenFilter filter, int scale, uint8_t *dst) {
-  int w = src_w * scale, h = UI_H * scale;
+void ui_filter(const uint8_t *src, int src_w, int src_h, bool gbc, ScreenFilter filter, int scale, uint8_t *dst) {
+  int w = src_w * scale, h = src_h * scale;
   if (is_upscaler(filter) && src_w <= FILTER_MAX_SRC_W) {
     // The scalers read whole pixels, so the colour correction has to happen before them rather than
     // after: they decide which pixels count as equal, and it is the shown colours they should compare.
-    const uint8_t *in = gbc ? corrected_source(src, src_w) : src;
-    if (filter == FILTER_XBRZ) ui_xbrz_scale(in, src_w, UI_H, UPSCALE_FACTOR, scale, dst);
-    else ui_hqx_scale(in, src_w, UI_H, UPSCALE_FACTOR, scale, dst);
+    const uint8_t *in = gbc ? corrected_source(src, src_w, src_h) : src;
+    if (filter == FILTER_XBRZ) ui_xbrz_scale(in, src_w, src_h, UPSCALE_FACTOR, scale, dst);
+    else ui_hqx_scale(in, src_w, src_h, UPSCALE_FACTOR, scale, dst);
     return;
   }
   if (filter != FILTER_CRT) {
-    for (int y = 0; y < UI_H; y++)
+    for (int y = 0; y < src_h; y++)
       for (int x = 0; x < src_w; x++) {
         uint8_t px[3];
         source_pixel(src, src_w, gbc, x, y, px);
@@ -87,10 +87,10 @@ void ui_filter(const uint8_t *src, int src_w, bool gbc, ScreenFilter filter, int
   crt_line_init();
   const uint8_t *csrc = src;
   bool convert = gbc;
-  if (gbc && src_w <= FILTER_MAX_SRC_W) { csrc = corrected_source(src, src_w); convert = false; }
+  if (gbc && src_w <= FILTER_MAX_SRC_W) { csrc = corrected_source(src, src_w, src_h); convert = false; }
   const float curve = 0.06f;
   const float inv_w = 2.0f / w, inv_h = 2.0f / h;
-  const float to_src_x = src_w * 0.5f, to_src_y = UI_H * 0.5f;
+  const float to_src_x = src_w * 0.5f, to_src_y = src_h * 0.5f;
   for (int y = 0; y < h; y++) {
     float ny = (y + 0.5f) * inv_h - 1.0f, ny2 = ny * ny;
     uint8_t *row = dst + (size_t)y * w * 3;
@@ -108,7 +108,7 @@ void ui_filter(const uint8_t *src, int src_w, bool gbc, ScreenFilter filter, int
       float fx = (ux + 1) * to_src_x, fy = (uy + 1) * to_src_y;
       int sx = (int)fx, sy = (int)fy;
       if (sx >= src_w) sx = src_w - 1;
-      if (sy >= UI_H) sy = UI_H - 1;
+      if (sy >= src_h) sy = src_h - 1;
       if (sx != held_sx || sy != held_sy) {
         held_sx = sx;
         held_sy = sy;

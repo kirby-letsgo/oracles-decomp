@@ -10,9 +10,9 @@
 static const int default_keys[ACTIONS][KEYS_PER_ACTION] = {
   {82, NO_BINDING}, {81, NO_BINDING}, {80, NO_BINDING}, {79, NO_BINDING}, {27, NO_BINDING},
   {29, NO_BINDING}, {40, NO_BINDING}, {42, 229}, {41, NO_BINDING}, {43, NO_BINDING}, {6, NO_BINDING},
-  {4, NO_BINDING}, {22, NO_BINDING}, {NO_BINDING, NO_BINDING}, {NO_BINDING, NO_BINDING},
+  {4, NO_BINDING}, {22, NO_BINDING}, {NO_BINDING, NO_BINDING}, {NO_BINDING, NO_BINDING}, {20, NO_BINDING}, {26, NO_BINDING},
 };
-static const int default_pads[ACTIONS] = {11, 12, 13, 14, 0, 2, 6, 4, 5, PAD_RIGHT_TRIGGER, 9, 3, 1, 7, 8};
+static const int default_pads[ACTIONS] = {11, 12, 13, 14, 0, 2, 6, 4, 5, PAD_RIGHT_TRIGGER, 9, 3, 1, 7, 8, PAD_LEFT_TRIGGER, 10};
 
 int pad_axis_button(int value, int negative, int positive, int held) {
   if (value < -16000) return negative;
@@ -88,6 +88,14 @@ void bindings_parse_line(Bindings *b, const char *key, const char *value) {
       p = end + (*end == ';');
     } else return;
   }
+  // Old profiles can already use the default shoulder or key for another action.
+  for (int i = ACT_ITEM_L; i <= ACT_ITEM_R; i++)
+    for (int j = 0; j < i; j++) {
+      if (!strcmp(key, "pads") && t.pad[i] == t.pad[j]) t.pad[i] = NO_BINDING;
+      if (!strcmp(key, "keys"))
+        for (int k = 0; k < KEYS_PER_ACTION; k++)
+          if (t.key[i][k] == t.key[j][0] || t.key[i][k] == t.key[j][1]) t.key[i][k] = NO_BINDING;
+    }
   *b = t;
 }
 

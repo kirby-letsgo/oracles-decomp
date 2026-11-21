@@ -13,7 +13,7 @@ typedef enum { DEVICE_KEYBOARD, DEVICE_PAD, DEVICE_TOUCH } InputDevice;
 enum { HUD_GLYPH_CROSS = 1, HUD_GLYPH_CIRCLE, HUD_GLYPH_SQUARE, HUD_GLYPH_TRIANGLE };
 
 // The four status bar slots, in screen order.
-typedef enum { HUD_X, HUD_Y, HUD_B, HUD_A, HUD_SLOTS } HudSlot;
+typedef enum { HUD_X, HUD_Y, HUD_B, HUD_A, HUD_L, HUD_R, HUD_SLOTS } HudSlot;
 
 extern const char *const pad_style_keys[STYLES];     // "auto", "nintendo", "xbox", "playstation"
 

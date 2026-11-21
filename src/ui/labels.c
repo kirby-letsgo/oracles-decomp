@@ -33,8 +33,8 @@ const char *pad_style_name(PadStyle resolved, int button) {
   return p ? ps[button] : xbox[button];
 }
 
-static const Action slot_action[HUD_SLOTS] = {ACT_ITEM_X, ACT_ITEM_Y, ACT_B, ACT_A};
-static const char slot_letter[HUD_SLOTS] = {'X', 'Y', 'B', 'A'};
+static const Action slot_action[HUD_SLOTS] = {ACT_ITEM_X, ACT_ITEM_Y, ACT_B, ACT_A, ACT_ITEM_L, ACT_ITEM_R};
+static const char slot_letter[HUD_SLOTS] = {'X', 'Y', 'B', 'A', 'L', 'R'};
 
 // SDL scancodes: A-Z 4-29, 1-9 30-38, 0 39.
 static uint8_t key_glyph(int sc) {

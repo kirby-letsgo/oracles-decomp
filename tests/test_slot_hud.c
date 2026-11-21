@@ -44,7 +44,7 @@ static void check_counts(GB *gb, const uint8_t *rom, size_t size, bool seasons) 
   s.hram[seasons ? 0x19 : 0x1b] = 2;
   s.wram[0][0xd00] = 1;
   for (int y = 0; y < 16; y++) s.framebuffer[y * FB_W] = 0x7fff;
-  WideOptions o = {.seasons = seasons, .rom = rom, .rom_size = size, .slots = true, .slot_item = {3, 0x19}};
+  WideOptions o = {.seasons = seasons, .rom = rom, .rom_size = size, .extra_slots = 2, .slot_item = {3, 0x19}};
   // Independently specified bitmaps for 0, 1, 8 and 9.
   const uint8_t zero[] = {7, 5, 5, 5, 7}, one[] = {2, 6, 2, 2, 7};
   const uint8_t eight[] = {7, 5, 7, 5, 7}, nine[] = {7, 5, 7, 1, 7};
@@ -83,9 +83,9 @@ static void check_counts(GB *gb, const uint8_t *rom, size_t size, bool seasons) 
   o.slot_item[0] = 5;
   ASSERT(wide_slot_strip(&s, &o, 0, false, picture));
   for (int i = 26 * WIDE_STRIP_W * 3; i < WIDE_STRIP_W * FB_H * 3; i++) ASSERT_EQ(picture[i], 0);
-  o.slots = false;
+  o.extra_slots = 0;
   ASSERT(!wide_slot_strip(&s, &o, 0, false, picture));
-  o.slots = true;
+  o.extra_slots = 2;
   s.hram[seasons ? 0x19 : 0x1b] = 0;
   ASSERT(!wide_slot_strip(&s, &o, 0, false, picture));
 }
@@ -126,8 +126,16 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   mem_wr(gb, wObtainedTreasureFlags + 1, 0xff);
   W8(wTilesetFlags) = underwater ? 0x40 : 0;
   mem_wr(gb, wInventoryStorage, item);
-  features = (Features){.four_slots = true, .slot_boxes = true, .slot_item = {0, 0}};
-  features.slot_item[slot] = item;
+  features = (Features){.extra_slots = 2, .slot_boxes = true};
+  ASSERT_EQ(features_slot_press(gb, 3), 0);
+  features.extra_slots = 4;
+  W8(wOpenedMenuType) = 1;
+  W8(wInventorySubmenu) = W8(wInventorySubmenu0CursorPos) = 0;
+  ASSERT(features_assign_slot(gb, (slot + 1) % 4));
+  ASSERT(features_assign_slot(gb, slot));
+  ASSERT_EQ(features.slot_item[(slot + 1) % 4], 0);
+  ASSERT_EQ(features.slot_item[slot], item);
+  W8(wOpenedMenuType) = 0;
   draw(gb, true);
   uint8_t expected[0x1000];
   memcpy(expected, gb->wram[4], sizeof expected);
@@ -169,10 +177,10 @@ int main(void) {
     GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Ages (Europe) (En,Fr,De,Es,It).gbc",
     GAME_ROM_DIR "/Legend of Zelda, The - Oracle of Seasons (Europe) (En,Fr,De,Es,It).gbc"};
   for (int variant = 0; variant < 4; variant++)
-    for (int slot = 0; slot < 2; slot++)
+    for (int slot = 0; slot < 4; slot++)
       for (int item = 3; item <= 0x19; item += 0x16) {
         check(paths[variant], variant % 2, variant >= 2, item, false, slot);
         if (!(variant % 2)) check(paths[variant], false, variant >= 2, item, true, slot);
       }
-  puts("slot HUD: both slots, bombs and satchel, USA/EU Ages/Seasons, underwater A, with/without boxes passed");
+  puts("slot HUD: all four extra slots, bombs and satchel, USA/EU Ages/Seasons, underwater A, with/without boxes passed");
 }

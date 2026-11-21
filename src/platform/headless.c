@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
   const char *init_ram = arg_value(argc, argv, "--init-ram");
   if (arg_flag(argc, argv, "--serial")) gb->serial_out = serial_print;
   // ORACLES_FEATURES="fast_text,..." turns on the app's optional behaviour, to test it headless
-  if ((p = getenv("ORACLES_FEATURES"))) { features.fast_text = strstr(p, "fast_text") != NULL; features.quick_swap = strstr(p, "quick_swap") != NULL; features.fast_menus = strstr(p, "fast_menus") != NULL; features.four_slots = strstr(p, "four_slots") != NULL; }
+  if ((p = getenv("ORACLES_FEATURES"))) { features.fast_text = strstr(p, "fast_text") != NULL; features.quick_swap = strstr(p, "quick_swap") != NULL; features.fast_menus = strstr(p, "fast_menus") != NULL; features.extra_slots = strstr(p, "six_slots") ? 4 : strstr(p, "four_slots") ? 2 : 0; }
   if (getenv("PCTRACE") || getenv("HOOKLOG")) setvbuf(stdout, NULL, _IOLBF, 0);
   hooks_init();
   static uint64_t il_a, il_b; if (getenv("INTLOG")) sscanf(getenv("INTLOG"), "%llu-%llu", (unsigned long long *)&il_a, (unsigned long long *)&il_b);

@@ -20,7 +20,7 @@ What this port adds on top of the original games:
 - **Fast-forward** — hold Tab, or the right trigger; 3x by default, 2x to 8x in Settings
 - **Screen filters** — sharp, scanlines, LCD grid, CRT, or the xBRZ and hqx pixel-art scalers, and true Game Boy Color colours
 - **Fast text and faster menus** — optional, off by default
-- **Quick swap and 4 item slots** — optional, off by default
+- **Quick swap and up to 6 item slots** — optional, off by default
 - **Mods** — Lua folder mods; see [MODDING.md](MODDING.md). The in-app Mods screen is
   hidden until the upcoming mods release.
 
@@ -96,6 +96,7 @@ the game's file-selection screen to protect that save. A message explains why it
 | Pause | Esc | Guide / PS button |
 | Fast-forward | Hold Tab | Hold RT / R2 |
 | Quick swap | `C` | LB / L1 |
+| Item L / Item R (6 items) | `Q` / `W` | LT / L2, RB / R1 |
 | Item X / Item Y | `A` / `S` | Y / Triangle, B / Circle |
 | Mute | `M` | |
 | Fullscreen | F11 or Cmd+F | |
@@ -124,12 +125,10 @@ There are also quality-of-life toggles, **all off by default**:
 
 - **Fast text** and **faster menus**
 - **Quick swap**: `C` swaps the A and B items
-- **4 slots**: `A`/`S` become two more item buttons — highlight an item in the inventory and press
-  one to assign it, then hold it in play to use that item. In widescreen they get their own X and Y
-  boxes at the left of the status bar, so all four items are on screen at once; without widescreen
-  the boxes go in the black bars either side of the picture when the window is wide enough.
-  Bombs, Bombchus and seed tools show their remaining count. Compact side tabs put the count
-  below the icon; seed counts follow the type selected for that tool.
+- **Holdable items** defaults to **2**. Choose **4** to add X/Y or **6** to add X/Y and L/R.
+  Highlight an item in the inventory and press an extra button to assign it. Press or hold that button during play to use it.
+  Six-item widescreen mode groups the items at the lower left. With widescreen off, X/L stack in the left margin and Y/R in the right. Narrow margins use compact tabs. On a phone, portrait uses a strip as wide as the native HUD, with item labels inside the screen insets. Landscape fits the side panels around the touch controls, with the top strip as a fallback. When the game and its controls fill the available space, the items use a compact row just below the status bar.
+  Four-item mode uses the existing status-bar boxes or side tabs. Bombs, Bombchus and seed tools show their remaining count.
 
 ### Save states
 
@@ -152,8 +151,8 @@ around you, decoded from your ROM: the overworld grid (with the right season in 
 dungeons, the rooms through a doorway once you've visited them. Large dungeon rooms simply show more
 of themselves.
 
-The status bar runs the whole way across rather than sitting in a box in the middle. With **4 slots**
-on, the X and Y items get their own boxes at its left end and the game's own bar slides right to make
+The status bar runs the whole way across rather than sitting in a box in the middle. With **Holdable items**
+set to **4**, the X and Y items get their own boxes at its left end and the game's own bar slides right to make
 room, so the four item slots read across as X, Y, B, A. Holding X or Y then leaves the B box showing
 its own item, instead of borrowing it to display the one you pressed.
 
@@ -182,7 +181,7 @@ state's picture too), until the next KEEP WHICH? about the same file replaces it
 
 Touch controls sit under the game in portrait and at its sides in landscape: D-pad (diagonals by
 touching between the arms), A, B, Start, Select, Pause and fast-forward (`>>`, hold), plus X and Y
-when 4 slots is on. They hide when you use a controller or keyboard and come back on the next touch.
+for four or six holdable items. Six-item mode adds L and R. They hide when you use a controller or keyboard and come back on the next touch.
 The back button pauses, and goes back in menus. In the menus, tap a row to choose it and drag a long
 list to scroll it; while a menu fills the screen the on-screen controls step aside.
 

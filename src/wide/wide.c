@@ -1,5 +1,6 @@
 #include "wide/wide.h"
 #include "ui/ui.h"
+#include "ui/labels.h"
 #include "wide/item.h"
 #include "wide/room.h"
 #include "wide/hud.h"
@@ -25,7 +26,7 @@ enum {
   W_PALETTE_FADE = 0xc4ab,            // wPaletteThread_mode: non-zero while a screen is fading
   W_ROOM_WIDTH = 0xcd0a, W_ROOM_HEIGHT = 0xcd0b,
   W2_DUNGEON_LAYOUT = 0xc00,          // $dc00 in WRAM bank 2: $40 bytes a floor, 8x8
-  TILESETFLAG_SIDESCROLL = 0x20, TILESETFLAG_DUNGEON = 0x08, STATUS_BAR_LINES = 16, ROOMFLAG_VISITED = 0x10,
+  TILESETFLAG_SIDESCROLL = 0x20, TILESETFLAG_DUNGEON = 0x08, STATUS_BAR_LINES = UI_ITEM_BAR_H, ROOMFLAG_VISITED = 0x10,
 };
 
 static uint8_t rd(const GBSample *s, uint16_t a) {
@@ -457,7 +458,7 @@ enum { HUD_SHIFT = 30, SLOT_LEFT = 2, SLOT_PITCH = 38, COMPACT_PITCH = 34,
 
 enum { SLOT_LETTER_TOP = 1, SLOT_COUNT_TOP = 9, COUNT_W = 7, COUNT_H = 5 };
 
-typedef struct { bool show; bool on[2]; WideItemIcon icon[2]; int x[2], count[2]; } SlotIcons;
+typedef struct { bool show; bool on[6]; WideItemIcon icon[6]; int count[6]; } SlotIcons;
 
 // Two 3x5 digits fit below the button label, clear of both the bracket and item art.
 static void count_row(uint8_t *row, int x, int y, int count, int ink) {
@@ -499,52 +500,105 @@ static bool bar_blank(const GBSample *s) {
 }
 
 static void slot_icons(const GBSample *s, const WideOptions *o, SlotIcons *si) {
-  si->show = o->slots && !bar_blank(s);
-  for (int i = 0; i < 2; i++) {
-    si->on[i] = o->slots && o->rom && o->slot_item[i] &&
+  si->show = o->extra_slots && !bar_blank(s);
+  for (int i = 0; i < (o->extra_slots == 4 ? 6 : 2); i++) {
+    si->on[i] = o->extra_slots && o->rom && o->slot_item[i] &&
                 wide_item_icon(o->rom, o->rom_size, o->seasons, o->slot_item[i], &s->wram[0][0x600], &si->icon[i]);
     if (!si->on[i]) continue;
     si->count[i] = wide_item_count(o->seasons, o->slot_item[i], &s->wram[0][0x600]);
-    // Centre a narrow icon in its box, so the two boxes line up whatever is in them.
-    si->x[i] = SLOT_LEFT + i * (o->compact ? COMPACT_PITCH : SLOT_PITCH) + SLOT_ICON + (SLOT_BOX_W - si->icon[i].halves * 8) / 2;
   }
 }
 
-static void draw_slot_icons(const GBSample *s, const WideOptions *o, const SlotIcons *si, int y, uint8_t *row) {
+static void draw_slot(const GBSample *s, const WideOptions *o, const SlotIcons *si, int i, int y, uint8_t *row) {
   if (!si->show || y >= 16) return;                     // an icon is as tall as the status bar
   // The letters sit in the middle of the bar's height, in the colour the game writes its own text in.
   const uint8_t *bg = s->drawn_bg_pal[s->line_drawn[y] & 1];
   int ink = bg[3 * 2] | (bg[3 * 2 + 1] << 8);           // BG palette 0, colour 3
-  for (int i = 0; i < 2; i++) {
-    int base = SLOT_LEFT + i * (o->compact ? COMPACT_PITCH : SLOT_PITCH);
-    if (y >= SLOT_LETTER_TOP && y < SLOT_LETTER_TOP + HUD_GLYPH_H) {
-      const uint8_t *g = hud_glyph(o->glyph[i]);
-      if (!g) g = hud_glyph(i ? 'Y' : 'X');
-      uint8_t bits = g[y - SLOT_LETTER_TOP];
-      for (int x = 0; x < 6; x++)
-        if (bits & (0x80 >> x)) put555(row + (base + x) * 3, ink, false);
-    }
-    if (y >= SLOT_TOP && y <= SLOT_BOTTOM) {
-      bool serif = y == SLOT_TOP || y == SLOT_BOTTOM;      // the short arms top and bottom
-      put555(row + (base + SLOT_OPEN) * 3, ink, false);
-      put555(row + (base + SLOT_CLOSE + 1) * 3, ink, false);
-      if (serif) {
-        put555(row + (base + SLOT_OPEN + 1) * 3, ink, false);
-        put555(row + (base + SLOT_CLOSE) * 3, ink, false);
-      }
-    }
-    if (!si->on[i]) continue;
-    count_row(row, base, y - SLOT_COUNT_TOP, si->count[i], ink);
-    // The status bar draws item icons as sprites (spr_item_icons, wBItemSpriteAttribute1), so they
-    // take an OBJ palette and colour 0 is clear, leaving the bar behind them.
-    const WideItemIcon *ic = &si->icon[i];
-    for (int x = 0; x < ic->halves * 8; x++) {
-      int ci = ic->ci[y][x];
-      if (!ci) continue;
-      int p = ic->pal[x >> 3] * 8 + ci * 2;
-      put555(row + (si->x[i] + x) * 3, s->ob_pal[p] | (s->ob_pal[p + 1] << 8), false);
+  if (y >= SLOT_LETTER_TOP && y < SLOT_LETTER_TOP + HUD_GLYPH_H) {
+    const uint8_t *g = hud_glyph(o->glyph[i]);
+    if (!g) g = hud_glyph("XYBALR"[i]);
+    uint8_t bits = g[y - SLOT_LETTER_TOP];
+    for (int x = 0; x < 6; x++)
+      if (bits & (0x80 >> x)) put555(row + x * 3, ink, false);
+  }
+  if (y >= SLOT_TOP && y <= SLOT_BOTTOM) {
+    bool serif = y == SLOT_TOP || y == SLOT_BOTTOM;      // the short arms top and bottom
+    put555(row + SLOT_OPEN * 3, ink, false);
+    put555(row + (SLOT_CLOSE + 1) * 3, ink, false);
+    if (serif) {
+      put555(row + (SLOT_OPEN + 1) * 3, ink, false);
+      put555(row + (SLOT_CLOSE) * 3, ink, false);
     }
   }
+  if (!si->on[i]) return;
+  count_row(row, 0, y - SLOT_COUNT_TOP, si->count[i], ink);
+  // The status bar draws item icons as sprites (spr_item_icons, wBItemSpriteAttribute1), so they
+  // take an OBJ palette and colour 0 is clear, leaving the bar behind them.
+  const WideItemIcon *ic = &si->icon[i];
+  for (int x = 0; x < ic->halves * 8; x++) {
+    int ci = ic->ci[y][x];
+    if (!ci) continue;
+    int p = ic->pal[x >> 3] * 8 + ci * 2;
+    put555(row + (SLOT_ICON + (SLOT_BOX_W - ic->halves * 8) / 2 + x) * 3, s->ob_pal[p] | (s->ob_pal[p + 1] << 8), false);
+  }
+}
+
+static void draw_slot_icons(const GBSample *s, const WideOptions *o, const SlotIcons *si, int y, uint8_t *row) {
+  for (int i = 0; i < 2; i++)
+    draw_slot(s, o, si, i, y, row + 3 * (SLOT_LEFT + i * (o->compact ? COMPACT_PITCH : SLOT_PITCH)));
+}
+
+// The six-button layout mirrors the controller: shoulders above a diamond of
+// face buttons. Keep the original-width room clear with one compact extra row.
+static void draw_six_hud(const GBSample *s, const WideOptions *o, const SlotIcons *icons, uint8_t *rgb, int width) {
+  if (!icons->show || rd(s, W_OPENED_MENU)) return;
+  static const int column[] = {1, 2, 0, 1, 0, 2}; // X, Y, B, A, L, R
+  static const int tier[] = {1, 2, 2, 3, 0, 0};
+  for (int i = 0; i < 6; i++) {
+    int left = 1 + 13 * column[i], top = FB_H - 1 - 4 * 17 + tier[i] * 17;
+    if (width == FB_W) {
+      if (i == 2 || i == 3) continue; // A and B are in the native bar
+      left = 2 + (i < 2 ? i : i - 2) * 32;
+      top = STATUS_BAR_LINES;
+    }
+    for (int y = 0; y < STATUS_BAR_LINES; y++) {
+      // Render the normal box, then retain its label, count and icon on a small tile.
+      uint8_t box[SLOT_BOX * 3];
+      const uint8_t *pal = s->drawn_bg_pal[s->line_drawn[y] & 1];
+      int paper = pal[4] | (pal[5] << 8);
+      for (int x = 0; x < SLOT_BOX; x++) put555(box + x*3, paper, false);
+      draw_slot(s, o, icons, i, y, box);
+      uint8_t *dst = rgb + 3 * ((top + y) * width + left);
+      memcpy(dst, box, 8*3);
+      memcpy(dst + 8*3, box + SLOT_ICON*3, SLOT_BOX_W*3);
+    }
+  }
+}
+
+void wide_narrow_six_hud(const GBSample *s, const WideOptions *o, uint8_t *rgb) {
+  if (!bar_up(s, o->seasons ? &seasons_ram : &ages_ram)) return;
+  SlotIcons icons;
+  slot_icons(s, o, &icons);
+  draw_six_hud(s, o, &icons, rgb, FB_W);
+}
+
+bool wide_top_item_bar(const GBSample *s, const WideOptions *o, uint8_t *out) {
+  if (o->extra_slots != 4 || rd(s, W_OPENED_MENU) || !bar_up(s, o->seasons ? &seasons_ram : &ages_ram)) return false;
+  SlotIcons icons;
+  slot_icons(s, o, &icons);
+  if (!icons.show) return false;
+  const int slots[] = {HUD_X, HUD_Y, HUD_L, HUD_R};
+  const int cell = FB_W / 4;
+  for (int y = 0; y < STATUS_BAR_LINES; y++) {
+    uint8_t *row = out + y * FB_W * 3;
+    for (int x = 0; x < FB_W; x++) put555(row + x * 3, s->framebuffer[y * FB_W], false);
+    for (int i = 0; i < 4; i++) {
+      uint8_t *start = row + i * cell * 3;
+      if (i) memset(start, 0, 3);
+      draw_slot(s, o, &icons, slots[i], y, start + (cell - SLOT_BOX) / 2 * 3);
+    }
+  }
+  return true;
 }
 
 // One slot for the narrow picture's side bars, the rest of the strip black: with room, the box
@@ -553,36 +607,37 @@ static void draw_slot_icons(const GBSample *s, const WideOptions *o, const SlotI
 enum { STRIP_LETTER_X = 5, STRIP_ICON_TOP = 9, STRIP_H = STRIP_ICON_TOP + 17,
        STRIP_COUNT_TOP = STRIP_H, STRIP_COUNT_H = STRIP_COUNT_TOP + COUNT_H + 1 };
 
-bool wide_slot_strip(const GBSample *s, const WideOptions *o, int slot, bool box, uint8_t *out) {
-  const GameRam *r = o->seasons ? &seasons_ram : &ages_ram;
-  if (!o->slots || !bar_up(s, r) || bar_blank(s)) return false;
+static void draw_side_slot(const GBSample *s, const WideOptions *o, const SlotIcons *icons,
+                           int slot, int side, bool box, int min_height, uint8_t *out) {
   int w = box ? WIDE_BOX_W : WIDE_STRIP_W;
-  memset(out, 0, (size_t)w * FB_H * 3);
   if (box) {
-    static SlotIcons icons;
-    static uint8_t row[WIDE_W * 3];
-    slot_icons(s, o, &icons);
-    // the game's gap of eight between boxes, towards the picture: after X's box, before Y's
-    int at = slot ? SLOT_PITCH - SLOT_BOX : 1;
-    for (int y = 0; y < STATUS_BAR_LINES; y++) {
-      for (int x = 0; x < WIDE_W; x++) put555(row + x * 3, s->framebuffer[y * FB_W], false);
-      draw_slot_icons(s, o, &icons, y, row);
-      uint8_t *line = out + (size_t)y * w * 3;
-      for (int x = 0; x < w; x++) memcpy(line + x * 3, row, 3);
-      memcpy(line + at * 3, row + (SLOT_LEFT + slot * SLOT_PITCH) * 3, SLOT_BOX * 3);
+    // The gap between the box and the picture is at the inner edge of each margin.
+    int at = side ? SLOT_PITCH - SLOT_BOX : 1;
+    int first = 0, end = w;
+    if (o->extra_slots == 4) {
+      // A small gutter separates the stacked boxes from the game's own bar.
+      first = side ? 2 : 0;
+      end = side ? w : w - 2;
+      at = first + (end - first - SLOT_BOX) / 2;
     }
-    return true;
+    for (int y = 0; y < STATUS_BAR_LINES || y < min_height; y++) {
+      uint8_t *line = out + (size_t)y * w * 3;
+      int paper = s->framebuffer[(y < STATUS_BAR_LINES ? y : STATUS_BAR_LINES - 1) * FB_W];
+      for (int x = first; x < end; x++) put555(line + x * 3, paper, false);
+      draw_slot(s, o, icons, slot, y, line + at * 3);
+    }
+    return;
   }
   const uint8_t *bg = s->drawn_bg_pal[s->line_drawn[0] & 1];
   int paper = s->framebuffer[0], ink = bg[3 * 2] | (bg[3 * 2 + 1] << 8);
   const uint8_t *g = hud_glyph(o->glyph[slot]);
-  if (!g) g = hud_glyph(slot ? 'Y' : 'X');
-  WideItemIcon ic;
-  bool icon = o->rom && o->slot_item[slot] &&
-              wide_item_icon(o->rom, o->rom_size, o->seasons, o->slot_item[slot], &s->wram[0][0x600], &ic);
-  int count = icon ? wide_item_count(o->seasons, o->slot_item[slot], &s->wram[0][0x600]) : -1;
-  int icon_x = icon ? (w - ic.halves * 8) / 2 : 0;
-  for (int y = 0; y < (count >= 0 ? STRIP_COUNT_H : STRIP_H); y++) {
+  if (!g) g = hud_glyph("XYBALR"[slot]);
+  const WideItemIcon *ic = &icons->icon[slot];
+  bool icon = icons->on[slot];
+  int count = icon ? icons->count[slot] : -1;
+  int icon_x = icon ? (w - ic->halves * 8) / 2 : 0;
+  int height = count >= 0 ? STRIP_COUNT_H : STRIP_H;
+  for (int y = 0; y < height || y < min_height; y++) {
     uint8_t *row = out + (size_t)y * w * 3;
     for (int x = 0; x < w; x++) put555(row + x * 3, paper, false);
     count_row(row, (w - COUNT_W) / 2, y - STRIP_COUNT_TOP, count, ink);
@@ -591,13 +646,32 @@ bool wide_slot_strip(const GBSample *s, const WideOptions *o, int slot, bool box
         if (g[y - SLOT_LETTER_TOP] & (0x80 >> x)) put555(row + (STRIP_LETTER_X + x) * 3, ink, false);
     int iy = y - STRIP_ICON_TOP;
     if (!icon || iy < 0 || iy >= 16) continue;
-    for (int x = 0; x < ic.halves * 8; x++) {
-      int ci = ic.ci[iy][x];
+    for (int x = 0; x < ic->halves * 8; x++) {
+      int ci = ic->ci[iy][x];
       if (!ci) continue;
-      int p = ic.pal[x >> 3] * 8 + ci * 2;
+      int p = ic->pal[x >> 3] * 8 + ci * 2;
       put555(row + (icon_x + x) * 3, s->ob_pal[p] | (s->ob_pal[p + 1] << 8), false);
     }
   }
+}
+
+int wide_slot_strip_height(int extra_slots, bool box) {
+  int row = box ? STATUS_BAR_LINES : STRIP_COUNT_H;
+  return extra_slots == 4 ? row * 2 + 4 : row;
+}
+
+bool wide_slot_strip(const GBSample *s, const WideOptions *o, int side, bool box, uint8_t *out) {
+  const GameRam *r = o->seasons ? &seasons_ram : &ages_ram;
+  if (!o->extra_slots || !bar_up(s, r) || (o->extra_slots == 4 && rd(s, W_OPENED_MENU))) return false;
+  SlotIcons icons;
+  slot_icons(s, o, &icons);
+  if (!icons.show) return false;
+  int w = box ? WIDE_BOX_W : WIDE_STRIP_W;
+  memset(out, 0, (size_t)w * FB_H * 3);
+  // Continue the upper slot's paper down to the shoulder slot, including any unused ammo row.
+  int pitch = o->extra_slots == 4 ? wide_slot_strip_height(2, box) + 4 : 0;
+  draw_side_slot(s, o, &icons, side, side, box, pitch, out);
+  if (pitch) draw_side_slot(s, o, &icons, 4 + side, side, box, 0, out + pitch * w * 3);
   return true;
 }
 
@@ -683,11 +757,11 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
     // dimmed, unlike the room strips: half a dimmed bar would only put a seam down it.
     if (bar_shown && y < STATUS_BAR_LINES) {
       const uint8_t *mid = middle + (size_t)y * FB_W * 3;
-      int bar = o->slots ? (o->compact ? 2 * COMPACT_PITCH : WIDE_SIDE + HUD_SHIFT) : side;
+      int bar = o->extra_slots == 2 ? (o->compact ? 2 * COMPACT_PITCH : WIDE_SIDE + HUD_SHIFT) : side;
       for (int x = 0; x < bar; x++) memcpy(row + x * 3, mid, 3);
       for (int x = bar + FB_W; x < viewport; x++) memcpy(row + x * 3, mid + (FB_W - 1) * 3, 3);
       memcpy(row + (size_t)bar * 3, mid, FB_W * 3);
-      draw_slot_icons(s, o, &icons, y, row);
+      if (o->extra_slots == 2) draw_slot_icons(s, o, &icons, y, row);
       continue;
     }
     bool line = rooms && y >= STATUS_BAR_LINES && (s->line_lcdc[y] & 0x81) == 0x81 && !wide_window_at(s, 0, y);
@@ -726,4 +800,5 @@ void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out) {
     }
     memcpy(row + side * 3, middle + (size_t)y * FB_W * 3, FB_W * 3);
   }
+  if (o->extra_slots == 4 && bar_shown) draw_six_hud(s, o, &icons, out, viewport);
 }

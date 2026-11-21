@@ -164,6 +164,11 @@ static void settings_round_trip(void) {
   Settings s, back;
   settings_default(&s);
   ASSERT_EQ(s.volume, 10);
+  ASSERT_EQ(s.holdable_items, 2);
+  settings_parse(&s, "four_slots=on\n");
+  ASSERT_EQ(s.holdable_items, 4);
+  settings_parse(&s, "holdable_items=6\nholdable_items=5\n");
+  ASSERT_EQ(s.holdable_items, 6);
   ASSERT(!s.essence_tracker);
   s.essence_tracker = true;
   s.volume = 3; s.filter = FILTER_CRT; s.gbc_colours = true; s.fullscreen = true; s.fill = true;
@@ -176,6 +181,7 @@ static void settings_round_trip(void) {
   settings_format(&s, buf, sizeof buf);
   settings_default(&back);
   settings_parse(&back, buf);
+  ASSERT_EQ(back.holdable_items, 6);
   ASSERT_EQ(back.widescreen, WIDE_16_10);
   settings_parse(&back, "widescreen=on\n");
   ASSERT_EQ(back.widescreen, WIDE_16_9);
@@ -248,7 +254,11 @@ static void settings_menu_changes_values(void) {
   ASSERT_EQ(m.sel, SET_CONTROLS);
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_ACCEPT, &row);
-  ASSERT(s.four_slots);
+  ASSERT_EQ(s.holdable_items, 4);
+  settings_press(&m, &s, UI_RIGHT, &row);
+  ASSERT_EQ(s.holdable_items, 6);
+  settings_press(&m, &s, UI_RIGHT, &row);
+  ASSERT_EQ(s.holdable_items, 2);
   settings_press(&m, &s, UI_UP, &row);
   settings_press(&m, &s, UI_ACCEPT, &row);
   ASSERT(s.quick_swap);
@@ -286,7 +296,7 @@ static void settings_rows_follow_the_device(void) {
   settings_default(&s);
   settings_menu_open(&m, false);
   ASSERT(!settings_row_shown(&m, SET_HAPTICS));
-  m.sel = SET_FOUR_SLOTS;
+  m.sel = SET_HOLDABLE_ITEMS;
   settings_press(&m, &s, UI_DOWN, &row);
   ASSERT_EQ(m.sel, SET_CONTROLS);
   ASSERT(settings_row_shown(&m, SET_FULLSCREEN));
@@ -305,7 +315,7 @@ static void settings_rows_follow_the_device(void) {
   m.sel = SET_COLOURS;
   settings_press(&m, &s, UI_DOWN, &row);
   ASSERT_EQ(m.sel, SET_FAST_TEXT);
-  m.sel = SET_FOUR_SLOTS;
+  m.sel = SET_HOLDABLE_ITEMS;
   settings_press(&m, &s, UI_DOWN, &row);
   ASSERT_EQ(m.sel, SET_HAPTICS);
   settings_press(&m, &s, UI_ACCEPT, &row);
@@ -313,7 +323,7 @@ static void settings_rows_follow_the_device(void) {
   settings_press(&m, &s, UI_RIGHT, &row);
   ASSERT(s.haptics);
   settings_press(&m, &s, UI_UP, &row);
-  ASSERT_EQ(m.sel, SET_FOUR_SLOTS);
+  ASSERT_EQ(m.sel, SET_HOLDABLE_ITEMS);
   m.sel = SET_CONTROLS;
   settings_press(&m, &s, UI_DOWN, &row);
   ASSERT_EQ(m.sel, SET_PAD_STYLE);                     // shown on phones too
@@ -329,20 +339,20 @@ static void settings_rows_follow_the_device(void) {
 static void filters_keep_pixel_alignment(void) {
   static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 4 * UI_H * 4 * 3];
   memset(src, 200, sizeof src);
-  ui_filter(src, UI_W, false, FILTER_SHARP, 4, dst);
+  ui_filter(src, UI_W, UI_H, false, FILTER_SHARP, 4, dst);
   ASSERT_EQ(dst[0], 200);
   ASSERT_EQ(dst[(3 * UI_W * 4 + 3) * 3], 200);
-  ui_filter(src, UI_W, false, FILTER_SCANLINES, 4, dst);
+  ui_filter(src, UI_W, UI_H, false, FILTER_SCANLINES, 4, dst);
   ASSERT_EQ(dst[0], 200);
   ASSERT_EQ(dst[(3 * UI_W * 4) * 3], 100);              // the last row of each pixel is darker
-  ui_filter(src, UI_W, false, FILTER_LCD, 4, dst);
+  ui_filter(src, UI_W, UI_H, false, FILTER_LCD, 4, dst);
   ASSERT_EQ(dst[3 * 3], 150);                           // the last column too
-  ui_filter(src, UI_W, false, FILTER_CRT, 4, dst);
+  ui_filter(src, UI_W, UI_H, false, FILTER_CRT, 4, dst);
   ASSERT_EQ(dst[0], 0);                                 // the curved screen leaves the corner black
   static uint8_t wide[256 * UI_H * 3], wdst[256 * 3 * UI_H * 3 * 3];
   memset(wide, 10, sizeof wide);
   wide[(5 * 256 + 255) * 3] = 250;                      // the last column of the 256-wide picture
-  ui_filter(wide, 256, false, FILTER_SHARP, 3, wdst);
+  ui_filter(wide, 256, UI_H, false, FILTER_SHARP, 3, wdst);
   ASSERT_EQ(wdst[((5 * 3 + 2) * 256 * 3 + 255 * 3 + 2) * 3], 250);
   ASSERT_EQ(wdst[((5 * 3) * 256 * 3 + 254 * 3) * 3], 10);
   uint8_t in[3] = {255, 255, 255}, out[3];
@@ -475,6 +485,34 @@ static void touch_layout_fits_screens(void) {
   ASSERT_EQ(touch_hit(&l, 100, 300), 0);
 }
 
+static void six_item_panels_fit_phone_insets_and_touch_controls(void) {
+  TouchLayout l;
+  UiRect safe = {78, 164, 924, 2152}, slots[2];
+  for (int fill = 0; fill <= 1; fill++) {
+    touch_layout(&l, 1080, 2400, safe, true, 4, fill, UI_W);
+    ASSERT(l.game_px.x < safe.x);
+    ASSERT(touch_top_item_bar(&l, safe, slots));
+    ASSERT_EQ(slots[0].x, safe.x);
+    ASSERT_EQ(slots[0].w, safe.w);
+    ASSERT(slots[0].y >= safe.y);
+    ASSERT_EQ(slots[0].y + slots[0].h, l.game_px.y);
+  }
+  safe = (UiRect){132, 74, 2190, 922};
+  touch_layout(&l, 2400, 1080, safe, true, 4, false, UI_W);
+  int zoom = l.game_px.w / UI_W;
+  ASSERT(!touch_item_margins(&l, safe, 38 * zoom, 36 * zoom, slots)); // the shoulder buttons
+  ASSERT(touch_item_margins(&l, safe, 16 * zoom, 68 * zoom, slots));
+  for (int i = 0; i < 2; i++) {
+    ASSERT(!overlaps(slots[i], l.game_px));
+    for (int a = 0; a <= ACTIONS; a++) {
+      UiRect b = a == ACTIONS ? l.dpad : l.button[a];
+      if (b.w) ASSERT(!overlaps(slots[i], ((UiRect){b.x * l.scale, b.y * l.scale, b.w * l.scale, b.h * l.scale})));
+    }
+  }
+  touch_layout(&l, 640, 576, (UiRect){0, 0, 640, 576}, false, 4, false, UI_W);
+  ASSERT(!touch_top_item_bar(&l, (UiRect){0, 0, 640, 576}, slots));
+}
+
 static void touch_fill_scales_past_whole_pixels(void) {
   TouchLayout l;
   touch_layout(&l, 1080, 2400, (UiRect){78, 164, 924, 2152}, true, false, true, UI_W);   // Pixel 8 portrait
@@ -530,7 +568,7 @@ static void touch_layout_takes_the_wide_picture(void) {
 
 static void touch_hits_each_control(void) {
   TouchLayout l;
-  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, true, false, UI_W);
+  touch_layout(&l, 1080, 2400, (UiRect){0, 0, 1080, 2400}, true, 4, false, UI_W);
   float x, y;
   for (int a = 0; a < ACTIONS; a++) {
     bool shown = touch_point(&l, (Action)a, &x, &y);
@@ -610,7 +648,7 @@ static void upscalers_fill_the_whole_picture(void) {
   for (int i = 0; i < UI_W * UI_H; i++) { src[i * 3] = 30; src[i * 3 + 1] = 60; src[i * 3 + 2] = 90; }
   for (int k = 0; k < 2; k++) {
     memset(dst, 0xab, sizeof dst);                      // canary: every pixel must be overwritten
-    ui_filter(src, UI_W, false, upscalers[k], 3, dst);
+    ui_filter(src, UI_W, UI_H, false, upscalers[k], 3, dst);
     // One flat colour in means the same flat colour out, everywhere: nothing left unwritten.
     for (int i = 0; i < UI_W * 3 * UI_H * 3; i++) {
       ASSERT_EQ(dst[i * 3], 30);
@@ -632,7 +670,7 @@ static void upscalers_smooth_a_diagonal(void) {
   static uint8_t src[UI_W * UI_H * 3], dst[UI_W * 3 * UI_H * 3 * 3];
   make_staircase(src);
   for (int k = 0; k < 2; k++) {
-    ui_filter(src, UI_W, false, upscalers[k], 3, dst);
+    ui_filter(src, UI_W, UI_H, false, upscalers[k], 3, dst);
     int blended = 0;
     for (int i = 0; i < UI_W * 3 * UI_H * 3; i++)
       if (dst[i * 3] != 0 && dst[i * 3] != 255) blended++;
@@ -658,13 +696,13 @@ static void upscalers_keep_whole_pixels_past_their_factor(void) {
   static uint8_t dst[UI_W * 6 * UI_H * 6 * 3];
   make_staircase(src);
   for (int k = 0; k < 2; k++) {
-    ui_filter(src, UI_W, false, upscalers[k], 6, dst);
+    ui_filter(src, UI_W, UI_H, false, upscalers[k], 6, dst);
     ASSERT(uniform_2x2_blocks(dst, UI_W * 6, UI_H * 6));
   }
   // At scale 3 the scaler covers the whole enlargement, so there is detail inside those blocks.
   static uint8_t exact[UI_W * 3 * UI_H * 3 * 3];
   for (int k = 0; k < 2; k++) {
-    ui_filter(src, UI_W, false, upscalers[k], 3, exact);
+    ui_filter(src, UI_W, UI_H, false, upscalers[k], 3, exact);
     ASSERT(!uniform_2x2_blocks(exact, UI_W * 3, UI_H * 3));
   }
 }
@@ -680,7 +718,7 @@ static void upscalers_take_the_wide_picture(void) {
   const int w = 256 * 3;
   for (int k = 0; k < 2; k++) {
     memset(wdst, 0xab, sizeof wdst);
-    ui_filter(wide, 256, false, upscalers[k], 3, wdst);
+    ui_filter(wide, 256, UI_H, false, upscalers[k], 3, wdst);
     for (int i = 0; i < w * UI_H * 3; i++) ASSERT(wdst[i * 3] == 7 || wdst[i * 3] == 250);
     ASSERT_EQ(wdst[0], 7);                              // far left
     ASSERT_EQ(wdst[(w - 1) * 3], 250);                  // far right of the first row
@@ -695,7 +733,7 @@ static void upscalers_apply_gbc_colours_first(void) {
   uint8_t in[3] = {255, 255, 255}, want[3];
   ui_gbc_colour(in, want);
   for (int k = 0; k < 2; k++) {
-    ui_filter(src, UI_W, true, upscalers[k], 3, dst);
+    ui_filter(src, UI_W, UI_H, true, upscalers[k], 3, dst);
     ASSERT_EQ(dst[0], want[0]);
     ASSERT_EQ(dst[2], want[2]);
   }
@@ -711,8 +749,8 @@ static void the_two_scalers_differ(void) {
   for (int y = 0; y < UI_H; y++)
     for (int x = 0; x < UI_W; x++)
       memcpy(src + (y * UI_W + x) * 3, pal[((x * x + y * y) / 97 + x / 7 + y / 5) % 5], 3);
-  ui_filter(src, UI_W, false, FILTER_XBRZ, 3, a);
-  ui_filter(src, UI_W, false, FILTER_HQX, 3, b);
+  ui_filter(src, UI_W, UI_H, false, FILTER_XBRZ, 3, a);
+  ui_filter(src, UI_W, UI_H, false, FILTER_HQX, 3, b);
   ASSERT(memcmp(a, b, sizeof a) != 0);
 }
 
@@ -799,6 +837,7 @@ int main(void) {
   RUN(bindings_remap_and_persist);
   RUN(labels_follow_device_style_and_bindings);
   RUN(touch_layout_fits_screens);
+  RUN(six_item_panels_fit_phone_insets_and_touch_controls);
   RUN(sync_page_shows_the_rows_for_its_state);
   RUN(code_entry_edits_each_digit);
   RUN(conflict_picks_a_side);

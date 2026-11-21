@@ -29,12 +29,17 @@ void features_frame(GB *gb) {
 #define MENU_INVENTORY 1
 #define INVENTORY_CAPACITY 0x10
 
+static void equip_extra(int slot, uint8_t item) {
+  for (int i = 0; i < 4; i++)
+    if (features.slot_item[i] == item) features.slot_item[i] = 0;
+  features.slot_item[slot] = item;
+}
+
 bool features_assign_slot(GB *gb, int slot) {
-  if (!features.four_slots || W8(wOpenedMenuType) != MENU_INVENTORY || W8(wInventorySubmenu) != 0) return false;
+  if (slot < 0 || slot >= features.extra_slots || W8(wOpenedMenuType) != MENU_INVENTORY || W8(wInventorySubmenu) != 0) return false;
   uint8_t item = mem_rd(gb, (uint16_t)(wInventoryStorage + W8(wInventorySubmenu0CursorPos)));
   if (!item) return false;
-  if (features.slot_item[!slot] == item) features.slot_item[!slot] = 0;
-  features.slot_item[slot] = item;
+  equip_extra(slot, item);
   return true;
 }
 
@@ -50,8 +55,9 @@ static bool in_storage(GB *gb, uint8_t item) {
 }
 
 uint8_t features_slot_press(GB *gb, int slot) {
+  if (slot < 0 || slot >= features.extra_slots) return 0;
   uint8_t item = features.slot_item[slot];
-  if (!features.four_slots || !item || held_slot >= 0) return 0;
+  if (!item || held_slot >= 0) return 0;
   if (item == W8(wInventoryB)) return JOY_B;
   if (item == W8(wInventoryA)) return JOY_A;
   if (!can_change_items(gb) || !in_storage(gb, item)) return 0;

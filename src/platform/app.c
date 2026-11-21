@@ -238,11 +238,20 @@ static const char *pad_name(int button) {
   return buf;
 }
 
-static uint8_t live_joy, slot_joy[2], stick_joy, stick_pressed;
+static uint8_t live_joy, slot_joy[4], stick_joy, stick_pressed;
 static TapLatch taps;
+// VBlank latches the button before the game dispatches it on the next frame.
+static uint8_t item_frames[4], item_released;
 static int axis_down = NO_BINDING;
 static uint32_t axis_releases; // action bits; disconnect can release more than one axis
-static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy | slot_joy[0] | slot_joy[1] | stick_joy; }
+static uint8_t live_input(void *ctx, uint64_t frame) { (void)ctx; (void)frame; return live_joy | slot_joy[0] | slot_joy[1] | slot_joy[2] | slot_joy[3] | stick_joy; }
+
+static void release_item_buttons(GB *gb) {
+  memset(item_frames, 0, sizeof item_frames);
+  item_released = 0;
+  for (int slot = 0; slot < 4; slot++) features_slot_release(gb, slot);
+  memset(slot_joy, 0, sizeof slot_joy);
+}
 
 static void stick_event(const SDL_Event *ev) {
   static const struct { int negative, positive; } buttons[SDL_GAMEPAD_AXIS_COUNT] = {
@@ -672,35 +681,45 @@ static void apply_game_settings(void) {
   features.fast_text = settings.fast_text;
   features.quick_swap = settings.quick_swap;
   features.fast_menus = settings.fast_menus;
-  features.four_slots = settings.four_slots;
+  features.extra_slots = settings.holdable_items - 2;
 }
 
-// The items on X and Y, per game: two bytes in item_buttons.
+// Per-game X/Y/L/R assignments. Older profiles contain only the first two bytes.
 static void item_buttons_load(const char *dir) {
   char path[1300];
   size_t n;
   snprintf(path, sizeof path, "%s/item_buttons", dir);
   uint8_t *b = oracles_read_file(path, &n);
-  features.slot_item[0] = b && n >= 2 ? b[0] : 0;
-  features.slot_item[1] = b && n >= 2 ? b[1] : 0;
+  memset(features.slot_item, 0, sizeof features.slot_item);
+  if (b && (n == 2 || n == sizeof features.slot_item)) memcpy(features.slot_item, b, n);
   free(b);
 }
 
 static void item_buttons_store(const char *dir) {
   char path[1300];
   snprintf(path, sizeof path, "%s/item_buttons", dir);
-  write_file(path, features.slot_item, 2);
+  write_file(path, features.slot_item, sizeof features.slot_item);
 }
 
 // X/Y: in the inventory they take the highlighted item; in play they use theirs while held.
 static void item_button(GB *gb, const char *dir, int slot, bool down) {
-  if (!down) { features_slot_release(gb, slot); slot_joy[slot] = 0; return; }
+  uint8_t bit = (uint8_t)(1u << slot);
+  if (!down) {
+    if (item_frames[slot]) item_released |= bit;
+    else { features_slot_release(gb, slot); slot_joy[slot] = 0; }
+    return;
+  }
+  item_released &= (uint8_t)~bit;
+  if (slot_joy[slot]) return;
   if (features_assign_slot(gb, slot)) {
     item_buttons_store(dir);
-    show_status(slot ? "Item set on Y" : "Item set on X");
+    char message[32];
+    snprintf(message, sizeof message, "Item set on %c", "XYLR"[slot]);
+    show_status(message);
     return;
   }
   slot_joy[slot] = features_slot_press(gb, slot);
+  if (slot_joy[slot]) item_frames[slot] = 2;
 }
 
 // The touch overlay: shown from the first touch until a controller or keyboard is used. The layout
@@ -847,53 +866,112 @@ static void shot_if_due(SDL_Renderer *ren) {
 }
 
 // A picture's textures: straight to the screen, or through the filter at an integer scale first.
-typedef struct { SDL_Texture *direct, *big; int direct_w, big_scale, big_w; uint8_t *buf; } PicTextures;
+typedef struct { SDL_Texture *direct, *big; int direct_w, direct_h, big_scale, big_w, big_h; uint8_t *buf; } PicTextures;
 
-static void draw_pic(SDL_Renderer *ren, PicTextures *t, const uint8_t *rgb, int pic_w, int scale, bool fractional, ScreenFilter filter,
+static SDL_Texture *draw_pic(SDL_Renderer *ren, PicTextures *t, const uint8_t *rgb, int pic_w, int pic_h, int scale, bool fractional, ScreenFilter filter,
                      const SDL_FRect *dst) {
   if (!fractional && (filter == FILTER_SHARP || scale < 2) && !settings.gbc_colours) {
-    if (!t->direct || t->direct_w != pic_w) {
+    if (!t->direct || t->direct_w != pic_w || t->direct_h != pic_h) {
       if (t->direct) SDL_DestroyTexture(t->direct);
-      t->direct = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, pic_w, FB_H);
+      t->direct = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, pic_w, pic_h);
       SDL_SetTextureScaleMode(t->direct, SDL_SCALEMODE_NEAREST);
       t->direct_w = pic_w;
+      t->direct_h = pic_h;
     }
     SDL_UpdateTexture(t->direct, NULL, rgb, pic_w * 3);
     SDL_RenderTexture(ren, t->direct, NULL, dst);
-    return;
+    return t->direct;
   }
-  if (!t->big || t->big_scale != scale || t->big_w != pic_w) {
+  if (!t->big || t->big_scale != scale || t->big_w != pic_w || t->big_h != pic_h) {
     if (t->big) SDL_DestroyTexture(t->big);
-    t->big = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, pic_w * scale, FB_H * scale);
+    t->big = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, pic_w * scale, pic_h * scale);
     free(t->buf);
-    t->buf = malloc((size_t)pic_w * scale * FB_H * scale * 3);
+    t->buf = malloc((size_t)pic_w * scale * pic_h * scale * 3);
     t->big_scale = scale;
     t->big_w = pic_w;
+    t->big_h = pic_h;
   }
   SDL_SetTextureScaleMode(t->big, fractional ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
-  ui_filter(rgb, pic_w, settings.gbc_colours, scale < 2 ? FILTER_SHARP : filter, scale, t->buf);
+  ui_filter(rgb, pic_w, pic_h, settings.gbc_colours, scale < 2 ? FILTER_SHARP : filter, scale, t->buf);
   SDL_UpdateTexture(t->big, NULL, t->buf, pic_w * scale * 3);
   SDL_RenderTexture(ren, t->big, NULL, dst);
+  return t->big;
 }
 
-// Item X and Y beside the narrow picture, set by show_game for the frame it presents: the boxes
-// where they fit, else the narrow strips; strips_shown says whether the last frame had the room.
-static const uint8_t *box_rgb[2], *strip_rgb[2];
-static bool strips_shown;
+// The labels stay inside the safe area. Carry the blank edge column of
+// the filtered bar across each inset so its background meets the native HUD.
+static void extend_item_bar(SDL_Renderer *ren, SDL_Texture *texture, SDL_FRect bar, SDL_FRect game) {
+  const SDL_FRect ends[] = {
+    {game.x, bar.y, bar.x - game.x, bar.h},
+    {bar.x + bar.w, bar.y, game.x + game.w - (bar.x + bar.w), bar.h},
+  };
+  if (ends[0].w <= 0 && ends[1].w <= 0) return;
+  float h;
+  if (!SDL_GetTextureSize(texture, NULL, &h)) return;
+  SDL_FRect paper = {0, 0, 1, h};
+  for (int i = 0; i < 2; i++) {
+    if (ends[i].w > 0) SDL_RenderTexture(ren, texture, &paper, &ends[i]);
+  }
+}
 
-// Draws a picture pic_w (160 or WIDE_W) x 144 at the layout's place and scale, then the overlay.
-static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
-  static PicTextures pic, strip[2];
+static SDL_Rect update_frame_layout(SDL_Renderer *ren, int pic_w) {
   int w = pic_w, h = FB_H;
   SDL_GetCurrentRenderOutputSize(ren, &w, &h);
   SDL_Rect safe = {0, 0, w, h};
   SDL_GetRenderSafeArea(ren, &safe);
-  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.four_slots, settings.fill, pic_w);
+  touch_layout(&layout, w, h, (UiRect){safe.x, safe.y, safe.w, safe.h}, touch_on, settings.holdable_items - 2, settings.fill, pic_w);
   static int logged_w, logged_h, logged_scale;
   if (w != logged_w || h != logged_h || layout.scale != logged_scale) {
     fprintf(stderr, "screen %dx%d, safe area %d,%d %dx%d, scale %d\n", w, h, safe.x, safe.y, safe.w, safe.h, layout.scale);
     logged_w = w; logged_h = h; logged_scale = layout.scale;
   }
+  return safe;
+}
+
+typedef struct {
+  int width, height;
+  UiRect dst[2]; // One top strip (FB_W wide), or a pair of side panels.
+} ItemPanels;
+
+static ItemPanels fit_item_panels(SDL_Rect safe, int extra_slots) {
+  ItemPanels p = {0};
+  UiRect area = {safe.x, safe.y, safe.w, safe.h};
+  if (layout.portrait && extra_slots == 4 && touch_top_item_bar(&layout, area, p.dst)) {
+    p.width = FB_W;
+    p.height = UI_ITEM_BAR_H;
+    return p;
+  }
+  const int widths[] = {WIDE_BOX_W, WIDE_STRIP_W};
+  // At some phone sizes the gap beside a shoulder button misses the tab by
+  // a few pixels. Try the next smaller whole scale before using the playfield.
+  int game_w = layout.game_px.w;
+  int smaller_w = ((game_w - 1) / FB_W) * FB_W;
+  int scales = layout.overlay && smaller_w > 0 && smaller_w * 3 >= game_w * 2 ? 2 : 1;
+  for (int k = 0; k < scales; k++) {
+    int w = k ? smaller_w : game_w;
+    int h = k ? smaller_w / FB_W * FB_H : layout.game_px.h;
+    for (int i = 0; i < 2; i++) {
+      int rows = wide_slot_strip_height(extra_slots, widths[i] == WIDE_BOX_W);
+      int sw = (w * widths[i] + FB_W - 1) / FB_W, sh = (h * rows + FB_H - 1) / FB_H;
+      if (touch_item_margins(&layout, area, sw, sh, p.dst)) {
+        p.width = widths[i];
+        p.height = rows;
+        return p;
+      }
+    }
+  }
+  if (!layout.portrait && extra_slots == 4 && touch_top_item_bar(&layout, area, p.dst)) {
+    p.width = FB_W;
+    p.height = UI_ITEM_BAR_H;
+  }
+  return p;
+}
+
+static uint8_t top_items[FB_W * UI_ITEM_BAR_H * 3];
+static uint8_t item_margins[2][WIDE_BOX_W * FB_H * 3];
+
+static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w, SDL_Rect safe, const ItemPanels *panels) {
+  static PicTextures pic, strip[2], bar;
   bool fractional = layout.game_px.w % pic_w != 0;
   int scale = SDL_min((layout.game_px.w + pic_w - 1) / pic_w, MAX_FILTER_SCALE);
   SDL_FRect dst = {(float)layout.game_px.x, (float)layout.game_px.y, (float)layout.game_px.w, (float)layout.game_px.h};
@@ -901,25 +979,26 @@ static void present_frame(SDL_Renderer *ren, const uint8_t *rgb, int pic_w) {
   SDL_RenderClear(ren);
   SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
   if (touch_on) SDL_RenderFillRect(ren, &dst);
-  draw_pic(ren, &pic, rgb, pic_w, scale, fractional, settings.filter, &dst);
-  strips_shown = false;
-  for (int k = 0; k < 2 && !strips_shown && strip_rgb[0] && pic_w == FB_W && !touch_on; k++) {
-    const uint8_t *const *src = k ? strip_rgb : box_rgb;
-    int sw_px = k ? WIDE_STRIP_W : WIDE_BOX_W;
-    float sw = dst.w * sw_px / pic_w;
-    SDL_FRect left = {dst.x - sw, dst.y, sw, dst.h}, right = {dst.x + dst.w, dst.y, sw, dst.h};
-    if (left.x < safe.x || right.x + sw > safe.x + safe.w) continue;
-    // CRT bends and darkens a picture towards its own edges, which on a strip this narrow is all of it
-    ScreenFilter f = settings.filter == FILTER_CRT ? FILTER_SHARP : settings.filter;
-    draw_pic(ren, &strip[0], src[0], sw_px, scale, fractional, f, &left);
-    draw_pic(ren, &strip[1], src[1], sw_px, scale, fractional, f, &right);
-    strips_shown = true;
+  draw_pic(ren, &pic, rgb, pic_w, FB_H, scale, fractional, settings.filter, &dst);
+  // A CRT vignette on the margins would darken the entire item box.
+  ScreenFilter f = settings.filter == FILTER_CRT ? FILTER_SHARP : settings.filter;
+  if (panels && panels->width) {
+    bool top = panels->width == FB_W;
+    for (int i = 0; i < (top ? 1 : 2); i++) {
+      UiRect r = panels->dst[i];
+      SDL_FRect panel = {(float)r.x, (float)r.y, (float)r.w, (float)r.h};
+      int zoom = SDL_min((r.w + panels->width - 1) / panels->width, MAX_FILTER_SCALE);
+      bool smooth = r.w % panels->width || r.h % panels->height;
+      SDL_Texture *texture = draw_pic(ren, top ? &bar : &strip[i], top ? top_items : item_margins[i],
+                                      panels->width, panels->height, zoom, smooth, f, &panel);
+      if (top && texture) extend_item_bar(ren, texture, panel, dst);
+    }
   }
   if (touch_on && !overlay_blocked) gui_pad(&layout, touch_held, &gui_t);
   bool toast_on = toast[0] && SDL_GetTicks() < toast_until;
   if (ui_layer || toast_on || waiting) {
     GuiFrame f = {{(float)layout.game_px.x, (float)layout.game_px.y, (float)layout.game_px.w, (float)layout.game_px.h},
-                  {(float)safe.x, (float)safe.y, (float)safe.w, (float)safe.h}, (float)w, (float)h, !touch_on, NULL, NULL};
+                  {(float)safe.x, (float)safe.y, (float)safe.w, (float)safe.h}, (float)layout.screen_w, (float)layout.screen_h, !touch_on, NULL, NULL};
     menu_hint_keys(input_device(), pad_style(), &f.ok_key, &f.back_key);
     if (ui_layer) ui_layer(&f);
     else gui_begin(gui_display_scale());
@@ -968,7 +1047,10 @@ static int rd_room_group(const GBSample *sample, bool seasons) {
 static int rd_room_w(const GBSample *sample) { return sample->wram[0][0xd0a]; }
 static int rd_room_h(const GBSample *sample) { return sample->wram[0][0xd0b]; }
 
-static void hud_glyphs(uint8_t g[4]) {
+// The running game's paused picture: menus drawn over it show it as the game frame it was.
+static struct { const uint8_t *rgb; GB *gb; bool seasons; const uint8_t *rom; size_t rom_size; } paused_game;
+
+static void hud_glyphs(uint8_t g[HUD_SLOTS]) {
   InputDevice d = input_device();
   PadStyle style = pad_style();
   for (int i = 0; i < HUD_SLOTS; i++) g[i] = hud_slot_glyph(d, style, &settings.bindings, (HudSlot)i);
@@ -978,19 +1060,32 @@ static void hud_glyphs(uint8_t g[4]) {
 // message stays centred), the status bar names the buttons in use and the mods' overlay is on top.
 // rgb itself is left as the game drew it.
 static void show_game(SDL_Renderer *ren, const GBSample *sample, const uint8_t *rgb, bool seasons, const uint8_t *rom, size_t rom_size) {
-  static uint8_t pic[WIDE_W * FB_H * 3], boxes[2][WIDE_BOX_W * FB_H * 3], strips[2][WIDE_STRIP_W * FB_H * 3];
+  static uint8_t pic[WIDE_W * FB_H * 3];
   int w = picture_width();
-  // The X and Y items go in the space widescreen adds beside the status bar, or in the narrow
-  // picture's side bars when they are wide enough; the game has nowhere to put them.
+  SDL_Rect safe = update_frame_layout(ren, w);
+  ItemPanels panels = {0};
   WideOptions o = {seasons, settings.dim_sides, {overlay_theme.bg.r, overlay_theme.bg.g, overlay_theme.bg.b}, rom, rom_size,
-                   settings.four_slots, {features.slot_item[0], features.slot_item[1]}, wide_npcs_room, {0}, settings.widescreen == WIDE_16_10};
+                   settings.holdable_items - 2, {0}, wide_npcs_room, {0}, settings.widescreen == WIDE_16_10};
+  o.slot_item[HUD_X] = features.slot_item[0];
+  o.slot_item[HUD_Y] = features.slot_item[1];
+  if (o.extra_slots == 4) {
+    o.slot_item[HUD_L] = features.slot_item[2];
+    o.slot_item[HUD_R] = features.slot_item[3];
+    o.slot_item[HUD_B] = features_hud_item(paused_game.gb, wInventoryB);
+    o.slot_item[HUD_A] = features_hud_item(paused_game.gb, wInventoryA);
+  }
   hud_glyphs(o.glyph);
   if (!settings.widescreen) {
     memcpy(pic, rgb, FB_W * FB_H * 3);
     hud_relabel(sample, o.glyph[HUD_B], o.glyph[HUD_A], pic);
-    if (wide_slot_strip(sample, &o, 0, true, boxes[0]) && wide_slot_strip(sample, &o, 1, true, boxes[1]) &&
-        wide_slot_strip(sample, &o, 0, false, strips[0]) && wide_slot_strip(sample, &o, 1, false, strips[1]))
-      for (int i = 0; i < 2; i++) { box_rgb[i] = boxes[i]; strip_rgb[i] = strips[i]; }
+    if (o.extra_slots) panels = fit_item_panels(safe, o.extra_slots);
+    if (panels.width == FB_W) {
+      if (!wide_top_item_bar(sample, &o, top_items)) panels.width = 0;
+    } else if (panels.width) {
+      bool box = panels.width == WIDE_BOX_W;
+      if (!wide_slot_strip(sample, &o, 0, box, item_margins[0]) ||
+          !wide_slot_strip(sample, &o, 1, box, item_margins[1])) panels.width = 0;
+    } else if (o.extra_slots == 4) wide_narrow_six_hud(sample, &o, pic);
   } else wide_render(sample, &o, pic);
   // the overlay was drawn for the width the mods last saw, which a paused game can have changed since
   const ModOverlay *ov = mods_overlay();
@@ -998,17 +1093,13 @@ static void show_game(SDL_Renderer *ren, const GBSample *sample, const uint8_t *
     for (int y = 0; y < FB_H; y++)
       for (int x = 0; x < w; x++)
         if (overlay_cover_at(ov, x, y)) memcpy(pic + ((size_t)y * w + x) * 3, overlay_rgb_at(ov, x, y), 3);
-  present_frame(ren, pic, w);
-  box_rgb[0] = box_rgb[1] = strip_rgb[0] = strip_rgb[1] = NULL;
+  present_frame(ren, pic, w, safe, &panels);
   // With the boxes on screen the B box must keep showing the B item, so holding X or Y should not
   // repaint it with the item it lends to the B slot.
-  features.slot_boxes = settings.four_slots && (settings.widescreen || strips_shown);
+  features.slot_boxes = o.extra_slots == 4 || (o.extra_slots && (settings.widescreen || panels.width));
 }
 
 static GBSample display_frame;
-
-// The running game's paused picture: menus drawn over it show it as the game frame it was.
-static struct { const uint8_t *rgb; const GB *gb; bool seasons; const uint8_t *rom; size_t rom_size; } paused_game;
 
 // A game frame.
 static void present_game(SDL_Renderer *ren, const GBSample *sample, const uint8_t *rgb, bool seasons, const uint8_t *rom, size_t rom_size) {
@@ -1067,7 +1158,7 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
     show_game(ren, &display_frame, rgb, paused_game.seasons, paused_game.rom, paused_game.rom_size);
     return;
   }
-  if (!settings.widescreen) { present_frame(ren, rgb, FB_W); return; }
+  if (!settings.widescreen) { present_frame(ren, rgb, FB_W, update_frame_layout(ren, FB_W), NULL); return; }
   static uint8_t wide[WIDE_W * FB_H * 3];
   const int w = picture_width(), side = (w - FB_W) / 2;
   for (int y = 0; y < FB_H; y++) {
@@ -1076,7 +1167,7 @@ static void present(SDL_Renderer *ren, SDL_Texture *tex, const uint8_t *rgb) {
       if (x < side || x >= side + FB_W) { row[x * 3] = overlay_theme.bg.r; row[x * 3 + 1] = overlay_theme.bg.g; row[x * 3 + 2] = overlay_theme.bg.b; }
     memcpy(row + side * 3, rgb + (size_t)y * FB_W * 3, FB_W * 3);
   }
-  present_frame(ren, wide, w);
+  present_frame(ren, wide, w, update_frame_layout(ren, w), NULL);
 }
 
 // A modal settings screen; returns false when the window is closed. Changes apply as they are made.
@@ -1135,7 +1226,7 @@ static bool test_key_tick(const char *p, unsigned long long *at, char name[32], 
 
 // "#A", "#UP", ... in ORACLES_TEST_KEYS touch that control of the overlay (one finger).
 static void test_touch(const char *name, bool down) {
-  static const char *const names[ACTIONS] = {"UP", "DOWN", "LEFT", "RIGHT", "A", "B", "START", "SELECT", "PAUSE", "FAST", "SWAP", "X", "Y", "SAVE", "LOAD"};
+  static const char *const names[ACTIONS] = {"UP", "DOWN", "LEFT", "RIGHT", "A", "B", "START", "SELECT", "PAUSE", "FAST", "SWAP", "X", "Y", "SAVE", "LOAD", "L", "R"};
   float x, y;
   for (int a = 0; a < ACTIONS; a++) {
     if (strcmp(name, names[a]) || !touch_point(&layout, (Action)a, &x, &y)) continue;
@@ -2076,6 +2167,7 @@ static bool SDLCALL on_app_event(void *data, SDL_Event *ev) {
   if (gb->hung) return true;
   if (*session.mode == MODE_PLAY || *session.mode == MODE_PAUSING) {
     static int16_t samples[APU_RING * 2];
+    release_item_buttons(gb);
     live_joy = 0;
     for (int i = 0; i < PARK_TIMEOUT && !gb->hung && !threads_parked(gb); i++) { features_frame(gb); gb_run_frame(gb); (*session.frames)++; }
     if (gb->hung) return true;
@@ -2173,7 +2265,8 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   int undo_slot = -1;
   gui_theme(&gui_t, ages);
   gb->input_at = live_input;
-  live_joy = slot_joy[0] = slot_joy[1] = 0;
+  live_joy = 0;
+  memset(slot_joy, 0, sizeof slot_joy);
   item_buttons_load(dir);
   // Re-scans for this specific game: the launcher's own, game-agnostic mods_init (see main())
   // already populated settings rows before the player picked anything, but only mods_init here
@@ -2238,6 +2331,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     SDL_Event ev;
     while (poll_event(&ev)) {
       if (ev.type == SDL_EVENT_QUIT) {
+        release_item_buttons(gb);
         if (mode == MODE_PAUSED) { end = GAME_QUIT; running = false; if (parked) slot_save(gb, dir, SLOT_AUTO, paused_rgb); }
         else { mode = MODE_QUITTING; end = GAME_QUIT; park_from = frames; live_joy = 0; }
         continue;
@@ -2299,7 +2393,13 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
       case SDL_EVENT_KEY_UP:
         release |= action_bit(bindings_key_action(&settings.bindings, (int)ev.key.scancode));
         break;
+      case SDL_EVENT_WINDOW_FOCUS_LOST:
+        release_item_buttons(gb);
+        break;
       case SDL_EVENT_GAMEPAD_REMOVED:
+        release_item_buttons(gb);
+        release |= axis_releases;
+        break;
       case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         press |= action_bit(bindings_pad_action(&settings.bindings, axis_down));
         release |= axis_releases;
@@ -2312,25 +2412,26 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         release |= action_bit(bindings_pad_action(&settings.bindings, ev.gbutton.button));
         break;
       }
-      if (press >> ACT_PAUSE & 1) { mode = MODE_PAUSING; park_from = frames; live_joy = 0; boot.phase = BOOT_OFF; continue; }
+      if (press >> ACT_PAUSE & 1) { release_item_buttons(gb); mode = MODE_PAUSING; park_from = frames; live_joy = 0; boot.phase = BOOT_OFF; continue; }
       if (press && boot.phase != BOOT_OFF && boot.phase != BOOT_LANGUAGE) { boot.phase = BOOT_OFF; live_joy = 0; }
       for (int a = 0; a < ACTIONS; a++) {
-        bool item = a == ACT_ITEM_X || a == ACT_ITEM_Y;
+        int slot = a == ACT_ITEM_X ? 0 : a == ACT_ITEM_Y ? 1 : a == ACT_ITEM_L ? 2 : a == ACT_ITEM_R ? 3 : -1;
         if (press >> a & 1) {
           if (a == ACT_FAST) fast = true;
           else if (a == ACT_SWAP) features_quick_swap(gb);
-          else if (a == ACT_SAVE_STATE) save_from = frames;
+          else if (a == ACT_SAVE_STATE) { release_item_buttons(gb); save_from = frames; }
           else if (a == ACT_LOAD_STATE) {
+            release_item_buttons(gb);
             bool ok = slot_load(gb, dir, 0);
             if (ok) { live_joy = 0; save_from = NO_SAVE; }
             show_status(ok ? "Loaded slot 1" : "Slot 1 is empty");
           }
-          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, true);
+          else if (slot >= 0) item_button(gb, dir, slot, true);
           else live_joy = tap_press(&taps, live_joy, joy_of((Action)a));
         }
         if (release >> a & 1) {
           if (a == ACT_FAST) fast = false;
-          else if (item) item_button(gb, dir, a == ACT_ITEM_Y, false);
+          else if (slot >= 0) item_button(gb, dir, slot, false);
           else live_joy = tap_release(&taps, live_joy, joy_of((Action)a));
         }
       }
@@ -2365,6 +2466,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
 
     // fast-forward's sound plays ff_speed times as fast; what it left queued is dropped on release,
     // as at normal speed it would play slowed down and late
+    uint64_t before_frame = frames;
     int ratio = fast && mode == MODE_PLAY && (boot.phase == BOOT_OFF || boot.phase == BOOT_LANGUAGE) ? settings.ff_speed : 1;
     if (ratio != ff_ratio) {
       if (audio && ratio == 1) SDL_ClearAudioStream(audio);
@@ -2403,6 +2505,15 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
     }
     // A stopped frame may have no sample and must never reach autosave or rendering.
     if (gb->hung) break;
+    if (before_frame != frames) {
+      for (int slot = 0; slot < 4; slot++) {
+        if (item_frames[slot]) item_frames[slot]--;
+        if (!item_frames[slot] && (item_released & (1u << slot))) {
+          item_button(gb, dir, slot, false);
+          item_released &= (uint8_t)~(1u << slot);
+        }
+      }
+    }
     live_joy = tap_frame_ran(&taps, live_joy);
 
     if (settings.widescreen && mode == MODE_PLAY && boot.phase == BOOT_OFF && wide_npcs_update(gb)) npcs_signal();
@@ -2448,6 +2559,7 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
   }
   else if (gs->max_frames && end != GAME_FAILED) fprintf(stderr, "ran %llu frames, state %016llx\n", (unsigned long long)frames, (unsigned long long)gb_state_hash(gb));
   if (!gb->hung && end != GAME_FAILED) save_sram(gb, sav);
+  release_item_buttons(gb);
   session.gb = NULL;
   playing = NULL;
   if (audio) SDL_DestroyAudioStream(audio);
