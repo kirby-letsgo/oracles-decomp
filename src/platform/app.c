@@ -41,6 +41,16 @@
 
 #ifdef __ANDROID__
 #include "platform/companion.h"
+#include <jni.h>
+
+JNIEXPORT void JNICALL Java_org_oracles_OraclesActivity_controllerBack(JNIEnv *env, jclass cls, jboolean down) {
+  SDL_Event ev = {0};
+  ev.type = down ? SDL_EVENT_GAMEPAD_BUTTON_DOWN : SDL_EVENT_GAMEPAD_BUTTON_UP;
+  ev.gbutton.button = PAD_ANDROID_BACK;
+  ev.gbutton.down = down;
+  SDL_PushEvent(&ev);
+}
+
 #define ON_PHONE true           // the settings show Vibration and leave out Fullscreen
 #else
 #define ON_PHONE false
@@ -1320,7 +1330,7 @@ static bool menu_button(const SDL_Event *ev, UiButton *b) {
     case SDL_GAMEPAD_BUTTON_DPAD_LEFT: *b = UI_LEFT; return true;
     case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: *b = UI_RIGHT; return true;
     case SDL_GAMEPAD_BUTTON_SOUTH: case SDL_GAMEPAD_BUTTON_START: *b = UI_ACCEPT; return true;
-    case SDL_GAMEPAD_BUTTON_EAST: case SDL_GAMEPAD_BUTTON_WEST: *b = UI_BACK; return true;
+    case PAD_ANDROID_BACK: case SDL_GAMEPAD_BUTTON_EAST: case SDL_GAMEPAD_BUTTON_WEST: *b = UI_BACK; return true;
     default: return false;
     }
   }
@@ -2416,7 +2426,11 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
         if (stick_pressed && boot.phase != BOOT_OFF && boot.phase != BOOT_LANGUAGE) { boot.phase = BOOT_OFF; live_joy = 0; }
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-        press |= action_bit(bindings_pad_action(&settings.bindings, ev.gbutton.button));
+        {
+          Action a = bindings_pad_action(&settings.bindings, ev.gbutton.button);
+          if (a == ACTIONS && ev.gbutton.button == PAD_ANDROID_BACK) a = ACT_PAUSE;
+          press |= action_bit(a);
+        }
         break;
       case SDL_EVENT_GAMEPAD_BUTTON_UP:
         release |= action_bit(bindings_pad_action(&settings.bindings, ev.gbutton.button));

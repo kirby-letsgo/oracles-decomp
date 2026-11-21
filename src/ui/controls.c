@@ -83,7 +83,7 @@ void bindings_parse_line(Bindings *b, const char *key, const char *value) {
       }
     } else if (!strcmp(key, "pads")) {
       long v = strtol(p, &end, 10);
-      if (end == p || v < NO_BINDING || v > PAD_RS_DOWN) return;
+      if (end == p || v < NO_BINDING || v > PAD_ANDROID_BACK) return;
       t.pad[a] = (int)v;
       p = end + (*end == ';');
     } else return;

@@ -12,7 +12,7 @@ typedef enum { ACT_UP, ACT_DOWN, ACT_LEFT, ACT_RIGHT, ACT_A, ACT_B, ACT_START, A
 #define PAD_RIGHT_TRIGGER 100   // the triggers, axes, stand in as buttons
 #define PAD_LEFT_TRIGGER 101
 enum { PAD_LS_LEFT = 102, PAD_LS_RIGHT, PAD_LS_UP, PAD_LS_DOWN,
-       PAD_RS_LEFT, PAD_RS_RIGHT, PAD_RS_UP, PAD_RS_DOWN };
+       PAD_RS_LEFT, PAD_RS_RIGHT, PAD_RS_UP, PAD_RS_DOWN, PAD_ANDROID_BACK };
 
 // Virtual buttons on one axis. Release closer to centre so small fluctuations
 // around the press threshold don't repeatedly fire actions such as Load state.

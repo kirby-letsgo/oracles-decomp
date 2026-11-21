@@ -2,6 +2,7 @@ package org.oracles;
 
 import android.hardware.display.DisplayManager;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
@@ -19,6 +20,27 @@ public class OraclesActivity extends SDLActivity implements DisplayManager.Displ
             companionEnabled = enabled;
             updateCompanion();
         });
+    }
+
+    private static native void controllerBack(boolean down);
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        // Some handhelds expose the Linux KEY_BACK key on the gamepad itself.
+        // SDL's controller path folds Android Back into View/Select.
+        if (!mBrokenLibraries && event.getKeyCode() == KeyEvent.KEYCODE_BACK
+                && event.getScanCode() == 158 && event.getDevice() != null
+                && event.getDevice().supportsSource(android.view.InputDevice.SOURCE_GAMEPAD)) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (event.getRepeatCount() == 0) controllerBack(true);
+                return true;
+            }
+            if (event.getAction() == KeyEvent.ACTION_UP) {
+                controllerBack(false);
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
