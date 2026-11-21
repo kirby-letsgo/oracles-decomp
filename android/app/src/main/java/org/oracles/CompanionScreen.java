@@ -32,7 +32,11 @@ final class CompanionScreen extends Presentation {
     private LinearLayout items, slots;
     private ScrollView scroll;
     private int[] snapshot;
-    private int selected;
+    private int selected, pendingTicket, pendingSlot, pendingItem, flashedSlot = -1;
+    private final Runnable endFlash = () -> {
+        flashedSlot = -1;
+        if (tab == INVENTORY) render();
+    };
     private CompanionMapView mapImage;
     private LinearLayout floorButtons;
     private int selectedFloor, previousDungeon = -1, previousLinkFloor = -1;
@@ -43,7 +47,7 @@ final class CompanionScreen extends Presentation {
             MAP_BASE_FLOOR = 8, MAP_VISIBLE = 9, MAP_FLOORS = 10, MAP_PIXELS = 11;
     private int[] mapSnapshot;
     private static native int[] worldMap(int revision);
-    private static final int HEADER = 8; // revision, slot count, six equipped IDs
+    private static final int HEADER = 10; // revision, slot count, six equipped IDs, equip result, two-hand availability
     private static final int RECORD = 259;
     private static final String[] KEYS = {"A", "B", "X", "Y", "L", "R"};
     private static final String[] NAMES = {"", "Shield", "Punch", "Bombs", "Cane of Somaria",
@@ -51,7 +55,7 @@ final class CompanionScreen extends Presentation {
         "Biggoron's Sword", "Bombchus", "Flute", "Seed Shooter", "", "Harp of Ages", "",
         "Slingshot", "", "Shovel", "Power Bracelet", "Roc's Feather", "", "Seed Satchel"};
     private static native int[] inventory(int revision);
-    private static native void assign(int revision, int slot, int item);
+    private static native int assign(int revision, int slot, int item);
     private final Handler handler = new Handler(android.os.Looper.getMainLooper());
     private final Runnable poll = new Runnable() {
         @Override public void run() {
@@ -71,6 +75,16 @@ final class CompanionScreen extends Presentation {
                 int[] changed = inventory(snapshot == null ? -1 : snapshot[0]);
                 if (changed != null) {
                     snapshot = changed;
+                    if (pendingTicket != 0 && Math.abs(changed[8]) == pendingTicket) {
+                        if (changed[8] > 0) {
+                            flashedSlot = pendingSlot;
+                            if (selected == pendingItem) selected = 0;
+                            handler.removeCallbacks(endFlash);
+                            handler.postDelayed(endFlash, 700);
+                        }
+                        pendingTicket = 0;
+                    }
+                    if (changed[1] == 0) pendingTicket = 0;
                     render();
                 }
             }
@@ -85,6 +99,8 @@ final class CompanionScreen extends Presentation {
 
     @Override protected void onStop() {
         handler.removeCallbacks(poll);
+        handler.removeCallbacks(endFlash);
+        flashedSlot = -1;
         super.onStop();
     }
 
@@ -322,11 +338,18 @@ final class CompanionScreen extends Presentation {
             button.setTextSize(13);
             button.setPadding(dp(2), dp(4), dp(2), dp(4));
             button.setMinHeight(dp(52));
-            button.setTextColor(0xfff8efd4);
-            button.setBackgroundColor(0xff364e42);
+            boolean eligible = canEquip && selected != 0 && (selected != 0x0c || slot >= 2 || snapshot[9] != 0);
+            boolean flash = flashedSlot == slot;
+            button.setTextColor(flash || eligible ? 0xff21342a : 0xfff8efd4);
+            button.setBackgroundColor(flash ? 0xffb7f6b6 : eligible ? 0xffefd58c : 0xff364e42);
             button.setText(KEYS[i] + "\n" + (id == 0 ? "—" : name(id)));
-            button.setEnabled(canEquip && selected != 0);
-            button.setOnClickListener(v -> assign(snapshot[0], slot, selected));
+            button.setEnabled(eligible && pendingTicket == 0);
+            button.setOnClickListener(v -> {
+                pendingItem = selected;
+                pendingSlot = slot;
+                pendingTicket = assign(snapshot[0], slot, selected);
+                render();
+            });
             LinearLayout.LayoutParams slotSize = new LinearLayout.LayoutParams(0, -2, 1);
             slotSize.setMargins(dp(1), dp(1), dp(1), dp(1));
             slotRow.addView(button, slotSize);

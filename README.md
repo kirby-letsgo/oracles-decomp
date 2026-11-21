@@ -75,9 +75,9 @@ it.
 
 ### Android dual-screen handhelds
 
-On a handheld that exposes its second screen to Android as a presentation display, open a save to use the touch tabs there. The controller stays with the game on the main screen.
+On a handheld that exposes its second screen to Android as a presentation display, turn on **Settings → Picture → Dual screen** to show the touch tabs. The setting is off by default. The controller stays with the game on the main screen.
 
-- **Inventory** — tap an item, then the slot you want to equip it in.
+- **Inventory** — tap an item to highlight its available slots in gold. Tap a slot to equip it. The slot flashes green when equipped.
 - **Map** — shows the game's overworld or dungeon map. Tap to zoom, drag to pan, and tap again to fit the map. In a dungeon, tap a floor to browse it. Link's marker follows his current floor. Finding the dungeon map and compass reveals rooms and markers as in the game.
 - **Guide** — opens the Zelda Dungeon walkthrough for the current game and remembers your chapter and reading position. Use **Save walkthrough** to download all chapters and illustrations for offline reading, or **Save chapter** for the open chapter. Downloads require the site to allow access. If a download stops, **Contents** lists chapters already saved, and **Save walkthrough** resumes from those chapters.
 

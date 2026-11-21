@@ -3,7 +3,7 @@
 
 static const char *const filter_labels[FILTERS] = {"Sharp", "Lines", "LCD", "CRT", "xBRZ", "HQX"};
 static const char *const pad_style_labels[STYLES] = {"Auto", "Nintendo", "Xbox", "PlayStation"};
-static const char *const setting_labels[SET_ROWS] = {"Volume", "Screen", "Scale", "Widescreen", "Dim sides", "Colours", "Fullscreen",
+static const char *const setting_labels[SET_ROWS] = {"Volume", "Screen", "Dual screen", "Scale", "Widescreen", "Dim sides", "Colours", "Fullscreen",
                                                      "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Holdable items", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version", "Copy error log", "Mods"};
 
 static const char *section_before(int r) {
@@ -27,6 +27,7 @@ static int toggle_of(const Settings *s, int r) {
   case SET_FAST_TEXT: v = s->fast_text; break;
   case SET_FAST_MENUS: v = s->fast_menus; break;
   case SET_QUICK_SWAP: v = s->quick_swap; break;
+  case SET_DUAL_SCREEN: v = s->dual_screen; break;
   case SET_HAPTICS: v = s->haptics; break;
   case SET_PORTABLE: v = s->portable; break;
   default: return 0;

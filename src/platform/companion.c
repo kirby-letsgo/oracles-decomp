@@ -1,3 +1,4 @@
+#include <SDL3/SDL_system.h>
 #include "platform/companion.h"
 #include "game/game.h"
 #include "game/features.h"
@@ -10,12 +11,24 @@
 
 // Packet for CompanionScreen: slot count, six assigned IDs, then a record per
 // owned item (ID, remaining count, 16x16 ARGB icon, equipment level). A/B plus 16 storage cells.
-enum { HEADER = 7, RECORD = 259, CAPACITY = HEADER + 18 * RECORD };
+enum { HEADER = 9, RECORD = 259, CAPACITY = HEADER + 18 * RECORD };
 static jint packet[CAPACITY];
 static InventoryArt inventoryArt;
 static bool hasInventoryArt;
 static int length = HEADER, revision = 1;
-static int requested_item, requested_slot;
+static int requested_item, requested_slot, request_id, last_result;
+
+void companion_set_enabled(bool enabled) {
+  JNIEnv *env = SDL_GetAndroidJNIEnv();
+  if (!env) return;
+  jobject activity = SDL_GetAndroidActivity();
+  if (!activity) return;
+  jclass cls = (*env)->GetObjectClass(env, activity);
+  jmethodID setter = (*env)->GetMethodID(env, cls, "setCompanionEnabled", "(Z)V");
+  if (setter) (*env)->CallVoidMethod(env, activity, setter, (jboolean)enabled);
+  (*env)->DeleteLocalRef(env, cls);
+  (*env)->DeleteLocalRef(env, activity);
+}
 static atomic_bool refresh;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -93,19 +106,24 @@ JNIEXPORT jintArray JNICALL Java_org_oracles_CompanionScreen_inventory(JNIEnv *e
   return result;
 }
 
-JNIEXPORT void JNICALL Java_org_oracles_CompanionScreen_assign(JNIEnv *env, jclass cls, jint seen, jint slot, jint item) {
+JNIEXPORT jint JNICALL Java_org_oracles_CompanionScreen_assign(JNIEnv *env, jclass cls, jint seen, jint slot, jint item) {
   (void)env; (void)cls;
   pthread_mutex_lock(&lock);
+  int accepted = 0;
   if (seen == revision && slot >= 0 && slot < packet[0] && item > 0 && item < 32) {
+    request_id = request_id == INT32_MAX ? 1 : request_id + 1;
+    accepted = request_id;
     requested_item = item;
     requested_slot = slot;
   }
   pthread_mutex_unlock(&lock);
   atomic_store(&refresh, true);
+  return accepted;
 }
 
 void companion_clear(void) {
   pthread_mutex_lock(&lock);
+  last_result = 0;
   hasInventoryArt = false;
   memset(packet, 0, HEADER * sizeof(jint));
   length = HEADER;
@@ -140,12 +158,14 @@ bool companion_update(GB *gb, bool seasons, bool playing) {
   if (map_requested) update_map(gb, seasons, loaded);
   if (!inventory_requested) return false;
   pthread_mutex_lock(&lock);
-  int slot = requested_slot, item = requested_item;
+  int slot = requested_slot, item = requested_item, ticket = request_id;
   requested_item = 0;
   pthread_mutex_unlock(&lock);
   bool can_equip = playing && loaded && !gb->wram[0][0xc04] && features_touch_available(gb);
   bool assigned = item && can_equip && features_touch_equip(gb, slot, item);
   jint next[CAPACITY] = {0};
+  if (item) last_result = assigned ? ticket : -ticket;
+  next[7] = last_result;
   int n = HEADER;
   if (loaded) {
     // A negative slot count means the current menu or cutscene blocks equipping.
@@ -153,6 +173,9 @@ bool companion_update(GB *gb, bool seasons, bool playing) {
     next[1] = features_hud_item(gb, wInventoryA);
     next[2] = features_hud_item(gb, wInventoryB);
     for (int i = 0; i < 4; i++) next[3+i] = features.slot_item[i];
+    // With full storage, Biggoron's Sword cannot displace two occupied hands.
+    next[8] = !next[1] || !next[2] || next[1] == 0x0c || next[2] == 0x0c ||
+        memchr(&gb->wram[0][wInventoryStorage - 0xc000], 0, 16) != NULL;
     if (!hasInventoryArt) {
       inventory_load_art(gb->rom, gb->rom_size, seasons, &inventoryArt);
       hasInventoryArt = true;

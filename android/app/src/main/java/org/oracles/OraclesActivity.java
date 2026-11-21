@@ -11,6 +11,15 @@ public class OraclesActivity extends SDLActivity implements DisplayManager.Displ
     private DisplayManager displays;
     private CompanionScreen companion;
     private int selectedTab;
+    private boolean companionEnabled;
+
+    public void setCompanionEnabled(boolean enabled) {
+        runOnUiThread(() -> {
+            if (companionEnabled == enabled) return;
+            companionEnabled = enabled;
+            updateCompanion();
+        });
+    }
 
     @Override
     protected void onStart() {
@@ -41,7 +50,10 @@ public class OraclesActivity extends SDLActivity implements DisplayManager.Displ
     }
 
     private void updateCompanion() {
-        if (displays == null) return;
+        if (!companionEnabled || displays == null) {
+            dismissCompanion();
+            return;
+        }
         int gameDisplay = getWindowManager().getDefaultDisplay().getDisplayId();
         for (Display display : displays.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)) {
             if (display.getDisplayId() == gameDisplay) continue;

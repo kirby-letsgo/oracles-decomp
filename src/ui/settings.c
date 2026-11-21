@@ -18,6 +18,7 @@ void settings_default(Settings *s) {
   s->fast_menus = false;
   s->ff_speed = 3;
   s->holdable_items = 2;
+  s->dual_screen = false;
   s->haptics = true;
   s->essence_tracker = false;
   s->d1_randomizer = false;
@@ -50,6 +51,7 @@ void settings_parse(Settings *s, const char *text) {
       else if (!strcmp(key, "holdable_items") && (!strcmp(value, "2") || !strcmp(value, "4") || !strcmp(value, "6"))) s->holdable_items = atoi(value);
       else if (!strcmp(key, "d1_randomizer")) s->d1_randomizer = !strcmp(value, "on");
       else if (!strcmp(key, "essence_tracker")) s->essence_tracker = !strcmp(value, "on");
+      else if (!strcmp(key, "dual_screen")) s->dual_screen = !strcmp(value, "on");
       else if (!strcmp(key, "haptics")) s->haptics = !strcmp(value, "on");
       else if (!strcmp(key, "filter")) {
         for (int i = 0; i < FILTERS; i++) if (!strcmp(value, filter_keys[i])) s->filter = (ScreenFilter)i;
@@ -68,6 +70,7 @@ int settings_format(const Settings *s, char *out, size_t size) {
                    s->volume, s->fullscreen ? "on" : "off", filter_keys[s->filter], s->fill ? "fill" : "pixel", s->widescreen == WIDE_16_10 ? "16:10" : s->widescreen == WIDE_16_9 ? "on" : "off", s->dim_sides ? "on" : "off", s->gbc_colours ? "on" : "off",
                    s->fast_text ? "on" : "off", s->fast_menus ? "on" : "off", s->ff_speed, s->quick_swap ? "on" : "off", s->holdable_items,
                    s->haptics ? "on" : "off", pad_style_keys[s->pad_style < STYLES ? s->pad_style : STYLE_AUTO]);
+  if (n < (int)size) n += snprintf(out + n, size - n, "dual_screen=%s\n", s->dual_screen ? "on" : "off");
   if (n < (int)size) n += snprintf(out + n, size - n, "d1_randomizer=%s\n", s->d1_randomizer ? "on" : "off");
   if (n < (int)size) n += snprintf(out + n, size - n, "essence_tracker=%s\n", s->essence_tracker ? "on" : "off");
   if (n < (int)size) n += bindings_format(&s->bindings, out + n, size - n);
@@ -81,7 +84,7 @@ void settings_menu_open(SettingsMenu *m, bool phone) {
 
 bool settings_row_shown(const SettingsMenu *m, SettingsRow r) {
   if (r == SET_MODS) return false; // Deferred until the mods release.
-  if (r == SET_HAPTICS) return m->phone;
+  if (r == SET_HAPTICS || r == SET_DUAL_SCREEN) return m->phone;
   if (r == SET_FULLSCREEN || r == SET_PORTABLE) return !m->phone;
   return true;
 }
@@ -106,6 +109,7 @@ MenuAction settings_press(SettingsMenu *m, Settings *s, UiButton b, SettingsRow 
   switch (m->sel) {
   case SET_VOLUME: s->volume = s->volume + dir < 0 ? 0 : s->volume + dir > 10 ? 10 : s->volume + dir; break;
   case SET_SCREEN: s->filter = (ScreenFilter)((s->filter + dir + FILTERS) % FILTERS); break;
+  case SET_DUAL_SCREEN: if (dir) s->dual_screen = !s->dual_screen; break;
   case SET_SCALE: if (dir) s->fill = !s->fill; break;
   case SET_WIDESCREEN: s->widescreen = (s->widescreen + dir + WIDE_MODES) % WIDE_MODES; break;
   case SET_DIM_SIDES: if (dir) s->dim_sides = !s->dim_sides; break;

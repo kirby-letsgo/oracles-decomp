@@ -679,6 +679,9 @@ static void portable_switched(void) {
 }
 
 static void apply_game_settings(void) {
+#ifdef __ANDROID__
+  companion_set_enabled(settings.dual_screen);
+#endif
   features.fast_text = settings.fast_text;
   features.quick_swap = settings.quick_swap;
   features.fast_menus = settings.fast_menus;
