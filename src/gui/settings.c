@@ -4,7 +4,7 @@
 static const char *const filter_labels[FILTERS] = {"Sharp", "Lines", "LCD", "CRT", "xBRZ", "HQX"};
 static const char *const pad_style_labels[STYLES] = {"Auto", "Nintendo", "Xbox", "PlayStation"};
 static const char *const setting_labels[SET_ROWS] = {"Volume", "Screen", "Scale", "Widescreen", "Dim sides", "Colours", "Fullscreen",
-                                                     "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Item X/Y buttons", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version", "Copy error log", "Mods"};
+                                                     "Fast text", "Fast menus", "Fast-forward", "Quick swap", "Holdable items", "Vibration", "Controls", "Pad button names", "Save sync", "Portable", "Version", "Copy error log", "Mods"};
 
 static const char *section_before(int r) {
   switch (r) {
@@ -27,7 +27,6 @@ static int toggle_of(const Settings *s, int r) {
   case SET_FAST_TEXT: v = s->fast_text; break;
   case SET_FAST_MENUS: v = s->fast_menus; break;
   case SET_QUICK_SWAP: v = s->quick_swap; break;
-  case SET_FOUR_SLOTS: v = s->four_slots; break;
   case SET_HAPTICS: v = s->haptics; break;
   case SET_PORTABLE: v = s->portable; break;
   default: return 0;
@@ -37,6 +36,7 @@ static int toggle_of(const Settings *s, int r) {
 
 static Clay_String value_of(const Settings *s, const char *sync_label, int r, int toggle) {
   switch (r) {
+  case SET_HOLDABLE_ITEMS: return gui_str("< %d >", s->holdable_items);
   case SET_SCREEN: return gui_str("< %s >", filter_labels[s->filter]);
   case SET_WIDESCREEN: return gui_str("< %s >", s->widescreen == WIDE_16_10 ? "16:10" : s->widescreen == WIDE_16_9 ? "16:9" : "Off");
   case SET_SCALE: return gui_str("< %s >", s->fill ? "Fill" : "Pixel");

@@ -8,9 +8,9 @@
 #include <string.h>
 #include <pthread.h>
 
-// Packet for CompanionScreen: slot count, four assigned IDs, then a record per
+// Packet for CompanionScreen: slot count, six assigned IDs, then a record per
 // owned item (ID, remaining count, 16x16 ARGB icon). A/B plus 16 storage cells.
-enum { HEADER = 5, RECORD = 258, CAPACITY = HEADER + 18 * RECORD };
+enum { HEADER = 7, RECORD = 258, CAPACITY = HEADER + 18 * RECORD };
 static jint packet[CAPACITY];
 static int length = HEADER, revision = 1;
 static int requested_item, requested_slot;
@@ -131,11 +131,10 @@ bool companion_update(GB *gb, bool seasons, bool playing) {
   int n = HEADER;
   if (loaded) {
     // A negative slot count means the current menu or cutscene blocks equipping.
-    next[0] = (features.four_slots ? 4 : 2) * (can_equip ? 1 : -1);
+    next[0] = (2 + features.extra_slots) * (can_equip ? 1 : -1);
     next[1] = features_hud_item(gb, wInventoryA);
     next[2] = features_hud_item(gb, wInventoryB);
-    next[3] = features.slot_item[0];
-    next[4] = features.slot_item[1];
+    for (int i = 0; i < 4; i++) next[3+i] = features.slot_item[i];
     bool present[32] = {false};
     for (int i = 0; i < 18; i++) {
       int id = i < 2 ? next[i+1] : mem_rd(gb, wInventoryStorage+i-2);

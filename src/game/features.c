@@ -29,12 +29,17 @@ void features_frame(GB *gb) {
 #define MENU_INVENTORY 1
 #define INVENTORY_CAPACITY 0x10
 
+static void equip_extra(int slot, uint8_t item) {
+  for (int i = 0; i < 4; i++)
+    if (features.slot_item[i] == item) features.slot_item[i] = 0;
+  features.slot_item[slot] = item;
+}
+
 bool features_assign_slot(GB *gb, int slot) {
-  if (!features.four_slots || W8(wOpenedMenuType) != MENU_INVENTORY || W8(wInventorySubmenu) != 0) return false;
+  if (slot < 0 || slot >= features.extra_slots || W8(wOpenedMenuType) != MENU_INVENTORY || W8(wInventorySubmenu) != 0) return false;
   uint8_t item = mem_rd(gb, (uint16_t)(wInventoryStorage + W8(wInventorySubmenu0CursorPos)));
   if (!item) return false;
-  if (features.slot_item[!slot] == item) features.slot_item[!slot] = 0;
-  features.slot_item[slot] = item;
+  equip_extra(slot, item);
   return true;
 }
 
@@ -53,16 +58,14 @@ bool features_touch_available(GB *gb) {
   return held_slot < 0 && can_change_items(gb);
 }
 
-// Companion screen slots are A, B, X, Y. Only the game thread changes inventory.
+// Companion screen slots are A, B, X, Y, L, R. Only the game thread changes inventory.
 bool features_touch_equip(GB *gb, int slot, uint8_t item) {
-  if (slot < 0 || slot > 3 || !item || item >= 0x20 || !features_touch_available(gb)) return false;
+  if (slot < 0 || slot >= 2 + features.extra_slots || !item || item >= 0x20 || !features_touch_available(gb)) return false;
   uint8_t *a = &W8(wInventoryA), *b = &W8(wInventoryB);
   uint8_t *stored = &W8(wInventoryStorage);
   if (item != *a && item != *b && !in_storage(gb, item)) return false;
   if (slot >= 2) {
-    if (!features.four_slots) return false;
-    if (features.slot_item[3-slot] == item) features.slot_item[3-slot] = 0;
-    features.slot_item[slot-2] = item;
+    equip_extra(slot - 2, item);
     return true;
   }
   uint8_t *target = slot == 0 ? a : b, *other = slot == 0 ? b : a;
@@ -93,8 +96,9 @@ bool features_touch_equip(GB *gb, int slot, uint8_t item) {
 }
 
 uint8_t features_slot_press(GB *gb, int slot) {
+  if (slot < 0 || slot >= features.extra_slots) return 0;
   uint8_t item = features.slot_item[slot];
-  if (!features.four_slots || !item || held_slot >= 0) return 0;
+  if (!item || held_slot >= 0) return 0;
   if (item == W8(wInventoryB)) return JOY_B;
   if (item == W8(wInventoryA)) return JOY_A;
   if (!can_change_items(gb) || !in_storage(gb, item)) return 0;

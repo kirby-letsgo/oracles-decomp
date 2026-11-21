@@ -6,6 +6,7 @@
 #include "wide/hud.h"
 #include "wide/wide.h"
 #include "ui/labels.h"
+#include "ui/ui.h"
 
 // hud.c has the same bytes; this copy is deliberately separate, so a typo in one is caught by the other
 static const uint8_t tile_b[16] = {0x00, 0xff, 0x73, 0xff, 0x4a, 0xff, 0x4a, 0xff, 0x72, 0xff, 0x4a, 0xff, 0x4a, 0xff, 0x72, 0xff};
@@ -171,7 +172,7 @@ static void slot_strip_draws_its_letter_on_a_tab(void) {
   s.hram[0x9b - 0x80] = 2;                             // Ages wDisplayedLcdBehaviour: the bar is split
   s.wram[0][0xd00] = 1;                                // wScrollMode: normal play
   for (int y = 0; y < 16; y++) s.framebuffer[y * FB_W] = 0x7fff;  // the bar's paper, white
-  WideOptions o = {false, false, {0, 0, 0}, NULL, 0, true, {0, 0}, NULL, {'Z', 0, 0, 0}, false};
+  WideOptions o = {false, false, {0, 0, 0}, NULL, 0, 2, {0, 0}, NULL, {'Z', 0, 0, 0}, false};
   memset(strip, 0x55, sizeof strip);
   ASSERT(wide_slot_strip(&s, &o, 0, false, strip));
   const uint8_t *g = hud_glyph('Z');
@@ -192,9 +193,40 @@ static void slot_strip_draws_its_letter_on_a_tab(void) {
   for (int y = 1; y <= 14; y++) ASSERT_EQ(box[(y * WIDE_BOX_W + 9) * 3], 0);
   ASSERT_EQ(box[(15 * WIDE_BOX_W + 9) * 3], 0xff);
   for (int i = 16 * WIDE_BOX_W * 3; i < WIDE_BOX_W * FB_H * 3; i++) ASSERT_EQ(box[i], 0);
-  o.slots = false;
+  // Six items stack a shoulder slot below each original side slot. Both
+  // formats leave room for ammo counts and honour the bound shoulder glyph.
+  o.extra_slots = 4;
+  for (int side = 0; side < 2; side++) {
+    o.glyph[4 + side] = side ? 'W' : 'Q';
+    const uint8_t *shoulder = hud_glyph(o.glyph[4 + side]);
+    ASSERT(wide_slot_strip(&s, &o, side, true, box));
+    ASSERT(wide_slot_strip(&s, &o, side, false, strip));
+    // Both stacks carry the HUD paper across the spacer, including a tab with no ammo count.
+    for (int y = 26; y < 36; y++)
+      for (int x = 0; x < WIDE_STRIP_W; x++) ASSERT_EQ(strip[(y * WIDE_STRIP_W + x) * 3], 255);
+    for (int y = 16; y < 20; y++)
+      for (int x = 0; x < WIDE_BOX_W; x++)
+        ASSERT_EQ(box[(y * WIDE_BOX_W + x) * 3], (side ? x >= 2 : x < WIDE_BOX_W - 2) ? 255 : 0);
+    for (int y = 0; y < 7; y++) for (int x = 0; x < 6; x++) {
+      int pixel = shoulder[y] & (0x80 >> x) ? 0 : 255;
+      ASSERT_EQ(box[((21 + y) * WIDE_BOX_W + (side ? 5 : 3) + x) * 3], pixel);
+      ASSERT_EQ(strip[((37 + y) * WIDE_STRIP_W + 5 + x) * 3], pixel);
+    }
+  }
+  static uint8_t top[FB_W * UI_ITEM_BAR_H * 3];
+  ASSERT(wide_top_item_bar(&s, &o, top));
+  const char keys[] = "ZYQW";
+  for (int cell = 0; cell < 4; cell++) {
+    const uint8_t *glyph = hud_glyph(keys[cell]);
+    for (int y = 0; y < 7; y++) for (int x = 0; x < 6; x++)
+      ASSERT_EQ(top[((1 + y) * FB_W + cell * 40 + 5 + x) * 3], glyph[y] & (0x80 >> x) ? 0 : 255);
+  }
+  s.wram[0][0xbcb] = 1; // inventory
+  ASSERT(!wide_top_item_bar(&s, &o, top));
+  s.wram[0][0xbcb] = 0;
+  o.extra_slots = 0;
   ASSERT(!wide_slot_strip(&s, &o, 0, false, strip));
-  o.slots = true;
+  o.extra_slots = 2;
   s.hram[0x9b - 0x80] = 0;
   ASSERT(!wide_slot_strip(&s, &o, 0, false, strip));
 }

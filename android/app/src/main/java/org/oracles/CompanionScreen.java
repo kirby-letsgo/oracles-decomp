@@ -39,8 +39,9 @@ final class CompanionScreen extends Presentation {
             MAP_BASE_FLOOR = 8, MAP_VISIBLE = 9, MAP_FLOORS = 10, MAP_PIXELS = 11;
     private int[] mapSnapshot;
     private static native int[] worldMap(int revision);
+    private static final int HEADER = 8; // revision, slot count, six equipped IDs
     private static final int RECORD = 258;
-    private static final String[] KEYS = {"A", "B", "X", "Y"};
+    private static final String[] KEYS = {"A", "B", "X", "Y", "L", "R"};
     private static final String[] NAMES = {"", "Shield", "Punch", "Bombs", "Cane of Somaria",
         "Sword", "Boomerang", "Rod of Seasons", "Magnet Gloves", "", "Switch Hook", "",
         "Biggoron's Sword", "Bombchus", "Flute", "Seed Shooter", "", "Harp of Ages", "",
@@ -175,19 +176,19 @@ final class CompanionScreen extends Presentation {
             page.setText("Open a game file to see your items");
             return;
         }
-        if (snapshot.length == 6) {
+        if (snapshot.length == HEADER) {
             selected = 0;
             page.setText("No items yet");
             return;
         }
         boolean found = false;
-        for (int pos = 6; pos < snapshot.length; pos += RECORD) found |= snapshot[pos] == selected;
+        for (int pos = HEADER; pos < snapshot.length; pos += RECORD) found |= snapshot[pos] == selected;
         if (!found) selected = 0;
         boolean canEquip = snapshot[1] > 0;
         page.setText(!canEquip ? "Inventory · Equipping paused"
                 : selected == 0 ? "Choose an item" : name(selected) + " · Choose a slot");
         LinearLayout row = null;
-        for (int pos = 6, i = 0; pos < snapshot.length; pos += RECORD, i++) {
+        for (int pos = HEADER, i = 0; pos < snapshot.length; pos += RECORD, i++) {
             int id = snapshot[pos], count = snapshot[pos + 1];
             if (i % 3 == 0) {
                 row = new LinearLayout(getContext());
@@ -206,7 +207,14 @@ final class CompanionScreen extends Presentation {
             button.setOnClickListener(v -> { selected = id; render(); });
             row.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
         }
-        for (int i = 0; i < Math.abs(snapshot[1]); i++) {
+        int slotCount = Math.abs(snapshot[1]);
+        slots.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout slotRow = null;
+        for (int i = 0; i < slotCount; i++) {
+            if (i == 0 || (slotCount == 6 && i == 3)) {
+                slotRow = new LinearLayout(getContext());
+                slots.addView(slotRow);
+            }
             final int slot = i;
             Button button = new Button(getContext());
             int id = snapshot[2+i];
@@ -214,7 +222,7 @@ final class CompanionScreen extends Presentation {
             button.setText(KEYS[i] + "\n" + (id == 0 ? "—" : name(id)));
             button.setEnabled(canEquip && selected != 0);
             button.setOnClickListener(v -> assign(snapshot[0], slot, selected));
-            slots.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
+            slotRow.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
         }
     }
 

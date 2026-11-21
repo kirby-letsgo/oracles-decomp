@@ -25,7 +25,7 @@ typedef struct {
   bool quick_swap;              // the Swap button exchanges the A and B items
   bool fast_menus;              // quick fades into and out of the inventory and map
   int ff_speed;                 // fast-forward runs the game this many times as fast (FF_SPEED_MIN..FF_SPEED_MAX)
-  bool four_slots;              // Item X / Item Y buttons, assigned in the inventory
+  int holdable_items;           // 2, 4 or 6 equipped item buttons
   bool d1_randomizer;           // bundled fixed-seed Seasons preview; off by default
   bool essence_tracker;         // bundled official mod; applied when a game starts
   bool haptics;                 // a tick when a finger presses a control or taps a menu (Android)
@@ -40,7 +40,7 @@ typedef struct {
 
 enum { FF_SPEED_MIN = 2, FF_SPEED_MAX = 8, FF_SPEEDS = FF_SPEED_MAX - FF_SPEED_MIN + 1 };
 
-typedef enum { SET_VOLUME, SET_SCREEN, SET_SCALE, SET_WIDESCREEN, SET_DIM_SIDES, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_FF_SPEED, SET_QUICK_SWAP, SET_FOUR_SLOTS, SET_HAPTICS, SET_CONTROLS, SET_PAD_STYLE, SET_SYNC, SET_PORTABLE, SET_VERSION, SET_ERROR_LOG, SET_MODS, SET_ROWS } SettingsRow;
+typedef enum { SET_VOLUME, SET_SCREEN, SET_SCALE, SET_WIDESCREEN, SET_DIM_SIDES, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_FF_SPEED, SET_QUICK_SWAP, SET_HOLDABLE_ITEMS, SET_HAPTICS, SET_CONTROLS, SET_PAD_STYLE, SET_SYNC, SET_PORTABLE, SET_VERSION, SET_ERROR_LOG, SET_MODS, SET_ROWS } SettingsRow;
 
 typedef struct {
   SettingsRow sel;

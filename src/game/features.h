@@ -8,8 +8,8 @@ typedef struct {
   bool fast_text;               // each line of a text box appears at once
   bool quick_swap;              // a button swaps the A and B items
   bool fast_menus;              // the fades into and out of the inventory and map take 4 frames
-  bool four_slots;              // two more item buttons, X and Y
-  uint8_t slot_item[2];         // the items on X and Y (0: none), assigned in the inventory
+  int extra_slots;              // 0, 2 or 4
+  uint8_t slot_item[4];         // X, Y, L, R (0: none), assigned in the inventory
   bool slot_boxes;              // their own boxes are on screen, so leave the B box alone
   // set by the app for mods: the treasure (id, subid) loading in (group, room) becomes
   // (*new_id, *new_subid) when this returns true
@@ -24,12 +24,12 @@ struct GB;
 bool features_quick_swap(struct GB *gb);
 // Called by the app before each frame: applies the toggles that act on the game's state.
 void features_frame(struct GB *gb);
-// With the inventory's item page open: puts the highlighted item on X (slot 0) or Y (slot 1).
+// With the inventory's item page open: puts the highlighted item on X, Y, L or R (slots 0..3).
 bool features_assign_slot(struct GB *gb, int slot);
-// Equip an owned item from the companion touch screen (0..3 = A/B/X/Y).
+// Equip an owned item from the companion touch screen (0..5 = A/B/X/Y/L/R).
 bool features_touch_available(struct GB *gb);
 bool features_touch_equip(struct GB *gb, int slot, uint8_t item);
-// In play, pressing X/Y: returns the game buttons to hold. For an item on neither A nor B this puts
+// In play, pressing an extra button returns the game buttons to hold. For an item on neither A nor B this puts
 // it on B for as long as the button is held; features_slot_release puts B's own item back.
 uint8_t features_slot_press(struct GB *gb, int slot);
 void features_slot_release(struct GB *gb, int slot);

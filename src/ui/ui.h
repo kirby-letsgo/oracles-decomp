@@ -8,6 +8,7 @@
 
 #define UI_W 160
 #define UI_H 144
+#define UI_ITEM_BAR_H 16
 #define UI_W_16_10 230  // nearest even width at the original 144 lines
 #define UI_GLYPH_W 8
 #define UI_GLYPH_H 16

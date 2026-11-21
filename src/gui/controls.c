@@ -2,7 +2,7 @@
 #include "gui/widgets.h"
 
 static const char *const control_labels[CTRL_ROWS] = {"Up", "Down", "Left", "Right", "A", "B", "Start", "Select", "Pause",
-                                                      "Fast forward", "Swap A/B", "Item X", "Item Y", "Save state", "Load state", "Reset to defaults"};
+                                                      "Fast forward", "Swap A/B", "Item X", "Item Y", "Save state", "Load state", "Item L", "Item R", "Reset to defaults"};
 static const char *const page_labels[2] = {"Keyboard", "Gamepad"};
 
 static const char *section_before(int r) {
@@ -10,6 +10,7 @@ static const char *section_before(int r) {
   case ACT_UP: return "Movement";
   case ACT_A: return "Buttons";
   case ACT_PAUSE: return "More";
+  case ACT_ITEM_L: return "Extra items";
   case ACT_SAVE_STATE: return "Slot 1";
   default: return NULL;
   }

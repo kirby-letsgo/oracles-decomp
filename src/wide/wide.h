@@ -25,22 +25,27 @@ typedef struct {
   uint8_t border[3];            // RGB where the strips show nothing
   const uint8_t *rom;           // for the neighbouring rooms (the app's copy, code bytes zeroed, will do)
   size_t rom_size;
-  bool slots;                   // 4 slots is on: the X and Y boxes take the left of the status bar
-  uint8_t slot_item[2];         // what is on each of them (0: the box is empty)
+  int extra_slots;              // 0, 2 (X/Y), or 4 (X/Y/L/R)
+  uint8_t slot_item[6];         // what is on each of them (0: the box is empty)
   // the sprites of a neighbouring room, NULL where none are known (wide/npcs.h)
   const WideRoomSprites *(*room_sprites)(int group, int room);
-  uint8_t glyph[4];             // the four slots' letters, X Y B A (ui/labels.h codes; 0: the game's own)
+  uint8_t glyph[6];             // the six slots' letters, X Y B A L R (ui/labels.h codes; 0: the game's own)
   bool compact;                 // 16:10 viewport
 } WideOptions;
+
+void wide_narrow_six_hud(const GBSample *s, const WideOptions *o, uint8_t *rgb);
 
 // out: (compact ? UI_W_16_10 : WIDE_W) x FB_H RGB24.
 void wide_render(const GBSample *s, const WideOptions *o, uint8_t *out);
 enum { WIDE_STRIP_W = 16, WIDE_BOX_W = 38 };
-// Item X/Y beside the narrow picture: slot 0 (X) or 1 (Y) as an RGB24 strip FB_H tall, either the
-// widescreen box (WIDE_BOX_W wide, as tall as the status bar) or, where that does not fit, the
-// letter above the icon (WIDE_STRIP_W wide). False (out untouched) unless o->slots is on and the
-// status bar is up and not blanked to one colour.
-bool wide_slot_strip(const GBSample *s, const WideOptions *o, int slot, bool box, uint8_t *out);
+// Four extra slots across the original width, above the native status bar.
+// Output is FB_W by 16, RGB24. False when the item HUD is hidden.
+bool wide_top_item_bar(const GBSample *s, const WideOptions *o, uint8_t *out);
+// Left (0) and right (1) margins for the original picture. X/Y sit at the top,
+// with L/R underneath in six-item mode. Output is an RGB24 strip FB_H tall,
+// WIDE_BOX_W or WIDE_STRIP_W wide. False when the item HUD is hidden.
+int wide_slot_strip_height(int extra_slots, bool box);
+bool wide_slot_strip(const GBSample *s, const WideOptions *o, int side, bool box, uint8_t *out);
 // The room's background pixel (RGB555) at screen (x, y), x from -48 to 207, or -1 where the room is
 // not shown there. Inside 0-159 it matches the PPU's background wherever no sprite covers it.
 int wide_room_pixel(const GBSample *s, bool seasons, int x, int y);
