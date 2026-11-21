@@ -218,7 +218,7 @@ final class CompanionScreen extends Presentation {
         }
         page.setVisibility(View.GONE);
         guide.setVisibility(View.VISIBLE);
-        guide.setGame(mapSnapshot[1] == -1 ? "ages" : "seasons");
+        guide.setGame(mapSnapshot[3] == 0 ? "ages" : "seasons");
     }
 
     @Override public void dismiss() {
@@ -234,13 +234,15 @@ final class CompanionScreen extends Presentation {
         if (plane != 0 && plane != 1) {
             mapImage.setImageDrawable(null);
             page.setText(plane == -2 ? "Open a game file to see the map" :
-                    plane == 2 ? "Dungeon map unavailable" : "Map available in Seasons");
+                    "Dungeon map unavailable");
             return;
         }
-        page.setText(plane == 0 ? "Holodrum" : "Subrosia");
-        int width = plane == 0 ? 128 : 88, height = plane == 0 ? 128 : 64;
+        boolean seasons = mapSnapshot[3] != 0;
+        page.setText(seasons ? (plane == 0 ? "Holodrum" : "Subrosia")
+                : (plane == 0 ? "Labrynna · Present" : "Labrynna · Past"));
+        int width = mapSnapshot[4], height = mapSnapshot[5];
         Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        image.setPixels(mapSnapshot, 3, width, 0, 0, width, height);
+        image.setPixels(mapSnapshot, 6, width, 0, 0, width, height);
         int room = mapSnapshot[2], cx = (room % 16) * 8 + 3, cy = (room / 16) * 8 + 3;
         if (cx < width && cy < height) {
             for (int y = -3; y <= 3; y++) for (int x = -3; x <= 3; x++) {

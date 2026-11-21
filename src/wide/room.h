@@ -35,12 +35,15 @@ typedef struct {
 // The ROM's region comes from its header (European ROMs: game code AZ8P, AZ7P).
 bool wide_decode_room(const uint8_t *rom, size_t size, bool seasons, const WideRoomKey *key, WideRoom *out);
 
-// The Seasons map menu uses wMinimapGroup/Room even when Link is inside a building.
-// plane is 0 for Holodrum, 1 for Subrosia, 2 for a dungeon.
+// The games keep a separate minimap room to remember the entrance to interiors.
+// Plane 0 is Holodrum/present Labrynna, 1 is Subrosia/past Labrynna, 2 is a dungeon.
 typedef struct {
-  uint8_t plane, room, companion, floodgates, ship_docked;
+  bool seasons;
+  uint8_t plane, room, companion, floodgates, ship_docked, symmetry_restored, water_shifted;
   uint8_t visited[256];
-} SeasonsMap;
-void seasons_map_state(const uint8_t wram[4096], SeasonsMap *map);
-// Draws the map grid, 128x128 (Holodrum) or 88x64 (Subrosia), tightly packed ARGB.
-void seasons_map_pixels(const uint8_t *rom, size_t size, const SeasonsMap *map, uint32_t *pixels);
+} OverworldMap;
+void overworld_map_state(bool seasons, const uint8_t wram[4096], OverworldMap *map);
+int overworld_map_width(const OverworldMap *map);
+int overworld_map_height(const OverworldMap *map);
+// Draws the map grid into a tightly packed ARGB buffer, at most 128x128.
+void overworld_map_pixels(const uint8_t *rom, size_t size, const OverworldMap *map, uint32_t *pixels);

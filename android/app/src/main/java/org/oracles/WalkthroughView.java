@@ -1,6 +1,7 @@
 package org.oracles;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -19,12 +20,17 @@ final class WalkthroughView extends LinearLayout {
     private final WebView reader;
     private final TextView status;
     private final Button chapter, book, contents;
+    private final SharedPreferences bookmarks;
     private String game, current;
+    private String resumeChapter;
+    private int resumeOffset;
+    private boolean ready;
     private boolean busy;
 
     WalkthroughView(Context context) {
         super(context);
         setOrientation(VERTICAL);
+        bookmarks = context.getSharedPreferences("guide-bookmarks", Context.MODE_PRIVATE);
         library = new File(context.getFilesDir(), "walkthroughs");
         LinearLayout row = new LinearLayout(context);
         addView(row);
@@ -62,10 +68,32 @@ final class WalkthroughView extends LinearLayout {
                 reader.loadUrl(local.toString());
                 return true;
             }
+            @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
+                current = null;
+                ready = false;
+            }
             @Override public void onPageFinished(WebView view, String url) {
+                if (!url.equals(view.getUrl()) || game == null) return;
                 current = url;
+                String chapterUrl = canonicalPage(url);
+                if (!chapterUrl.isEmpty()) {
+                    int offset = chapterUrl.equals(resumeChapter) ? resumeOffset : 0;
+                    resumeChapter = null;
+                    view.postVisualStateCallback(0, new WebView.VisualStateCallback() {
+                        @Override public void onComplete(long requestId) {
+                            if (!url.equals(current)) return;
+                            if (offset > 0) view.scrollTo(0, offset);
+                            ready = true;
+                            rememberPlace();
+                        }
+                    });
+                }
                 updateButtons();
             }
+        });
+        reader.setOnScrollChangeListener((v, x, y, oldX, oldY) -> {
+            reader.removeCallbacks(storePosition);
+            reader.postDelayed(storePosition, 350);
         });
         addView(reader, new LayoutParams(-1, 0, 1));
     }
@@ -81,10 +109,34 @@ final class WalkthroughView extends LinearLayout {
 
     void setGame(String next) {
         if (next.equals(game)) return;
+        rememberPlace();
+        ready = false;
         game = next;
         current = null;
         status.setText("Zelda Dungeon");
-        openContents();
+        resumeChapter = GuideBook.chapter(bookmarks.getString(game + "-page", ""), root());
+        resumeOffset = bookmarks.getInt(game + "-offset", 0);
+        openUrl(resumeChapter.isEmpty() ? root() : resumeChapter);
+    }
+
+    private final Runnable storePosition = this::rememberPlace;
+
+    private String canonicalPage(String url) {
+        Uri uri = Uri.parse(url);
+        if (!"file".equals(uri.getScheme())) return GuideBook.chapter(url, root());
+        if (uri.getPath() == null) return "";
+        File file = new File(uri.getPath());
+        if (!folder().equals(file.getParentFile()) && !partial().equals(file.getParentFile())) return "";
+        String name = file.getName();
+        if (!name.matches("[a-z0-9-]+\\.html")) return "";
+        return name.equals("index.html") ? root() : root() + name.substring(0, name.length()-5) + "/";
+    }
+
+    private void rememberPlace() {
+        if (!ready || current == null || game == null) return;
+        String url = canonicalPage(current);
+        if (!url.isEmpty()) bookmarks.edit().putString(game + "-page", url)
+                .putInt(game + "-offset", reader.getScrollY()).apply();
     }
 
     private String root() { return GuideBook.index(game); }
@@ -145,7 +197,12 @@ final class WalkthroughView extends LinearLayout {
                 busy = false;
                 if (target.equals(game)) {
                     status.setText(result);
-                    if (new File(folder(),"index.html").isFile()) openUrl(root());
+                    if (new File(folder(),"index.html").isFile()) {
+                        String place = current == null ? "" : canonicalPage(current);
+                        resumeChapter = place.isEmpty() ? root() : place;
+                        resumeOffset = reader.getScrollY();
+                        openUrl(resumeChapter);
+                    }
                 }
                 updateButtons();
             });
@@ -153,6 +210,10 @@ final class WalkthroughView extends LinearLayout {
     }
 
     void close() {
+        rememberPlace();
+        ready = false;
+        current = null;
+        reader.removeCallbacks(storePosition);
         reader.stopLoading();
         removeView(reader);
         reader.destroy();

@@ -17,10 +17,10 @@ static int requested_item, requested_slot;
 static atomic_bool refresh;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
-// mapStatus: -2 means no file, -1 means Ages, 0/1/2 are the Seasons map planes.
+// Packet header: revision, plane (-2 before file load), room, game, width and height.
 static atomic_bool refreshMap;
 static int mapRevision = 1, mapStatus = -2;
-static SeasonsMap lastMap;
+static OverworldMap lastMap;
 static uint32_t mapPixels[128*128];
 
 JNIEXPORT jintArray JNICALL Java_org_oracles_CompanionScreen_worldMap(JNIEnv *env, jclass cls, jint seen) {
@@ -29,12 +29,14 @@ JNIEXPORT jintArray JNICALL Java_org_oracles_CompanionScreen_worldMap(JNIEnv *en
   pthread_mutex_lock(&lock);
   jintArray result = NULL;
   if (seen != mapRevision) {
-    int count = mapStatus == 0 ? 128*128 : mapStatus == 1 ? 88*64 : 0;
-    jint header[] = {mapRevision, mapStatus, lastMap.room};
-    result = (*env)->NewIntArray(env, count + 3);
+    int width = mapStatus < 0 ? 0 : overworld_map_width(&lastMap);
+    int height = mapStatus < 0 ? 0 : overworld_map_height(&lastMap);
+    int count = width * height;
+    jint header[] = {mapRevision, mapStatus, lastMap.room, lastMap.seasons, width, height};
+    result = (*env)->NewIntArray(env, count + 6);
     if (result) {
-      (*env)->SetIntArrayRegion(env, result, 0, 3, header);
-      if (count) (*env)->SetIntArrayRegion(env, result, 3, count, (const jint *)mapPixels);
+      (*env)->SetIntArrayRegion(env, result, 0, 6, header);
+      if (count) (*env)->SetIntArrayRegion(env, result, 6, count, (const jint *)mapPixels);
     }
   }
   pthread_mutex_unlock(&lock);
@@ -42,13 +44,13 @@ JNIEXPORT jintArray JNICALL Java_org_oracles_CompanionScreen_worldMap(JNIEnv *en
 }
 
 static void update_map(GB *gb, bool seasons, bool loaded) {
-  SeasonsMap next = {0};
-  if (loaded && seasons) seasons_map_state(gb->wram[0], &next);
-  int status = !loaded ? -2 : !seasons ? -1 : next.plane;
+  OverworldMap next = {0};
+  if (loaded) overworld_map_state(seasons, gb->wram[0], &next);
+  int status = !loaded ? -2 : next.plane;
   pthread_mutex_lock(&lock);
   if (status != mapStatus || memcmp(&next, &lastMap, sizeof next)) {
     if (status == 0 || status == 1)
-      seasons_map_pixels(gb->rom, gb->rom_size, &next, mapPixels);
+      overworld_map_pixels(gb->rom, gb->rom_size, &next, mapPixels);
     mapStatus = status;
     lastMap = next;
     mapRevision++;

@@ -378,19 +378,33 @@ bool wide_decode_room(const uint8_t *rom, size_t size, bool seasons, const WideR
   return true;
 }
 
-void seasons_map_state(const uint8_t wram[4096], SeasonsMap *map) {
+static void seasons_map_location(const uint8_t wram[4096], OverworldMap *map) {
   int group = wram[0x63a], room = wram[0x63b];
   if (group == 0 && room == 0xc9) room = 0x40; // Sword upgrade
   if (group == 2) room = 0xc9;                  // Maku Tree
   if (group == 4 && wram[0xc49] == 3 && wram[0xc4c] == 0x98) group = room = 0;
   map->plane = group >= 4 ? 2 : group == 1;
   map->room = room;
-  map->companion = wram[0x610];
+
   map->floodgates = wram[0x781] & 0x80;
   map->ship_docked = wram[0x6ca + 0x17/8] & (1 << (0x17%8));
+}
+
+void overworld_map_state(bool seasons, const uint8_t wram[4096], OverworldMap *map) {
+  *map = (OverworldMap){.seasons = seasons, .companion = wram[0x610]};
+  if (seasons) {
+    seasons_map_location(wram, map);
+  } else {
+    uint8_t flags = wram[0xc34];
+    map->plane = (flags & TILESETFLAG_DUNGEON) && !(flags & TILESETFLAG_LARGE_INDOORS)
+        ? 2 : !!(flags & TILESETFLAG_PAST);
+    map->room = map->plane != 2 && (flags & 2) ? 0x38 : wram[0x63b];
+    map->symmetry_restored = wram[0x713] & 1;
+    map->water_shifted = wram[0x841] & 1;
+  }
   for (int i = 0; i < 256; i++)
     map->visited[i] = wram[(map->plane == 1 ? 0x800 : 0x700) + i] & 0x10;
-  if (!map->plane) map->visited[0xc9] = wram[0x80b] & 0x10;
+  if (seasons && !map->plane) map->visited[0xc9] = wram[0x80b] & 0x10;
 }
 
 // The original map stores alternate artwork in the off-screen columns of each row.
@@ -401,13 +415,33 @@ static void map_substitution(WideRoom *art, int dst, int src, int w, int h) {
   }
 }
 
-void seasons_map_pixels(const uint8_t *rom, size_t size, const SeasonsMap *map, uint32_t *pixels) {
+int overworld_map_width(const OverworldMap *map) {
+  if (map->plane > 1) return 0;
+  return map->seasons ? (map->plane ? 88 : 128) : 112;
+}
+
+int overworld_map_height(const OverworldMap *map) {
+  if (map->plane > 1) return 0;
+  return map->seasons && map->plane == 1 ? 64 : overworld_map_width(map);
+}
+
+void overworld_map_pixels(const uint8_t *rom, size_t size, const OverworldMap *map, uint32_t *pixels) {
   if (size <= 0x142 || map->plane > 1) return;
-  Rom r = {rom, size, rom[0x142] == 'P' ? &seasons_eu_tables : &seasons_tables, 0};
+  bool eu = rom[0x142] == 'P';
+  const Tables *tables = map->seasons ? (eu ? &seasons_eu_tables : &seasons_tables)
+                                      : (eu ? &ages_eu_tables : &ages_tables);
+  Rom r = {rom, size, tables, 0};
   WideRoom art = {0};
   load_gfx(&r, r.t->gfx_bank, r.t->gfx_headers, 0x0d + map->plane, GFX_MINIMAP, &art);
   load_palette_header(&r, 7 + map->plane, &art);
-  if (map->plane == 0) {
+  if (!map->seasons) {
+    if (map->plane == 0) {
+      if (map->companion == 0x0c || map->companion == 0x0d)
+        map_substitution(&art, 0x68, map->companion == 0x0c ? 0x75 : 0x78, 3, 3);
+      if (map->symmetry_restored) map_substitution(&art, 0x45, 0x7b, 3, 2);
+    }
+    if (map->water_shifted) map_substitution(&art, 0xc3, 0xd5, 3, 2);
+  } else if (map->plane == 0) {
     if (map->companion == 0x0c || map->companion == 0x0d)
       map_substitution(&art, 0xa8, map->companion == 0x0c ? 0xb6 : 0xbb, 5, 4);
     if (map->floodgates) map_substitution(&art, 0xe2, 0xf4, 2, 2);
@@ -417,8 +451,8 @@ void seasons_map_pixels(const uint8_t *rom, size_t size, const SeasonsMap *map, 
     }
   } else if (map->ship_docked) map_substitution(&art, 0x168, 0x178, 1, 2);
 
-  int width = map->plane ? 11 : 16, height = map->plane ? 8 : 16;
-  int start = map->plane ? 5*32 + 4 : 32 + 2;
+  int width = overworld_map_width(map)/8, height = overworld_map_height(map)/8;
+  int start = !map->seasons ? 2*32+3 : (map->plane ? 5*32+4 : 32+2);
   for (int y = 0; y < height*8; y++) for (int x = 0; x < width*8; x++) {
     int pos = start + (y/8)*32 + x/8;
     bool visited = map->visited[(y/8)*16 + x/8] != 0;
