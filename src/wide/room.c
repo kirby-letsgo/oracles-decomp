@@ -180,13 +180,13 @@ static void gfx_decompress(const Rom *r, size_t src, int mode, int n, uint8_t *o
 
 static void load_palette_header(const Rom *r, int index, WideRoom *out);
 
-enum { GFX_COMPRESSED, GFX_UNCOMPRESSED, GFX_UNIQUE };
+enum { GFX_COMPRESSED, GFX_UNCOMPRESSED, GFX_UNIQUE, GFX_MINIMAP };
 
 // A list of 6-byte gfx headers (the continue bit chains them) into VRAM. In the European ROMs a
 // gfx header table entry that starts with 0 is localized: 0, five [bank|mode][source] triples (one
 // per language), then the destination and size.
 static void load_gfx_headers(const Rom *r, size_t e, int kind, WideRoom *out) {
-  static uint8_t buf[0x1000 * 16];
+  uint8_t buf[128 * 16];
   for (int guard = 0; guard < 64; guard++) {
     uint8_t h0 = b(r, e);
     if (h0 == 0 && kind == GFX_UNIQUE) {                   // unique gfx: a palette entry
@@ -197,7 +197,7 @@ static void load_gfx_headers(const Rom *r, size_t e, int kind, WideRoom *out) {
       continue;
     }
     size_t src_at = e + 1, rest = e + 3;
-    if (h0 == 0 && kind == GFX_COMPRESSED && r->t->localized) {
+    if (h0 == 0 && (kind == GFX_COMPRESSED || kind == GFX_MINIMAP) && r->t->localized) {
       int lang = r->language >= 0 && r->language < 5 ? r->language : 0;
       h0 = b(r, e + 1 + (size_t)lang * 3);
       src_at = e + 2 + (size_t)lang * 3;
@@ -208,6 +208,11 @@ static void load_gfx_headers(const Rom *r, size_t e, int kind, WideRoom *out) {
     uint8_t h5 = b(r, rest + 2);
     int n = ((h5 & 0x7f) + 1) * 16, bank = dest & 1, addr = (dest & 0xfff0) - 0x8000;
     gfx_decompress(r, at(src_bank, src), mode, n, buf);
+    // The minimap header also loads the 32-column map and attributes into WRAM bank 4.
+    if (kind == GFX_MINIMAP && n <= (int)sizeof out->tiles) {
+      if ((dest & 0xfff0) == 0xd000) memcpy(out->tiles, buf, n);
+      if ((dest & 0xfff0) == 0xd400) memcpy(out->attrs, buf, n);
+    }
     for (int i = 0; i < n; i++) {
       int a = addr + i;
       if (a < 0 || a >= 0x1800) continue;
@@ -371,4 +376,176 @@ bool wide_decode_room(const uint8_t *rom, size_t size, bool seasons, const WideR
       (out->flags & (TILESETFLAG_INDOORS | TILESETFLAG_DUNGEON | TILESETFLAG_LARGE_INDOORS)))
     load_gfx(&r, 1, r.t->uncmp_gfx_headers, 0x37, GFX_UNCOMPRESSED, out);    // the past's chest and sign
   return true;
+}
+
+static void seasons_map_location(const uint8_t wram[4096], OverworldMap *map) {
+  int group = wram[0x63a], room = wram[0x63b];
+  if (group == 0 && room == 0xc9) room = 0x40; // Sword upgrade
+  if (group == 2) room = 0xc9;                  // Maku Tree
+  if (group == 4 && wram[0xc49] == 3 && wram[0xc4c] == 0x98) group = room = 0;
+  map->plane = group >= 4 ? 2 : group == 1;
+  map->room = room;
+
+  map->floodgates = wram[0x781] & 0x80;
+  map->ship_docked = wram[0x6ca + 0x17/8] & (1 << (0x17%8));
+}
+
+void overworld_map_state(bool seasons, const uint8_t wram[4096], OverworldMap *map) {
+  *map = (OverworldMap){.seasons = seasons, .companion = wram[0x610]};
+  if (seasons) {
+    seasons_map_location(wram, map);
+  } else {
+    uint8_t flags = wram[0xc34];
+    map->plane = (flags & TILESETFLAG_DUNGEON) && !(flags & TILESETFLAG_LARGE_INDOORS)
+        ? 2 : !!(flags & TILESETFLAG_PAST);
+    map->room = map->plane != 2 && (flags & 2) ? 0x38 : wram[0x63b];
+    map->symmetry_restored = wram[0x713] & 1;
+    map->water_shifted = wram[0x841] & 1;
+  }
+  for (int i = 0; i < 256; i++)
+    map->visited[i] = wram[(map->plane == 1 ? 0x800 : 0x700) + i] & 0x10;
+  if (seasons && !map->plane) map->visited[0xc9] = wram[0x80b] & 0x10;
+}
+
+// The original map stores alternate artwork in the off-screen columns of each row.
+static void map_substitution(WideRoom *art, int dst, int src, int w, int h) {
+  for (int y = 0; y < h; y++, dst += 32, src += 32) {
+    memcpy(art->tiles + dst, art->tiles + src, w);
+    memcpy(art->attrs + dst, art->attrs + src, w);
+  }
+}
+
+int overworld_map_width(const OverworldMap *map) {
+  if (map->plane > 1) return 0;
+  return map->seasons ? (map->plane ? 88 : 128) : 112;
+}
+
+int overworld_map_height(const OverworldMap *map) {
+  if (map->plane > 1) return 0;
+  return map->seasons && map->plane == 1 ? 64 : overworld_map_width(map);
+}
+
+static uint32_t map_pixel(const WideRoom *art, int tile, int attr, int x, int y) {
+  int row = (attr & 0x40) ? 7 - y%8 : y%8, bit = (attr & 0x20) ? x%8 : 7 - x%8;
+  const uint8_t *data = art->vram[(attr>>3)&1] + 0x1000 + (int8_t)tile*16 + row*2;
+  int ci = ((data[0]>>bit)&1) | (((data[1]>>bit)&1)<<1);
+  int p = (attr&7)*8 + ci*2;
+  int rgb = art->bg_pal[p] | art->bg_pal[p+1]<<8;
+  return 0xff000000u | ((rgb&31)*255/31)<<16 |
+                         (((rgb>>5)&31)*255/31)<<8 | ((rgb>>10)&31)*255/31;
+}
+
+void overworld_map_pixels(const uint8_t *rom, size_t size, const OverworldMap *map, uint32_t *pixels) {
+  if (size <= 0x142 || map->plane > 1) return;
+  bool eu = rom[0x142] == 'P';
+  const Tables *tables = map->seasons ? (eu ? &seasons_eu_tables : &seasons_tables)
+                                      : (eu ? &ages_eu_tables : &ages_tables);
+  Rom r = {rom, size, tables, 0};
+  WideRoom art = {0};
+  load_gfx(&r, r.t->gfx_bank, r.t->gfx_headers, 0x0d + map->plane, GFX_MINIMAP, &art);
+  load_palette_header(&r, 7 + map->plane, &art);
+  if (!map->seasons) {
+    if (map->plane == 0) {
+      if (map->companion == 0x0c || map->companion == 0x0d)
+        map_substitution(&art, 0x68, map->companion == 0x0c ? 0x75 : 0x78, 3, 3);
+      if (map->symmetry_restored) map_substitution(&art, 0x45, 0x7b, 3, 2);
+    }
+    if (map->water_shifted) map_substitution(&art, 0xc3, 0xd5, 3, 2);
+  } else if (map->plane == 0) {
+    if (map->companion == 0x0c || map->companion == 0x0d)
+      map_substitution(&art, 0xa8, map->companion == 0x0c ? 0xb6 : 0xbb, 5, 4);
+    if (map->floodgates) map_substitution(&art, 0xe2, 0xf4, 2, 2);
+    if (map->ship_docked) {
+      map_substitution(&art, 0x1e4, 0x1fe, 1, 2);
+      map_substitution(&art, 0x1f0, 0x1ff, 1, 1);
+    }
+  } else if (map->ship_docked) map_substitution(&art, 0x168, 0x178, 1, 2);
+
+  int width = overworld_map_width(map)/8, height = overworld_map_height(map)/8;
+  int start = !map->seasons ? 2*32+3 : (map->plane ? 5*32+4 : 32+2);
+  for (int y = 0; y < height*8; y++) for (int x = 0; x < width*8; x++) {
+    int pos = start + (y/8)*32 + x/8;
+    bool visited = map->visited[(y/8)*16 + x/8] != 0;
+    int tile = visited ? art.tiles[pos] : 4, attr = visited ? art.attrs[pos] : 0x0a;
+    pixels[y*width*8+x] = map_pixel(&art, tile, attr, x, y);
+  }
+}
+
+// Matches dungeonMap_getTileForRoom. Compass markers supersede ordinary room tiles.
+static uint8_t dungeon_tile(int room, int flags, int properties, bool compass, bool has_map) {
+  if (!room || properties == 0x60 || properties == 0x70) return 0xac;
+  if (compass) {
+    int feature = properties & 0x70;
+    if (feature == 0x40) return 0x83;
+    if ((feature == 0x20 || feature == 0x30) && !(flags & 0x20)) return 0xae;
+  }
+  if (flags & 0x10) return 0xb0 + ((flags | properties) & 15);
+  return has_map ? 0xaf : 0xac;
+}
+
+void dungeon_map_state(bool seasons, const uint8_t *rom, size_t size,
+                       const uint8_t wram[4096], const uint8_t bank2[4096], DungeonMap *map) {
+  *map = (DungeonMap){0};
+  int offset = seasons ? 0x1c : 0;
+  int index = wram[0xc39 + offset], floors = wram[0xc40 + offset];
+  int flags_page = wram[0xc3d + offset];
+  if (index >= (seasons ? 12 : 16) || !floors || floors > DUNGEON_MAX_FLOORS ||
+      (flags_page != 0xc9 && flags_page != 0xca)) return;
+
+  int group = wram[0xc2d + offset];
+  // Bank 1 room-property tables have the same addresses in the US and European releases.
+  size_t props = (seasons ? 0x4d41 : 0x4dce) + (group & 1) * 256;
+  if (props + 256 > size) return;
+  int item_byte = (seasons ? 0x67c : 0x684) + index / 8;
+  int bit = 1 << (index % 8);
+  bool compass = wram[item_byte] & bit;
+  bool has_map = wram[item_byte + 2] & bit;
+  map->index = index;
+  map->floors = floors;
+  map->base_floor = wram[0xc41 + offset];
+  map->link_floor = wram[0x63d];
+  map->link_cell = wram[0x63c];
+  if (group == 5 && wram[0xc30 + offset] == (seasons ? 0x9e : 0xf5)) map->link_cell = 0x13;
+  int visible = wram[0x662 + index];
+  if (compass) visible |= wram[0xc42 + offset];
+  map->visible = (has_map ? 0xff : visible) & ((1 << floors) - 1);
+  for (int floor = 0; floor < floors; floor++) {
+    if (!(map->visible & (1 << floor))) continue;
+    for (int cell = 0; cell < DUNGEON_CELLS; cell++) {
+      int room = bank2[0xc00 + floor * DUNGEON_CELLS + cell];
+      int flags = wram[(flags_page - 0xc0) * 256 + room];
+      map->tiles[floor][cell] = dungeon_tile(room, flags, rom[props + room], compass, has_map);
+    }
+  }
+}
+
+void dungeon_map_pixels(bool seasons, const uint8_t *rom, size_t size,
+                        const DungeonMap *map, uint32_t *pixels) {
+  if (!map->floors || size <= 0x142) return;
+  bool eu = rom[0x142] == 'P';
+  const Tables *tables = seasons ? (eu ? &seasons_eu_tables : &seasons_tables)
+                                 : (eu ? &ages_eu_tables : &ages_tables);
+  Rom r = {rom, size, tables, 0};
+  WideRoom art = {0};
+  load_gfx(&r, tables->gfx_bank, tables->gfx_headers, 0x0f, GFX_MINIMAP, &art);
+  load_palette_header(&r, 9, &art);
+  for (int floor = 0; floor < map->floors; floor++) {
+    for (int y = 0; y < 64; y++) for (int x = 0; x < 64; x++) {
+      int tile = map->tiles[floor][(y/8)*8 + x/8];
+      int palette = tile == 0x83 ? 0 : tile == 0xae ? 2 : tile == 0xaf ? 4 : 5;
+      pixels[floor * DUNGEON_FLOOR_PIXELS + y*64+x] = map_pixel(&art, tile ? tile : 0xac, palette, x, y);
+    }
+  }
+}
+
+void inventory_load_art(const uint8_t *rom, size_t size, bool seasons, InventoryArt *art) {
+  bool eu = size > 0x142 && rom[0x142] == 'P';
+  const Tables *tables = seasons ? (eu ? &seasons_eu_tables : &seasons_tables)
+                                 : (eu ? &ages_eu_tables : &ages_tables);
+  Rom r = {rom, size, tables, 0};
+  WideRoom menu = {0};
+  load_gfx(&r, tables->gfx_bank, tables->gfx_headers, 8, GFX_MINIMAP, &menu);
+  load_palette_header(&r, 0x0a, &menu);
+  memcpy(art->tiles, menu.vram[1], sizeof art->tiles);
+  memcpy(art->palettes, menu.bg_pal, sizeof art->palettes);
 }

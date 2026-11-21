@@ -64,6 +64,47 @@ static bool in_storage(GB *gb, uint8_t item) {
   return false;
 }
 
+bool features_touch_available(GB *gb) {
+  return !held_buttons() && can_change_items(gb);
+}
+
+// Companion screen slots are A, B, X, Y. Only the game thread changes inventory.
+bool features_touch_equip(GB *gb, int slot, uint8_t item) {
+  if (slot < 0 || slot >= 2 + features.extra_slots || !item || item >= 0x20 || !features_touch_available(gb)) return false;
+  uint8_t *a = &W8(wInventoryA), *b = &W8(wInventoryB);
+  uint8_t *stored = &W8(wInventoryStorage);
+  if (item != *a && item != *b && !in_storage(gb, item)) return false;
+  if (slot >= 2) {
+    equip_extra(slot - 2, item);
+    return true;
+  }
+  uint8_t *target = slot == 0 ? a : b, *other = slot == 0 ? b : a;
+  if (*target == item) return true;
+  if (*other == item) {
+    *other = *target;
+  } else {
+    int pos = 0;
+    while (pos < INVENTORY_CAPACITY && stored[pos] != item) pos++;
+    if (pos == INVENTORY_CAPACITY) return false;
+    if (item == 0x0c) { // Biggoron's Sword needs both hands. Stow both displaced items.
+      int empty = pos;
+      if (*target && *other) {
+        for (empty = 0; empty < INVENTORY_CAPACITY && stored[empty]; empty++) {}
+        if (empty == INVENTORY_CAPACITY) return false;
+      }
+      stored[pos] = *target;
+      if (*other) stored[empty] = *other;
+      *other = item;
+    } else {
+      stored[pos] = *target;
+      if (*target == 0x0c) *other = 0;
+    }
+  }
+  *target = item;
+  W8(wStatusBarNeedsRefresh) |= 1;
+  return true;
+}
+
 bool features_extra_shield_equipped(GB *gb) {
   for (int slot = 0; slot < features.extra_slots; slot++) {
     if (features.slot_item[slot] == ITEM_SHIELD && in_storage(gb, ITEM_SHIELD)) return true;

@@ -25,6 +25,7 @@ const char *pad_style_name(PadStyle resolved, int button) {
   static const char *const stick_names[] = {"LS LEFT", "LS RIGHT", "LS UP", "LS DOWN",
                                            "RS LEFT", "RS RIGHT", "RS UP", "RS DOWN"};
   if (button >= PAD_LS_LEFT && button <= PAD_RS_DOWN) return stick_names[button - PAD_LS_LEFT];
+  if (button == PAD_ANDROID_BACK) return "BACK";
   if (resolved == STYLE_NINTENDO) return NULL;
   bool p = resolved == STYLE_PLAYSTATION;
   if (button == PAD_RIGHT_TRIGGER) return p ? "R2" : "RT";

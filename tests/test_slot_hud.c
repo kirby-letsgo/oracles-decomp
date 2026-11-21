@@ -203,7 +203,9 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   mem_wr(gb, wObtainedTreasureFlags + 1, 0xff);
   W8(wTilesetFlags) = underwater ? 0x40 : 0;
   mem_wr(gb, wInventoryStorage, item);
-  features = (Features){.extra_slots = 2, .slot_boxes = true};
+  features = (Features){.extra_slots = 4, .slot_boxes = true, .slot_item = {0, 0}};
+  features.extra_slots = 2;
+  ASSERT(!features_touch_equip(gb, 4, item));
   ASSERT_EQ(features_slot_press(gb, 3, 0), 0);
   features.extra_slots = 4;
   W8(wOpenedMenuType) = 1;
@@ -211,8 +213,14 @@ static void check(const char *path, bool seasons, bool eu, int item, bool underw
   ASSERT(features_assign_slot(gb, (slot + 1) % 4));
   ASSERT(features_assign_slot(gb, slot));
   ASSERT_EQ(features.slot_item[(slot + 1) % 4], 0);
-  ASSERT_EQ(features.slot_item[slot], item);
   W8(wOpenedMenuType) = 0;
+  ASSERT(features_touch_equip(gb, slot + 2, item));
+  ASSERT_EQ(features.slot_item[slot], item);
+  ASSERT(features_touch_equip(gb, 0, item));
+  ASSERT_EQ(W8(wInventoryA), item);
+  ASSERT_EQ(W8(wInventoryStorage), 1);
+  ASSERT(features_touch_equip(gb, 0, 1));
+  ASSERT_EQ(W8(wInventoryStorage), item);
   draw(gb, true);
   uint8_t expected[0x1000];
   memcpy(expected, gb->wram[4], sizeof expected);

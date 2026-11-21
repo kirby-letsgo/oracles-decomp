@@ -28,6 +28,7 @@ typedef struct {
   int holdable_items;           // 2, 4 or 6 equipped item buttons
   bool d1_randomizer;           // bundled fixed-seed Seasons preview; off by default
   bool essence_tracker;         // bundled official mod; applied when a game starts
+  bool dual_screen;             // Android companion display
   bool haptics;                 // a tick when a finger presses a control or taps a menu (Android)
   PadStyle pad_style;           // the names on screen for a controller: Auto follows the pad's type
   Bindings bindings;
@@ -40,7 +41,7 @@ typedef struct {
 
 enum { FF_SPEED_MIN = 2, FF_SPEED_MAX = 8, FF_SPEEDS = FF_SPEED_MAX - FF_SPEED_MIN + 1 };
 
-typedef enum { SET_VOLUME, SET_SCREEN, SET_SCALE, SET_WIDESCREEN, SET_DIM_SIDES, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_FF_SPEED, SET_QUICK_SWAP, SET_HOLDABLE_ITEMS, SET_HAPTICS, SET_CONTROLS, SET_PAD_STYLE, SET_SYNC, SET_PORTABLE, SET_VERSION, SET_ERROR_LOG, SET_MODS, SET_ROWS } SettingsRow;
+typedef enum { SET_VOLUME, SET_SCREEN, SET_DUAL_SCREEN, SET_SCALE, SET_WIDESCREEN, SET_DIM_SIDES, SET_COLOURS, SET_FULLSCREEN, SET_FAST_TEXT, SET_FAST_MENUS, SET_FF_SPEED, SET_QUICK_SWAP, SET_HOLDABLE_ITEMS, SET_HAPTICS, SET_CONTROLS, SET_PAD_STYLE, SET_SYNC, SET_PORTABLE, SET_VERSION, SET_ERROR_LOG, SET_MODS, SET_ROWS } SettingsRow;
 
 typedef struct {
   SettingsRow sel;

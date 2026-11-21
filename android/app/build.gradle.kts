@@ -67,3 +67,7 @@ android {
         abortOnError = false
     }
 }
+
+dependencies {
+    implementation("org.jsoup:jsoup:1.18.3")
+}

@@ -26,6 +26,9 @@ bool features_quick_swap(struct GB *gb);
 void features_frame(struct GB *gb);
 // With the inventory's item page open: puts the highlighted item on X, Y, L or R (slots 0..3).
 bool features_assign_slot(struct GB *gb, int slot);
+// Equip an owned item from the companion touch screen (0..5 = A/B/X/Y/L/R).
+bool features_touch_available(struct GB *gb);
+bool features_touch_equip(struct GB *gb, int slot, uint8_t item);
 enum { ITEM_SHIELD = 0x01, ITEM_SWORD = 0x05 };
 bool features_extra_shield_equipped(struct GB *gb);
 // Returns the joypad bit for this extra slot. Borrow an available native hand
