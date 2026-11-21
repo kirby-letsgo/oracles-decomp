@@ -47,9 +47,17 @@ final class CompanionScreen extends Presentation {
             MAP_BASE_FLOOR = 8, MAP_VISIBLE = 9, MAP_FLOORS = 10, MAP_PIXELS = 11;
     private int[] mapSnapshot;
     private static native int[] worldMap(int revision);
-    private static final int HEADER = 10; // revision, slot count, six equipped IDs, equip result, two-hand availability
+    private static final int SLOT_LABELS = 10, HEADER = SLOT_LABELS + 6;
     private static final int RECORD = 259;
-    private static final String[] KEYS = {"A", "B", "X", "Y", "L", "R"};
+    private static String slotLabel(int glyph) {
+        switch (glyph) {
+            case 1: return "×";
+            case 2: return "○";
+            case 3: return "□";
+            case 4: return "△";
+            default: return Character.toString((char) glyph);
+        }
+    }
     private static final String[] NAMES = {"", "Shield", "Punch", "Bombs", "Cane of Somaria",
         "Sword", "Boomerang", "Rod of Seasons", "Magnet Gloves", "", "Switch Hook", "",
         "Biggoron's Sword", "Bombchus", "Flute", "Seed Shooter", "", "Harp of Ages", "",
@@ -342,7 +350,7 @@ final class CompanionScreen extends Presentation {
             boolean flash = flashedSlot == slot;
             button.setTextColor(flash || eligible ? 0xff21342a : 0xfff8efd4);
             button.setBackgroundColor(flash ? 0xffb7f6b6 : eligible ? 0xffefd58c : 0xff364e42);
-            button.setText(KEYS[i] + "\n" + (id == 0 ? "—" : name(id)));
+            button.setText(slotLabel(snapshot[SLOT_LABELS + slot]) + "\n" + (id == 0 ? "—" : name(id)));
             button.setEnabled(eligible && pendingTicket == 0);
             button.setOnClickListener(v -> {
                 pendingItem = selected;

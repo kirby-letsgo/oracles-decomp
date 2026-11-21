@@ -2325,7 +2325,9 @@ static GameEnd run_game(SDL_Window *win, SDL_Renderer *ren, SDL_Texture *tex, co
 
   for (bool running = end != GAME_FAILED; running && !gb->hung;) {
 #ifdef __ANDROID__
-    if (companion_update(gb, !ages, mode == MODE_PLAY && boot.phase == BOOT_OFF))
+    uint8_t companion_glyphs[HUD_SLOTS];
+    hud_glyphs(companion_glyphs);
+    if (companion_update(gb, !ages, mode == MODE_PLAY && boot.phase == BOOT_OFF, companion_glyphs))
       item_buttons_store(dir);
 #endif
     test_keys();

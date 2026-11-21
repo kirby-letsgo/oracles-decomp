@@ -11,7 +11,7 @@
 
 // Packet for CompanionScreen: slot count, six assigned IDs, then a record per
 // owned item (ID, remaining count, 16x16 ARGB icon, equipment level). A/B plus 16 storage cells.
-enum { HEADER = 9, RECORD = 259, CAPACITY = HEADER + 18 * RECORD };
+enum { LABELS = 9, HEADER = LABELS + HUD_SLOTS, RECORD = 259, CAPACITY = HEADER + 18 * RECORD };
 static jint packet[CAPACITY];
 static InventoryArt inventoryArt;
 static bool hasInventoryArt;
@@ -150,7 +150,7 @@ static int companion_item_level(const uint8_t *page, bool seasons, int id) {
   }
 }
 
-bool companion_update(GB *gb, bool seasons, bool playing) {
+bool companion_update(GB *gb, bool seasons, bool playing, const uint8_t glyphs[HUD_SLOTS]) {
   bool inventory_requested = atomic_exchange(&refresh, false);
   bool map_requested = atomic_exchange(&refreshMap, false);
   bool loaded = !memcmp(&gb->wram[0][0x5b2], seasons ? "Z11216-0" : "Z21216-0", 8);
@@ -170,6 +170,8 @@ bool companion_update(GB *gb, bool seasons, bool playing) {
   if (loaded) {
     // A negative slot count means the current menu or cutscene blocks equipping.
     next[0] = (2 + features.extra_slots) * (can_equip ? 1 : -1);
+    static const HudSlot companion_order[] = {HUD_A, HUD_B, HUD_X, HUD_Y, HUD_L, HUD_R};
+    for (int i = 0; i < HUD_SLOTS; i++) next[LABELS+i] = glyphs[companion_order[i]];
     next[1] = features_hud_item(gb, wInventoryA);
     next[2] = features_hud_item(gb, wInventoryB);
     for (int i = 0; i < 4; i++) next[3+i] = features.slot_item[i];
