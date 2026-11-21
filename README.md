@@ -8,7 +8,19 @@ Play **Oracle of Ages** and **Oracle of Seasons** natively on macOS, Windows, Li
 2. Open Oracles and select the **Ages** or **Seasons** tab.
 3. Choose **Add ROM…** and select your ROM. Once imported, choose **Title screen** to start playing.
 
-The port adds 16:10 and 16:9 widescreen, remappable controls, up to six item slots, and save states you can sync across devices. Android builds made after v1.0.10 also support a second screen for touch inventory, maps and walkthroughs.
+## Quality-of-life improvements
+
+- **Widescreen (16:10 and 16:9)** — see the rooms around you, not just the one you're in
+- **Save states** — 4 slots with thumbnails, plus a Resume state from wherever you last quit
+- **Save sync** — your saves and states follow you between desktop and phone, no passwords
+- **Remappable controls** — every button, for keyboard and gamepad
+- **Fast-forward** — hold Tab, or the right trigger; 3x by default, 2x to 8x in Settings
+- **Screen filters** — sharp, scanlines, LCD grid, CRT, or the xBRZ and hqx pixel-art scalers, and true Game Boy Color colours
+- **Fast text and faster menus** — optional, off by default
+- **Quick swap and up to 6 item slots** — optional, off by default
+- **Mods** — Lua folder mods; see [MODDING.md](MODDING.md). The in-app Mods screen is
+  hidden until the upcoming mods release.
+- **Android dual-screen support** — use the second screen for touch inventory, maps and walkthroughs in builds made after v1.0.10.
 
 ## Player guides
 
